@@ -15,7 +15,7 @@ equityweighting[:cons_percap_consumption_0] = readpagedata(m, "test/validationda
 equityweighting[:rcons_percap_dis] = readpagedata(m, "test/validationdata/rcons_per_cap_DiscRemainConsumption.csv")
 equityweighting[:yagg_periodspan] = readpagedata(m, "test/validationdata/yagg_periodspan.csv")
 equityweighting[:pop_population] = readpagedata(m, "test/validationdata/pop_population.csv")
-equityweighting[:y_year_0] = 2008.
+equityweighting[:y_year_0] = 2015.
 equityweighting[:y_year] = Mimi.dim_keys(m.md, :time)
 
 p = load_parameters(m)

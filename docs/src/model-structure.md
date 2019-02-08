@@ -23,7 +23,8 @@ A schematic of the model, and full listing of components, follows below.
 
 ## Time periods and regions
 
-The ten uneven timesteps employed in Mimi-PAGE are 2009, 2010, 2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200. The baseline period used, prior to any modeled results, is 2008.
+The ten uneven timesteps employed in Mimi-PAGE are 2020, 2030, 2040,
+2050, 2075, 2100, 2150, 2200, 2250, and 2300. The baseline period used, prior to any modeled results, is 2015.
 
 The eight regions included are Europe (EU), the United States (US or USA),
 other countries in the Organisation for Economic Co-operation and

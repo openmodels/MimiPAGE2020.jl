@@ -3,7 +3,7 @@ using Mimi
 @defcomp AbatementCosts begin
     region = Index()
     y_year = Parameter(index=[time], unit="year")
-    y_year_0 = Parameter(unit="year", default=2008.)
+    y_year_0 = Parameter(unit="year", default=2015.)
 
     #gas inputs
     emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = Parameter(unit="%")

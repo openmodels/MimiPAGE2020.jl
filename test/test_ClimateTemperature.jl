@@ -6,7 +6,7 @@ include("../src/components/ClimateTemperature.jl")
 
 climatetemperature = add_comp!(m, ClimateTemperature)
 
-climatetemperature[:y_year_0] = 2008.
+climatetemperature[:y_year_0] = 2015.
 climatetemperature[:y_year] = Mimi.dim_keys(m.md, :time)
 
 climatetemperature[:ft_totalforcing] = readpagedata(m, "test/validationdata/ft_totalforcing.csv")
