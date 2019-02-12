@@ -60,5 +60,7 @@ using Mimi
             v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
             v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
         end
+
+        println("Wow!  That's a lot of money!")
     end
 end
