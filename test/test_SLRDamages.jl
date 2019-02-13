@@ -7,12 +7,12 @@ include("../src/components/SLRDamages.jl")
 
 slrdamages = addslrdamages(m)
 
-set_param!(m, :SLRDamages, :y_year, [2009, 2010, 2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200])
+set_param!(m, :SLRDamages, :y_year, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
 set_param!(m, :SLRDamages, :atl_adjustedtolerablelevelofsealevelrise, readpagedata(m,
 "test/validationdata/atl_adjustedtolerablelevelofsealevelrise.csv"))
 set_param!(m, :SLRDamages, :imp_actualreductionSLR, readpagedata(m,
 "test/validationdata/imp_actualreductionSLR.csv"))
-set_param!(m, :SLRDamages, :y_year_0, 2008.)
+set_param!(m, :SLRDamages, :y_year_0, 2015.)
 set_param!(m, :SLRDamages, :s_sealevel, readpagedata(m, "test/validationdata/s_sealevelrise.csv"))
 set_param!(m, :SLRDamages, :cons_percap_consumption, readpagedata(m, "test/validationdata/cons_percap_consumption.csv"))
 set_param!(m, :SLRDamages, :tct_per_cap_totalcostspercap, readpagedata(m, "test/validationdata/tct_per_cap_totalcostspercap.csv"))

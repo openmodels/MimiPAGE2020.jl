@@ -9,7 +9,7 @@ gdp = add_comp!(m, GDP)
 gdp[:pop0_initpopulation] = readpagedata(m, "data/pop0_initpopulation.csv")
 gdp[:pop_population] = readpagedata(m, "test/validationdata/pop_population.csv")
 gdp[:y_year] = Mimi.dim_keys(m.md, :time)
-gdp[:y_year_0] = 2008.
+gdp[:y_year_0] = 2015.
 
 p=load_parameters(m)
 set_leftover_params!(m,p)

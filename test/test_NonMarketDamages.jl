@@ -19,7 +19,7 @@ set_param!(m, :NonMarketDamages, :imp_actualreduction, readpagedata(m,
 set_param!(m, :NonMarketDamages, :isatg_impactfxnsaturation, 28.333333333333336)
 
 p = load_parameters(m)
-p["y_year_0"] = 2008.
+p["y_year_0"] = 2015.
 p["y_year"] = Mimi.dim_keys(m.md, :time)
 set_leftover_params!(m, p)
 

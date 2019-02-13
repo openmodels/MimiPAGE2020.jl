@@ -5,7 +5,7 @@ m = page_model()
 include("../src/components/Population.jl")
 
 population = addpopulation(m)
-population[:y_year_0] = 2008.
+population[:y_year_0] = 2015.
 population[:y_year] = Mimi.dim_keys(m.md, :time)
 
 p = load_parameters(m)

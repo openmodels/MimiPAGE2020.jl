@@ -32,7 +32,7 @@ For more information about the Mimi component framework, you can refer to the [M
 
 ## Installing Mimi-PAGE
 
-Clone or download the Mimi-PAGE repository from the Mimi-PAGE [Github website](https://github.com/anthofflab/mimi-page-2009.jl).
+Clone or download the Mimi-PAGE repository from the Mimi-PAGE [Github website](https://github.com/openmodels/mimi-page-2020.jl).
 
 ## Using Mimi-PAGE
 

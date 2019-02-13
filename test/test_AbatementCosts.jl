@@ -16,7 +16,7 @@ set_param!(m, :AbatementCostsN2O, :yagg, readpagedata(m,"test/validationdata/yag
 set_param!(m, :AbatementCostsLin, :yagg, readpagedata(m,"test/validationdata/yagg_periodspan.csv"))
 
 p = load_parameters(m)
-p["y_year_0"] = 2008.
+p["y_year_0"] = 2015.
 p["y_year"] = Mimi.dim_keys(m.md, :time)
 set_leftover_params!(m, p)
 

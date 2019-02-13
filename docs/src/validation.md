@@ -1,6 +1,6 @@
 # Validation
 
-This guide briefly explains how Mimi PAGE results were validated against PAGE 2009 outputs.
+This guide briefly explains how Mimi PAGE results were validated against PAGE 2020 outputs.
 
 Validations were performed for both the deterministic and probabilistic versions of the model. For the deterministic version of the model, both individual components and final outputs were validated. For the probabilistic version of the model, final outputs were validated.
 
