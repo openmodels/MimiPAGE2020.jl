@@ -24,9 +24,9 @@ using Mimi
     yagg = Parameter(index=[time], unit="year") # from equity weighting
 
     #inputs with single, uncertain values
-    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit="none", default=.733333333333333334)
-    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.2666666666666666)
-    c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=.8333333333333334)
+    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit="none", default=0.8833333333333333)
+    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.1166666666666667)
+    c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=0.9333333333333335)
     curve_below_curvatureofMACcurvebelowzerocost = Parameter(unit="none", default=.5)
     curve_above_curvatureofMACcurveabovezerocost = Parameter(unit="none", default=.4)
     cross_experiencecrossoverratio = Parameter(unit="none", default=.2)
@@ -141,11 +141,11 @@ function addabatementcosts(model::Model, class::Symbol, policy::String="policy-a
 
     if class == :CO2
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 8.333333333333334)
-        setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 20.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -233.333333333333)
-        setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 70.)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 400.)
-        setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 150000.)
+        setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -100.0)
+        setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 60.)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 150.)
+        setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 150000.0)
         if policy == "policy-a"
             setdistinctparameter(model, componentname, :er_emissionsgrowth, readpagedata(model, "data/er_CO2emissionsgrowth.csv"))
         else
@@ -156,9 +156,9 @@ function addabatementcosts(model::Model, class::Symbol, policy::String="policy-a
     elseif class == :CH4
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 25.)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -4333.3333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -4983.333333333333)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 51.66666666666666664)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 6333.33333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 7283.333333333333)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 2000.)
         if policy == "policy-a"
             setdistinctparameter(model, componentname, :er_emissionsgrowth, readpagedata(model, "data/er_CH4emissionsgrowth.csv"))
@@ -170,9 +170,9 @@ function addabatementcosts(model::Model, class::Symbol, policy::String="policy-a
     elseif class == :N2O
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 0.)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -7333.333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -8433.333333333334)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 51.66666666666666664)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 27333.3333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 31433.333333333332)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 53.3333333333333)
         if policy == "policy-a"
             setdistinctparameter(model, componentname, :er_emissionsgrowth, readpagedata(model, "data/er_N2Oemissionsgrowth.csv"))
@@ -184,9 +184,9 @@ function addabatementcosts(model::Model, class::Symbol, policy::String="policy-a
     elseif class == :Lin
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 0.)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -233.333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -0.0)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 70.)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 333.333333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 383.3333333333333)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 2000.)
         if policy == "policy-a"
             setdistinctparameter(model, componentname, :er_emissionsgrowth, readpagedata(model,"data/er_LGemissionsgrowth.csv"))
