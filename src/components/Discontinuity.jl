@@ -24,7 +24,7 @@ using Mimi
   distau_discontinuityexponent=Parameter(unit="unitless", default=20.)
 
   idis_lossfromdisc=Variable(index=[time], unit="degreeC")
-  tdis_tolerabilitydisc=Parameter(unit="degreeC", default=1.5.)
+  tdis_tolerabilitydisc=Parameter(unit="degreeC", default=1.5)
   rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
   pdis_probability=Parameter(unit="%/degreeC", default=20.)
 
