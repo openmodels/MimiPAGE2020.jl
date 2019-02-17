@@ -22,7 +22,7 @@ using Mimi
     pop_population    = Parameter(index=[time,region],unit="million person")
 
     # Saturation, used in impacts
-    isat0_initialimpactfxnsaturation = Parameter(unit="unitless", default=33.333333333333336) #pp34 PAGE09 documentation
+    isat0_initialimpactfxnsaturation = Parameter(unit="unitless", default=20.0) #pp34 PAGE09 documentation
     isatg_impactfxnsaturation = Variable(unit="unitless")
 
     function init(p, v, d)

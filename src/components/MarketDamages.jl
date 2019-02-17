@@ -18,11 +18,11 @@ using Mimi
 
     save_savingsrate = Parameter(unit= "%", default=15.)
     wincf_weightsfactor =Parameter(index=[region], unit="")
-    W_MarketImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.5)
-    ipow_MarketIncomeFxnExponent =Parameter(default=-0.13333333333333333)
-    iben_MarketInitialBenefit=Parameter(default=.1333333333333)
+    W_MarketImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.0)
+    ipow_MarketIncomeFxnExponent =Parameter(default=0.0)
+    iben_MarketInitialBenefit=Parameter(default=0.0)
     tcal_CalibrationTemp = Parameter(default=3.)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=27934.244777382406)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=34298.93698672955)
 
     #impact variables
     isatg_impactfxnsaturation = Parameter(unit="unitless")
@@ -34,7 +34,7 @@ using Mimi
 
     isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
-    pow_MarketImpactExponent=Parameter(unit="", default=2.16666666666665)
+    pow_MarketImpactExponent=Parameter(unit="", default=2.1666666666666665)
 
     function run_timestep(p, v, d, t)
 
@@ -79,8 +79,8 @@ using Mimi
     end
 end
 
-# Still need this function in order to set the parameters than depend on 
-# readpagedata, which takes model as an input. These cannot be set using 
+# Still need this function in order to set the parameters than depend on
+# readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
 
 function addmarketdamages(model::Model)
