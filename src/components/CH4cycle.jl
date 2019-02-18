@@ -2,7 +2,7 @@ using Mimi
 
 @defcomp ch4cycle begin
     e_globalCH4emissions=Parameter(index=[time],unit="Mtonne/year")
-    e_0globalCH4emissions=Parameter(unit="Mtonne/year", default=1803.0)
+    e_0globalCH4emissions=Parameter(unit="Mtonne/year", default=371.139275895821)
     c_CH4concentration=Variable(index=[time],unit="ppbv")
     pic_preindustconcCH4=Parameter(unit="ppbv", default=700.)
     exc_excessconcCH4=Variable(unit="ppbv")
