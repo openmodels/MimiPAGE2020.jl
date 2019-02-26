@@ -1,12 +1,12 @@
 # Index: region
 # Unit: %
 
-Region,impred_1_a
-EU,30
-US,30
-OT,30
-EE,30
-CA,15
-IA,15
-AF,15
-LA,15
+region,impred_1_a
+EU,30.0
+US,30.0
+OT,30.0
+EE,30.0
+CA,20.0
+IA,20.0
+AF,20.0
+LA,20.0

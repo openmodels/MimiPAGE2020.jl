@@ -21,7 +21,7 @@ using Mimi
     cons_percap_aftercosts = Parameter(index=[time, region], unit="\$/person")
 
     # Calculation of weighted costs
-    emuc_utilityconvexity = Parameter(unit="none", default=1.1666666667)
+    emuc_utilityconvexity = Parameter(unit="none", default=1.1666666666666667)
 
     wtct_percap_weightedcosts = Variable(index=[time, region], unit="\$/person")
     eact_percap_weightedadaptationcosts = Variable(index=[time, region], unit="\$/person")
@@ -36,7 +36,7 @@ using Mimi
     pct_g_partiallyweighted_global = Variable(index=[time], unit="\$million")
 
     # Discount rates
-    ptp_timepreference = Parameter(unit="%/year", default=1.0333333333) # <0.1,1, 2>
+    ptp_timepreference = Parameter(unit="%/year", default=1.0333333333333334) # <0.1,1, 2>
     grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year")
     popgrw_populationgrowth = Parameter(index=[time, region], unit="%/year")
 
@@ -66,7 +66,7 @@ using Mimi
     addt_equityweightedimpact_discountedaggregated = Variable(index=[time, region], unit="\$million")
     addt_gt_equityweightedimpact_discountedglobal = Variable(unit="\$million")
 
-    civvalue_civilizationvalue = Parameter(unit="\$million", default=5.3e10) # Called "CIV_VALUE"
+    civvalue_civilizationvalue = Parameter(unit="\$million", default=6.1333333333333336e10) # Called "CIV_VALUE"
     td_totaldiscountedimpacts = Variable(unit="\$million")
 
     aact_equityweightedadaptation_discountedaggregated = Variable(index=[time, region], unit="\$million")
