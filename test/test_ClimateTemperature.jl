@@ -19,7 +19,7 @@ set_leftover_params!(m, p)
 run(m)
 
 rtl = m[:ClimateTemperature, :rtl_realizedtemperature]
-rtl_compare = readpagedata(m, "test/validationdata/rt_g_globaltemperature.csv")
+rtl_compare = readpagedata(m, "test/validationdata/rtl_realizedtemperature.csv")
 
 @test rtl ≈ rtl_compare rtol=1e-5
 
