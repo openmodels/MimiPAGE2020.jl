@@ -11,7 +11,7 @@ using Mimi
     sfx_sulphateflux = Variable(index=[time, region], unit="TgS/km^2/yr")
 
     d_sulphateforcingbase = Parameter(unit="W/m2", default=-0.46666666666666673)
-    ind_slopeSEforcing_indirect = Parameter(unit="W/m2", default=-0.4000000000000001)
+    ind_slopeSEforcing_indirect = Parameter(unit="W/m2", default=-0.2333333333333333)
     nf_naturalsfx = Parameter(index=[region], unit="TgS/km^2/yr")
 
     fs_sulphateforcing = Variable(index=[time, region], unit="W/m2")

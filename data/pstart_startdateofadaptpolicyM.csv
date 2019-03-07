@@ -1,12 +1,12 @@
 # Index: region
 # Unit: year
 
-Region,pstart_1_a
-EU,2e3
-US,2e3
-OT,2e3
-EE,2e3
-CA,2010
-IA,2010
-AF,2010
-LA,2010
+region,pstart_1_a
+EU,2000.0
+US,2000.0
+OT,2000.0
+EE,2000.0
+CA,2010.0
+IA,2010.0
+AF,2010.0
+LA,2010.0

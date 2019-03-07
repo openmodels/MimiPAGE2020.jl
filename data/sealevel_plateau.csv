@@ -1,7 +1,7 @@
 # Index: region
 # Unit: meter
 
-Region,plateau_s_a
+region,plateau_s_a
 EU,0.25
 US,0.25
 OT,0.25
