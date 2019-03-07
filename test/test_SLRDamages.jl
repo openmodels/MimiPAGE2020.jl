@@ -13,7 +13,7 @@ set_param!(m, :SLRDamages, :atl_adjustedtolerablelevelofsealevelrise, readpageda
 set_param!(m, :SLRDamages, :imp_actualreductionSLR, readpagedata(m,
 "test/validationdata/imp_actualreductionSLR.csv"))
 set_param!(m, :SLRDamages, :y_year_0, 2015.)
-set_param!(m, :SLRDamages, :s_sealevel, readpagedata(m, "test/validationdata/s_sealevelrise.csv"))
+set_param!(m, :SLRDamages, :s_sealevel, readpagedata(m, "test/validationdata/s_sealevel.csv"))
 set_param!(m, :SLRDamages, :cons_percap_consumption, readpagedata(m, "test/validationdata/cons_percap_consumption.csv"))
 set_param!(m, :SLRDamages, :tct_per_cap_totalcostspercap, readpagedata(m, "test/validationdata/tct_per_cap_totalcostspercap.csv"))
 set_param!(m, :SLRDamages, :act_percap_adaptationcosts, readpagedata(m, "test/validationdata/act_percap_adaptationcosts.csv"))
