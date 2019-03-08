@@ -13,7 +13,7 @@ function page_model()
     set_dimension!(m, :region, ["EU", "USA", "OECD", "USSR", "China", "SEAsia", "Africa", "LatAmerica"])
 
     return m
- end
+end
 
 @testset "mimi-page.jl" begin
 

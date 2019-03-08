@@ -18,7 +18,13 @@ set_leftover_params!(m, p)
 ##running Model
 run(m)
 
-rt_g = m[:ClimateTemperature, :rt_g_globaltemperature]
-rt_g_compare = readpagedata(m, "test/validationdata/rt_g_globaltemperature.csv")
+rtl = m[:ClimateTemperature, :rtl_realizedtemperature]
+rtl_compare = readpagedata(m, "test/validationdata/rtl_realizedtemperature.csv")
 
-@test rt_g ≈ rt_g_compare rtol=1e-5
+@test rtl ≈ rtl_compare rtol=1e-5
+
+rto = m[:ClimateTemperature, :rto_g_oceantemperature]
+rto_compare = readpagedata(m, "test/validationdata/rto_g_oceantemperature.csv")
+
+@test rto ≈ rto_compare rtol=1e-5
+
