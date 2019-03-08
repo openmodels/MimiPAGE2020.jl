@@ -1,12 +1,12 @@
 # Index: region
 # Unit: year
 
-Region,istart_s_a
-EU,2020
-US,2020
-OT,2020
-EE,2020
-CA,2020
-IA,2020
-AF,2020
-LA,2020
+region,istart_s_a
+EU,2020.0
+US,2020.0
+OT,2020.0
+EE,2020.0
+CA,2020.0
+IA,2020.0
+AF,2020.0
+LA,2020.0

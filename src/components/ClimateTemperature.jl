@@ -9,8 +9,8 @@ using Mimi
     y_year = Parameter(index=[time], unit="year")
 
     # Climate sensitivity calculations
-    tcr_transientresponse = Parameter(unit="degreeC", default=1.70)
-    frt_warminghalflife = Parameter(unit="year", default=35.00)
+    tcr_transientresponse = Parameter(unit="degreeC", default=1.7666666666666668)
+    frt_warminghalflife = Parameter(unit="year", default=28.333333333333332)
 
     sens_climatesensitivity = Variable(unit="degreeC")
 

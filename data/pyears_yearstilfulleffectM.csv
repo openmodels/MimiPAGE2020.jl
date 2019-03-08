@@ -1,12 +1,12 @@
 # Index: region
 # Unit: year
 
-Region,pyears_1_a
-EU,20
-US,20
-OT,20
-EE,20
-CA,30
-IA,30
-AF,30
-LA,30
+region,pyears_1_a
+EU,40.0
+US,40.0
+OT,40.0
+EE,40.0
+CA,60.0
+IA,60.0
+AF,60.0
+LA,60.0

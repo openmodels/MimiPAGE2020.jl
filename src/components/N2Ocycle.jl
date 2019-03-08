@@ -2,11 +2,11 @@ using Mimi
 
 @defcomp n2ocycle begin
     e_globalN2Oemissions=Parameter(index=[time],unit="Mtonne/year")
-    e_0globalN2Oemissions=Parameter(unit="Mtonne/year", default=11.046520000000001)
+    e_0globalN2Oemissions=Parameter(unit="Mtonne/year", default=11.22281348065454)
     c_N2Oconcentration=Variable(index=[time],unit="ppbv")
     pic_preindustconcN2O=Parameter(unit="ppbv", default=270.)
     exc_excessconcN2O=Variable(unit="ppbv")
-    c0_N2Oconcbaseyr=Parameter(unit="ppbv", default=322.)
+    c0_N2Oconcbaseyr=Parameter(unit="ppbv", default=324.)
     re_remainN2O=Variable(index=[time],unit="Mtonne")
     re_remainN2Obase=Variable(unit="Mtonne")
     nte_natN2Oemissions=Variable(index=[time],unit="Mtonne/year")
@@ -18,7 +18,7 @@ using Mimi
     res_N2Oatmlifetime=Parameter(unit="year", default=114.)
     den_N2Odensity=Parameter(unit="Mtonne/ppbv", default=7.8)
     stim_N2Oemissionfeedback=Parameter(unit="Mtonne/degreeC", default=0.)
-    rtl_g0_baselandtemp=Parameter(unit="degreeC", default=0.9258270139190647)
+    rtl_g0_baselandtemp=Parameter(unit="degreeC", default=1.1683981941310047)
     rtl_g_landtemperature=Parameter(index=[time],unit="degreeC")
 
     function run_timestep(p, v, d, t)

@@ -10,21 +10,21 @@ using Mimi
 
   irefeqdis_eqdiscimpact=Variable(index=[region], unit="%")
   wincf_weightsfactor=Parameter(index=[region], unit="unitless", default=[1, 0.8, 0.8, 0.4, 0.8, 0.8, 0.6, 0.6])
-  wdis_gdplostdisc=Parameter(unit="%", default=15.)
+  wdis_gdplostdisc=Parameter(unit="%", default=3.)
 
   igdpeqdis_eqdiscimpact=Variable(index=[time,region], unit="%")
   rgdp_per_cap_NonMarketRemainGDP=Parameter(index=[time,region], unit="\$/person")
-  GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="unitless", default=27934.244777382406)
+  GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="unitless", default=34298.93698672955)
   ipow_incomeexponent=Parameter(unit="unitless", default=-0.13333333333333333)
 
   igdp_realizeddiscimpact=Variable(index=[time,region], unit="%")
   occurdis_occurrencedummy=Variable(index=[time], unit="unitless")
   expfdis_discdecay=Variable(index=[time], unit="unitless")
 
-  distau_discontinuityexponent=Parameter(unit="unitless", default=90.)
+  distau_discontinuityexponent=Parameter(unit="unitless", default=20.)
 
   idis_lossfromdisc=Variable(index=[time], unit="degreeC")
-  tdis_tolerabilitydisc=Parameter(unit="degreeC", default=3.)
+  tdis_tolerabilitydisc=Parameter(unit="degreeC", default=1.5)
   rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
   pdis_probability=Parameter(unit="%/degreeC", default=20.)
 
@@ -33,7 +33,7 @@ using Mimi
 
   isat_per_cap_DiscImpactperCapinclSaturation=Variable(index=[time,region], unit="\$/person")
   rcons_per_cap_DiscRemainConsumption=Variable(index=[time, region], unit = "\$/person")
-  rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, region], unit = "\$/person")   
+  rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, region], unit = "\$/person")
 
     function run_timestep(p, v, d, t)
 
