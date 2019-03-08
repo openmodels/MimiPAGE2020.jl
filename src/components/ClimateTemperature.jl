@@ -7,7 +7,6 @@ using Mimi
     area = Parameter(index=[region], unit="km2")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
-    area_l_landarea = Parameter(unit="km2", default=1.42682e8)
     area_e_eartharea = Parameter(unit="km2", default=5.1e8)
 
     # Initial temperature outputs
@@ -61,7 +60,7 @@ using Mimi
 
     function run_timestep(p, v, d, tt)
         # Grand total forcing
-        v.fant_anthroforcing[tt] = p.ft_totalforcing[tt] + sum(p.area .* p.fs_sulfateforcing[tt, :]) / sum(p.area)
+        v.fant_anthroforcing[tt] = p.ft_totalforcing[tt] + sum(p.area .* p.fs_sulfateforcing[tt, :]) / p.area_e_eartharea
 
         # Rate of change of grand total forcing
         if is_first(tt)
@@ -100,6 +99,6 @@ using Mimi
         v.rtl_g_landtemperature[tt] = sum(v.rtl_realizedtemperature[tt, :]' .* p.area') / sum(p.area)
 
         # Ocean average temperature
-        v.rto_g_oceantemperature[tt] = (p.area_e_eartharea * v.rt_g_globaltemperature[tt] - p.area_l_landarea * v.rtl_g_landtemperature[tt]) / (p.area_e_eartharea - p.area_l_landarea)
+        v.rto_g_oceantemperature[tt] = (p.area_e_eartharea * v.rt_g_globaltemperature[tt] - sum(p.area) * v.rtl_g_landtemperature[tt]) / (p.area_e_eartharea - sum(p.area))
     end
 end
