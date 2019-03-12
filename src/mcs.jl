@@ -83,9 +83,9 @@ mcs = @defmcs begin
 
     # Discountinuity
     rand_discontinuity = Uniform(0, 1)
-    tdis_tolerabilitydisc = TriangularDist(2, 4, 3)
+    tdis_tolerabilitydisc = TriangularDist(1, 2, 1.5)
     pdis_probability = TriangularDist(10, 30, 20)
-    wdis_gdplostdisc = TriangularDist(5, 25, 15)
+    wdis_gdplostdisc = TriangularDist(1, 5, 3)
     ipow_incomeexponent = TriangularDist(-.3, 0, -.1)
     distau_discontinuityexponent = TriangularDist(20, 200, 50)
 
