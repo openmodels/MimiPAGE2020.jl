@@ -1,5 +1,5 @@
 using Mimi
-using MimiPAGE2009
+include("../src/getpagefunction.jl")
 
 m = getpage()
 run(m)

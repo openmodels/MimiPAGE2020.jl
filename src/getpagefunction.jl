@@ -1,11 +1,7 @@
-using Mimi, ExcelReaders
-
-export getpage
+using Mimi
 
 include("utils/load_parameters.jl")
 include("utils/mctools.jl")
-
-include("mcs.jl")
 
 include("components/CO2emissions.jl")
 include("components/CO2cycle.jl")
@@ -222,4 +218,3 @@ function getpage(policy::String="policy-a")
     return m
 end
 
-end
