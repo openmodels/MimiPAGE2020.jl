@@ -1,4 +1,5 @@
 using Mimi
+
 using Distributions
 using CSVFiles
 using DataFrames
@@ -57,7 +58,7 @@ mcs = @defmcs begin
     sltau_SLresponsetime = TriangularDist(500, 1500, 1000)
 
     # GDP
-    isat0_initialimpactfxnsaturation = TriangularDist(20, 50, 30)
+    isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
 
     # MarketDamages
     tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.)
@@ -82,9 +83,9 @@ mcs = @defmcs begin
 
     # Discountinuity
     rand_discontinuity = Uniform(0, 1)
-    tdis_tolerabilitydisc = TriangularDist(2, 4, 3)
+    tdis_tolerabilitydisc = TriangularDist(1, 2, 1.5)
     pdis_probability = TriangularDist(10, 30, 20)
-    wdis_gdplostdisc = TriangularDist(5, 25, 15)
+    wdis_gdplostdisc = TriangularDist(1, 5, 3)
     ipow_incomeexponent = TriangularDist(-.3, 0, -.1)
     distau_discontinuityexponent = TriangularDist(20, 200, 50)
 
@@ -94,9 +95,9 @@ mcs = @defmcs begin
     emuc_utilityconvexity = TriangularDist(0.5,2,1)
 
     # AbatementCosts
-    AbatementCostsCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,75,0)
-    AbatementCostsCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-25,100,0)
-    AbatementCostsN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,50,0)
+    AbatementCostsCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,6.0,-22)
+    AbatementCostsCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67,6.0,-30)
+    AbatementCostsN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20,6.0,-7.0)
     AbatementCostsLin_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,50,0)
 
     AbatementCostsCO2_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,40,20)

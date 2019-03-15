@@ -13,7 +13,7 @@ function page_model()
     set_dimension!(m, :region, ["EU", "USA", "OECD", "USSR", "China", "SEAsia", "Africa", "LatAmerica"])
 
     return m
- end
+end
 
 @testset "mimi-page.jl" begin
 
@@ -22,11 +22,11 @@ function page_model()
 #include("test_AdaptationCosts.jl")
 #include("test_CH4cycle.jl")
 #include("test_CH4emissions.jl")
-#include("test_CH4forcing.jl")
-#include("test_ClimateTemperature.jl")
+include("test_CH4forcing.jl")
+include("test_ClimateTemperature.jl")
 #include("test_CO2cycle.jl")
 #include("test_CO2emissions.jl")
-include("test_CO2forcing.jl")
+#include("test_CO2forcing.jl")
 include("test_Discontinuity.jl")
 #include("test_EquityWeighting.jl")
 include("test_GDP.jl")
