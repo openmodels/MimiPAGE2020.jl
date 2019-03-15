@@ -6,6 +6,8 @@ using Distributions
 
 Mimi.reset_compdefs()
 
+include("../src/mcs.jl")
+
 regenerate = false # do a large MC run, to regenerate information needed for std. errors
 samplesize = 1000 # normal MC sample size (takes ~5 seconds)
 confidence = 2.576 # 99% CI by default; use 1.96 to apply a 95% CI, but expect more spurious errors
@@ -29,7 +31,7 @@ if regenerate
     println("Regenerating MC distribution information")
 
     # Perform a large MC run and extract statistics
-    MimiPAGE2009.do_monte_carlo_runs(100_000)
+    do_monte_carlo_runs(100_000)
     df = DataFrame(load(joinpath(@__DIR__, "../output/mimipagemontecarlooutput.csv")))
 
      for ii in 1:nrow(compare)
@@ -50,7 +52,7 @@ if regenerate
 else
     println("Performing MC sample")
     # Perform a small MC run
-    MimiPAGE2009.do_monte_carlo_runs(samplesize)
+    do_monte_carlo_runs(samplesize)
     df = DataFrame(load(joinpath(@__DIR__, "../output/mimipagemontecarlooutput.csv")))
 end
 

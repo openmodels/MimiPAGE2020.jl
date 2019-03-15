@@ -1,5 +1,3 @@
-
-
 @defcomp AdaptationCosts begin
     region = Index()
 

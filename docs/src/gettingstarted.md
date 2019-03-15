@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide will briefly explain how to install Julia and MimiPAGE2009.
+This guide will briefly explain how to install Julia and Mimi PAGE 2020.
 
 ## Installing Julia
 
@@ -58,12 +58,8 @@ for just one. For more details on the graphical interface of Mimi look to the
 documentation in the Mimi [User Guide](`http://anthofflab.berkeley.edu/Mimi.jl/stable/userguide/#Plotting-and-the-Explorer-UI-1`).
 
 To run the stochastic version of Mimi-PAGE, which uses parameter
-distributions, see the `mcs.jl` file in the src folder and the documentation for
-Mimi Monte Carlo support [here](https://github.com/anthofflab/Mimi.jl/blob/master/docs/src/internals/montecarlo.md). The simplest version of the stochastic can be implemented as follows:
-```julia
-julia> MimiPAGE2009.do_monte_carlo_runs(1000) #1000 runs
-```
-The current Monte Carlo process outputs a selection of variables that are
+distributions, see the `mcs.jl` file in the src folder. The
+current Monte Carlo process outputs a selection of variables that are
 important for validation, but these can be modified by the user if
 desired. For more information, see the [Technical Guide](technicaluserguide.md).
 

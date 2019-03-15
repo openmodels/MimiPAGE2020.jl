@@ -2,6 +2,7 @@ using Test
 
 Mimi.reset_compdefs()
 
+include("../src/getpagefunction.jl")
 m = getpage()
 run(m)
 
