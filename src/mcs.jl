@@ -48,8 +48,8 @@ mcs = @defmcs begin
     # ClimateTemperature
     rlo_ratiolandocean = TriangularDist(1.2, 1.6, 1.4)
     pole_polardifference = TriangularDist(1, 2, 1.5)
-    frt_warminghalflife = TriangularDist(10, 65, 30)
-    tcr_transientresponse = TriangularDist(1, 2.8, 1.3)
+    frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation
+    tcr_transientresponse = TriangularDist(0.8, 2.7, 1.8)   # from PAGE-ICE v6.2 documentation
 
     # SeaLevelRise
     s0_initialSL = TriangularDist(0.1, 0.2, 0.15)
