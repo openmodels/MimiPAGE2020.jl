@@ -1,5 +1,8 @@
 using Test
 using Mimi
+using MimiPAGE2009
+
+using MimiPAGE2009: readpagedata, buildpage, initpage, load_parameters, setdistinctparameter
 
 function page_model()
     Mimi.reset_compdefs()
@@ -15,7 +18,7 @@ function page_model()
     return m
 end
 
-@testset "mimi-page.jl" begin
+@testset "MimiPAGE2009.jl" begin
 
 #include("test_climatemodel.jl")
 #include("test_AbatementCosts.jl")
@@ -49,5 +52,7 @@ include("test_TotalAbatementCosts.jl")
 include("test_TotalAdaptationCosts.jl")
 include("test_TotalForcing.jl")
 #include("test_mcs.jl")
+include("test_mcs.jl")
+include("contrib/test_taxeffect.jl") 
 
 end

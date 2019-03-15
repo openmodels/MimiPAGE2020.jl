@@ -1,5 +1,4 @@
 using Mimi
-
 using Distributions
 using CSVFiles
 using DataFrames
@@ -239,14 +238,21 @@ end
 
 function do_monte_carlo_runs(samplesize::Int)
 
+        # get simulation
+        mcs = getsim()
+        
+        # get a model
+        m = getpage()
+        run(m)
+
         # Generate trial data for all RVs and save to a file
         generate_trials!(mcs, samplesize, filename = joinpath(@__DIR__, "../output/trialdata.csv"))
 
         # set model
-        Mimi.set_model!(mcs, m)
+        Mimi.set_models!(mcs, m)
 
         # Run trials 1:samplesize, and save results to the indicated directory, one CSV file per RV
-        run_mcs(mcs, samplesize, output_dir = joinpath(@__DIR__, "../output/"))
+        run_sim(mcs, samplesize, output_dir = joinpath(@__DIR__, "../output/"))
 
         # reformat outputs for testing and analysis
         reformat_RV_outputs(samplesize)

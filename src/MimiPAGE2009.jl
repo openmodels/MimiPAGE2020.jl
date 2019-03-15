@@ -1,7 +1,13 @@
-using Mimi
+module MimiPAGE2009
+
+using Mimi, ExcelReaders
+
+export getpage
 
 include("utils/load_parameters.jl")
 include("utils/mctools.jl")
+
+include("mcs.jl")
 
 include("components/CO2emissions.jl")
 include("components/CO2cycle.jl")
@@ -25,6 +31,7 @@ include("components/NonMarketDamages.jl")
 include("components/Discontinuity.jl")
 include("components/AdaptationCosts.jl")
 include("components/SLRDamages.jl")
+include("components/AbatementCostParameters.jl")
 include("components/AbatementCosts.jl")
 include("components/TotalAbatementCosts.jl")
 include("components/TotalAdaptationCosts.jl")
@@ -56,6 +63,11 @@ function buildpage(m::Model, policy::String="policy-a")
     add_comp!(m, GDP)
 
     #Abatement Costs
+    abatementcostparameters_CO2 = addabatementcostparameters(m, :CO2, policy)
+    abatementcostparameters_CH4 = addabatementcostparameters(m, :CH4, policy)
+    abatementcostparameters_N2O = addabatementcostparameters(m, :N2O, policy)
+    abatementcostparameters_Lin = addabatementcostparameters(m, :Lin, policy)
+
     abatementcosts_CO2 = addabatementcosts(m, :CO2, policy)
     abatementcosts_CH4 = addabatementcosts(m, :CH4, policy)
     abatementcosts_N2O = addabatementcosts(m, :N2O, policy)
@@ -116,10 +128,25 @@ function buildpage(m::Model, policy::String="policy-a")
 
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
 
-    connect_param!(m, :AbatementCostsCO2 => :yagg, :GDP => :yagg_periodspan)
-    connect_param!(m, :AbatementCostsCH4 => :yagg, :GDP => :yagg_periodspan)
-    connect_param!(m, :AbatementCostsN2O => :yagg, :GDP => :yagg_periodspan)
-    connect_param!(m, :AbatementCostsLin => :yagg, :GDP => :yagg_periodspan)
+    for allabatement in [
+        (:AbatementCostParametersCO2, :AbatementCostsCO2),
+        (:AbatementCostParametersCH4, :AbatementCostsCH4),
+        (:AbatementCostParametersN2O, :AbatementCostsN2O),
+        (:AbatementCostParametersLin, :AbatementCostsLin)]
+
+        abatementcostparameters, abatementcosts = allabatement
+
+        connect_param!(m, abatementcostparameters => :yagg, :GDP => :yagg_periodspan)
+        connect_param!(m, abatementcostparameters => :cbe_absoluteemissionreductions, abatementcosts => :cbe_absoluteemissionreductions)
+
+        connect_param!(m, abatementcosts => :zc_zerocostemissions, abatementcostparameters => :zc_zerocostemissions)
+        connect_param!(m, abatementcosts => :q0_absolutecutbacksatnegativecost, abatementcostparameters => :q0_absolutecutbacksatnegativecost)
+        connect_param!(m, abatementcosts => :blo, abatementcostparameters => :blo)
+        connect_param!(m, abatementcosts => :alo, abatementcostparameters => :alo)
+        connect_param!(m, abatementcosts => :bhi, abatementcostparameters => :bhi)
+        connect_param!(m, abatementcosts => :ahi, abatementcostparameters => :ahi)
+
+    end
 
     connect_param!(m, :TotalAbatementCosts => :tc_totalcosts_co2, :AbatementCostsCO2 => :tc_totalcost)
     connect_param!(m, :TotalAbatementCosts => :tc_totalcosts_n2o, :AbatementCostsN2O => :tc_totalcost)
@@ -195,4 +222,6 @@ function getpage(policy::String="policy-a")
     initpage(m, policy)
 
     return m
+end
+
 end

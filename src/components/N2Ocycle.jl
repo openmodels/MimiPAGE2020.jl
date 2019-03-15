@@ -1,5 +1,3 @@
-using Mimi
-
 @defcomp n2ocycle begin
     e_globalN2Oemissions=Parameter(index=[time],unit="Mtonne/year")
     e_0globalN2Oemissions=Parameter(unit="Mtonne/year", default=11.22281348065454)
