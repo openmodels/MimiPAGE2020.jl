@@ -3,6 +3,8 @@ using Test
 Mimi.reset_compdefs()
 
 include("../src/getpagefunction.jl")
+m = getpage()
+run(m)
 
 m = getpage("policy-b")
 run(m)
