@@ -3,6 +3,7 @@ using Mimi
 include("utils/load_parameters.jl")
 include("utils/mctools.jl")
 
+include("components/RCPSSPScenario.jl")
 include("components/CO2emissions.jl")
 include("components/CO2cycle.jl")
 include("components/CO2forcing.jl")
@@ -32,40 +33,41 @@ include("components/TotalAdaptationCosts.jl")
 include("components/Population.jl")
 include("components/EquityWeighting.jl")
 
-function buildpage(m::Model, policy::String="policy-a")
+function buildpage(m::Model, rcp::String, ssp::String)
 
     #add all the components
-    add_comp!(m, co2emissions)
+    scenario = add_comp!(m, RCPSSPScenario)
+    co2emit = add_comp!(m, co2emissions)
     add_comp!(m, co2cycle)
     add_comp!(m, co2forcing)
-    add_comp!(m, ch4emissions)
+    ch4emit = add_comp!(m, ch4emissions)
     add_comp!(m, ch4cycle)
     add_comp!(m, ch4forcing)
-    add_comp!(m, n2oemissions)
+    n2oemit = add_comp!(m, n2oemissions)
     add_comp!(m, n2ocycle)
     add_comp!(m, n2oforcing)
-    add_comp!(m, LGemissions)
+    lgemit = add_comp!(m, LGemissions)
     add_comp!(m, LGcycle)
     add_comp!(m, LGforcing)
-    add_comp!(m, SulphateForcing)
-    add_comp!(m, TotalForcing)
+    sulfemit = add_comp!(m, SulphateForcing)
+    totalforcing = add_comp!(m, TotalForcing)
     add_comp!(m, ClimateTemperature)
     add_comp!(m, SeaLevelRise)
 
     #Socio-Economics
     population = addpopulation(m)
-    add_comp!(m, GDP)
+    gdp = add_comp!(m, GDP)
 
     #Abatement Costs
-    abatementcostparameters_CO2 = addabatementcostparameters(m, :CO2, policy)
-    abatementcostparameters_CH4 = addabatementcostparameters(m, :CH4, policy)
-    abatementcostparameters_N2O = addabatementcostparameters(m, :N2O, policy)
-    abatementcostparameters_Lin = addabatementcostparameters(m, :Lin, policy)
+    abatementcostparameters_CO2 = addabatementcostparameters(m, :CO2)
+    abatementcostparameters_CH4 = addabatementcostparameters(m, :CH4)
+    abatementcostparameters_N2O = addabatementcostparameters(m, :N2O)
+    abatementcostparameters_Lin = addabatementcostparameters(m, :Lin)
 
-    abatementcosts_CO2 = addabatementcosts(m, :CO2, policy)
-    abatementcosts_CH4 = addabatementcosts(m, :CH4, policy)
-    abatementcosts_N2O = addabatementcosts(m, :N2O, policy)
-    abatementcosts_Lin = addabatementcosts(m, :Lin, policy)
+    abatementcosts_CO2 = addabatementcosts(m, :CO2)
+    abatementcosts_CH4 = addabatementcosts(m, :CH4)
+    abatementcosts_N2O = addabatementcosts(m, :N2O)
+    abatementcosts_Lin = addabatementcosts(m, :Lin)
     add_comp!(m, TotalAbatementCosts)
 
     #Adaptation Costs
@@ -83,12 +85,20 @@ function buildpage(m::Model, policy::String="policy-a")
     #Equity weighting and Total Costs
     add_comp!(m, EquityWeighting)
 
+    # Scenario setup
+    scenario[:rcp] = rcp
+    scenario[:ssp] = ssp
+
     #connect parameters together
+    co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
+
     connect_param!(m, :co2cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
     connect_param!(m, :co2cycle => :rt_g0_baseglobaltemp, :ClimateTemperature => :rt_g0_baseglobaltemp)
     connect_param!(m, :co2cycle => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
 
     connect_param!(m, :co2forcing => :c_CO2concentration, :co2cycle => :c_CO2concentration)
+
+    ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
 
     connect_param!(m, :ch4cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
     connect_param!(m, :ch4cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
@@ -97,6 +107,8 @@ function buildpage(m::Model, policy::String="policy-a")
     connect_param!(m, :ch4forcing => :c_CH4concentration, :ch4cycle => :c_CH4concentration)
     connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
+    n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
+
     connect_param!(m, :n2ocycle => :e_globalN2Oemissions, :n2oemissions => :e_globalN2Oemissions)
     connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
     connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
@@ -104,31 +116,39 @@ function buildpage(m::Model, policy::String="policy-a")
     connect_param!(m, :n2oforcing => :c_CH4concentration, :ch4cycle => :c_CH4concentration)
     connect_param!(m, :n2oforcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
+    lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
+
     connect_param!(m, :LGcycle => :e_globalLGemissions, :LGemissions => :e_globalLGemissions)
     connect_param!(m, :LGcycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
     connect_param!(m, :LGcycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
 
     connect_param!(m, :LGforcing => :c_LGconcentration, :LGcycle => :c_LGconcentration)
 
+    sulfemit[:pse_sulphatevsbase] = scenario[:pse_sulphatevsbase]
+
     connect_param!(m, :TotalForcing => :f_CO2forcing, :co2forcing => :f_CO2forcing)
     connect_param!(m, :TotalForcing => :f_CH4forcing, :ch4forcing => :f_CH4forcing)
     connect_param!(m, :TotalForcing => :f_N2Oforcing, :n2oforcing => :f_N2Oforcing)
     connect_param!(m, :TotalForcing => :f_lineargasforcing, :LGforcing => :f_LGforcing)
+    totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
 
     connect_param!(m, :ClimateTemperature => :ft_totalforcing, :TotalForcing => :ft_totalforcing)
     connect_param!(m, :ClimateTemperature => :fs_sulfateforcing, :SulphateForcing => :fs_sulphateforcing)
 
     connect_param!(m, :SeaLevelRise => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
 
+    population[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
+
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
+    gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
 
     for allabatement in [
-        (:AbatementCostParametersCO2, :AbatementCostsCO2),
-        (:AbatementCostParametersCH4, :AbatementCostsCH4),
-        (:AbatementCostParametersN2O, :AbatementCostsN2O),
-        (:AbatementCostParametersLin, :AbatementCostsLin)]
+        (:AbatementCostParametersCO2, :AbatementCostsCO2, :er_CO2emissionsgrowth),
+        (:AbatementCostParametersCH4, :AbatementCostsCH4, :er_CH4emissionsgrowth),
+        (:AbatementCostParametersN2O, :AbatementCostsN2O, :er_N2Oemissionsgrowth),
+        (:AbatementCostParametersLin, :AbatementCostsLin, :er_LGemissionsgrowth)]
 
-        abatementcostparameters, abatementcosts = allabatement
+        abatementcostparameters, abatementcosts, er_parameter = allabatement
 
         connect_param!(m, abatementcostparameters => :yagg, :GDP => :yagg_periodspan)
         connect_param!(m, abatementcostparameters => :cbe_absoluteemissionreductions, abatementcosts => :cbe_absoluteemissionreductions)
@@ -139,6 +159,7 @@ function buildpage(m::Model, policy::String="policy-a")
         connect_param!(m, abatementcosts => :alo, abatementcostparameters => :alo)
         connect_param!(m, abatementcosts => :bhi, abatementcostparameters => :bhi)
         connect_param!(m, abatementcosts => :ahi, abatementcostparameters => :ahi)
+        connect_param!(m, abatementcosts => :er_emissionsgrowth, :RCPSSPScenario => er_parameter)
 
     end
 
@@ -198,8 +219,8 @@ function buildpage(m::Model, policy::String="policy-a")
     return m
 end
 
-function initpage(m::Model, policy::String="policy-a")
-    p = load_parameters(m, policy)
+function initpage(m::Model)
+    p = load_parameters(m)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
     set_leftover_params!(m, p)
@@ -210,10 +231,10 @@ function getpage(policy::String="policy-a")
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
-    buildpage(m, policy)
+    buildpage(m)
 
     # next: add vector and panel example
-    initpage(m, policy)
+    initpage(m)
 
     return m
 end
