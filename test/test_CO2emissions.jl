@@ -2,10 +2,15 @@
 using Test
 
 m = page_model()
+include("../src/components/RCPSSPScenario.jl")
 include("../src/components/CO2emissions.jl")
 
-add_comp!(m, co2emissions)
+scenario = add_comp!(m, RCPSSPScenario)
+co2emit = add_comp!(m, co2emissions)
 
+scenario[:ssp] = "rcp85"
+
+co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
 set_param!(m, :co2emissions, :e0_baselineCO2emissions, readpagedata(m,"data/e0_baselineCO2emissions.csv"))
 set_param!(m, :co2emissions, :er_CO2emissionsgrowth, readpagedata(m, "data/er_CO2emissionsgrowth.csv"))
 
