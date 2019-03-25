@@ -4,10 +4,8 @@ m = page_model()
 include("../src/components/RCPSSPScenario.jl")
 include("../src/components/CH4emissions.jl")
 
-scenario = add_comp!(m, RCPSSPScenario)
+scenario = addrcpsspscenario(m, "NDCs")
 ch4emit = add_comp!(m, ch4emissions)
-
-scenario[:ssp] = "rcp85"
 
 ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
 set_param!(m, :ch4emissions, :e0_baselineCH4emissions, readpagedata(m, "data/e0_baselineCH4emissions.csv")) #PAGE 2009 documentation pp38

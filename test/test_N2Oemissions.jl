@@ -5,10 +5,8 @@ m = page_model()
 include("../src/components/RCPSSPScenario.jl")
 include("../src/components/N2Oemissions.jl")
 
-scenario = add_comp!(m, RCPSSPScenario)
+scenario = addrcpsspscenario(m, "NDCs")
 n2oemit = add_comp!(m, n2oemissions)
-
-scenario[:ssp] = "rcp85"
 
 n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
 set_param!(m, :n2oemissions, :e0_baselineN2Oemissions, readpagedata(m,"data/e0_baselineN2Oemissions.csv"))

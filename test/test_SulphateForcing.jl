@@ -5,10 +5,8 @@ m = page_model()
 include("../src/components/RCPSSPScenario.jl")
 include("../src/components/SulphateForcing.jl")
 
-scenario = add_comp!(m, RCPSSPScenario)
+scenario = addrcpsspscenario(m, "NDCs")
 sulfemit = add_comp!(m, SulphateForcing)
-
-scenario[:ssp] = "rcp85"
 
 sulfemit[:pse_sulphatevsbase] = scenario[:pse_sulphatevsbase]
 

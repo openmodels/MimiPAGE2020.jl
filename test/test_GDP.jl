@@ -5,10 +5,8 @@ m = page_model()
 include("components/RCPSSPScenario.jl")
 include("../src/components/GDP.jl")
 
-scenario = add_comp!(m, RCPSSPScenario)
+scenario = addrcpsspscenario(m, "NDCs")
 gdp = add_comp!(m, GDP)
-
-scenario[:ssp] = "ssp3"
 
 gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
 gdp[:pop0_initpopulation] = readpagedata(m, "data/pop0_initpopulation.csv")

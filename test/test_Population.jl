@@ -5,10 +5,8 @@ m = page_model()
 include("components/RCPSSPScenario.jl")
 include("../src/components/Population.jl")
 
-scenario = add_comp!(m, RCPSSPScenario)
+scenario = addrcpsspscenario(m, "NDCs")
 population = addpopulation(m)
-
-scenario[:ssp] = "ssp3"
 
 population[:y_year_0] = 2015.
 population[:y_year] = Mimi.dim_keys(m.md, :time)

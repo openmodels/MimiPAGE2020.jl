@@ -5,10 +5,8 @@ m = page_model()
 include("../src/components/RCPSSPScenario.jl")
 include("../src/components/LGemissions.jl")
 
-scenario = add_comp!(m, RCPSSPScenario)
+scenario = addrcpsspscenario(m, "NDCs")
 lgemit = add_comp!(m, LGemissions)
-
-scenario[:ssp] = "rcp85"
 
 lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
 set_param!(m, :LGemissions, :e0_baselineLGemissions, readpagedata(m,"data/e0_baselineLGemissions.csv"))

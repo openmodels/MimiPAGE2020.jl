@@ -5,10 +5,8 @@ m = page_model()
 include("../src/components/RCPSSPScenario.jl")
 include("../src/components/TotalForcing.jl")
 
-scenario = add_comp!(m, RCPSSPScenario)
+scenario = addrcpsspscenario(m, "NDCs")
 totalforcing = add_comp!(m, TotalForcing)
-
-scenario[:ssp] = "rcp85"
 
 totalforcing[:f_CO2forcing] = readpagedata(m,"test/validationdata/f_co2forcing.csv")
 totalforcing[:f_CH4forcing] = readpagedata(m,"test/validationdata/f_ch4forcing.csv")
