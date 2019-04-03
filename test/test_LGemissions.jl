@@ -2,10 +2,13 @@
 using Test
 
 m = page_model()
+include("../src/components/RCPSSPScenario.jl")
 include("../src/components/LGemissions.jl")
 
-add_comp!(m, LGemissions)
+scenario = addrcpsspscenario(m, "NDCs")
+lgemit = add_comp!(m, LGemissions)
 
+lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
 set_param!(m, :LGemissions, :e0_baselineLGemissions, readpagedata(m,"data/e0_baselineLGemissions.csv"))
 set_param!(m, :LGemissions, :er_LGemissionsgrowth, readpagedata(m, "data/er_LGemissionsgrowth.csv"))
 

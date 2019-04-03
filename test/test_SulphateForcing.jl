@@ -2,9 +2,13 @@ using Test
 
 
 m = page_model()
+include("../src/components/RCPSSPScenario.jl")
 include("../src/components/SulphateForcing.jl")
 
-add_comp!(m, SulphateForcing)
+scenario = addrcpsspscenario(m, "NDCs")
+sulfemit = add_comp!(m, SulphateForcing)
+
+sulfemit[:pse_sulphatevsbase] = scenario[:pse_sulphatevsbase]
 
 p = load_parameters(m)
 p["y_year_0"] = 2015.

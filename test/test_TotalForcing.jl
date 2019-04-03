@@ -1,16 +1,18 @@
 using Test
 
 
-m = m = page_model()
+m = page_model()
+include("../src/components/RCPSSPScenario.jl")
 include("../src/components/TotalForcing.jl")
 
+scenario = addrcpsspscenario(m, "NDCs")
 totalforcing = add_comp!(m, TotalForcing)
 
 totalforcing[:f_CO2forcing] = readpagedata(m,"test/validationdata/f_co2forcing.csv")
 totalforcing[:f_CH4forcing] = readpagedata(m,"test/validationdata/f_ch4forcing.csv")
 totalforcing[:f_N2Oforcing] = readpagedata(m,"test/validationdata/f_n2oforcing.csv")
 totalforcing[:f_lineargasforcing] = readpagedata(m,"test/validationdata/f_LGforcing.csv")
-totalforcing[:exf_excessforcing] = readpagedata(m,"data/exf_excessforcing.csv")
+totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
 
 run(m)
 
