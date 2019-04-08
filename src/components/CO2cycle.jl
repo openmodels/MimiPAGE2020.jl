@@ -16,7 +16,6 @@ using Mimi
     teay_CO2emissionstoatm=Variable(index=[time],unit="Mtonne/t")
     ccf_CO2feedback=Parameter(unit="%/degreeC", default=0.0)
     ccfmax_maxCO2feedback=Parameter(unit="%", default=20.0)
-    cea_cumCO2emissionsatm=Variable(index=[time],unit="Mtonne")
     ce_0_basecumCO2emissions=Parameter(unit="Mtonne", default=2040000.)
     conoccf_concentrationCO2wocc=Variable(index=[time], unit="ppbv")
     y_year=Parameter(index=[time],unit="year")
@@ -68,14 +67,12 @@ using Mimi
             v.re_remainCO2base=v.exc_excessconcCO2*p.den_CO2density
             #PAGE 2009 initial remaining emissions without CO2 feedback
             renoccf0_remainCO2wocc=v.re_remainCO2base/(1+gain/100)
-            #eq. 8 from Hope (2006) - baseline cumulative emissions to atmosphere
-            ceabase=p.ce_0_basecumCO2emissions*p.air_CO2fractioninatm/100
-            #eq.9 from Hope(2006) - cumulative emissions in atmosphere
-            v.cea_cumCO2emissionsatm[t]=ceabase+v.teay_CO2emissionstoatm[t]
 
             #update remaining emissions
 
             #Functions for two parameters that are fixed
+            # eq. 8 from Hope (2006) - baseline cumulative emissions to atmosphere
+            #ceabase=p.ce_0_basecumCO2emissions*p.air_CO2fractioninatm/100
             #p.thist_timescaleco2hist=ceabase/tea0
             #p.corrf_correctionfactorco2_0=renoccf0_remainCO2wocc/(tea0*p.thist_timescaleco2hist*((p.stay_fractionCO2emissionsinatm)+(p.a1_percentco2oceanlong/100)/(1+p.thist_timescaleco2hist/p.t1_timeco2oceanlong)
             #    +(p.a2_percentco2oceanshort/100)/(1+p.thist_timescaleco2hist/p.t2_timeco2oceanshort)+(p.a3_percentco2land/100)/(1+p.thist_timescaleco2hist/p.t3_timeco2land)))
@@ -110,8 +107,6 @@ using Mimi
             v.tea_CO2emissionstoatm[t]=(p.e_globalCO2emissions[t])*p.air_CO2fractioninatm/100
             #eq.7 from Hope (2006) - total emissions over time period
             v.teay_CO2emissionstoatm[t]=(v.tea_CO2emissionstoatm[t]+v.tea_CO2emissionstoatm[t-1])*(p.y_year[t]-p.y_year[t-1])/2
-            #eq.9 from Hope(2006) - cumulative emissions in atmosphere
-            v.cea_cumCO2emissionsatm[t]=v.cea_cumCO2emissionsatm[t-1]+v.teay_CO2emissionstoatm[t]
 
             #update remaining emissions
             v.asymptote_co2_hist[t]=p.corrf_correctionfactorco2_0 * tea0* p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm)
@@ -131,8 +126,8 @@ using Mimi
             v.conoccf_concentrationCO2wocc[t]= p.pic_preindustconcCO2 + v.exc_excessconcCO2*v.renoccf_remainCO2wocc[t]*v.re_remainCO2base
             #Hope 2009 - remaining emissions with CO2 feedback
             v.re_remainCO2[t]=v.renoccf_remainCO2wocc[t]*(1+gain/100)
+            #eq.11 from Hope(2006) - CO2 concentration
+            v.c_CO2concentration[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2 * v.re_remainCO2[t]/v.re_remainCO2base
         end
-        #eq.11 from Hope(2006) - CO2 concentration
-        v.c_CO2concentration[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2 * v.re_remainCO2[t]/v.re_remainCO2base
     end
 end

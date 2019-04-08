@@ -14,8 +14,17 @@ set_leftover_params!(m,p) #important for setting left over component values
 ##running Model
 run(m)
 
-pop=m[:co2cycle,  :c_CO2concentration]
+asymp = m[:co2cycle, :asymptote_co2_hist]
+asymp_compare = readpagedata(m, "test/validationdata/asymp_comp_co2_proj.csv")
 
-pop_compare=readpagedata(m, "test/validationdata/c_co2concentration.csv")
+@test asymp ≈ asymp_compare rtol=1e-4
 
-@test pop ≈ pop_compare rtol=1e-4
+renoccff = m[:co2cycle, :renoccf_remainCO2wocc]
+renoccff_compare = readpagedata(m, "test/validationdata/re_co2_no_ccff.csv")
+
+@test renoccff ≈ renoccff_compare rtol=1e-4
+
+co2conc = m[:co2cycle,  :c_CO2concentration]
+co2conc_compare = readpagedata(m, "test/validationdata/c_co2concentration.csv")
+
+@test co2conc ≈ co2conc_compare rtol=1e-4
