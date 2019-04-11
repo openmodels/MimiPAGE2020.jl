@@ -16,8 +16,11 @@ run(m)
 
 asymp = m[:co2cycle, :asymptote_co2_hist]
 asymp_compare = readpagedata(m, "test/validationdata/asymp_comp_co2_proj.csv")
-
 @test asymp ≈ asymp_compare rtol=1e-4
+
+oceanlong = m[:co2cycle, :ocean_long_uptake_component_hist]
+oceanlong_compare = readpagedata(m, "test/validationdata/ocean_long_comp_co2_proj.csv")
+@test oceanlong ≈ oceanlong_compare rtol=1e-4
 
 renoccff = m[:co2cycle, :renoccf_remainCO2wocc]
 renoccff_compare = readpagedata(m, "test/validationdata/re_co2_no_ccff.csv")

@@ -1,6 +1,12 @@
 using Mimi
 
-@defcomp co2cycle begin
+use_permafrost = true
+
+@defcomp CO2Cycle begin
+    # Permafrost outputs (calculations not implemented yet)
+    permte0_permafrostemissions0 = Parameter(unit="Mtonne")
+    permte_permafrostemissions = Parameter(index=[time], unit="Mtonne")
+
     e_globalCO2emissions=Parameter(index=[time],unit="Mtonne/year")
     e0_globalCO2emissions=Parameter(unit="Mtonne/year", default=41223.85968577856)
     c_CO2concentration=Variable(index=[time],unit="ppbv")
@@ -33,12 +39,8 @@ using Mimi
 
 
     #New Parameters as fixed
-    thist_timescaleco2hist=Parameter( unit="year", default=49.59054463)
-    corrf_correctionfactorco2_0=Parameter(default=0.817730784)
-
-    #New parameters as functions and using emissions
-    #thist_timescaleco2hist=Parameter(unit="year")
-    #corrf_correctionfactorco2_0=Parameter(default=0.817730784)
+    thist_timescaleco2hist = Parameter( unit="year", default=49.59054463320648)
+    corrf_correctionfactorco2_0 = Parameter(default=0.8177307839027955)
 
     #renoccf0_remainCO2wocc=Parameter(unit="Mtonne")#not added in file
     asymptote_co2_hist =Variable(index=[time], unit="Mtonne")
@@ -55,9 +57,8 @@ using Mimi
     function run_timestep(p, v, d, t)
 
         if is_first(t)
-            #CO2 emissions gain calculated based on PAGE 2009
-            gain=p.ccf_CO2feedback*p.rt_g0_baseglobaltemp
-            #eq.6 from Hope (2006) - emissions to atmosphere depend on the sum of natural and anthropogenic emissions
+            te0_totalemissions0 = p.e0_globalCO2emissions + p.permte0_permafrostemissions0
+
             tea0=p.e0_globalCO2emissions*p.air_CO2fractioninatm/100
             v.tea_CO2emissionstoatm[t]=(p.e_globalCO2emissions[t])*p.air_CO2fractioninatm/100
             v.teay_CO2emissionstoatm[t]=(v.tea_CO2emissionstoatm[t]+tea0)*(p.y_year[t]-p.y_year_0)/2
@@ -65,8 +66,6 @@ using Mimi
             v.exc_excessconcCO2=p.c0_CO2concbaseyr-p.pic_preindustconcCO2
             #Eq. 2 from Hope (2006) - base-year remaining emissions
             v.re_remainCO2base=v.exc_excessconcCO2*p.den_CO2density
-            #PAGE 2009 initial remaining emissions without CO2 feedback
-            renoccf0_remainCO2wocc=v.re_remainCO2base/(1+gain/100)
 
             #update remaining emissions
 
@@ -77,7 +76,7 @@ using Mimi
             #p.corrf_correctionfactorco2_0=renoccf0_remainCO2wocc/(tea0*p.thist_timescaleco2hist*((p.stay_fractionCO2emissionsinatm)+(p.a1_percentco2oceanlong/100)/(1+p.thist_timescaleco2hist/p.t1_timeco2oceanlong)
             #    +(p.a2_percentco2oceanshort/100)/(1+p.thist_timescaleco2hist/p.t2_timeco2oceanshort)+(p.a3_percentco2land/100)/(1+p.thist_timescaleco2hist/p.t3_timeco2land)))
 
-            v.asymptote_co2_hist[t] = (p.corrf_correctionfactorco2_0 * tea0) * (p.thist_timescaleco2hist) * (p.stay_fractionCO2emissionsinatm)
+            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm/100)
             v.ocean_long_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)
             v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
             v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)
@@ -86,22 +85,9 @@ using Mimi
             v.ocean_long_uptake_component_proj[t]=0
             v.ocean_short_uptake_component_proj[t]=0
             v.land_uptake_co2_proj[t]=0
-
-            #remaining emmissions C02 before ccf
-            v.renoccf_remainCO2wocc[t]=v.asymptote_co2_hist[t]+v.ocean_long_uptake_component_hist[t]+v.ocean_short_uptake_component_hist[t]+v.land_uptake_co2hist[t]+v.asymptote_co2_proj[t]+v.ocean_long_uptake_component_proj[t]+v.ocean_short_uptake_component_proj[t]+v.land_uptake_co2_proj[t]
-            #CO2 concentration CO2 before CCF
-            v.conoccf_concentrationCO2wocc[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2*(v.renoccf_remainCO2wocc[t]*v.re_remainCO2base)
-
-            #Co2 concentration
-            v.c_CO2concentration[t]=v.conoccf_concentrationCO2wocc[t]+p.ccf_CO2feedback
-            #Hope 2009 - remaining emissions with CO2 feedback
-            v.re_remainCO2[t]=v.renoccf_remainCO2wocc[t]*(1+gain/100)
-
         else
-            #CO2 emissions gain calculated based on PAGE 2009
-            gain=min(p.ccf_CO2feedback*p.rt_g_globaltemperature[t-1],p.ccfmax_maxCO2feedback)
-            #PAGE 2009 initial remaining emissions without CO2 feedback
-            renoccf0_remainCO2wocc=v.re_remainCO2base/(1+gain/100)
+            te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
+
             #eq.6 from Hope (2006) - emissions to atmosphere depend on the sum of natural and anthropogenic emissions
             tea0=p.e0_globalCO2emissions*p.air_CO2fractioninatm/100#added for the update
             v.tea_CO2emissionstoatm[t]=(p.e_globalCO2emissions[t])*p.air_CO2fractioninatm/100
@@ -109,7 +95,7 @@ using Mimi
             v.teay_CO2emissionstoatm[t]=(v.tea_CO2emissionstoatm[t]+v.tea_CO2emissionstoatm[t-1])*(p.y_year[t]-p.y_year[t-1])/2
 
             #update remaining emissions
-            v.asymptote_co2_hist[t]=p.corrf_correctionfactorco2_0 * tea0* p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm)
+            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te_totalemissions * p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm/100)
             v.ocean_long_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)
             v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)
             v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t3_timeco2land)
@@ -119,15 +105,32 @@ using Mimi
             v.ocean_long_uptake_component_proj[t]=v.ocean_long_uptake_component_proj[t-1]*exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)+0.5 * (v.teay_CO2emissionstoatm[t-1] +  v.teay_CO2emissionstoatm[t]) * p.t1_timeco2oceanlong * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)
             v.ocean_short_uptake_component_proj[t]=v.ocean_short_uptake_component_proj[t-1] * exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)+ 0.5 * (v.teay_CO2emissionstoatm[t-1] +  v.teay_CO2emissionstoatm[t]) * p.t2_timeco2oceanshort * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
             v.land_uptake_co2_proj[t]=v.land_uptake_co2_proj[t-1]*exp(-(p.y_year[t]-p.y_year[t-1])/p.t3_timeco2land)+0.5 * (v.teay_CO2emissionstoatm[t-1]+v.teay_CO2emissionstoatm[t]) * p.t3_timeco2land * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t3_timeco2land)) * p.a3_percentco2land/100
+        end
 
-            #remaining emmissions C02 before ccf
-            v.renoccf_remainCO2wocc[t]= v.asymptote_co2_hist[t] + v.ocean_long_uptake_component_hist[t] + v.ocean_short_uptake_component_hist[t] + v.land_uptake_co2hist[t] + v.asymptote_co2_proj[t] + v.ocean_long_uptake_component_proj[t] + v.ocean_short_uptake_component_proj[t] + v.land_uptake_co2_proj[t]
-            #CO2 concentration CO2 before CCF
-            v.conoccf_concentrationCO2wocc[t]= p.pic_preindustconcCO2 + v.exc_excessconcCO2*v.renoccf_remainCO2wocc[t]*v.re_remainCO2base
-            #Hope 2009 - remaining emissions with CO2 feedback
-            v.re_remainCO2[t]=v.renoccf_remainCO2wocc[t]*(1+gain/100)
+        #remaining emmissions C02 before ccf
+        v.renoccf_remainCO2wocc[t]=v.asymptote_co2_hist[t]+v.ocean_long_uptake_component_hist[t]+v.ocean_short_uptake_component_hist[t]+v.land_uptake_co2hist[t]+v.asymptote_co2_proj[t]+v.ocean_long_uptake_component_proj[t]+v.ocean_short_uptake_component_proj[t]+v.land_uptake_co2_proj[t]
+        #CO2 concentration CO2 before CCF
+        v.conoccf_concentrationCO2wocc[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2*(v.renoccf_remainCO2wocc[t]*v.re_remainCO2base)
+        v.re_remainCO2[t]=v.renoccf_remainCO2wocc[t]
+
+        if is_first(t)
+            #Co2 concentration
+            v.c_CO2concentration[t]=v.conoccf_concentrationCO2wocc[t]+p.ccf_CO2feedback
+        else
             #eq.11 from Hope(2006) - CO2 concentration
             v.c_CO2concentration[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2 * v.re_remainCO2[t]/v.re_remainCO2base
         end
+    end
+end
+
+function addco2cycle(model::Model, use_permafrost::Bool)
+    co2cycle = add_comp!(model, CO2Cycle)
+
+    if use_permafrost
+        co2cycle[:permte0_permafrostemissions0] = 692.2476420621228
+        co2cycle[:permte_permafrostemissions] = readpagedata(model, "perm_tot_e_co2.csv")
+    else
+        co2cycle[:permte0_permafrostemissions0] = 0
+        co2cycle[:permte_permafrostemissions] = zeros(10)
     end
 end
