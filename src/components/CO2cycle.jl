@@ -7,8 +7,11 @@ use_permafrost = true
     permte0_permafrostemissions0 = Parameter(unit="Mtonne")
     permte_permafrostemissions = Parameter(index=[time], unit="Mtonne")
 
-    e_globalCO2emissions=Parameter(index=[time],unit="Mtonne/year")
-    e0_globalCO2emissions=Parameter(unit="Mtonne/year", default=41223.85968577856)
+    e_globalCO2emissions = Parameter(index=[time],unit="Mtonne/year")
+    e0_globalCO2emissions = Parameter(unit="Mtonne/year", default=41223.85968577856)
+
+    te_totalemissions = Variable(unit="Mtonne/year")
+
     c_CO2concentration=Variable(index=[time],unit="ppbv")
     pic_preindustconcCO2=Parameter(unit="ppbv", default=278000.)
     exc_excessconcCO2=Variable(unit="ppbv")
@@ -81,12 +84,13 @@ use_permafrost = true
             v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
             v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)
 
-            v.asymptote_co2_proj[t]=0
+            v.te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
+            v.asymptote_co2_proj[t] = 0.5*(te0_totalemissions0 + v.te_totalemissions[t]) * (p.y_year[t]-p.y_year_0) * (p.stay_fractionCO2emissionsinatm / 100)
             v.ocean_long_uptake_component_proj[t]=0
             v.ocean_short_uptake_component_proj[t]=0
             v.land_uptake_co2_proj[t]=0
         else
-            te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
+            v.te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
 
             #eq.6 from Hope (2006) - emissions to atmosphere depend on the sum of natural and anthropogenic emissions
             tea0=p.e0_globalCO2emissions*p.air_CO2fractioninatm/100#added for the update
@@ -100,7 +104,7 @@ use_permafrost = true
             v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)
             v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t3_timeco2land)
 
-            v.asymptote_co2_proj[t] = v.asymptote_co2_proj[t-1] + 0.5*( v.teay_CO2emissionstoatm[t-1] +  v.teay_CO2emissionstoatm[t]) * (p.y_year[t]-p.y_year[t-1]) * p.stay_fractionCO2emissionsinatm #check if it's teay or tea
+            v.asymptote_co2_proj[t] = v.asymptote_co2_proj[t-1] + 0.5*(v.te_totalemissions[t-1] + v.te_totalemissions[t]) * (p.y_year[t]-p.y_year[t-1]) * (p.stay_fractionCO2emissionsinatm / 100)
 
             v.ocean_long_uptake_component_proj[t]=v.ocean_long_uptake_component_proj[t-1]*exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)+0.5 * (v.teay_CO2emissionstoatm[t-1] +  v.teay_CO2emissionstoatm[t]) * p.t1_timeco2oceanlong * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)
             v.ocean_short_uptake_component_proj[t]=v.ocean_short_uptake_component_proj[t-1] * exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)+ 0.5 * (v.teay_CO2emissionstoatm[t-1] +  v.teay_CO2emissionstoatm[t]) * p.t2_timeco2oceanshort * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
@@ -128,7 +132,7 @@ function addco2cycle(model::Model, use_permafrost::Bool)
 
     if use_permafrost
         co2cycle[:permte0_permafrostemissions0] = 692.2476420621228
-        co2cycle[:permte_permafrostemissions] = readpagedata(model, "perm_tot_e_co2.csv")
+        co2cycle[:permte_permafrostemissions] = readpagedata(model, "data/perm_tot_e_co2.csv")
     else
         co2cycle[:permte0_permafrostemissions0] = 0
         co2cycle[:permte_permafrostemissions] = zeros(10)
