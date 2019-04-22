@@ -129,10 +129,16 @@ end
 function addrcpsspscenarios(model::Model, scenario::String)
     rcpsspscenario = add_comp!(model, RCPSSPScenario)
 
+    # Default parameters
+    rcpsspscenario[:extra_abate_rate] = 0
+    rcpsspscenario[:extra_abate_start] = 2015
+    rcpsspscenario[:extra_abate_end] = 2100
+    rcpsspscenario[:weight_scenarios] = 0.
+
     if scenario == "Zero Emissions & SSP1"
         rcpsspscenario[:rcp] = "zero"
         rcpsspscenario[:ssp] = "ssp1"
-    elseif sceanario == "1.5 degC Target"
+    elseif scenario == "1.5 degC Target"
         rcpsspscenario[:rcp] = "rcp26extra"
         rcpsspscenario[:ssp] = "ssp1"
         rcpsspscenario[:extra_abate_rate] = 4.053014079712271

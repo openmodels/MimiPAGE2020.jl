@@ -1,22 +1,32 @@
+include("../src/components/RCPSSPScenario.jl")
+include("../src/components/AbatementCostParameters.jl")
+include("../src/components/AbatementCosts.jl")
+
 
 using DataFrames
 using Test
 
 m = page_model()
+scenario = addrcpsspscenarios(m, "NDCs")
 
 for gas in [:CO2, :CH4, :N2O, :Lin]
-    abatementcostparameters = MimiPAGE2009.addabatementcostparameters(m, gas)
-    abatementcosts = MimiPAGE2009.addabatementcosts(m, gas)
+    abatementcostparameters = addabatementcostparameters(m, gas)
+    abatementcosts = addabatementcosts(m, gas)
 
     abatementcostparameters[:yagg] = readpagedata(m,"test/validationdata/yagg_periodspan.csv")
     abatementcostparameters[:cbe_absoluteemissionreductions] = abatementcosts[:cbe_absoluteemissionreductions]
-        
+
     abatementcosts[:zc_zerocostemissions] = abatementcostparameters[:zc_zerocostemissions]
     abatementcosts[:q0_absolutecutbacksatnegativecost] = abatementcostparameters[:q0_absolutecutbacksatnegativecost]
     abatementcosts[:blo] = abatementcostparameters[:blo]
     abatementcosts[:alo] = abatementcostparameters[:alo]
     abatementcosts[:bhi] = abatementcostparameters[:bhi]
     abatementcosts[:ahi] = abatementcostparameters[:ahi]
+    if gas == :Lin
+        abatementcosts[:er_emissionsgrowth] = scenario[:er_LGemissionsgrowth]
+    else
+        abatementcosts[:er_emissionsgrowth] = scenario[Symbol("er_" * String(gas) * "emissionsgrowth")]
+    end
 end
 
 p = load_parameters(m)
