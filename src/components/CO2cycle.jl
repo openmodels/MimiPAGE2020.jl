@@ -7,10 +7,10 @@ use_permafrost = true
     permte0_permafrostemissions0 = Parameter(unit="Mtonne")
     permte_permafrostemissions = Parameter(index=[time], unit="Mtonne")
 
-    e_globalCO2emissions = Parameter(index=[time],unit="Mtonne/year")
+    e_globalCO2emissions = Parameter(index=[time], unit="Mtonne/year")
     e0_globalCO2emissions = Parameter(unit="Mtonne/year", default=41223.85968577856)
 
-    te_totalemissions = Variable(unit="Mtonne/year")
+    te_totalemissions = Variable(index=[time], unit="Mtonne/year")
 
     c_CO2concentration=Variable(index=[time],unit="ppbv")
     pic_preindustconcCO2=Parameter(unit="ppbv", default=278000.)
@@ -33,19 +33,19 @@ use_permafrost = true
     den_CO2density=Parameter(unit="Mtonne/ppbv", default=7.8)
     rt_g0_baseglobaltemp=Parameter(unit="degreeC", default=0.9461666666666667)
     rt_g_globaltemperature=Parameter(index=[time],unit="degreeC")
-    a1_percentco2oceanlong=Parameter(unit="%", default=22.97)
-    a2_percentco2oceanshort=Parameter(unit="%", default=26.64)
-    a3_percentco2land=Parameter(unit="%", default=26.96)
-    t1_timeco2oceanlong=Parameter(unit="year", default=312.54)
-    t2_timeco2oceanshort=Parameter(unit="year", default=34.87)
-    t3_timeco2land=Parameter(unit="year", default=4.26)
 
 
-    #New Parameters as fixed
+    # Parameters for components of CO2
     thist_timescaleco2hist = Parameter( unit="year", default=49.59054463320648)
     corrf_correctionfactorco2_0 = Parameter(default=0.8177307839027955)
+    a1_percentco2oceanlong=Parameter(unit="%", default=22.97348182941324)
+    a2_percentco2oceanshort=Parameter(unit="%", default=26.64454562239661)
+    a3_percentco2land=Parameter(unit="%", default=26.96395086206718)
+    t1_timeco2oceanlong=Parameter(unit="year", default=312.54206687556456)
+    t2_timeco2oceanshort=Parameter(unit="year", default=34.873449489671636)
+    t3_timeco2land=Parameter(unit="year", default=4.257701532922862)
 
-    #renoccf0_remainCO2wocc=Parameter(unit="Mtonne")#not added in file
+    # Projections for components of CO2
     asymptote_co2_hist =Variable(index=[time], unit="Mtonne")
     ocean_long_uptake_component_hist=Variable(index=[time], unit="Mtonne")
     ocean_short_uptake_component_hist=Variable(index=[time], unit="Mtonne")
@@ -59,8 +59,8 @@ use_permafrost = true
 
     function run_timestep(p, v, d, t)
 
+        te0_totalemissions0 = p.e0_globalCO2emissions + p.permte0_permafrostemissions0
         if is_first(t)
-            te0_totalemissions0 = p.e0_globalCO2emissions + p.permte0_permafrostemissions0
 
             tea0=p.e0_globalCO2emissions*p.air_CO2fractioninatm/100
             v.tea_CO2emissionstoatm[t]=(p.e_globalCO2emissions[t])*p.air_CO2fractioninatm/100
@@ -79,16 +79,16 @@ use_permafrost = true
             #p.corrf_correctionfactorco2_0=renoccf0_remainCO2wocc/(tea0*p.thist_timescaleco2hist*((p.stay_fractionCO2emissionsinatm)+(p.a1_percentco2oceanlong/100)/(1+p.thist_timescaleco2hist/p.t1_timeco2oceanlong)
             #    +(p.a2_percentco2oceanshort/100)/(1+p.thist_timescaleco2hist/p.t2_timeco2oceanshort)+(p.a3_percentco2land/100)/(1+p.thist_timescaleco2hist/p.t3_timeco2land)))
 
-            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm/100)
-            v.ocean_long_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)
-            v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
-            v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)
+            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * p.stay_fractionCO2emissionsinatm
+            v.ocean_long_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100) * exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)
+            v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100) * exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)
+            v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100) * exp(-(p.y_year[t]-p.y_year_0)/p.t3_timeco2land)
 
             v.te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
-            v.asymptote_co2_proj[t] = 0.5*(te0_totalemissions0 + v.te_totalemissions[t]) * (p.y_year[t]-p.y_year_0) * (p.stay_fractionCO2emissionsinatm / 100)
-            v.ocean_long_uptake_component_proj[t]=0
-            v.ocean_short_uptake_component_proj[t]=0
-            v.land_uptake_co2_proj[t]=0
+            v.asymptote_co2_proj[t] = 0.5*(te0_totalemissions0 + v.te_totalemissions[t]) * (p.y_year[t]-p.y_year_0) * p.stay_fractionCO2emissionsinatm
+            v.ocean_long_uptake_component_proj[t] = 0.5*(te0_totalemissions0 + v.te_totalemissions[t]) * p.t1_timeco2oceanlong * (1 - exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)
+            v.ocean_short_uptake_component_proj[t] = 0.5*(te0_totalemissions0 + v.te_totalemissions[t]) * p.t2_timeco2oceanshort * (1 - exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
+            v.land_uptake_co2_proj[t] = 0.5*(te0_totalemissions0 + v.te_totalemissions[t]) * p.t3_timeco2land * (1 - exp(-(p.y_year[t]-p.y_year_0)/p.t3_timeco2land)) * p.a3_percentco2land/100
         else
             v.te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
 
@@ -99,16 +99,15 @@ use_permafrost = true
             v.teay_CO2emissionstoatm[t]=(v.tea_CO2emissionstoatm[t]+v.tea_CO2emissionstoatm[t-1])*(p.y_year[t]-p.y_year[t-1])/2
 
             #update remaining emissions
-            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te_totalemissions * p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm/100)
-            v.ocean_long_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)
-            v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)
-            v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * tea0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t3_timeco2land)
+            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm/100)
+            v.ocean_long_uptake_component_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)
+            v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)
+            v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t3_timeco2land)
 
-            v.asymptote_co2_proj[t] = v.asymptote_co2_proj[t-1] + 0.5*(v.te_totalemissions[t-1] + v.te_totalemissions[t]) * (p.y_year[t]-p.y_year[t-1]) * (p.stay_fractionCO2emissionsinatm / 100)
-
-            v.ocean_long_uptake_component_proj[t]=v.ocean_long_uptake_component_proj[t-1]*exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)+0.5 * (v.teay_CO2emissionstoatm[t-1] +  v.teay_CO2emissionstoatm[t]) * p.t1_timeco2oceanlong * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)
-            v.ocean_short_uptake_component_proj[t]=v.ocean_short_uptake_component_proj[t-1] * exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)+ 0.5 * (v.teay_CO2emissionstoatm[t-1] +  v.teay_CO2emissionstoatm[t]) * p.t2_timeco2oceanshort * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
-            v.land_uptake_co2_proj[t]=v.land_uptake_co2_proj[t-1]*exp(-(p.y_year[t]-p.y_year[t-1])/p.t3_timeco2land)+0.5 * (v.teay_CO2emissionstoatm[t-1]+v.teay_CO2emissionstoatm[t]) * p.t3_timeco2land * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t3_timeco2land)) * p.a3_percentco2land/100
+            v.asymptote_co2_proj[t] = v.asymptote_co2_proj[t-1] + 0.5*(v.te_totalemissions[t-1] + v.te_totalemissions[t]) * (p.y_year[t]-p.y_year[t-1]) * p.stay_fractionCO2emissionsinatm
+            v.ocean_long_uptake_component_proj[t]=v.ocean_long_uptake_component_proj[t-1]*exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)+0.5 * (v.te_totalemissions[t-1] + v.te_totalemissions[t]) * p.t1_timeco2oceanlong * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)
+            v.ocean_short_uptake_component_proj[t]=v.ocean_short_uptake_component_proj[t-1] * exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)+ 0.5 * (v.te_totalemissions[t-1] + v.te_totalemissions[t]) * p.t2_timeco2oceanshort * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)
+            v.land_uptake_co2_proj[t]=v.land_uptake_co2_proj[t-1]*exp(-(p.y_year[t]-p.y_year[t-1])/p.t3_timeco2land)+0.5 * (v.te_totalemissions[t-1] + v.te_totalemissions[t]) * p.t3_timeco2land * (1 - exp(-(p.y_year[t]-p.y_year[t-1])/p.t3_timeco2land)) * p.a3_percentco2land/100
         end
 
         #remaining emmissions C02 before ccf

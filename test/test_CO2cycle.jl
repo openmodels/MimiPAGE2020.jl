@@ -1,4 +1,3 @@
-
 using Test
 
 include("../src/components/CO2cycle.jl")
@@ -23,13 +22,12 @@ asymp = m[:CO2Cycle, :asymptote_co2_proj]
 asymp_compare = readpagedata(m, "test/validationdata/asymp_comp_co2_proj.csv")
 @test asymp ≈ asymp_compare rtol=1e-4
 
-oceanlong = m[:CO2Cycle, :ocean_long_uptake_component_hist]
+oceanlong = m[:CO2Cycle, :ocean_long_uptake_component_proj]
 oceanlong_compare = readpagedata(m, "test/validationdata/ocean_long_comp_co2_proj.csv")
 @test oceanlong ≈ oceanlong_compare rtol=1e-4
 
 renoccff = m[:CO2Cycle, :renoccf_remainCO2wocc]
 renoccff_compare = readpagedata(m, "test/validationdata/re_co2_no_ccff.csv")
-
 @test renoccff ≈ renoccff_compare rtol=1e-4
 
 co2conc = m[:CO2Cycle,  :c_CO2concentration]
