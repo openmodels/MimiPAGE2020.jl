@@ -1,4 +1,4 @@
-using Mimi
+
 
 @defcomp SeaLevelRise begin
 
@@ -7,8 +7,8 @@ using Mimi
   rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
   sltemp_SLtemprise=Parameter(unit = "m-degreeC", default=1.7333333333333334)
   sla_SLbaselinerise=Parameter(unit = "m", default=1.00)
-  sltau_SLresponsetime=Parameter(unit = "years", default=1000.)
-  s0_initialSL=Parameter(unit = "m", default=0.15)
+  sltau_SLresponsetime=Parameter(unit = "years", default=386.0)
+  s0_initialSL=Parameter(unit = "m", default=0.18999999999999997)
   y_year=Parameter(index=[time], unit="year")
   y_year_0=Parameter(unit="year")
 

@@ -1,5 +1,3 @@
-using Mimi
-
 @defcomp AdaptationCosts begin
     region = Index()
 

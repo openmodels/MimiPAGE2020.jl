@@ -1,8 +1,6 @@
-using Mimi
-
 @defcomp LGcycle begin
     e_globalLGemissions=Parameter(index=[time],unit="Mtonne/year")
-    e_0globalLGemissions=Parameter(unit="Mtonne/year", default=557.2112715473608)
+    e_0globalLGemissions=Parameter(unit="Mtonne/year", default=631.2162983226708)
     c_LGconcentration=Variable(index=[time],unit="ppbv")
     pic_preindustconcLG=Parameter(unit="ppbv", default=0.)
     exc_excessconcLG=Variable(unit="ppbv")
@@ -17,7 +15,7 @@ using Mimi
     res_LGatmlifetime=Parameter(unit="year", default=1000.)
     den_LGdensity=Parameter(unit="Mtonne/ppbv", default=100000.)
     stim_LGemissionfeedback=Parameter(unit="Mtonne/degreeC", default=0.)
-    rtl_g0_baselandtemp=Parameter(unit="degreeC", default=0.9258270139190647)
+    rtl_g0_baselandtemp=Parameter(unit="degreeC", default=1.1683981941310047)
     rtl_g_landtemperature=Parameter(index=[time],unit="degreeC")
     re_remainLGbase=Variable(unit="Mtonne")
 

@@ -1,22 +1,18 @@
 language: julia
 os:
   - linux
-  - osx
 julia:
-  - 1.0
+  - 1.1
 notifications:
-  email: false
-branches:
-  only:
-  - master
-  - /release-.*/
+  email: true
 script:
   - julia -e 'using Pkg; Pkg.add("Mimi")'
   - julia -e 'using Pkg; Pkg.add("CSVFiles")'
   - julia -e 'using Pkg; Pkg.add("Query")'
   - julia -e 'using Pkg; Pkg.add("DataFrames")'
-  - julia -e 'using Pkg; Pkg.add("Missings")'
   - julia -e 'using Pkg; Pkg.add("Distributions")'
+  - julia -e 'using Pkg; Pkg.add("Query")'
+  - julia -e 'using Pkg; Pkg.add("Missings")'
   - julia --code-coverage=user test/runtests.jl
 after_success:
   # push coverage results to Codecov

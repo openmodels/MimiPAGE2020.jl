@@ -1,12 +1,16 @@
-using Mimi
+
 using Test
 
 m = page_model()
+include("components/RCPSSPScenario.jl")
 include("../src/components/Population.jl")
 
+scenario = addrcpsspscenario(m, "NDCs")
 population = addpopulation(m)
+
 population[:y_year_0] = 2015.
 population[:y_year] = Mimi.dim_keys(m.md, :time)
+population[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
 
 p = load_parameters(m)
 

@@ -1,4 +1,4 @@
-using Mimi
+
 
 @defcomp NonMarketDamages begin
     region = Index()
@@ -22,11 +22,11 @@ using Mimi
 
     save_savingsrate = Parameter(unit= "%", default=15.)
     wincf_weightsfactor =Parameter(index=[region], unit="unitless")
-    w_NonImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.5333333333333333)
+    w_NonImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.6333333333333333)
     ipow_NonMarketIncomeFxnExponent =Parameter(unit="unitless", default=0.)
     iben_NonMarketInitialBenefit=Parameter(unit="%GDP/degreeC", default=0.08333333333333333)
     tcal_CalibrationTemp = Parameter(unit="degreeC", default=3.)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=27934.244777382406)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
     pow_NonMarketExponent = Parameter(unit="", default=2.1666666666666665)
 
     #impact variables
@@ -82,8 +82,8 @@ using Mimi
 end
 
 
-# Still need this function in order to set the parameters than depend on 
-# readpagedata, which takes model as an input. These cannot be set using 
+# Still need this function in order to set the parameters than depend on
+# readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
 function addnonmarketdamages(model::Model)
     nonmarketdamagescomp = add_comp!(model, NonMarketDamages)

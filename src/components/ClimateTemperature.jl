@@ -1,5 +1,3 @@
-using Mimi
-
 @defcomp ClimateTemperature begin
     region = Index()
 
@@ -7,96 +5,98 @@ using Mimi
     area = Parameter(index=[region], unit="km2")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
+    area_e_eartharea = Parameter(unit="km2", default=5.1e8)
 
-    # Climate sensitivity calculations
-    tcr_transientresponse = Parameter(unit="degreeC", default=1.70)
-    frt_warminghalflife = Parameter(unit="year", default=35.00)
+    # Initial temperature outputs
+    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) #needed for feedback in CO2 cycle component
+    rtl_0_baselandtemp = Variable(index=[region], unit="degreeC")
+    rtl_g0_baselandtemp = Variable(unit="degreeC") #needed for feedback in CH4 and N2O cycles
 
-    sens_climatesensitivity = Variable(unit="degreeC")
-
-    # Unadjusted temperature calculations
-    fslope_CO2forcingslope = Parameter(unit="W/m2", default=5.5)
-
+    # Total anthropogenic forcing
     ft_totalforcing = Parameter(index=[time], unit="W/m2")
     fs_sulfateforcing = Parameter(index=[time, region], unit="W/m2")
 
-    et_equilibriumtemperature = Variable(index=[time, region], unit="degreeC")
-    rt_realizedtemperature = Variable(index=[time, region], unit="degreeC") # unadjusted temperature
+    fant_anthroforcing = Variable(index=[time], unit="W/m2")
 
-    # Adjusted temperature calculations
-    pole_polardifference = Parameter(unit="degreeC", default=1.50) # near 1 degC, the temperature increase difference between equator and pole
-    lat_latitude = Parameter(index=[region], unit="degreeLatitude")
-    lat_g_meanlatitude = Parameter(unit="degreeLatitude", default=30.21989459076828) # Area-weighted average latitude
-    rlo_ratiolandocean = Parameter(unit="unitless", default=1.40) # near 1.4, the ratio between mean land and ocean temperature increases
+    # Rate of change of forcing
+    ft_0_totalforcing0 = Parameter(unit="W/m2", default=3.202)
+    fsd_g_0_directsulphate0 = Parameter(unit="W/m2", default=-0.46666666666666673)
+    fsi_g_0_indirectsulphate0 = Parameter(unit="W/m2", default=-0.17529148701061475)
 
-    rtl_0_realizedtemperature = Parameter(index=[region], unit="degreeC")
-    rtl_realizedtemperature = Variable(index=[time, region], unit="degreeC")
+    # Climate sensitivity calculations
+    tcr_transientresponse = Parameter(unit="degreeC", default=1.7666666666666668)
+    frt_warminghalflife = Parameter(unit="year", default=28.333333333333332)
+
+    ecs_climatesensitivity = Variable(unit="degreeC")
+
+    # Unadjusted temperature calculations
+    fslope_CO2forcingslope = Parameter(unit="W/m2", default=5.5)
+    pt_g_preliminarygmst = Variable(index=[time], unit="degreeC")
 
     # Global outputs
-    rtl_g_landtemperature = Variable(index=[time], unit="degreeC")
-    rto_g_oceantemperature = Variable(index=[time], unit="degreeC")
     rt_g_globaltemperature = Variable(index=[time], unit="degreeC")
-    rt_g0_baseglobaltemp=Variable(unit="degreeC") #needed for feedback in CO2 cycle component
-    rtl_g0_baselandtemp=Variable(unit="degreeC") #needed for feedback in CH4 and N2O cycles
+    rto_g_oceantemperature = Variable(index=[time], unit="degreeC")
+    rtl_g_landtemperature = Variable(index=[time], unit="degreeC")
+
+    # Regional outputs
+    ampf_amplification = Parameter(index=[region])
+
+    rtl_realizedtemperature = Variable(index=[time, region], unit="degreeC")
 
     function init(p, v, d)
-        #calculate global baseline temperature from initial regional temperatures
-
-        ocean_prop_ortion = 1. - sum(p.area) / 510000000.
+        println(0)
+        for rr in d.region
+            v.rtl_0_baselandtemp[rr] = p.rt_g0_baseglobaltemp * p.ampf_amplification[rr]
+        end
 
         # Equation 21 from Hope (2006): initial global land temperature
-        v.rtl_g0_baselandtemp = sum(p.rtl_0_realizedtemperature' .* p.area') / sum(p.area)
-
-        # initial ocean and global temperatures
-        rto_g0_baseoceantemp = v.rtl_g0_baselandtemp/ p.rlo_ratiolandocean
-        v.rt_g0_baseglobaltemp = ocean_prop_ortion * rto_g0_baseoceantemp + (1. - ocean_prop_ortion) * v.rtl_g0_baselandtemp
-    end
-
-
-    function run_timestep(p, v, d, tt)
+        v.rtl_g0_baselandtemp = sum(v.rtl_0_baselandtemp .* p.area) / sum(p.area)
 
         # Inclusion of transient climate response from Hope (2009)
-        if is_first(tt) # only calculate once
-            v.sens_climatesensitivity = p.tcr_transientresponse / (1. - (p.frt_warminghalflife / 70.) * (1. - exp(-70. / p.frt_warminghalflife)))
-        end
+        v.ecs_climatesensitivity = p.tcr_transientresponse / (1. - (p.frt_warminghalflife / 70.) * (1. - exp(-70. / p.frt_warminghalflife)))
+    end
 
-        ## Adjustment for latitude and land
-        ocean_prop_ortion = 1. - (sum(p.area) / 510000000.)
-        rt_adj_temperatureadjustment = (p.pole_polardifference / 90.) * (abs.(p.lat_latitude) .- p.lat_g_meanlatitude)
+    function run_timestep(p, v, d, tt)
+        # Grand total forcing
+        v.fant_anthroforcing[tt] = p.ft_totalforcing[tt] + sum(p.area .* p.fs_sulfateforcing[tt, :]) / p.area_e_eartharea
 
-        ## Unadjusted realized temperature
-
-        # Equation 19 from Hope (2006): equilibrium temperature estimate
-        for rr in d.region
-            v.et_equilibriumtemperature[tt, rr] = (v.sens_climatesensitivity / log(2.0)) * (p.ft_totalforcing[tt] + p.fs_sulfateforcing[tt, rr]) / p.fslope_CO2forcingslope
-        end
-
-        # Equation 20 from Hope (2006): realized temperature estimate
-        # Hope (2009) replaced OCEAN with FRT
+        # Rate of change of grand total forcing
         if is_first(tt)
-            # Calculate baseline realized temperature by subtracting off adjustment
-            rt_0_realizedtemperature = (p.rtl_0_realizedtemperature - rt_adj_temperatureadjustment) * (1. + (ocean_prop_ortion / p.rlo_ratiolandocean) - ocean_prop_ortion)
-            for rr in d.region
-                v.rt_realizedtemperature[tt, rr] = rt_0_realizedtemperature[rr] + (1 - exp(-(p.y_year[tt] - p.y_year_0) / p.frt_warminghalflife)) * (v.et_equilibriumtemperature[tt, rr] - rt_0_realizedtemperature[rr])
-            end
+            rate_fant = 0 # inferred from spreadsheet
+            deltat = p.y_year[tt] - p.y_year_0
+        elseif is_timestep(tt, 2)
+            fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
+            rate_fant = (v.fant_anthroforcing[tt-1] - fant0) / (p.y_year[tt-1] - p.y_year_0)
+            deltat = p.y_year[tt] - p.y_year[tt-1]
         else
-            for rr in d.region
-                v.rt_realizedtemperature[tt, rr] = v.rt_realizedtemperature[tt-1, rr] + (1 - exp(-(p.y_year[tt] - p.y_year[tt-1]) / p.frt_warminghalflife)) * (v.et_equilibriumtemperature[tt, rr] - v.rt_realizedtemperature[tt-1, rr])
-            end
+            rate_fant = (v.fant_anthroforcing[tt-1] - v.fant_anthroforcing[tt-2]) / (p.y_year[tt-1] - p.y_year[tt-2])
+            deltat = p.y_year[tt] - p.y_year[tt-1]
         end
 
-        ## Adjusted realized temperature
+        BB = v.ecs_climatesensitivity / (p.fslope_CO2forcingslope * log(2.0)) * rate_fant
+        EXPT = exp(-deltat / p.frt_warminghalflife)
+
+        if is_first(tt)
+            fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
+            AA = v.ecs_climatesensitivity / (p.fslope_CO2forcingslope * log(2.0)) * fant0
+            v.pt_g_preliminarygmst[tt] = p.rt_g0_baseglobaltemp + (AA - p.rt_g0_baseglobaltemp) * (1 - EXPT) # Drop BB because 0
+        else
+            AA = v.ecs_climatesensitivity / (p.fslope_CO2forcingslope * log(2.0)) * v.fant_anthroforcing[tt-1]
+            v.pt_g_preliminarygmst[tt] = v.pt_g_preliminarygmst[tt-1] + (AA - p.frt_warminghalflife*BB - v.pt_g_preliminarygmst[tt-1]) * (1 - EXPT) + deltat * BB
+        end
+
+        # Without surface albedo, just equal
+        v.rt_g_globaltemperature[tt] = v.pt_g_preliminarygmst[tt]
 
         # Adding adjustment, from Hope (2009)
         for rr in d.region
-            v.rtl_realizedtemperature[tt, rr] = v.rt_realizedtemperature[tt, rr] / (1. + (ocean_prop_ortion / p.rlo_ratiolandocean) - ocean_prop_ortion) + rt_adj_temperatureadjustment[rr]
+            v.rtl_realizedtemperature[tt, rr] = v.rt_g_globaltemperature[tt] * p.ampf_amplification[rr]
         end
 
-        # Equation 21 from Hope (2006): global realized temperature estimate
+        # Land average temperature
         v.rtl_g_landtemperature[tt] = sum(v.rtl_realizedtemperature[tt, :]' .* p.area') / sum(p.area)
 
-        # Ocean and global average temperature from Hope (2009)
-        v.rto_g_oceantemperature[tt] = v.rtl_g_landtemperature[tt] / p.rlo_ratiolandocean
-        v.rt_g_globaltemperature[tt] = ocean_prop_ortion * v.rto_g_oceantemperature[tt] + (1. - ocean_prop_ortion) * v.rtl_g_landtemperature[tt]
+        # Ocean average temperature
+        v.rto_g_oceantemperature[tt] = (p.area_e_eartharea * v.rt_g_globaltemperature[tt] - sum(p.area) * v.rtl_g_landtemperature[tt]) / (p.area_e_eartharea - sum(p.area))
     end
 end

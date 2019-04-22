@@ -2,6 +2,7 @@ using Test
 using CSVFiles
 using Missings
 using DataFrames
+using Distributions
 
 Mimi.reset_compdefs()
 
@@ -48,7 +49,6 @@ if regenerate
             println(",")
         end
     end 
-
 else
     println("Performing MC sample")
     # Perform a small MC run
