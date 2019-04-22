@@ -15,6 +15,8 @@ using Mimi
     er_emissionsgrowth = Parameter(index=[time, region], unit= "%")
     e0_baselineemissions = Parameter(index=[region], unit= "Mtonne/year")
 
+
+
     #regional inputs
     emitf_uncertaintyinBAUemissfactor = Parameter(index=[region], unit= "none")
     q0f_negativecostpercentagefactor = Parameter(index=[region], unit="none")
@@ -24,14 +26,14 @@ using Mimi
     yagg = Parameter(index=[time], unit="year") # from equity weighting
 
     #inputs with single, uncertain values
-    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit="none", default=.733333333333333334)
-    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.2666666666666666)
-    c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=.8333333333333334)
+    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit="none", default=.883333333333333334) ## Modified
+    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.1166666666666666) ## Modified
+    c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=.9333333333333334) ## Modified
     curve_below_curvatureofMACcurvebelowzerocost = Parameter(unit="none", default=.5)
     curve_above_curvatureofMACcurveabovezerocost = Parameter(unit="none", default=.4)
     cross_experiencecrossoverratio = Parameter(unit="none", default=.2)
-    learn_learningrate = Parameter(unit="none", default=.2)
-    automult_autonomoustechchange = Parameter(unit="none", default=.65)
+    learn_learningrate = Parameter(unit="none", default=.2) ## No changes necessary - PAGE-ICE documentation also has value of 0.2.
+    automult_autonomoustechchange = Parameter(unit="none", default=.65) ## No changes necessary - PAGE-ICE documentation also has value of 0.65.
     equity_prop_equityweightsproportion = Parameter(unit="none", default=1.)
 
     #Variables
@@ -140,12 +142,14 @@ function addabatementcosts(model::Model, class::Symbol, policy::String="policy-a
     abatementcostscomp = add_comp!(model, AbatementCosts, componentname)
 
     if class == :CO2
-        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 8.333333333333334)
-        setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 20.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -233.333333333333)
-        setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 70.)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 400.)
-        setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 150000.)
+        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 8.333333333333334) ## Unchanged from PAGE-09
+        setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.) ## Modified
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -100.0) ## Modified
+        setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 60.) ## Modified
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 150.) ## Modified
+        setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 150000.) ## Unchanged from PAGE-09
+        setdistinctparameter(model, componentname, :)
+
         if policy == "policy-a"
             setdistinctparameter(model, componentname, :er_emissionsgrowth, readpagedata(model, "data/er_CO2emissionsgrowth.csv"))
         else
