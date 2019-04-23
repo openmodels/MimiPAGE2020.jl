@@ -58,9 +58,6 @@
     alo = Variable(index=[time, region], unit = "\$/tonne")
     bhi = Variable(index=[time, region], unit = "per Mtonne")
     ahi = Variable(index=[time, region], unit = "\$/tonne")
-    mc_marginalcost = Variable(index=[time, region], unit = "\$/tonne")
-    tcq0 = Variable(index=[time, region], unit = "\$million")
-    tc_totalcost = Variable(index=[time, region], unit= "\$million")
 
     function run_timestep(p, v, d, t)
 
@@ -129,7 +126,7 @@ function addabatementcostparameters(model::Model, class::Symbol, policy::String=
     abatementcostscomp[:y_year_0] = 2008.
 
     if class == :CO2
-        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 8.333333333333334)
+        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -22.0)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
         setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -100.0)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 60.)
@@ -138,29 +135,29 @@ function addabatementcostparameters(model::Model, class::Symbol, policy::String=
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model, "data/e0_baselineCO2emissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model, "data/bau_co2emissions.csv"))
     elseif class == :CH4
-        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 25.)
+        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -30.333333333333332)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -4333.3333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -4983.333333333333)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 51.66666666666666664)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 6333.33333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 7283.333333333333)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 2000.)
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model, "data/e0_baselineCH4emissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model, "data/bau_ch4emissions.csv"))
     elseif class == :N2O
-        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 0.)
+        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -7.0)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -7333.333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -8433.333333333334)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 51.66666666666666664)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 27333.3333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 31433.333333333332)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 53.3333333333333)
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model, "data/e0_baselineN2Oemissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model, "data/bau_n2oemissions.csv"))
     elseif class == :Lin
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 0.)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -233.333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -268.3333333333333)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 70.)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 333.333333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 383.3333333333333)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 2000.)
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model,"data/e0_baselineLGemissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model,"data/bau_linemissions.csv"))
