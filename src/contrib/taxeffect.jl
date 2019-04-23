@@ -91,12 +91,12 @@ end
 end
 
 """Construct a model with a uniform (global and all gases, but time-varying) tax."""
-function getuniformtaxmodel()
+function getuniformtaxmodel(scenario::String="NDCs")
     m = Model()
-    set_dimension!(m, :time, [2009, 2010, 2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200])
+    set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
-    buildpage(m)
+    buildpage(m, scenario)
 
     add_comp!(m, UniformTaxDrivenGrowth, after=:GDP) # before all abatement costs parameters
     set_param!(m, :UniformTaxDrivenGrowth, :uniformtax, zeros(10))

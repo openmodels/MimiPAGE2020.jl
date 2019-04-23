@@ -2,10 +2,13 @@ using Test
 
 Mimi.reset_compdefs()
 
+include("../src/getpagefunction.jl")
+
 m = getpage()
 run(m)
 
-while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,0.,0.,0.,0.,0.,0.,0.,0.,1.]
+while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,1.,1.,1.,1.,1.,1.,1.,1.,1.]
+    println(m[:Discontinuity,:occurdis_occurrencedummy])
     run(m)
 end
 

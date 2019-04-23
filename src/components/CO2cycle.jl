@@ -136,4 +136,6 @@ function addco2cycle(model::Model, use_permafrost::Bool)
         co2cycle[:permte0_permafrostemissions0] = 0
         co2cycle[:permte_permafrostemissions] = zeros(10)
     end
+
+    co2cycle
 end
