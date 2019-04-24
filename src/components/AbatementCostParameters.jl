@@ -27,7 +27,7 @@
     qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.1166666666666666)
     c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=0.9333333333333334)
     curve_below_curvatureofMACcurvebelowzerocost = Parameter(unit="none", default=.5)
-    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit="none", default=.4)
+    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit="none", default=0.39999999999999997)
     cross_experiencecrossoverratio = Parameter(unit="none", default=.2)
     learn_learningrate = Parameter(unit="none", default=.2)
     automult_autonomoustechchange = Parameter(unit="none", default=.65)
@@ -81,13 +81,13 @@
 
         v.cumcbe_g_totalreductions[t] = sum(v.cumcbe_cumulativereductionssincebaseyear[t,:])
 
-        v.auto = (1-p.automult_autonomoustechchange^(1/(p.y_year[end]-p.y_year_0)))*100
+        v.auto = (1-p.automult_autonomoustechchange^(1/(p.y_year_lssp-p.y_year_0)))*100
         v.autofac[t] = (1-v.auto/100)^(p.y_year[t] - p.y_year_0)
 
-        v.c0g = (p.c0mult_mostnegativecostinfinalyear^(1/(p.y_year[end]-p.y_year_0))-1)*100
+        v.c0g = (p.c0mult_mostnegativecostinfinalyear^(1/(p.y_year_lssp-p.y_year_0))-1)*100
         v.c0[t] = p.c0init_MostNegativeCostCutbackinBaseYear* (1+v.c0g/100)^(p.y_year[t]-p.y_year_0)
 
-        v.qmaxminusq0propg = (p.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear ^(1/(p.y_year[end]-p.y_year_0))- 1)* 100
+        v.qmaxminusq0propg = (p.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear ^(1/(p.y_year_lssp-p.y_year_0))- 1)* 100
         v.qmaxminusq0prop = p.qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear * (1+ v.qmaxminusq0propg/100)^(p.y_year[t]-p.y_year_0)
 
         v.q0propg = (p.q0propmult_cutbacksatnegativecostinfinalyear^(1/(p.y_year_lssp-p.y_year_0))-1)*100
@@ -115,15 +115,6 @@ function addabatementcostparameters(model::Model, class::Symbol, policy::String=
     componentname = Symbol("AbatementCostParameters$class")
     abatementcostscomp = add_comp!(model, AbatementCostParameters, componentname)
 
-    abatementcostscomp[:q0propmult_cutbacksatnegativecostinfinalyear] = .733333333333333334
-    abatementcostscomp[:qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear] = 1.2666666666666666
-    abatementcostscomp[:c0mult_mostnegativecostinfinalyear] = .8333333333333334
-    abatementcostscomp[:curve_below_curvatureofMACcurvebelowzerocost] = .5
-    abatementcostscomp[:curve_above_curvatureofMACcurveabovezerocost] = .4
-    abatementcostscomp[:cross_experiencecrossoverratio] = .2
-    abatementcostscomp[:learn_learningrate] = .2
-    abatementcostscomp[:automult_autonomoustechchange] = .65
-    abatementcostscomp[:equity_prop_equityweightsproportion] = 1.
     abatementcostscomp[:y_year_0] = 2015.
 
     if class == :CO2
