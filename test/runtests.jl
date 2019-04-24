@@ -24,7 +24,7 @@ end
 #include("test_CH4emissions.jl")
 include("test_CH4forcing.jl")
 include("test_ClimateTemperature.jl")
-#include("test_CO2cycle.jl")
+include("test_CO2cycle.jl")
 #include("test_CO2emissions.jl")
 #include("test_CO2forcing.jl")
 include("test_Discontinuity.jl")
@@ -48,8 +48,7 @@ include("test_Population.jl")
 include("test_TotalAbatementCosts.jl")
 include("test_TotalAdaptationCosts.jl")
 include("test_TotalForcing.jl")
-#include("test_mcs.jl")
 include("test_mcs.jl")
-include("contrib/test_taxeffect.jl") 
+include("contrib/test_taxeffect.jl")
 
 end
