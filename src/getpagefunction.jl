@@ -85,10 +85,6 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     #Equity weighting and Total Costs
     equityweighting = add_comp!(m, EquityWeighting)
 
-    # Scenario setup
-    scenario[:rcp] = rcp
-    scenario[:ssp] = ssp
-
     #connect parameters together
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
 
