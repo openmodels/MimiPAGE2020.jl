@@ -51,10 +51,10 @@ mcs = @defmcs begin
     tcr_transientresponse = TriangularDist(0.8, 2.7, 1.8)   # from PAGE-ICE v6.2 documentation
 
     # SeaLevelRise
-    s0_initialSL = TriangularDist(0.1, 0.2, 0.15)
-    sltemp_SLtemprise = TriangularDist(0.7, 3., 1.5)
-    sla_SLbaselinerise = TriangularDist(0.5, 1.5, 1.)
-    sltau_SLresponsetime = TriangularDist(500, 1500, 1000)
+    s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
+    sltemp_SLtemprise = TriangularDist(0.7, 3., 1.5)                            # median sensitivity to GMST changes
+    sla_SLbaselinerise = TriangularDist(0.5, 1.5, 1.)                           # asymptote for pre-industrial
+    sltau_SLresponsetime = Gamma(16.0833333333333333, 24.)                      # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
 
     # GDP
     isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
