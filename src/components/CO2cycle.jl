@@ -76,7 +76,7 @@ use_permafrost = true
         else
             v.te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
 
-            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * (p.stay_fractionCO2emissionsinatm/100)
+            v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * p.stay_fractionCO2emissionsinatm
             v.ocean_long_uptake_component_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)
             v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)
             v.land_uptake_co2hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t3_timeco2land)) * (p.a3_percentco2land/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t3_timeco2land)
@@ -93,13 +93,8 @@ use_permafrost = true
         v.conoccf_concentrationCO2wocc[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2*(v.renoccf_remainCO2wocc[t]*v.re_remainCO2base)
         v.re_remainCO2[t]=v.renoccf_remainCO2wocc[t]
 
-        if is_first(t)
-            #Co2 concentration
-            v.c_CO2concentration[t]=v.conoccf_concentrationCO2wocc[t]+p.ccf_CO2feedback
-        else
-            #eq.11 from Hope(2006) - CO2 concentration
-            v.c_CO2concentration[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2 * v.re_remainCO2[t]/v.re_remainCO2base
-        end
+        #eq.11 from Hope(2006) - CO2 concentration
+        v.c_CO2concentration[t]=p.pic_preindustconcCO2+v.exc_excessconcCO2 * v.re_remainCO2[t]/v.re_remainCO2base
     end
 end
 
@@ -113,4 +108,6 @@ function addco2cycle(model::Model, use_permafrost::Bool)
         co2cycle[:permte0_permafrostemissions0] = 0
         co2cycle[:permte_permafrostemissions] = zeros(10)
     end
+
+    co2cycle
 end

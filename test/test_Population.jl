@@ -2,7 +2,7 @@
 using Test
 
 m = page_model()
-include("components/RCPSSPScenario.jl")
+include("../src/components/RCPSSPScenario.jl")
 include("../src/components/Population.jl")
 
 scenario = addrcpsspscenario(m, "NDCs")

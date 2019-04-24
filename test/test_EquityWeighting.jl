@@ -2,8 +2,10 @@
 using Test
 
 m = page_model()
+include("../src/components/RCPSSPScenario.jl")
 include("../src/components/EquityWeighting.jl")
 
+scenario = addrcpsspscenario(m, "NDCs")
 equityweighting = add_comp!(m, EquityWeighting)
 
 equityweighting[:tct_percap_totalcosts_total] = readpagedata(m, "test/validationdata/tct_per_cap_totalcostspercap.csv")
@@ -17,6 +19,8 @@ equityweighting[:yagg_periodspan] = readpagedata(m, "test/validationdata/yagg_pe
 equityweighting[:pop_population] = readpagedata(m, "test/validationdata/pop_population.csv")
 equityweighting[:y_year_0] = 2015.
 equityweighting[:y_year] = Mimi.dim_keys(m.md, :time)
+equityweighting[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+equityweighting[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
 
 p = load_parameters(m)
 set_leftover_params!(m, p)

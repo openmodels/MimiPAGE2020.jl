@@ -2,7 +2,8 @@
 
     region = Index()
     y_year = Parameter(index=[time], unit="year")
-    y_year_0 = Parameter(unit="year", default = 2008.)
+    y_year_0 = Parameter(unit="year", default = 2015.)
+    y_year_lssp = Parameter(unit="year", default=2100.)
 
     #gas inputs
     emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = Parameter(unit="%")
@@ -22,11 +23,11 @@
     yagg = Parameter(index=[time], unit="year") # from equity weighting
 
     #inputs with single, uncertain values
-    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit="none", default=.733333333333333334)
-    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.2666666666666666)
-    c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=.8333333333333334)
+    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit="none", default=0.8833333333333333)
+    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.1166666666666666)
+    c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=0.9333333333333334)
     curve_below_curvatureofMACcurvebelowzerocost = Parameter(unit="none", default=.5)
-    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit="none", default=.4)
+    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit="none", default=0.39999999999999997)
     cross_experiencecrossoverratio = Parameter(unit="none", default=.2)
     learn_learningrate = Parameter(unit="none", default=.2)
     automult_autonomoustechchange = Parameter(unit="none", default=.65)
@@ -34,7 +35,7 @@
 
     # Inputs from other components
     cbe_absoluteemissionreductions = Parameter(index=[time, region], unit="Mtonne") #TODO: default here?
-    
+
     #Variables
     emit_UncertaintyinBAUEmissFactor = Variable(index=[region], unit = "%")
     q0propinit_CutbacksinNegativeCostinBaseYear = Variable(index=[region], unit= "% of BAU emissions")
@@ -58,9 +59,6 @@
     alo = Variable(index=[time, region], unit = "\$/tonne")
     bhi = Variable(index=[time, region], unit = "per Mtonne")
     ahi = Variable(index=[time, region], unit = "\$/tonne")
-    mc_marginalcost = Variable(index=[time, region], unit = "\$/tonne")
-    tcq0 = Variable(index=[time, region], unit = "\$million")
-    tc_totalcost = Variable(index=[time, region], unit= "\$million")
 
     function run_timestep(p, v, d, t)
 
@@ -80,19 +78,19 @@
                 v.cumcbe_cumulativereductionssincebaseyear[t,r] = v.cumcbe_cumulativereductionssincebaseyear[t-1, r] + p.cbe_absoluteemissionreductions[t-1, r] * p.yagg[t-1]
             end
         end
-        
+
         v.cumcbe_g_totalreductions[t] = sum(v.cumcbe_cumulativereductionssincebaseyear[t,:])
 
-        v.auto = (1-p.automult_autonomoustechchange^(1/(p.y_year[end]-p.y_year_0)))*100
+        v.auto = (1-p.automult_autonomoustechchange^(1/(p.y_year_lssp-p.y_year_0)))*100
         v.autofac[t] = (1-v.auto/100)^(p.y_year[t] - p.y_year_0)
 
-        v.c0g = (p.c0mult_mostnegativecostinfinalyear^(1/(p.y_year[end]-p.y_year_0))-1)*100
+        v.c0g = (p.c0mult_mostnegativecostinfinalyear^(1/(p.y_year_lssp-p.y_year_0))-1)*100
         v.c0[t] = p.c0init_MostNegativeCostCutbackinBaseYear* (1+v.c0g/100)^(p.y_year[t]-p.y_year_0)
 
-        v.qmaxminusq0propg = (p.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear ^(1/(p.y_year[end]-p.y_year_0))- 1)* 100
+        v.qmaxminusq0propg = (p.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear ^(1/(p.y_year_lssp-p.y_year_0))- 1)* 100
         v.qmaxminusq0prop = p.qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear * (1+ v.qmaxminusq0propg/100)^(p.y_year[t]-p.y_year_0)
 
-        v.q0propg = (p.q0propmult_cutbacksatnegativecostinfinalyear^(1/(p.y_year[end]-p.y_year_0))-1)*100
+        v.q0propg = (p.q0propmult_cutbacksatnegativecostinfinalyear^(1/(p.y_year_lssp-p.y_year_0))-1)*100
 
         for r in d.region
             v.learnfac_learning[t,r] = ((p.cross_experiencecrossoverratio *v.cumcbe_g_totalreductions[t]+ (1-p.cross_experiencecrossoverratio)*v.cumcbe_cumulativereductionssincebaseyear[t,r] + p.ies_InitialExperienceStockofCutbacks)/ p.ies_InitialExperienceStockofCutbacks)^ -(log(1/(1-p.learn_learningrate))/log(2))
@@ -117,50 +115,41 @@ function addabatementcostparameters(model::Model, class::Symbol, policy::String=
     componentname = Symbol("AbatementCostParameters$class")
     abatementcostscomp = add_comp!(model, AbatementCostParameters, componentname)
 
-    abatementcostscomp[:q0propmult_cutbacksatnegativecostinfinalyear] = .733333333333333334
-    abatementcostscomp[:qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear] = 1.2666666666666666
-    abatementcostscomp[:c0mult_mostnegativecostinfinalyear] = .8333333333333334
-    abatementcostscomp[:curve_below_curvatureofMACcurvebelowzerocost] = .5
-    abatementcostscomp[:curve_above_curvatureofMACcurveabovezerocost] = .4
-    abatementcostscomp[:cross_experiencecrossoverratio] = .2
-    abatementcostscomp[:learn_learningrate] = .2
-    abatementcostscomp[:automult_autonomoustechchange] = .65
-    abatementcostscomp[:equity_prop_equityweightsproportion] = 1.
-    abatementcostscomp[:y_year_0] = 2008.
+    abatementcostscomp[:y_year_0] = 2015.
 
     if class == :CO2
-        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 8.333333333333334)
-        setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 20.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -233.333333333333)
-        setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 70.)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 400.)
+        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -22.0)
+        setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -100.0)
+        setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 60.)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 150.)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 150000.)
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model, "data/e0_baselineCO2emissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model, "data/bau_co2emissions.csv"))
     elseif class == :CH4
-        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 25.)
+        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -30.333333333333332)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -4333.3333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -4983.333333333333)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 51.66666666666666664)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 6333.33333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 7283.333333333333)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 2000.)
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model, "data/e0_baselineCH4emissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model, "data/bau_ch4emissions.csv"))
     elseif class == :N2O
-        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 0.)
+        setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -7.0)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -7333.333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -8433.333333333334)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 51.66666666666666664)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 27333.3333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 31433.333333333332)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 53.3333333333333)
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model, "data/e0_baselineN2Oemissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model, "data/bau_n2oemissions.csv"))
     elseif class == :Lin
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, 0.)
         setdistinctparameter(model, componentname, :q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear, 10.)
-        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -233.333333333333)
+        setdistinctparameter(model, componentname, :c0init_MostNegativeCostCutbackinBaseYear, -268.3333333333333)
         setdistinctparameter(model, componentname, :qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear, 70.)
-        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 333.333333333333)
+        setdistinctparameter(model, componentname, :cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear, 383.3333333333333)
         setdistinctparameter(model, componentname, :ies_InitialExperienceStockofCutbacks, 2000.)
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model,"data/e0_baselineLGemissions.csv"))
         setdistinctparameter(model, componentname, :bau_businessasusualemissions, readpagedata(model,"data/bau_linemissions.csv"))

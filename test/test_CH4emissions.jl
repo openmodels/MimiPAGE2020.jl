@@ -9,7 +9,6 @@ ch4emit = add_comp!(m, ch4emissions)
 
 ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
 set_param!(m, :ch4emissions, :e0_baselineCH4emissions, readpagedata(m, "data/e0_baselineCH4emissions.csv")) #PAGE 2009 documentation pp38
-set_param!(m, :ch4emissions, :er_CH4emissionsgrowth, readpagedata(m, "data/er_CH4emissionsgrowth.csv"))
 
 ##running Model
 run(m)

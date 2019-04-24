@@ -10,12 +10,11 @@ lgemit = add_comp!(m, LGemissions)
 
 lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
 set_param!(m, :LGemissions, :e0_baselineLGemissions, readpagedata(m,"data/e0_baselineLGemissions.csv"))
-set_param!(m, :LGemissions, :er_LGemissionsgrowth, readpagedata(m, "data/er_LGemissionsgrowth.csv"))
 
 # run Model
 run(m)
 
-emissions= m[:LGemissions,  :e_regionalLGemissions]
-emissions_compare=readpagedata(m, "test/validationdata/e_regionalLGemissions.csv")
+emissions= m[:LGemissions,  :e_globalLGemissions]
+emissions_compare=readpagedata(m, "test/validationdata/e_globalLGemissions.csv")
 
 @test emissions ≈ emissions_compare rtol=1e-3

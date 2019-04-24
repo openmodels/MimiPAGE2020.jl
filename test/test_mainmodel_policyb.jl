@@ -6,10 +6,10 @@ include("../src/getpagefunction.jl")
 m = getpage()
 run(m)
 
-m = getpage("policy-b")
+m = getpage("NDCs", "policy-b")
 run(m)
 
-while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,0.,0.,0.,0.,0.,0.,0.,0.,0.]
+while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,1.,1.,1.,1.,1.,1.,1.,1.,1.]
     run(m)
 end
 
