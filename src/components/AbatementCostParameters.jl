@@ -2,7 +2,8 @@
 
     region = Index()
     y_year = Parameter(index=[time], unit="year")
-    y_year_0 = Parameter(unit="year", default = 2008.)
+    y_year_0 = Parameter(unit="year", default = 2015.)
+    y_year_lssp = Parameter(unit="year", default=2100.)
 
     #gas inputs
     emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = Parameter(unit="%")
@@ -89,7 +90,7 @@
         v.qmaxminusq0propg = (p.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear ^(1/(p.y_year[end]-p.y_year_0))- 1)* 100
         v.qmaxminusq0prop = p.qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear * (1+ v.qmaxminusq0propg/100)^(p.y_year[t]-p.y_year_0)
 
-        v.q0propg = (p.q0propmult_cutbacksatnegativecostinfinalyear^(1/(p.y_year[end]-p.y_year_0))-1)*100
+        v.q0propg = (p.q0propmult_cutbacksatnegativecostinfinalyear^(1/(p.y_year_lssp-p.y_year_0))-1)*100
 
         for r in d.region
             v.learnfac_learning[t,r] = ((p.cross_experiencecrossoverratio *v.cumcbe_g_totalreductions[t]+ (1-p.cross_experiencecrossoverratio)*v.cumcbe_cumulativereductionssincebaseyear[t,r] + p.ies_InitialExperienceStockofCutbacks)/ p.ies_InitialExperienceStockofCutbacks)^ -(log(1/(1-p.learn_learningrate))/log(2))
@@ -123,7 +124,7 @@ function addabatementcostparameters(model::Model, class::Symbol, policy::String=
     abatementcostscomp[:learn_learningrate] = .2
     abatementcostscomp[:automult_autonomoustechchange] = .65
     abatementcostscomp[:equity_prop_equityweightsproportion] = 1.
-    abatementcostscomp[:y_year_0] = 2008.
+    abatementcostscomp[:y_year_0] = 2015.
 
     if class == :CO2
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -22.0)
