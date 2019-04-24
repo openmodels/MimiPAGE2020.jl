@@ -1,12 +1,10 @@
-using Mimi
-
 @defcomp ch4forcing begin
     c_N2Oconcentration=Parameter(index=[time],unit="ppbv")
     c_CH4concentration=Parameter(index=[time],unit="ppbv")
-    f0_CH4baseforcing=Parameter(unit="W/m2", default=0.550)
+    f0_CH4baseforcing=Parameter(unit="W/m2", default=0.48)
     fslope_CH4forcingslope=Parameter(unit="W/m2", default=0.036)
-    c0_baseN2Oconc=Parameter(unit="ppbv", default=322.)
-    c0_baseCH4conc=Parameter(unit="ppbv", default=1860.)
+    c0_baseN2Oconc=Parameter(unit="ppbv", default=324.)
+    c0_baseCH4conc=Parameter(unit="ppbv", default=1803.)
     f_CH4forcing=Variable(index=[time],unit="W/m2")
     over_baseoverlap=Variable(unit="W/m2")
     over=Variable(index=[time],unit="W/m2")

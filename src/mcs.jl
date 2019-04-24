@@ -47,8 +47,8 @@ mcs = @defmcs begin
     # ClimateTemperature
     rlo_ratiolandocean = TriangularDist(1.2, 1.6, 1.4)
     pole_polardifference = TriangularDist(1, 2, 1.5)
-    frt_warminghalflife = TriangularDist(10, 65, 30)
-    tcr_transientresponse = TriangularDist(1, 2.8, 1.3)
+    frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation
+    tcr_transientresponse = TriangularDist(0.8, 2.7, 1.8)   # from PAGE-ICE v6.2 documentation
 
     # SeaLevelRise
     s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
@@ -57,7 +57,7 @@ mcs = @defmcs begin
     sltau_SLresponsetime = Gamma(16.0833333333333333, 24.)                      # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
 
     # GDP
-    isat0_initialimpactfxnsaturation = TriangularDist(20, 50, 30)
+    isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
 
     # MarketDamages
     tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.)
@@ -82,9 +82,9 @@ mcs = @defmcs begin
 
     # Discountinuity
     rand_discontinuity = Uniform(0, 1)
-    tdis_tolerabilitydisc = TriangularDist(2, 4, 3)
+    tdis_tolerabilitydisc = TriangularDist(1, 2, 1.5)
     pdis_probability = TriangularDist(10, 30, 20)
-    wdis_gdplostdisc = TriangularDist(5, 25, 15)
+    wdis_gdplostdisc = TriangularDist(1, 5, 3)
     ipow_incomeexponent = TriangularDist(-.3, 0, -.1)
     distau_discontinuityexponent = TriangularDist(20, 200, 50)
 
@@ -94,9 +94,9 @@ mcs = @defmcs begin
     emuc_utilityconvexity = TriangularDist(0.5,2,1)
 
     # AbatementCosts
-    AbatementCostsCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,75,0)
-    AbatementCostsCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-25,100,0)
-    AbatementCostsN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,50,0)
+    AbatementCostsCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,6.0,-22)
+    AbatementCostsCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67,6.0,-30)
+    AbatementCostsN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20,6.0,-7.0)
     AbatementCostsLin_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,50,0)
 
     AbatementCostsCO2_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,40,20)

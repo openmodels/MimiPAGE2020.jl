@@ -1,11 +1,14 @@
-using Mimi
+
 using Test
 
 m = page_model()
+include("components/RCPSSPScenario.jl")
 include("../src/components/GDP.jl")
 
+scenario = addrcpsspscenario(m, "NDCs")
 gdp = add_comp!(m, GDP)
 
+gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
 gdp[:pop0_initpopulation] = readpagedata(m, "data/pop0_initpopulation.csv")
 gdp[:pop_population] = readpagedata(m, "test/validationdata/pop_population.csv")
 gdp[:y_year] = Mimi.dim_keys(m.md, :time)

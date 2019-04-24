@@ -1,12 +1,12 @@
 # Index: region
 # Unit: year
 
-Region,iyears_2_a
-EU,40
-US,40
-OT,40
-EE,40
-CA,40
-IA,40
-AF,40
-LA,40
+region,iyears_2_a
+EU,40.0
+US,40.0
+OT,40.0
+EE,40.0
+CA,40.0
+IA,40.0
+AF,40.0
+LA,40.0

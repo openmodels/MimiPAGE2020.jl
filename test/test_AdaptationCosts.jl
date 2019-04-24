@@ -1,4 +1,4 @@
-using Mimi
+
 using DataFrames
 using Test
 
@@ -49,7 +49,7 @@ ac_sealevel = m[:AdaptiveCostsSeaLevel, :ac_adaptivecosts]
 
 ac_noneconomic_compare = readpagedata(m, "test/validationdata/ac_adaptationcosts_noneconomic.csv")
 ac_economic_compare = readpagedata(m, "test/validationdata/ac_adaptationcosts_economic.csv")
-ac_sealevel_compare = readpagedata(m, "test/validationdata/ac_adaptationcosts_sealevelrise.csv")
+ac_sealevel_compare = readpagedata(m, "test/validationdata/ac_adaptationcosts_sealevel.csv")
 
 @test ac_noneconomic ≈ ac_noneconomic_compare rtol=1e-2
 @test ac_economic ≈ ac_economic_compare rtol=1e-3

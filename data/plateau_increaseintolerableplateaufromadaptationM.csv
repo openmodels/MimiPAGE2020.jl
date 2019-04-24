@@ -1,12 +1,12 @@
 # Index: region
 # Unit: degreeC
 
-Region,plateau_1_a
-EU,1
-US,1
-OT,1
-EE,1
-CA,1
-IA,1
-AF,1
-LA,1
+region,plateau_1_a
+EU,0.0
+US,0.0
+OT,0.0
+EE,0.0
+CA,0.0
+IA,0.0
+AF,0.0
+LA,0.0

@@ -1,14 +1,14 @@
-using Mimi
+
 
 @defcomp SeaLevelRise begin
 
   # Parameters
 
   rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
-  sltemp_SLtemprise=Parameter(unit = "m-degreeC", default=1.7333333333333333)   # median sensitivity to GMST changes
+  sltemp_SLtemprise=Parameter(unit = "m-degreeC", default=1.7333333333333334)   # median sensitivity to GMST changes
   sla_SLbaselinerise=Parameter(unit = "m", default=1.00)                        # asymptote for pre-industrial
-  sltau_SLresponsetime=Parameter(unit = "years", default=386.)                  # median sltau, changed from 1000.
-  s0_initialSL=Parameter(unit = "m", default=0.19)                              # mode initial sea level, from PAGE-ICE
+  sltau_SLresponsetime=Parameter(unit = "years", default=386.0)                 # median sltau, changed from 1000.
+  s0_initialSL=Parameter(unit = "m", default=0.0.18999999999999997)             # mode initial sea level, from PAGE-ICE
   y_year=Parameter(index=[time], unit="year")
   y_year_0=Parameter(unit="year")
 

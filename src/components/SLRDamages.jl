@@ -1,4 +1,4 @@
-using Mimi
+
 
 @defcomp SLRDamages begin
     region = Index()
@@ -14,7 +14,7 @@ using Mimi
     act_percap_adaptationcosts = Parameter(index=[time, region], unit="\$/person")
 
     #component parameters
-    impmax_maxSLRforadaptpolicySLR = Parameter(index=[region], unit= "m") 
+    impmax_maxSLRforadaptpolicySLR = Parameter(index=[region], unit= "m")
 
     save_savingsrate = Parameter(unit= "%", default=15.00) #pp33 PAGE09 documentation, "savings rate".
     wincf_weightsfactor =Parameter(index=[region], unit="")
@@ -23,7 +23,7 @@ using Mimi
     pow_SLRImpactFxnExponent=Parameter(default=0.7333333333333334)
     iben_SLRInitialBenefit=Parameter(default=0.00)
     scal_calibrationSLR = Parameter(default=0.5)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=27934.244777382406)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=34298.93698672955)
 
     #component variables
     cons_percap_aftercosts = Variable(index=[time, region], unit = "\$/person")
@@ -87,8 +87,8 @@ using Mimi
 end
 
 
-# Still need this function in order to set the parameters than depend on 
-# readpagedata, which takes model as an input. These cannot be set using 
+# Still need this function in order to set the parameters than depend on
+# readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
 function addslrdamages(model::Model)
     SLRDamagescomp = add_comp!(model, SLRDamages)
