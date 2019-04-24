@@ -10,9 +10,6 @@ use_permafrost = true
     e_globalCO2emissions = Parameter(index=[time], unit="Mtonne/year")
     e0_globalCO2emissions = Parameter(unit="Mtonne/year", default=41223.85968577856)
 
-    te_totalemissions = Variable(index=[time], unit="Mtonne/year")
-
-    c_CO2concentration=Variable(index=[time],unit="ppbv")
     pic_preindustconcCO2=Parameter(unit="ppbv", default=278000.)
     exc_excessconcCO2=Variable(unit="ppbv")
     c0_CO2concbaseyr=Parameter(unit="ppbv", default=400859.5833333334)
@@ -21,8 +18,6 @@ use_permafrost = true
     renoccf_remainCO2wocc=Variable(index=[time],unit="Mtonne")
     air_CO2fractioninatm=Parameter(unit="%", default=62.00)
     stay_fractionCO2emissionsinatm=Parameter(default=0.2341802168612297)#percent co2 stay but not in percent
-    tea_CO2emissionstoatm=Variable(index=[time],unit="Mtonne/year")
-    teay_CO2emissionstoatm=Variable(index=[time],unit="Mtonne/t")
     ccf_CO2feedback=Parameter(unit="%/degreeC", default=0.0)
     ccfmax_maxCO2feedback=Parameter(unit="%", default=20.0)
     ce_0_basecumCO2emissions=Parameter(unit="Mtonne", default=2040000.)
@@ -56,28 +51,17 @@ use_permafrost = true
     ocean_short_uptake_component_proj=Variable(index=[time], unit="Mtonne")
     land_uptake_co2_proj=Variable(index=[time], unit="Mtonne")
 
+    te_totalemissions = Variable(index=[time], unit="Mtonne/year")
+    c_CO2concentration=Variable(index=[time],unit="ppbv")
 
     function run_timestep(p, v, d, t)
 
         te0_totalemissions0 = p.e0_globalCO2emissions + p.permte0_permafrostemissions0
         if is_first(t)
-
-            tea0=p.e0_globalCO2emissions*p.air_CO2fractioninatm/100
-            v.tea_CO2emissionstoatm[t]=(p.e_globalCO2emissions[t])*p.air_CO2fractioninatm/100
-            v.teay_CO2emissionstoatm[t]=(v.tea_CO2emissionstoatm[t]+tea0)*(p.y_year[t]-p.y_year_0)/2
             #adapted from eq.1 in Hope(2006) - calculate excess concentration in base year
             v.exc_excessconcCO2=p.c0_CO2concbaseyr-p.pic_preindustconcCO2
             #Eq. 2 from Hope (2006) - base-year remaining emissions
             v.re_remainCO2base=v.exc_excessconcCO2*p.den_CO2density
-
-            #update remaining emissions
-
-            #Functions for two parameters that are fixed
-            # eq. 8 from Hope (2006) - baseline cumulative emissions to atmosphere
-            #ceabase=p.ce_0_basecumCO2emissions*p.air_CO2fractioninatm/100
-            #p.thist_timescaleco2hist=ceabase/tea0
-            #p.corrf_correctionfactorco2_0=renoccf0_remainCO2wocc/(tea0*p.thist_timescaleco2hist*((p.stay_fractionCO2emissionsinatm)+(p.a1_percentco2oceanlong/100)/(1+p.thist_timescaleco2hist/p.t1_timeco2oceanlong)
-            #    +(p.a2_percentco2oceanshort/100)/(1+p.thist_timescaleco2hist/p.t2_timeco2oceanshort)+(p.a3_percentco2land/100)/(1+p.thist_timescaleco2hist/p.t3_timeco2land)))
 
             v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * p.stay_fractionCO2emissionsinatm
             v.ocean_long_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100) * exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)
@@ -92,13 +76,6 @@ use_permafrost = true
         else
             v.te_totalemissions[t] = p.e_globalCO2emissions[t] + p.permte_permafrostemissions[t]
 
-            #eq.6 from Hope (2006) - emissions to atmosphere depend on the sum of natural and anthropogenic emissions
-            tea0=p.e0_globalCO2emissions*p.air_CO2fractioninatm/100#added for the update
-            v.tea_CO2emissionstoatm[t]=(p.e_globalCO2emissions[t])*p.air_CO2fractioninatm/100
-            #eq.7 from Hope (2006) - total emissions over time period
-            v.teay_CO2emissionstoatm[t]=(v.tea_CO2emissionstoatm[t]+v.tea_CO2emissionstoatm[t-1])*(p.y_year[t]-p.y_year[t-1])/2
-
-            #update remaining emissions
             v.asymptote_co2_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * p.thist_timescaleco2hist * p.stay_fractionCO2emissionsinatm
             v.ocean_long_uptake_component_hist[t] = p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t1_timeco2oceanlong)) * (p.a1_percentco2oceanlong/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t1_timeco2oceanlong)
             v.ocean_short_uptake_component_hist[t]=p.corrf_correctionfactorco2_0 * te0_totalemissions0 * (p.thist_timescaleco2hist / (1 + p.thist_timescaleco2hist/p.t2_timeco2oceanshort)) * (p.a2_percentco2oceanshort/100)*exp(-(p.y_year[t]-p.y_year_0)/p.t2_timeco2oceanshort)
