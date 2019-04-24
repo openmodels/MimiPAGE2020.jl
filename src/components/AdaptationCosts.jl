@@ -2,6 +2,7 @@
     region = Index()
 
     y_year_0 = Parameter(unit="year")
+    y_year_lssp = Parameter(unit="year", default=2100.)
     y_year = Parameter(index=[time], unit="year")
     gdp = Parameter(index=[time, region], unit="\$M")
     cf_costregional = Parameter(index=[region], unit="none") # first value should be 1.
@@ -32,7 +33,7 @@
     function run_timestep(p, v, d, tt)
 
         # Hope (2009), p. 21, equation -5
-        auto_autonomouschangepercent = (1 - p.automult_autonomouschange^(1/(p.y_year[end] - p.y_year_0)))*100 # % per year
+        auto_autonomouschangepercent = (1 - p.automult_autonomouschange^(1/(p.y_year_lssp - p.y_year_0)))*100 # % per year
         v.autofac_autonomouschangefraction[tt] = (1 - auto_autonomouschangepercent/100)^(p.y_year[tt] - p.y_year_0) # Varies by year
 
         for rr in d.region
