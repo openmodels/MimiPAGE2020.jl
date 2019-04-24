@@ -28,7 +28,7 @@ co2emit = add_comp!(m,co2emissions)
 addco2cycle(m, use_permafrost)
 add_comp!(m, co2forcing)
 ch4emit = add_comp!(m, ch4emissions)
-add_comp!(m, ch4cycle)
+addch4cycle(m, use_permafrost)
 add_comp!(m, ch4forcing)
 n2oemit = add_comp!(m, n2oemissions)
 add_comp!(m, n2ocycle)
@@ -50,13 +50,13 @@ connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :ClimateTemperature => :
 connect_param!(m, :co2forcing => :c_CO2concentration, :CO2Cycle => :c_CO2concentration)
 
 ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
-set_param!(m, :ch4cycle, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
-set_param!(m, :ch4cycle, :y_year_0, 2015.)
-connect_param!(m, :ch4cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
-connect_param!(m, :ch4cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-connect_param!(m, :ch4cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+set_param!(m, :CH4Cycle, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
+set_param!(m, :CH4Cycle, :y_year_0, 2015.)
+connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
+connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
+connect_param!(m, :CH4Cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
 
-connect_param!(m, :ch4forcing => :c_CH4concentration, :ch4cycle => :c_CH4concentration)
+connect_param!(m, :ch4forcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
 connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
 n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
@@ -66,7 +66,7 @@ connect_param!(m, :n2ocycle => :e_globalN2Oemissions, :n2oemissions => :e_global
 connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
 connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
 
-connect_param!(m, :n2oforcing => :c_CH4concentration, :ch4cycle => :c_CH4concentration)
+connect_param!(m, :n2oforcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
 connect_param!(m, :n2oforcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
 lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]

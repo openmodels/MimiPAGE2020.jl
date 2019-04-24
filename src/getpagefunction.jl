@@ -41,7 +41,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     addco2cycle(m, use_permafrost)
     add_comp!(m, co2forcing)
     ch4emit = add_comp!(m, ch4emissions)
-    add_comp!(m, ch4cycle)
+    addch4cycle(m, use_permafrost)
     add_comp!(m, ch4forcing)
     n2oemit = add_comp!(m, n2oemissions)
     add_comp!(m, n2ocycle)
@@ -99,11 +99,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
 
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
 
-    connect_param!(m, :ch4cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
-    connect_param!(m, :ch4cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-    connect_param!(m, :ch4cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
+    connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
+    connect_param!(m, :CH4Cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
 
-    connect_param!(m, :ch4forcing => :c_CH4concentration, :ch4cycle => :c_CH4concentration)
+    connect_param!(m, :ch4forcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
     n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
@@ -112,7 +112,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
     connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
 
-    connect_param!(m, :n2oforcing => :c_CH4concentration, :ch4cycle => :c_CH4concentration)
+    connect_param!(m, :n2oforcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :n2oforcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
     lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
