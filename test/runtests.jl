@@ -18,7 +18,7 @@ end
 @testset "mimi-page.jl" begin
 
 include("test_climatemodel.jl")
-#include("test_AbatementCosts.jl")
+include("test_AbatementCosts.jl")
 include("test_AdaptationCosts.jl")
 include("test_CH4cycle.jl")
 include("test_CH4emissions.jl")
