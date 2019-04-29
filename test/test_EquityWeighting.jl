@@ -56,8 +56,8 @@ aact_compare = readpagedata(m, "test/validationdata/aact_equityweightedadaptatio
 
 wit_compare = readpagedata(m, "test/validationdata/wit_equityweightedimpact.csv")
 addt_compare = readpagedata(m, "test/validationdata/addt_equityweightedimpact_discountedaggregated.csv")
-addt_gt_compare = 204132238.85242900
-te_compare = 213208136.69903600
+addt_gt_compare = 9.960706559386551e8
+te_compare = 1.0320923880568126e9
 
 @test df ≈ df_compare rtol=1e-8
 @test wtct_percap ≈ wtct_percap_compare rtol=1e-7
