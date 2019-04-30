@@ -1,4 +1,4 @@
-@defcomp MarketDamages begin
+@defcomp MarketDamagesBurke begin
     region = Index()
     y_year = Parameter(index=[time], unit="year")
 
