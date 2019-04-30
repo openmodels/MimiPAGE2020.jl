@@ -36,10 +36,6 @@
     isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
 
-    # TO-DO:
-    # 3) conduct test runs
-    # 3) consider dropping the intermediate variable i1log and instead computing iref right away --> ask James
-    # 4) change the way previous years are included for growth effect analysis
 
     function run_timestep(p, v, d, t)
 
