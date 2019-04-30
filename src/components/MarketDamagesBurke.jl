@@ -6,7 +6,6 @@
     rtl_realizedtemperature = Parameter(index=[time, region], unit="degreeC")
 
     #tolerability and impact variables from PAGE damages that Burke damages also require
-    i_regionalimpact = Variable(index=[time, region], unit="degreeC")
     rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, region], unit = "\$/person")
     rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit = "\$/person")
     save_savingsrate = Parameter(unit= "%", default=15.)
@@ -43,13 +42,6 @@
             # calculate the regional temperature impact relative to baseline year and add it to baseline absolute value
             v.i_burke_regionalimpact[t,r] = (p.rtl_realizedtemperature[t,r] - p.rtl_0_realizedtemperature[r]) + p.rtl_abs_0_realizedabstemperature[r]
 
-            #calculate tolerability
-#            if (p.rtl_realizedtemperature[t,r]-p.atl_adjustedtolerableleveloftemprise[t,r]) < 0    # adaptation is implicit for Burke damages
-#                v.i_regionalimpact[t,r] = 0
-#            else
-#                v.i_regionalimpact[t,r] = p.rtl_realizedtemperature[t,r]-p.atl_adjustedtolerableleveloftemprise[t,r]
-#            end
-
 
             # calculate the log change, depending on the number of lags specified
             v.i1log_impactlogchange[t,r] = p.nlag_burke * (p.impf_coeff_lin  * (v.i_burke_regionalimpact[t,r] - p.rtl_abs_0_realizedabstemperature[r]) +
@@ -58,10 +50,6 @@
 
             # calculate the impact at focus region GDP p.c.
             v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor[r] * (1 - exp(v.i1log_impactlogchange[t,r]))
-
-
-#            v.iref_ImpactatReferenceGDPperCap[t,r]= p.wincf_weightsfactor[r]*((p.W_MarketImpactsatCalibrationTemp + p.iben_MarketInitialBenefit * p.tcal_CalibrationTemp)*  # old impact function for PAGE09
-#                (v.i_regionalimpact[t,r]/p.tcal_CalibrationTemp)^p.pow_MarketImpactExponent - v.i_regionalimpact[t,r] * p.iben_MarketInitialBenefit)
 
             # calculate impacts at actual GDP
             v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
@@ -78,15 +66,6 @@
                     (v.igdp_ImpactatActualGDPperCap[t,r]-
                     p.isatg_impactfxnsaturation)))
                 end
-
-            # let adaptation decrease impacts
-#            if v.i_regionalimpact[t,r] < p.impmax_maxtempriseforadaptpolicyM[r]  adaptation is implicit for Burke damages
-#                v.isat_ImpactinclSaturationandAdaptation[t,r]=v.isat_ImpactinclSaturationandAdaptation[t,r]*(1-p.imp_actualreduction[t,r]/100)
-#            else
-#                v.isat_ImpactinclSaturationandAdaptation[t,r] = v.isat_ImpactinclSaturationandAdaptation[t,r] *
-#                    (1-(p.imp_actualreduction[t,r]/100)* p.impmax_maxtempriseforadaptpolicyM[r] /
-#                    v.i_regionalimpact[t,r])
-#            end
 
             v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r] = (v.isat_ImpactinclSaturationandAdaptation[t,r]/100)*p.rgdp_per_cap_SLRRemainGDP[t,r]
             v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
