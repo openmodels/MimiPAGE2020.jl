@@ -74,6 +74,10 @@ mcs = @defmcs begin
     pow_MarketImpactExponent = TriangularDist(1.5, 3, 2)
     ipow_MarketIncomeFxnExponent = TriangularDist(-.3, 0, -.1)
 
+    # MarketDamagesBurke
+    impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
+    impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
+
     # NonMarketDamages
     tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.)
     iben_NonMarketInitialBenefit = TriangularDist(0, .2, .05)
