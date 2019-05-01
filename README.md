@@ -14,12 +14,12 @@ The PAGE-ICE model is introduced
 in
 [Yumashev et al. (2019)](https://www.nature.com/articles/s41467-019-09863-x#Sec14).
 It extends PAGE09
-([Chris, 2011](https://www.jbs.cam.ac.uk/fileadmin/user_upload/research/workingpapers/wp1104.pdf),
-[Chris 2006](http://78.47.223.121:8080/index.php/iaj/article/view/227)
+([Hope, 2011](https://www.jbs.cam.ac.uk/fileadmin/user_upload/research/workingpapers/wp1104.pdf),
+[Hope 2006](http://78.47.223.121:8080/index.php/iaj/article/view/227))
 with nonlinear arctic feedbacks, empirical market damages, IPCC
 scenarios, and other changes.  See
 the
-[technical documentation](PAGE-ICE v6.22 Technical Description - v 24 Apr 2019.pdf) for
+[technical documentation](https://github.com/openmodels/PAGE-ICE/blob/master/PAGE-ICE%20v6.22%20Technical%20Description%20-%20v%2024%20Apr%202019.pdf?raw=true) for
 more information.
 
 The original version of PAGE-ICE is written in Excel, like the
@@ -27,7 +27,7 @@ previous versions of PAGE.  The Excel version of PAGE-ICE requires
 the [@RISK](https://www.palisade.com/risk/) Monte Carlo system.  You
 can download
 the
-[Excel version](PAGE-ICE v6.22 Nonlinear Arctic Feedbacks - Default.xlsx),
+[Excel version](https://github.com/openmodels/PAGE-ICE/blob/master/PAGE-ICE%20v6.22%20Nonlinear%20Arctic%20Feedbacks%20-%20Default.xlsx?raw=true),
 which features a Cockpit for setting up the model and a Results tab
 for the main result.
 
@@ -43,7 +43,7 @@ the code is available in this repository.  More
 details on downloading and running the Mimi version of the model are
 available below.
 
-# Mimi Software Requirements
+## Mimi Software Requirements
 
 You need to install [julia 1.1](https://julialang.org) or newer to run
 this model.
