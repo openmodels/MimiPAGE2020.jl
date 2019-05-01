@@ -19,9 +19,9 @@ mcs = @defmcs begin
     #set here as opposed to below within the blocks of RVs separated by component
     #so that they are not set more than once.
 
-    save_savingsrate = TriangularDist(10, 20, 15) # components: MarketDamages, NonMarketDamages. GDP, SLRDamages
+    save_savingsrate = TriangularDist(10, 20, 15) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages. GDP, SLRDamages
 
-    wincf_weightsfactor["USA"] = TriangularDist(.6, 1, .8) # components: MarketDamages, NonMarketDamages, , SLRDamages, Discountinuity
+    wincf_weightsfactor["USA"] = TriangularDist(.6, 1, .8) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages, , SLRDamages, Discountinuity
     wincf_weightsfactor["OECD"] = TriangularDist(.4, 1.2, .8)
     wincf_weightsfactor["USSR"] = TriangularDist(.2, .6, .4)
     wincf_weightsfactor["China"] = TriangularDist(.4, 1.2, .8)
@@ -37,16 +37,16 @@ mcs = @defmcs begin
     air_CO2fractioninatm = TriangularDist(57, 67, 62)
     res_CO2atmlifetime = TriangularDist(50, 100, 70)
     ccf_CO2feedback = TriangularDist(0, 0, 0)
-    ccfmax_maxCO2feedback = TriangularDist(10, 20, 30)
+    ccfmax_maxCO2feedback = TriangularDist(10, 30, 20)
     stay_fractionCO2emissionsinatm = TriangularDist(0.25,0.35,0.3)
-    ce_0_basecumCO2emissions=TriangularDist(1830000,2040000,2240000)
-    a1_percentco2oceanlong=TriangularDist( 4.3,	23.0, 41.6)
-    a2_percentco2oceanshort=TriangularDist(23.1, 26.6, 30.1)
-    a3_percentco2land=TriangularDist(11.4, 27.0,	42.5)
-    t1_timeco2oceanlong=TriangularDist(248.9, 312.5, 376.2)
-    t2_timeco2oceanshort=TriangularDist(25.9, 34.9,	43.9)
-    t3_timeco2land=TriangularDist(2.8, 4.3, 5.7)
-    rt_g0_baseglobaltemp=TriangularDist(0.903,0.946,0.989)
+    ce_0_basecumCO2emissions=TriangularDist(1830000, 2240000, 2040000)
+    a1_percentco2oceanlong=TriangularDist( 4.3,	41.6, 23.0)
+    a2_percentco2oceanshort=TriangularDist(23.1, 30.1, 26.6)
+    a3_percentco2land=TriangularDist(11.4, 42.5, 27.0)
+    t1_timeco2oceanlong=TriangularDist(248.9, 376.2, 312.5)
+    t2_timeco2oceanshort=TriangularDist(25.9, 43.9, 34.9)
+    t3_timeco2land=TriangularDist(2.8, 5.7, 4.3)
+    rt_g0_baseglobaltemp=TriangularDist(0.903, 0.989, 0.946)
 
     # SulphateForcing
     d_sulphateforcingbase = TriangularDist(-0.8, -0.2, -0.4)
@@ -73,6 +73,20 @@ mcs = @defmcs begin
     W_MarketImpactsatCalibrationTemp = TriangularDist(.2, .8, .5)
     pow_MarketImpactExponent = TriangularDist(1.5, 3, 2)
     ipow_MarketIncomeFxnExponent = TriangularDist(-.3, 0, -.1)
+
+    # MarketDamagesBurke
+    impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
+    impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
+
+    rtl_abs_0_realizedabstemperature["EU"] = TriangularDist(6.76231496767033, 13.482086163781, 10.1222005657257)
+    rtl_abs_0_realizedabstemperature["USA"] = TriangularDist(9.54210085883826, 17.3151395362191, 13.4286201975287)
+    rtl_abs_0_realizedabstemperature["OECD"] = TriangularDist(9.07596053028087, 15.0507477943984, 12.0633541623396)
+    rtl_abs_0_realizedabstemperature["USSR"] = TriangularDist(3.01320548016903, 11.2132204366259, 7.11321295839747)
+    rtl_abs_0_realizedabstemperature["China"] = TriangularDist(12.2330402806912, 17.7928749427573, 15.0129576117242)
+    rtl_abs_0_realizedabstemperature["SEAsia"] = TriangularDist(23.3863348263352, 26.5136231383473, 24.9499789823412)
+    rtl_abs_0_realizedabstemperature["Africa"] = TriangularDist(20.1866940491107, 23.5978086497453, 21.892251349428)
+    rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
+
 
     # NonMarketDamages
     tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.)
@@ -183,6 +197,7 @@ mcs = @defmcs begin
     cf_costregional["Africa"] = TriangularDist(0.4, 0.8, 0.6)
     cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
 
+
     ############################################################################
     # Indicate which parameters to save for each model run
     ############################################################################
@@ -196,7 +211,7 @@ mcs = @defmcs begin
         ClimateTemperature.rt_g_globaltemperature,
         SeaLevelRise.s_sealevel,
         SLRDamages.rgdp_per_cap_SLRRemainGDP,
-        MarketDamages.rgdp_per_cap_MarketRemainGDP,
+        MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
         NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
         Discontinuity.rgdp_per_cap_NonMarketRemainGDP)
 
