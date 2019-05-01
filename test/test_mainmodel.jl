@@ -7,7 +7,7 @@ include("../src/getpagefunction.jl")
 m = getpage()
 run(m)
 
-while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,1.,1.,1.,1.,1.,1.,1.,1.,1.]
+while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,0.,0.,0.,0.,0.,1.,1.,1.,1.]
     println(m[:Discontinuity,:occurdis_occurrencedummy])
     run(m)
 end
@@ -58,5 +58,5 @@ nmdamages_compare=readpagedata(m,"test/validationdata/rcons_per_cap_NonMarketRem
 @test nmdamages ≈ nmdamages_compare rtol=1
 
 te = m[:EquityWeighting, :te_totaleffect]
-te_compare = 213208136.69903600
+te_compare = 1.0320923880568126e9
 @test te ≈ te_compare rtol=1e4
