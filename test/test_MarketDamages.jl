@@ -21,10 +21,15 @@ set_leftover_params!(m, p)
 
 run(m)
 
-rcons_per_cap = m[:MarketDamages, :rcons_per_cap_MarketRemainConsumption]
-rcons_per_cap_compare = readpagedata(m, "test/validationdata/rcons_per_cap_MarketRemainConsumption.csv")
-@test rcons_per_cap ≈ rcons_per_cap_compare rtol=1e-1
+## Not a very good test, but damages are based on Burke et al. now anyway
+iref = m[:MarketDamages, :iref_ImpactatReferenceGDPperCap]
+iref_compare = readpagedata(m, "test/validationdata/iref_ImpactatReferenceGDPperCap_econ_page.csv")
+@test iref ≈ iref_compare rtol=1e-1
 
-rgdp_per_cap = m[:MarketDamages, :rgdp_per_cap_MarketRemainGDP]
-rgdp_per_cap_compare = readpagedata(m, "test/validationdata/rgdp_per_cap_MarketRemainGDP.csv")
-@test rgdp_per_cap ≈ rgdp_per_cap_compare rtol=1e-2
+# rcons_per_cap = m[:MarketDamages, :rcons_per_cap_MarketRemainConsumption]
+# rcons_per_cap_compare = readpagedata(m, "test/validationdata/rcons_per_cap_MarketRemainConsumption.csv")
+# @test rcons_per_cap ≈ rcons_per_cap_compare rtol=1e-1
+
+# rgdp_per_cap = m[:MarketDamages, :rgdp_per_cap_MarketRemainGDP]
+# rgdp_per_cap_compare = readpagedata(m, "test/validationdata/rgdp_per_cap_MarketRemainGDP.csv")
+# @test rgdp_per_cap ≈ rgdp_per_cap_compare rtol=1e-2
