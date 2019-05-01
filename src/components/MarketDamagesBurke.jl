@@ -30,7 +30,6 @@
     rgdp_per_cap_MarketRemainGDP = Variable(index=[time, region], unit = "\$/person")
     iref_ImpactatReferenceGDPperCap=Variable(index=[time, region])
     igdp_ImpactatActualGDPperCap=Variable(index=[time, region])
-    impmax_maxtempriseforadaptpolicyM = Parameter(index=[region], unit= "degreeC")
 
     isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
