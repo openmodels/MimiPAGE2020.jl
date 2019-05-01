@@ -55,24 +55,24 @@
             v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
                 (p.rgdp_per_cap_MarketRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_NonMarketIncomeFxnExponent
 
-                if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
-                    v.isat_ImpactinclSaturationandAdaptation[t,r] = v.igdp_ImpactatActualGDPperCap[t,r]
-                else
-                    v.isat_ImpactinclSaturationandAdaptation[t,r] = p.isatg_impactfxnsaturation+
-                        ((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)*
-                        ((v.igdp_ImpactatActualGDPperCap[t,r]-p.isatg_impactfxnsaturation)/
-                        (((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)+
-                        (v.igdp_ImpactatActualGDPperCap[t,r]-
-                        p.isatg_impactfxnsaturation)))
-                    end
+            if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
+                v.isat_ImpactinclSaturationandAdaptation[t,r] = v.igdp_ImpactatActualGDPperCap[t,r]
+            else
+                v.isat_ImpactinclSaturationandAdaptation[t,r] = p.isatg_impactfxnsaturation+
+                ((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)*
+                ((v.igdp_ImpactatActualGDPperCap[t,r]-p.isatg_impactfxnsaturation)/
+                 (((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)+
+                  (v.igdp_ImpactatActualGDPperCap[t,r]-
+                   p.isatg_impactfxnsaturation)))
+            end
 
-                if v.i_regionalimpact[t,r] < p.impmax_maxtempriseforadaptpolicyNM[r]
-                    v.isat_ImpactinclSaturationandAdaptation[t,r]=v.isat_ImpactinclSaturationandAdaptation[t,r]*(1-p.imp_actualreduction[t,r]/100)
-                else
-                    v.isat_ImpactinclSaturationandAdaptation[t,r] = v.isat_ImpactinclSaturationandAdaptation[t,r] *
-                        (1-(p.imp_actualreduction[t,r]/100)* p.impmax_maxtempriseforadaptpolicyNM[r] /
-                        v.i_regionalimpact[t,r])
-                end
+            if v.i_regionalimpact[t,r] < p.impmax_maxtempriseforadaptpolicyNM[r]
+                v.isat_ImpactinclSaturationandAdaptation[t,r]=v.isat_ImpactinclSaturationandAdaptation[t,r]*(1-p.imp_actualreduction[t,r]/100)
+            else
+                v.isat_ImpactinclSaturationandAdaptation[t,r] = v.isat_ImpactinclSaturationandAdaptation[t,r] *
+                    (1-(p.imp_actualreduction[t,r]/100)* p.impmax_maxtempriseforadaptpolicyNM[r] /
+                     v.i_regionalimpact[t,r])
+            end
 
             v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r] = (v.isat_ImpactinclSaturationandAdaptation[t,r]/100)*p.rgdp_per_cap_MarketRemainGDP[t,r]
             v.rcons_per_cap_NonMarketRemainConsumption[t,r] = p.rcons_per_cap_MarketRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
