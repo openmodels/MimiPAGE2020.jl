@@ -44,7 +44,6 @@
     rtl_realizedtemperature = Variable(index=[time, region], unit="degreeC")
 
     function init(p, v, d)
-        println(0)
         for rr in d.region
             v.rtl_0_baselandtemp[rr] = p.rt_g0_baseglobaltemp * p.ampf_amplification[rr]
         end
