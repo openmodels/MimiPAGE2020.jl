@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide will briefly explain how to install Julia and Mimi PAGE 2020.
+This guide will briefly explain how to install Julia and Mimi PAGE ICE.
 
 ## Installing Julia
 
@@ -42,7 +42,7 @@ For more information about the Mimi component framework, you can refer to the [M
 
 ## Installing Mimi-PAGE
 
-Clone or download the Mimi-PAGE repository from the Mimi-PAGE [Github website](https://github.com/openmodels/mimi-page-2020.jl).
+Clone or download the Mimi-PAGE repository from the Mimi-PAGE [Github website](https://github.com/openmodels/PAGE-ICE).
 
 ## Using Mimi-PAGE
 

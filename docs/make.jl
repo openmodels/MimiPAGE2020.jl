@@ -1,7 +1,7 @@
 using Documenter
 
 makedocs(
-	sitename = "mimi-page-2020.jl",
+	sitename = "PAGE-ICE",
 	pages = [
 		"Home" => "index.md",
 		"Getting started" => "gettingstarted.md",
@@ -11,5 +11,5 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/openmodels/mimi-page-2020.jl.git"
+    repo = "github.com/openmodels/PAGE-ICE.git"
 )

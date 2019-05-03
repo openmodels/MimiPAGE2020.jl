@@ -1,9 +1,7 @@
 # PAGE-ICE - Open-Source Repository for the PAGE-ICE Integrated Assessment Model
 
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](http://anthofflab.berkeley.edu/mimi-page-2020.jl/stable/)
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](http://anthofflab.berkeley.edu/mimi-page-2020.jl/latest/)
-[![Build Status](https://travis-ci.org/anthofflab/mimi-page-2020.jl.svg?branch=master)](https://travis-ci.org/anthofflab/mimi-page-2020.jl)
-[![codecov](https://codecov.io/gh/anthofflab/mimi-page-2020.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/anthofflab/mimi-page-2020.jl)
+[![Build Status](https://travis-ci.org/openmodels/PAGE-ICE.svg?branch=master)](https://travis-ci.org/openmodels/PAGE-ICE)
+[![codecov](https://codecov.io/gh/openmodels/PAGE-ICE/branch/master/graph/badge.svg)](https://codecov.io/gh/openmodels/PAGE-ICE)
 
 PAGE-ICE (Policy Analysis of Greenhouse Effect - Ice, Climate,
 Economics) is a cost-benefit Integrated Assessment Model.  
@@ -36,7 +34,7 @@ programming language, using
 the [Mimi framework](https://www.mimiframework.org/).  The Mimi
 version of PAGE-ICE is based on Mimi-PAGE-2009
 ([Moore et al., 2018](https://www.nature.com/articles/sdata2018187)).
-The documentation for Mimi-PAGE-2020.jl can be
+The documentation for Mimi-PAGE-2009.jl can be
 accessed
 [here](http://anthofflab.berkeley.edu/MimiPAGE2009.jl/stable/), and
 the code is available in this repository.  More
