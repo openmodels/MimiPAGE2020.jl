@@ -18,6 +18,6 @@ set_leftover_params!(m, p)
 run(m)
 
 forcing=m[:SulphateForcing,:fs_sulphateforcing]
-forcing_compare=readpagedata(m,"test/validationdata/fs_sulphateforcing.csv")
+forcing_compare=readpagedata(m,"test/validationdata/fs_sulfateforcing.csv")
 
 @test forcing ≈ forcing_compare rtol=1e-3

@@ -33,7 +33,7 @@ aci_economic = m[:AdaptiveCostsEconomic, :aci_adaptivecostimpact]
 
 autofac_compare = readpagedata(m, "test/validationdata/autofac_autonomouschangefraction.csv")
 atl_economic_compare = readpagedata(m, "test/validationdata/atl_1.csv")
-imp_economic_compare = readpagedata(m, "test/validationdata/imp_1.csv")
+imp_economic_compare = readpagedata(m, "test/validationdata/imp_actualreduction_market.csv")
 acp_economic_compare = readpagedata(m, "test/validationdata/acp_adaptivecostplateau_economic.csv")
 aci_economic_compare = readpagedata(m, "test/validationdata/aci_adaptivecostimpact_economic.csv")
 
