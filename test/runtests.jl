@@ -15,11 +15,21 @@ function page_model()
     return m
 end
 
+function get_scenario(ii)
+    Mimi.reset_compdefs()
+    if ii == 1
+        return "ndcs", "NDCs", true
+    end
+    if ii == 2
+        return "2c-saf", "2 degC Target", true
+    end
+end
+
 @testset "mimi-page.jl" begin
 
-include("test_climatemodel.jl")
-include("test_AbatementCosts.jl")
-include("test_AdaptationCosts.jl")
+include("test_climatemodel.jl") # error
+include("test_AbatementCosts.jl") # error
+include("test_AdaptationCosts.jl") # checks out!
 include("test_CH4cycle.jl")
 include("test_CH4emissions.jl")
 include("test_CH4forcing.jl")
