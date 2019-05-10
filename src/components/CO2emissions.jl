@@ -5,7 +5,6 @@
     e0_baselineCO2emissions=Parameter(index=[region],unit="Mtonne/year")
     e_regionalCO2emissions=Variable(index=[time,region],unit="Mtonne/year")
     er_CO2emissionsgrowth=Parameter(index=[time,region],unit="%")
-    temp_testdummy = Parameter(unit = "none", default = 0.)
 
     function run_timestep(p, v, d, t)
 
@@ -17,8 +16,8 @@
         v.e_globalCO2emissions[t]=sum(v.e_regionalCO2emissions[t,:])
 
         if is_first(t)
-            if scc_pulse == 1
-                v.e_globalCO2emissions[t] = v.e_globalCO2emissions[t] + 1
+            if scc_pulse != 0.
+                v.e_globalCO2emissions[t] = v.e_globalCO2emissions[t] + scc_pulse
             end
         end
     end
