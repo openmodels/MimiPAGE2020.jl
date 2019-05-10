@@ -22,7 +22,10 @@ scc_pulse = nothing
 # compute
 if m1[:co2emissions, :e_globalCO2emissions][1] - m[:co2emissions, :e_globalCO2emissions][1] == 1 && m1[:co2emissions, :e_globalCO2emissions][2] == m[:co2emissions, :e_globalCO2emissions][2]
     # pulse is 10^6 tCO2 and te_totaleffect is measured in million dollars --> no need for normalisation
-    scc = (m1[:EquityWeighting, :te_totaleffect] - m[:EquityWeighting, :te_totaleffect])
+    scc = m1[:EquityWeighting, :te_totaleffect] - m[:EquityWeighting, :te_totaleffect]
+    scc_imp = m1[:EquityWeighting, :td_totaldiscountedimpacts] - m[:EquityWeighting, :td_totaldiscountedimpacts]
+    scc_adt = m1[:EquityWeighting, :tac_totaladaptationcosts] - m[:EquityWeighting, :tac_totaladaptationcosts]
+    scc_abm = m1[:EquityWeighting, :tpc_totalaggregatedcosts] - m[:EquityWeighting, :tpc_totalaggregatedcosts]
 else
     error("CO2 pulse was not executed correctly. t=1 emissions do not differ by 1 or t = 2 emissions do not equal")
 end
