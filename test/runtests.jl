@@ -29,9 +29,9 @@ end
 
 include("test_climatemodel.jl") # error
 include("test_AbatementCosts.jl") # error
-include("test_AdaptationCosts.jl") # checks out!
-include("test_CH4cycle.jl")
-include("test_CH4emissions.jl")
+include("test_AdaptationCosts.jl") # works
+include("test_CH4cycle.jl") # error
+include("test_CH4emissions.jl") # works
 include("test_CH4forcing.jl")
 include("test_ClimateTemperature.jl")
 include("test_CO2cycle.jl")
