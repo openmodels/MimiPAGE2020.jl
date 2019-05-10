@@ -25,7 +25,7 @@ if m1[:co2emissions, :e_globalCO2emissions][2] == m[:co2emissions, :e_globalCO2e
     scc_adt = (m1[:EquityWeighting, :tac_totaladaptationcosts] - m[:EquityWeighting, :tac_totaladaptationcosts]) / scc_pulse
     scc_abm = (m1[:EquityWeighting, :tpc_totalaggregatedcosts] - m[:EquityWeighting, :tpc_totalaggregatedcosts]) / scc_pulse
 else
-    error("CO2 pulse was not executed correctly. t=1 emissions do not differ by 1 or t = 2 emissions do not equal")
+    error("CO2 pulse was not executed correctly. Emissions differ in the second time period.")
 end
 
 # empty the scc parameter to make sure it does not affect future model runs
