@@ -1,20 +1,24 @@
-
 using Test
 
-m = page_model()
-include("../src/components/CH4forcing.jl")
+for testscen in 1:2
+    valdir, scenario, use_permafrost = get_scenario(testscen)
+    println(scenario)
 
-add_comp!(m, ch4forcing, :ch4forcing)
+    m = page_model()
+    include("../src/components/CH4forcing.jl")
 
-set_param!(m, :ch4forcing, :c_N2Oconcentration, readpagedata(m,"test/validationdata/c_n2oconcentration.csv"))
-set_param!(m, :ch4forcing, :c_CH4concentration, readpagedata(m,"test/validationdata/c_ch4concentration.csv"))
+    add_comp!(m, ch4forcing, :ch4forcing)
 
-##running Model
-run(m)
+    set_param!(m, :ch4forcing, :c_N2Oconcentration, readpagedata(m,"test/validationdata/$valdir/c_n2oconcentration.csv"))
+    set_param!(m, :ch4forcing, :c_CH4concentration, readpagedata(m,"test/validationdata/$valdir/c_ch4concentration.csv"))
 
-@test !isnan(m[:ch4forcing, :f_CH4forcing][10])
+    ##running Model
+    run(m)
 
-forcing=m[:ch4forcing,:f_CH4forcing]
-forcing_compare=readpagedata(m,"test/validationdata/f_ch4forcing.csv")
+    @test !isnan(m[:ch4forcing, :f_CH4forcing][10])
 
-@test forcing ≈ forcing_compare rtol=1e-3
+    forcing=m[:ch4forcing,:f_CH4forcing]
+    forcing_compare=readpagedata(m,"test/validationdata/$valdir/f_ch4forcing.csv")
+
+    @test forcing ≈ forcing_compare rtol=1e-3
+end
