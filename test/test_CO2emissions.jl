@@ -1,22 +1,26 @@
-
 using Test
 
-m = page_model()
-include("../src/components/RCPSSPScenario.jl")
-include("../src/components/CO2emissions.jl")
+for testscen in 1:2
+    valdir, scenario, use_permafrost = get_scenario(testscen)
+    println(scenario)
 
-scenario = addrcpsspscenario(m, "NDCs")
-co2emit = add_comp!(m, co2emissions)
+    m = page_model()
+    include("../src/components/RCPSSPScenario.jl")
+    include("../src/components/CO2emissions.jl")
 
-co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
-set_param!(m, :co2emissions, :e0_baselineCO2emissions, readpagedata(m,"data/e0_baselineCO2emissions.csv"))
+    scenario = addrcpsspscenario(m, scenario)
+    co2emit = add_comp!(m, co2emissions)
 
-##running Model
-run(m)
+    co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
+    set_param!(m, :co2emissions, :e0_baselineCO2emissions, readpagedata(m,"data/e0_baselineCO2emissions.csv"))
 
-emissions= m[:co2emissions,  :e_regionalCO2emissions]
+    ##running Model
+    run(m)
 
-# Recorded data
-emissions_compare=readpagedata(m, "test/validationdata/e_regionalCO2emissions.csv")
+    emissions= m[:co2emissions,  :e_regionalCO2emissions]
 
-@test emissions ≈ emissions_compare rtol=1e-3
+    # Recorded data
+    emissions_compare=readpagedata(m, "test/validationdata/$valdir/e_regionalCO2emissions.csv")
+
+    @test emissions ≈ emissions_compare rtol=1e-3
+end
