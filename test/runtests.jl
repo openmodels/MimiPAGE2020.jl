@@ -36,7 +36,7 @@ include("test_CH4forcing.jl") # works
 include("test_ClimateTemperature.jl") # error
 include("test_CO2cycle.jl") # error
 include("test_CO2emissions.jl") # works
-include("test_CO2forcing.jl")
+include("test_CO2forcing.jl") # works
 include("test_Discontinuity.jl")
 include("test_EquityWeighting.jl")
 include("test_GDP.jl")
