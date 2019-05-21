@@ -9,7 +9,7 @@ for testscen in 1:2
 
     add_comp!(m, Discontinuity)
 
-    set_param!(m, :Discontinuity, :rt_g_globaltemperature, [0.75,0.77,0.99,1.27,1.62,1.99,3.07,3.90,5.10,6.03])
+    set_param!(m, :Discontinuity, :rt_g_globaltemperature, readpagedata(m, "test/validationdata/$valdir/rt_g_globaltemperature.csv"))
     set_param!(m, :Discontinuity, :y_year_0, 2015.)
     set_param!(m, :Discontinuity, :y_year, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_param!(m, :Discontinuity, :rgdp_per_cap_NonMarketRemainGDP, readpagedata(m, "test/validationdata/$valdir/rgdp_per_cap_NonMarketRemainGDP.csv"))
