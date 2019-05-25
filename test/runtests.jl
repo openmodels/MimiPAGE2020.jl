@@ -38,8 +38,8 @@ include("test_CO2cycle.jl") # error
 include("test_CO2emissions.jl") # works
 include("test_CO2forcing.jl") # works
 include("test_Discontinuity.jl") # works
-include("test_EquityWeighting.jl")
-include("test_GDP.jl")
+include("test_EquityWeighting.jl") # error
+include("test_GDP.jl") # works
 include("test_LGcycle.jl")
 include("test_LGemissions.jl")
 include("test_LGforcing.jl")
