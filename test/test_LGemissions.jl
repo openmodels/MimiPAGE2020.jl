@@ -1,20 +1,24 @@
-
 using Test
 
-m = page_model()
-include("../src/components/RCPSSPScenario.jl")
-include("../src/components/LGemissions.jl")
+for testscen in 1:2
+    valdir, scenario, use_permafrost = get_scenario(testscen)
+    println(scenario)
 
-scenario = addrcpsspscenario(m, "NDCs")
-lgemit = add_comp!(m, LGemissions)
+    m = page_model()
+    include("../src/components/RCPSSPScenario.jl")
+    include("../src/components/LGemissions.jl")
 
-lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
-set_param!(m, :LGemissions, :e0_baselineLGemissions, readpagedata(m,"data/e0_baselineLGemissions.csv"))
+    rcpsspscenario = addrcpsspscenario(m, scenario)
+    lgemit = add_comp!(m, LGemissions)
 
-# run Model
-run(m)
+    lgemit[:er_LGemissionsgrowth] = rcpsspscenario[:er_LGemissionsgrowth]
+    set_param!(m, :LGemissions, :e0_baselineLGemissions, readpagedata(m,"data/e0_baselineLGemissions.csv"))
 
-emissions= m[:LGemissions,  :e_globalLGemissions]
-emissions_compare=readpagedata(m, "test/validationdata/e_globalLGemissions.csv")
+    # run Model
+    run(m)
 
-@test emissions ≈ emissions_compare rtol=1e-3
+    emissions= m[:LGemissions,  :e_globalLGemissions]
+    emissions_compare=readpagedata(m, "test/validationdata/$valdir/e_globalLGemissions.csv")
+
+    @test emissions ≈ emissions_compare rtol=1e-3
+end
