@@ -13,10 +13,14 @@
     rcons_per_cap_MarketRemainConsumption = Parameter(index=[time, region], unit = "\$/person")
     rgdp_per_cap_MarketRemainGDP = Parameter(index=[time, region], unit = "\$/person")
     save_savingsrate = Parameter(unit= "%", default=15.)
-    b0 = Parameter(index=[region])
-    b1 = Parameter(index=[region])
-    b2 = Parameter(index=[region])
-    b3 = Parameter(index=[region])
+    b0m = Parameter(index=[region])
+    b1m = Parameter(index=[region])
+    b2m = Parameter(index=[region])
+    b3m = Parameter(index=[region])
+    b0c = Parameter(index=[region])
+    b1c = Parameter(index=[region])
+    b2c = Parameter(index=[region])
+    b3c = Parameter(index=[region])
 
      #parameters that are not required but otherwise the code does not run
     impmax_maxtempriseforadaptpolicyNM = Parameter(index=[region], unit= "degreeC")
@@ -36,7 +40,7 @@
 
         for r in d.region
 
-            v.mort_damages[t,r] = p.b0[r]*p.rtl_realizedtemperature[t,r]+p.b1[r]*(p.rtl_realizedtemperature[t,r])^2+p.b2[r]*p.rtl_realizedtemperature[t,r]*log(p.rgdp_per_cap_MarketRemainGDP[t,r])+p.b3[r]*((p.rtl_realizedtemperature[t,r])^2)*log(p.rgdp_per_cap_MarketRemainGDP[t,r])
+            v.mort_damages[t,r] = (p.b0m[r]+p.b0c[r])*p.rtl_realizedtemperature[t,r]+(p.b1m[r]+p.b1c[r])*(p.rtl_realizedtemperature[t,r])^2+(p.b2m[r]+p.b2c[r])*p.rtl_realizedtemperature[t,r]*log(p.rgdp_per_cap_MarketRemainGDP[t,r])+(p.b3m[r]+p.b3c[r])*((p.rtl_realizedtemperature[t,r])^2)*log(p.rgdp_per_cap_MarketRemainGDP[t,r])
 
             v.deaths[t,r] = v.mort_damages[t,r]*p.pop_population[t,r]
 
