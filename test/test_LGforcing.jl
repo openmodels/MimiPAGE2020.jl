@@ -1,17 +1,21 @@
-
 using Test
 
-m = page_model()
-include("../src/components/LGforcing.jl")
+for testscen in 1:2
+    valdir, scenario, use_permafrost = get_scenario(testscen)
+    println(scenario)
 
-add_comp!(m, LGforcing)
+    m = page_model()
+    include("../src/components/LGforcing.jl")
 
-set_param!(m, :LGforcing, :c_LGconcentration, readpagedata(m,"test/validationdata/c_LGconcentration.csv"))
+    add_comp!(m, LGforcing)
 
-# run Model
-run(m)
+    set_param!(m, :LGforcing, :c_LGconcentration, readpagedata(m,"test/validationdata/$valdir/c_LGconcentration.csv"))
 
-forcing=m[:LGforcing,:f_LGforcing]
-forcing_compare=readpagedata(m,"test/validationdata/f_LGforcing.csv")
+    # run Model
+    run(m)
 
-@test forcing ≈ forcing_compare rtol=1e-3
+    forcing=m[:LGforcing,:f_LGforcing]
+    forcing_compare=readpagedata(m,"test/validationdata/$valdir/f_LGforcing.csv")
+
+    @test forcing ≈ forcing_compare rtol=1e-3
+end

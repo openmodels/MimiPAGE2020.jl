@@ -42,10 +42,10 @@ include("test_EquityWeighting.jl") # error
 include("test_GDP.jl") # works
 include("test_LGcycle.jl") # works
 include("test_LGemissions.jl") # works
-include("test_LGforcing.jl")
-include("test_loadparameters.jl")
-include("test_mainmodel.jl")
-include("test_mainmodel_noperm.jl")
+include("test_LGforcing.jl") # works
+include("test_loadparameters.jl") # works
+include("test_mainmodel.jl") # error
+include("test_mainmodel_noperm.jl") # works
 include("test_MarketDamages.jl")
 include("test_MarketDamagesBurke.jl")
 include("test_N2Ocycle.jl")
