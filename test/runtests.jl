@@ -48,8 +48,8 @@ include("test_mainmodel.jl") # error
 include("test_mainmodel_noperm.jl") # works
 include("test_MarketDamages.jl") # works
 include("test_MarketDamagesBurke.jl") # works
-include("test_N2Ocycle.jl")
-include("test_N2Oemissions.jl")
+include("test_N2Ocycle.jl") # works
+include("test_N2Oemissions.jl") # works
 include("test_N2Oforcing.jl")
 include("test_NonMarketDamages.jl")
 include("test_Population.jl")

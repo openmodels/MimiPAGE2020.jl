@@ -61,21 +61,3 @@
         end
     end
 end
-
-function addpermafrost(model::Model, use_permafrost::Bool)
-    permafrost = add_comp!(model, Permafrost)
-
-    if use_permafrost
-        permafrost[:permtce0_permafrostemissions0] = 934.2010230392067
-        permafrost[:permtce_permafrostemissions] = readpagedata(model, "data/perm_tot_ce_ch4.csv")
-    else
-        permafrost[:permtce0_permafrostemissions0] = 0
-        permafrost[:permtce_permafrostemissions] = zeros(10)
-    end
-
-    permafrost
-end
-
-function addPermafrostSiBASA(model::Model)
-
-end
