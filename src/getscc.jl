@@ -12,7 +12,7 @@ m = getpage()
 run(m)
 
 # create a model with pulse of +1MT CO2 at t = 1
-scc_pulse = 10^(-6)
+scc_pulse = 10^(0)
 m1 = getpage()
 run(m1)
 
