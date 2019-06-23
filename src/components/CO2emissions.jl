@@ -16,7 +16,7 @@
         v.e_globalCO2emissions[t]=sum(v.e_regionalCO2emissions[t,:])
 
         if is_first(t)
-            if scc_pulse != 0.
+            if @isdefined scc_pulse
                 v.e_globalCO2emissions[t] = v.e_globalCO2emissions[t] + scc_pulse
             end
         end

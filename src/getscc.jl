@@ -28,5 +28,5 @@ else
     error("CO2 pulse was not executed correctly. Emissions differ in the second time period.")
 end
 
-# empty the scc parameter to make sure it does not affect future model runs
-scc_pulse = nothing
+# reset the pulse to zero
+scc_pulse = 0
