@@ -232,7 +232,7 @@ end
 
 function getpage(scenario::String="NDCs", use_permafrost::Bool=true)
     m = Model()
-    set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
+    set_dimension!(m, :time, [2020:1:2300;])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
     buildpage(m, scenario, use_permafrost)

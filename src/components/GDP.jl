@@ -34,19 +34,19 @@
     function run_timestep(p, v, d, t)
 
         # Analysis period ranges - required for abatemnt costs and equity weighting, from Hope (2006)
-        if is_first(t)
-            ylo_periodstart = p.y_year_0
-        else
-            ylo_periodstart = (p.y_year[t] + p.y_year[t-1]) / 2
-        end
+        #if is_first(t)
+        #    ylo_periodstart = p.y_year_0
+        #else
+        #    ylo_periodstart = (p.y_year[t] + p.y_year[t-1]) / 2
+        #end
 
-        if t.t == length(p.y_year)
-            yhi_periodend = p.y_year[t]
-        else
-            yhi_periodend = (p.y_year[t] + p.y_year[t+1]) / 2
-        end
+        #if t.t == length(p.y_year)
+        #    yhi_periodend = p.y_year[t]
+        #else
+        #    yhi_periodend = (p.y_year[t] + p.y_year[t+1]) / 2
+        #end
 
-        v.yagg_periodspan[t] = yhi_periodend- ylo_periodstart
+        v.yagg_periodspan[t] = 1. # set to one for the annualised version
 
         for r in d.region
             #eq.28 in Hope 2002
