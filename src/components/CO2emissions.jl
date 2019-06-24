@@ -18,10 +18,12 @@
 
         if @isdefined scc_pulse
             p.ep_CO2emissionpulse = scc_pulse
+        else
+            p.ep_CO2emissionpulse = 0.
         end
 
         if is_first(t)
-            v.e_globalCO2emissions[t] = v.e_globalCO2emissions[t] + scc_pulse
+            v.e_globalCO2emissions[t] = v.e_globalCO2emissions[t] + p.ep_CO2emissionpulse
         end
     end
 end
