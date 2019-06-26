@@ -50,8 +50,8 @@ include("test_MarketDamages.jl") # works
 include("test_MarketDamagesBurke.jl") # works
 include("test_N2Ocycle.jl") # works
 include("test_N2Oemissions.jl") # works
-include("test_N2Oforcing.jl")
-include("test_NonMarketDamages.jl")
+include("test_N2Oforcing.jl") # works
+include("test_NonMarketDamages.jl") # works
 include("test_Population.jl")
 include("test_SeaLevelRise.jl")
 include("test_SLRDamages.jl")

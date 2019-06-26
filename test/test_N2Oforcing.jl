@@ -1,18 +1,22 @@
-
 using Test
 
-m = page_model()
-include("../src/components/N2Oforcing.jl")
+for testscen in 1:2
+    valdir, scenario, use_permafrost = get_scenario(testscen)
+    println(scenario)
 
-add_comp!(m, n2oforcing)
+    m = page_model()
+    include("../src/components/N2Oforcing.jl")
 
-set_param!(m, :n2oforcing, :c_N2Oconcentration, readpagedata(m,"test/validationdata/c_n2oconcentration.csv"))
-set_param!(m, :n2oforcing, :c_CH4concentration, readpagedata(m,"test/validationdata/c_ch4concentration.csv"))
+    add_comp!(m, n2oforcing)
 
-##running Model
-run(m)
+    set_param!(m, :n2oforcing, :c_N2Oconcentration, readpagedata(m,"test/validationdata/$valdir/c_n2oconcentration.csv"))
+    set_param!(m, :n2oforcing, :c_CH4concentration, readpagedata(m,"test/validationdata/$valdir/c_ch4concentration.csv"))
 
-forcing=m[:n2oforcing,:f_N2Oforcing]
-forcing_compare=readpagedata(m,"test/validationdata/f_n2oforcing.csv")
+    ##running Model
+    run(m)
 
-@test forcing ≈ forcing_compare rtol=1e-3
+    forcing=m[:n2oforcing,:f_N2Oforcing]
+    forcing_compare=readpagedata(m,"test/validationdata/$valdir/f_n2oforcing.csv")
+
+    @test forcing ≈ forcing_compare rtol=1e-3
+end
