@@ -52,8 +52,8 @@ include("test_N2Ocycle.jl") # works
 include("test_N2Oemissions.jl") # works
 include("test_N2Oforcing.jl") # works
 include("test_NonMarketDamages.jl") # works
-include("test_Population.jl")
-include("test_SeaLevelRise.jl")
+include("test_Population.jl") # works
+include("test_SeaLevelRise.jl") # works
 include("test_SLRDamages.jl")
 include("test_SulphateForcing.jl")
 include("test_TotalAbatementCosts.jl")
