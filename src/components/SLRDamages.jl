@@ -81,6 +81,13 @@
                 v.rcons_per_cap_SLRRemainConsumption[t,r] = v.cons_percap_aftercosts[t,r] - v.isat_per_cap_SLRImpactperCapinclSaturationandAdaptation[t,r]
                 v.rgdp_per_cap_SLRRemainGDP[t,r] = v.rcons_per_cap_SLRRemainConsumption[t,r]/(1-p.save_savingsrate/100)
 
+                if @isdefined getscc_woSLR
+                    if getscc_woSLR == true
+                        v.rcons_per_cap_SLRRemainConsumption[t,r] = v.cons_percap_aftercosts[t,r]
+                        v.rgdp_per_cap_SLRRemainGDP[t,r] = v.gdp_percap_aftercosts[t,r]
+                    end
+                end
+
         end
 
     end

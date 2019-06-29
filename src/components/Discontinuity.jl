@@ -73,6 +73,12 @@
             end
             v.isat_per_cap_DiscImpactperCapinclSaturation[t,r] = (v.isat_satdiscimpact[t,r]/100)*p.rgdp_per_cap_NonMarketRemainGDP[t,r]
             v.rcons_per_cap_DiscRemainConsumption[t,r] = p.rcons_per_cap_NonMarketRemainConsumption[t,r] - v.isat_per_cap_DiscImpactperCapinclSaturation[t,r]
+
+            if @isdefined getscc_wodisc
+                if getscc_wodisc == true
+                    v.rcons_per_cap_DiscRemainConsumption[t,r] = p.rcons_per_cap_NonMarketRemainConsumption[t,r]
+                end
+            end
         end
     end
 end

@@ -6,6 +6,8 @@
     e_regionalCO2emissions=Variable(index=[time,region],unit="Mtonne/year")
     er_CO2emissionsgrowth=Parameter(index=[time,region],unit="%")
     ep_CO2emissionpulse = Parameter(unit = "Mtonne/year", default = 0.)
+    y_pulse = Parameter(unit = "year", default = 0)
+    y_year  = Parameter(index=[time], unit="year")
 
     function run_timestep(p, v, d, t)
 
@@ -18,11 +20,17 @@
 
         if @isdefined scc_pulse
             p.ep_CO2emissionpulse = scc_pulse
-        else
-            p.ep_CO2emissionpulse = 0.
+
+            if @isdefined year_pulse
+                p.y_pulse = year_pulse
+            else
+                p.y_pulse = p.y_year[1]
+            end
+
         end
 
-        if is_first(t)
+
+        if p.y_year[t] == p.y_pulse
             v.e_globalCO2emissions[t] = v.e_globalCO2emissions[t] + p.ep_CO2emissionpulse
         end
     end
