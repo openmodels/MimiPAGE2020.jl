@@ -5,6 +5,7 @@
 
     # Variables
     gdp               = Variable(index=[time, region], unit="\$M")
+    gdp_leveleffect = Variable(index=[time, region], unit="\$M")
     cons_consumption  = Variable(index=[time, region], unit="\$million")
     cons_percap_consumption = Variable(index=[time, region], unit="\$/person")
     cons_percap_consumption_0 = Variable(index=[region], unit="\$/person")
@@ -22,6 +23,11 @@
     # Saturation, used in impacts
     isat0_initialimpactfxnsaturation = Parameter(unit="unitless", default=20.0) #pp34 PAGE09 documentation
     isatg_impactfxnsaturation = Variable(unit="unitless")
+
+    # market damages as %GDP, for growth effects feedback
+    isat_ImpactinclSaturationandAdaptation = Parameter(index=[time,region])
+    ge_growtheffects = Parameter(index =[region], unit = "none")
+    lgdp_gdploss =  Variable(index=[time, region], unit="\$M")
 
     function init(p, v, d)
 
@@ -52,11 +58,16 @@
             #eq.28 in Hope 2002
             if is_first(t)
                 v.gdp[t, r] = p.gdp_0[r] * (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year_0)
+                v.gdp_leveleffect[t, r] = v.gdp[t, r]
             else
-                v.gdp[t, r] = v.gdp[t-1, r] * (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
+                v.gdp[t, r] = v.gdp[t-1, r] * (1 + (p.grw_gdpgrowthrate[t,r]/100) - p.ge_growtheffects[r] * (p.isat_ImpactinclSaturationandAdaptation[t-1,r] / 100))^(p.y_year[t] - p.y_year[t-1])
+                v.gdp_leveleffect[t, r] = v.gdp_leveleffect[t-1, r] * (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
             end
             v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
             v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
+
+            v.lgdp_gdploss[t,r] = v.gdp_leveleffect[t,r] - v.gdp[t,r]
+
         end
     end
 end

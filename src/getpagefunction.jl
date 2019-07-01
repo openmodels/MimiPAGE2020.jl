@@ -138,6 +138,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
 
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
     gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+    connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation)
 
     for allabatement in [
         (:AbatementCostParametersCO2, :AbatementCostsCO2, :er_CO2emissionsgrowth),
