@@ -43,7 +43,7 @@
     dfc_consumptiondiscountrate = Variable(index=[time, region], unit="1/year")
 
     isat_ImpactinclSaturationandAdaptation= Parameter(index=[time,region])
-    ge_growtheffects = Parameter(index =[region], unit = "none")
+    ge_growtheffects = Parameter(unit = "none", default =  0.05)
 
     df_utilitydiscountrate = Variable(index=[time], unit="fraction")
 
@@ -86,6 +86,10 @@
 
         v.df_utilitydiscountrate[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
 
+        if @isdefined ge_master
+            p.ge_growtheffects = ge_master
+        end
+
         for rr in d.region
 
             ## Gas Costs Accounting
@@ -111,7 +115,7 @@
             if is_first(tt)
                 v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
             else
-                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.ge_growtheffects[rr] * p.isat_ImpactinclSaturationandAdaptation[tt-1,rr] - p.popgrw_populationgrowth[tt, rr])
+                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation[tt-1,rr] - p.popgrw_populationgrowth[tt, rr])
             end
 
             if is_first(tt)
