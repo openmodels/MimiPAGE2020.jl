@@ -16,9 +16,9 @@
 
     save_savingsrate = Parameter(unit= "%", default=15.)
     wincf_weightsfactor =Parameter(index=[region], unit="")
-    W_MarketImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.0)
-    ipow_MarketIncomeFxnExponent =Parameter(default=0.0)
-    iben_MarketInitialBenefit=Parameter(default=0.0)
+    W_MarketImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.6)
+    ipow_MarketIncomeFxnExponent =Parameter(default=-0.13333333333333333)
+    iben_MarketInitialBenefit=Parameter(default=.1333333333333)
     tcal_CalibrationTemp = Parameter(default=3.)
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=34298.93698672955)
 
