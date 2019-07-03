@@ -28,6 +28,7 @@
 
     # Amount of equity weighting variable (0, (0, 1), or 1)
     equity_proportion = Parameter(unit="fraction", default=1.0)
+    dfc_feedback = Parameter(unit = "none", default = 0.) # new parameter to allow for feedback of growth effects into consumption discount rate
 
     pct_percap_partiallyweighted = Variable(index=[time, region], unit="\$/person")
     pct_partiallyweighted = Variable(index=[time, region], unit="\$million")
@@ -86,8 +87,17 @@
 
         v.df_utilitydiscountrate[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
 
+        # let the master parameters overwrite the component parameters if required
         if @isdefined ge_master
             p.ge_growtheffects = ge_master
+        end
+
+        if @isdefined dfc_feedback_master
+            p.dfc_feedback = dfc_feedback_master
+        end
+
+        if @isdefined equity_proportion_master
+            p.equity_proportion = equity_proportion_master
         end
 
         for rr in d.region
@@ -115,7 +125,11 @@
             if is_first(tt)
                 v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
             else
-                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation[tt-1,rr] - p.popgrw_populationgrowth[tt, rr])
+                if p.dfc_feedback == 1.
+                        v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation[tt-1,rr] - p.popgrw_populationgrowth[tt, rr])
+                else
+                    v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+                end
             end
 
             if is_first(tt)
