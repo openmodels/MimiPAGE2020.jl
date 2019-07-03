@@ -7,10 +7,23 @@ using CSV
 include("getpagefunction.jl")
 include("utils/mctools.jl")
 
+# define the model regions in the order that Mimi returns stuff
+myregions = ["EU", "US", "OT","EE","CA","IA","AF","LA"]
+
+# define the output directory
+dir_output = "C:/Users/nasha/Documents/GitHub/damage-regressions/data/mimi-page-output/"
 
 # create a data frame where SCCs will be stored
 df_out = DataFrame(pulse_exp = -999., pulse_year = -999., scc = -999., market_contr = -999.,
-                    nonmarket_contr = -999., SLR_contr = -999., disc_contr = -999.)
+                    nonmarket_contr = -999., SLR_contr = -999., disc_contr = -999.,
+                    scc_EU = -999.,
+                    scc_US = -999.,
+                    scc_OT = -999.,
+                    scc_EE = -999.,
+                    scc_CA = -999.,
+                    scc_IA = -999.,
+                    scc_AF = -999.,
+                    scc_LA = -999.)
 
 # create the years and pulse magnitudes through which will be looped
 pulse_year =  [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250]
@@ -56,8 +69,9 @@ for jj_year in pulse_year
                                 m_nopulse[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
 
             # write out the disaggregated version for selected years
-            if jj_year == 2020.
-                writedlm(string("output/scc_disaggregated_pulse", string(jj_exp), "_year", string(jj_year), ".csv"), scc_disaggregated, ",")
+            if jj_exp == 0. && jj_year == 2020.
+                writedlm(string(dir_output, "scc_disaggregated_pulse", string(jj_exp), "_year", string(jj_year), ".csv"),
+                                         [permutedims(myregions); scc_disaggregated], ",")
             end
 
             #### PART 2: calculate component contributions to overall SCC by switching them off
@@ -127,7 +141,15 @@ for jj_year in pulse_year
                                             scc_disaggregated
 
             # write the SCC and the contributions from the components into df_out
-            push!(df_out, [jj_exp, jj_year, scc, scc_womarket, scc_wononmarket, scc_woSLR, scc_wodisc])
+            push!(df_out, [jj_exp, jj_year, scc, scc_womarket, scc_wononmarket, scc_woSLR, scc_wodisc,
+                            sum(scc_disaggregated[:, 1]),
+                            sum(scc_disaggregated[:, 2]),
+                            sum(scc_disaggregated[:, 3]),
+                            sum(scc_disaggregated[:, 4]),
+                            sum(scc_disaggregated[:, 5]),
+                            sum(scc_disaggregated[:, 6]),
+                            sum(scc_disaggregated[:, 7]),
+                            sum(scc_disaggregated[:, 8])])
 
         else
             error("CO2 pulse was not executed correctly. Emissions differ in the second time period or do not have the pre-specified difference in the first.")
@@ -140,4 +162,4 @@ end
 df_out = df_out[df_out[:scc] .!= -999, :]
 
 # export the SCC and its decomposition for all pulse-year pairs into a csv file
-CSV.write("output/scc-aggregates.csv", df_out)
+CSV.write(string(dir_output, "scc-aggregates.csv"), df_out)
