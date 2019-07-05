@@ -69,6 +69,14 @@
             v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r] = (v.isat_ImpactinclSaturationandAdaptation[t,r]/100)*p.rgdp_per_cap_SLRRemainGDP[t,r]
             v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
             v.rgdp_per_cap_MarketRemainGDP[t,r] = v.rcons_per_cap_MarketRemainConsumption[t,r]/(1-p.save_savingsrate/100)
+
+            if @isdefined getscc_womarket
+                if getscc_womarket == true
+                    v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r]
+                    v.rgdp_per_cap_MarketRemainGDP[t,r] = p.rgdp_per_cap_SLRRemainGDP[t,r]
+                end
+            end
+
         end
 
     end
