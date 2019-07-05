@@ -7,7 +7,7 @@
   rand_discontinuity = Parameter(unit="unitless", default=.5)
 
   irefeqdis_eqdiscimpact=Variable(index=[region], unit="%")
-  wincf_weightsfactor=Parameter(index=[region], unit="unitless", default=[1, 0.8, 0.8, 0.4, 0.8, 0.8, 0.6, 0.6])
+  wincf_weightsfactor_sea = Parameter(index=[region], unit="")
   wdis_gdplostdisc=Parameter(unit="%", default=3.)
 
   igdpeqdis_eqdiscimpact=Variable(index=[time,region], unit="%")
@@ -56,7 +56,7 @@
         end
 
         for r in d.region
-            v.irefeqdis_eqdiscimpact[r] = p.wincf_weightsfactor[r]*p.wdis_gdplostdisc
+            v.irefeqdis_eqdiscimpact[r] = p.wincf_weightsfactor_sea[r]*p.wdis_gdplostdisc
 
             v.igdpeqdis_eqdiscimpact[t,r] = v.irefeqdis_eqdiscimpact[r] * (p.rgdp_per_cap_NonMarketRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
 
