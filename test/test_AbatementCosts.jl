@@ -11,7 +11,7 @@ for testscen in 1:2
     println(scenario)
 
     m = page_model()
-    scenario = addrcpsspscenario(m, "NDCs")
+    scenario = addrcpsspscenario(m, scenario)
 
     for gas in [:CO2, :CH4, :N2O, :Lin]
         abatementcostparameters = addabatementcostparameters(m, gas)

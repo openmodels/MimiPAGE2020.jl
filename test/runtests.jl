@@ -55,10 +55,10 @@ include("test_NonMarketDamages.jl") # works
 include("test_Population.jl") # works
 include("test_SeaLevelRise.jl") # works
 include("test_SLRDamages.jl") # error
-include("test_SulphateForcing.jl")
-include("test_TotalAbatementCosts.jl")
-include("test_TotalAdaptationCosts.jl")
-include("test_TotalForcing.jl")
+include("test_SulphateForcing.jl") # works
+include("test_TotalAbatementCosts.jl") # works
+include("test_TotalAdaptationCosts.jl") # works
+include("test_TotalForcing.jl") # works
 include("test_Permafrost.jl")
 #include("test_mcs.jl")
 include("contrib/test_taxeffect.jl")
