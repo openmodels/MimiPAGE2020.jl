@@ -18,6 +18,9 @@
     cons_percap_consumption_0 = Parameter(index=[region], unit="\$/person")
     cons_percap_aftercosts = Parameter(index=[time, region], unit="\$/person")
 
+    # GDP losses
+    lgdp_gdploss =  Parameter(index=[time, region], unit="\$M")
+
     # Calculation of weighted costs
     emuc_utilityconvexity = Parameter(unit="none", default=1.1666666666666667)
 
@@ -29,6 +32,7 @@
     # Amount of equity weighting variable (0, (0, 1), or 1)
     equity_proportion = Parameter(unit="fraction", default=1.0)
     dfc_feedback = Parameter(unit = "none", default = 0.) # new parameter to allow for feedback of growth effects into consumption discount rate
+    gdploss_included = Parameter(unit = "none", default = 0.) # new parameter to allow for including losses of GDP due to growth effects into impacts
 
     pct_percap_partiallyweighted = Variable(index=[time, region], unit="\$/person")
     pct_partiallyweighted = Variable(index=[time, region], unit="\$million")
@@ -38,13 +42,11 @@
     ptp_timepreference = Parameter(unit="%/year", default=1.0333333333333334) # <0.1,1, 2>
     grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year")
     popgrw_populationgrowth = Parameter(index=[time, region], unit="%/year")
+    grwnet_realizedgdpgrowth = Parameter(index=[time, region], unit = "%/year")
 
     dr_discountrate = Variable(index=[time, region], unit="%/year")
     yp_yearsperiod = Variable(index=[time], unit="year") # defined differently from yagg
     dfc_consumptiondiscountrate = Variable(index=[time, region], unit="1/year")
-
-    isat_ImpactinclSaturationandAdaptation= Parameter(index=[time,region])
-    ge_growtheffects = Parameter(unit = "none", default =  0.05)
 
     df_utilitydiscountrate = Variable(index=[time], unit="fraction")
 
@@ -88,16 +90,29 @@
         v.df_utilitydiscountrate[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
 
         # let the master parameters overwrite the component parameters if required
-        if @isdefined ge_master
-            p.ge_growtheffects = ge_master
+        if @isdefined equiw_master
+            if equiw_master == "Yes"
+                p.equity_proportion = 1.0
+                p.dfc_feedback = 0.
+            elseif equiw_master == "DFC"
+                p.equity_proportion = 0.0
+                p.dfc_feedback = 1.0
+            elseif equiw_master == "No"
+                p.equity_proportion = 0.0
+                p.dfc_feedback = 0.0
+            else
+                error("The equiw_master parameter must be set to either Yes, No or DFC. Please adjust the parameter")
+            end
         end
 
-        if @isdefined dfc_feedback_master
-            p.dfc_feedback = dfc_feedback_master
-        end
-
-        if @isdefined equity_proportion_master
-            p.equity_proportion = equity_proportion_master
+        if @isdefined gdploss_master
+            if gdploss_master == "Incl"
+                p.gdploss_included = 1.0
+            elseif gdploss_master == "Excl"
+                p.gdploss_included = 0.0
+            else
+                error("The gdploss_master parameter must be set to either Incl or Excl. Please adjust the parameter")
+            end
         end
 
         for rr in d.region
@@ -122,14 +137,10 @@
             v.wact_partiallyweighted[tt, rr] = v.wact_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
 
             # Discount rate calculations
-            if is_first(tt)
-                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+            if p.dfc_feedback == 1.
+                    v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grwnet_realizedgdpgrowth[tt, rr] - p.popgrw_populationgrowth[tt, rr])
             else
-                if p.dfc_feedback == 1.
-                        v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation[tt-1,rr] - p.popgrw_populationgrowth[tt, rr])
-                else
                     v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
-                end
             end
 
             if is_first(tt)
@@ -157,10 +168,24 @@
 
             ## Equity weighted impacts (end of page 28, Hope 2009)
             if p.equity_proportion == 0
-                v.wit_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr]
+                if p.gdploss_included == 0.0
+                    v.wit_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr]
+                else
+                    v.wit_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr] + p.lgdp_gdploss[tt, rr]
+                end
+
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
             else
-                v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                if p.gdploss_included == 0.0
+                    v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                else
+                    if p.rcons_percap_dis[tt, rr] <= p.lgdp_gdploss[tt, rr]/p.pop_population[tt,rr] # set impacts equal to consumption after costs if they would exceed it
+                        v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                    else
+                        v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.rcons_percap_dis[tt, rr] - p.lgdp_gdploss[tt, rr]/p.pop_population[tt,rr])^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                    end
+                end
+
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]
             end
 

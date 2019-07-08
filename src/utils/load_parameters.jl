@@ -80,3 +80,18 @@ function load_parameters(model::Model)
     end
     return parameters
 end
+
+# define a function to reset the master parameters
+function reset_masterparameters()
+    global modelspec_master = "RegionBayes" # "RegionBayes" (default), "Region", "Burke" or "PAGE09"
+    global scen_master = "NDCs"             # "NDCs" (default), tbd
+    global ge_master = 0.0                  # 0.0 (default), any other Float between 0 and 1
+    global equiw_master = "Yes"             # "Yes" (default), "No", "DFC"
+    global gdploss_master = "Excl"          # "Excl" (default), "Incl"
+    global permafr_master = "Yes"           # "Yes" (default), "No"
+    global sccpulse_master = 0.             # 0. (default), any other number
+    global yearpulse_master = 2020          # 2020 (default), any other model year
+    global gedisc_master = "No"             # "No" (default), "Yes"
+
+    "All master parameters reset to defaults"
+end

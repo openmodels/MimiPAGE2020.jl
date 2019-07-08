@@ -27,7 +27,7 @@
   pdis_probability=Parameter(unit="%/degreeC", default=20.)
 
   isatg_saturationmodification = Parameter(unit="unitless")
-  isat_satdiscimpact=Variable(index=[time,region], unit="%")
+  isat_satdiscimpact=Variable(index=[time,region], unit="%GDP")
 
   isat_per_cap_DiscImpactperCapinclSaturation=Variable(index=[time,region], unit="\$/person")
   rcons_per_cap_DiscRemainConsumption=Variable(index=[time, region], unit = "\$/person")

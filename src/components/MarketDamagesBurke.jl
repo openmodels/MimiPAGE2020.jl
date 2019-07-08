@@ -31,7 +31,7 @@
     iref_ImpactatReferenceGDPperCap=Variable(index=[time, region])
     igdp_ImpactatActualGDPperCap=Variable(index=[time, region])
 
-    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
+    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region], unit = "%GDP")
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
 
 
