@@ -37,8 +37,6 @@
     function run_timestep(p, v, d, t)
 
         for r in d.region
-            # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-            p.wincf_weightsfactor_market[r] = 1.
 
             #calculate tolerability
             if (p.rtl_realizedtemperature[t,r]-p.atl_adjustedtolerableleveloftemprise[t,r]) < 0
@@ -87,6 +85,9 @@ end
 function addmarketdamages(model::Model)
     marketdamagescomp = add_comp!(model, MarketDamages)
     marketdamagescomp[:impmax_maxtempriseforadaptpolicyM] = readpagedata(model, "data/impmax_economic.csv")
+
+    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
+    marketdamagescomp[:wincf_weightsfactor_market] = [1, 1, 1, 1, 1, 1, 1, 1]
 
     return marketdamagescomp
 end

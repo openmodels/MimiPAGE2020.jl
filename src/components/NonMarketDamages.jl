@@ -42,9 +42,6 @@
 
         for r in d.region
 
-            # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-            p.wincf_weightsfactor_nonmarket[r] = 1.
-
             if p.rtl_realizedtemperature[t,r]-p.atl_adjustedtolerableleveloftemprise[t,r] < 0
                 v.i_regionalimpact[t,r] = 0
             else
@@ -91,6 +88,9 @@ end
 function addnonmarketdamages(model::Model)
     nonmarketdamagescomp = add_comp!(model, NonMarketDamages)
     nonmarketdamagescomp[:impmax_maxtempriseforadaptpolicyNM] = readpagedata(model, "data/impmax_noneconomic.csv")
+
+    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
+    nonmarketdamagescomp[:wincf_weightsfactor_nonmarket] = [1, 1, 1, 1, 1, 1, 1, 1]
 
     return nonmarketdamagescomp
 end

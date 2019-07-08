@@ -38,8 +38,6 @@
     function run_timestep(p, v, d, t)
 
         for r in d.region
-            # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-            p.wincf_weightsfactor_market[r] = 1.
 
             # calculate the regional temperature impact relative to baseline year and add it to baseline absolute value
             v.i_burke_regionalimpact[t,r] = (p.rtl_realizedtemperature[t,r] - p.rtl_0_realizedtemperature[r]) + p.rtl_abs_0_realizedabstemperature[r]
@@ -85,6 +83,9 @@ function addmarketdamagesburke(model::Model)
     marketdamagesburkecomp = add_comp!(model, MarketDamagesBurke)
     marketdamagesburkecomp[:rtl_abs_0_realizedabstemperature] = readpagedata(model, "data/rtl_abs_0_realizedabstemperature.csv")
     marketdamagesburkecomp[:rtl_0_realizedtemperature] = readpagedata(model, "data/rtl_0_realizedtemperature.csv")
+
+    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
+    marketdamagesburkecomp[:wincf_weightsfactor_market] = [1, 1, 1, 1, 1, 1, 1, 1]
 
     return marketdamagesburkecomp
 end
