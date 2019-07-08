@@ -19,8 +19,10 @@
     perm_sib_sens_slope_vs_t_ch4 = Parameter(default=-0.061634027375886635)
     perm_sib_lag_slope_vs_t_ch4 = Parameter(default=-2.5752200686097426)
     perm_sib_pow_slope_vs_t_ch4 = Parameter(default=1.3992129787187544)
+    perm_sib_pow_c_ch4 = Parameter(default=0.2510548621108904)
+    perm_sib_ce_c_ch4_0 = Parameter(default=175.56164558499998)
 
-    perm_sib_temp = Variable(index=[time])
+    perm_sib_temp = Variable(index=[time], unit="degreeC")
     perm_sib_sens_c_co2_correct = Variable(index=[time])
     perm_sib_lag_c_co2_correct = Variable(index=[time])
     perm_sib_pow_c_co2_correct = Variable(index=[time])
@@ -30,7 +32,8 @@
     perm_sib_sens_c_ch4_correct = Variable(index=[time])
     perm_sib_lag_c_ch4_correct = Variable(index=[time])
     perm_sib_pow_c_ch4_correct = Variable(index=[time])
-    perm_sib_equilib_c_ch4 = Variable(index=[time])
+    perm_sib_equilib_c_ch4 = Variable(index=[time], unit="Mtonne C")
+    perm_sib_ce_c_ch4 = Variable(index=[time], unit="Mtonne C")
     perm_sib_ce_ch4 = Variable(index=[time], unit="Mtonne CH4")
 
     function run_timestep(p, v, d, tt)
@@ -67,7 +70,11 @@
         # Correction for perm lag, CO2
         v.perm_sib_lag_c_co2_correct[tt] = ifelse(1 + p.perm_sib_lag_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t <= 0, 0.000001, 1 + p.perm_sib_lag_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t)
         # Correction for perm power, CO2
-        v.perm_sib_pow_c_co2_correct[tt] = ifelse(1 + p.perm_sib_pow_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t <= 0, 0.000001, 1 + p.perm_sib_pow_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t)+v.perm_sib_pow_c_co2_correct[tt-1]
+        if is_first(tt)
+            v.perm_sib_pow_c_co2_correct[tt] = ifelse(1 + p.perm_sib_pow_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t <= 0, 0.000001, 1 + p.perm_sib_pow_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t)
+        else
+            v.perm_sib_pow_c_co2_correct[tt] = ifelse(1 + p.perm_sib_pow_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t <= 0, 0.000001, 1 + p.perm_sib_pow_slope_vs_t_co2 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t)+v.perm_sib_pow_c_co2_correct[tt-1]
+        end
         # Equilibrium perm cumul carbon, CO2
         v.perm_sib_equilib_c_co2[tt] = ifelse((p.perm_sib_sens_c_co2 * v.perm_sib_sens_c_co2_correct[tt]) * v.perm_sib_temp[tt] < p.perm_sib_limit_c, (p.perm_sib_sens_c_co2 * v.perm_sib_sens_c_co2_correct[tt]) * v.perm_sib_temp[tt], p.perm_sib_limit_c)
         # Released perm cumul carbon, CO2
@@ -85,6 +92,12 @@
         v.perm_sib_pow_c_ch4_correct[tt] = ifelse(1 + p.perm_sib_pow_slope_vs_t_ch4 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t <= 0, 0.000001, 1 + p.perm_sib_pow_slope_vs_t_ch4 * (v.perm_sib_temp[tt] - 0.5*p.perm_sib_limit_t) /p.perm_sib_limit_t)
         # Equilibrium perm cumul carbon, CH4
         v.perm_sib_equilib_c_ch4[tt] = ifelse((p.perm_sib_sens_c_ch4 * v.perm_sib_sens_c_ch4_correct[tt]) * v.perm_sib_temp[tt] < p.perm_sib_limit_c, (p.perm_sib_sens_c_ch4 * v.perm_sib_sens_c_ch4_correct[tt]) * v.perm_sib_temp[tt], p.perm_sib_limit_c)
+        # Released perm cumul carbon, CH4
+        if is_first(tt)
+            v.perm_sib_ce_c_ch4[tt] = ifelse(v.perm_sib_equilib_c_ch4[tt] <  p.perm_sib_ce_c_ch4_0, p.perm_sib_ce_c_ch4_0, ifelse( ((v.perm_sib_equilib_c_ch4[tt] - p.perm_sib_ce_c_ch4_0)/p.perm_sib_limit_c)^(1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) < (1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) * yp / (p.perm_sib_lag_c_ch4*v.perm_sib_lag_c_ch4_correct[tt]), v.perm_sib_equilib_c_ch4[tt], ( v.perm_sib_equilib_c_ch4[tt] - p.perm_sib_limit_c * ( ( ((v.perm_sib_equilib_c_ch4[tt] - p.perm_sib_ce_c_ch4_0)/p.perm_sib_limit_c)^(1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) - (1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) * yp / (p.perm_sib_lag_c_ch4*v.perm_sib_lag_c_ch4_correct[tt]) )^( 1/(1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) ) ) ) ) )
+        else
+            v.perm_sib_ce_c_ch4[tt] = ifelse(v.perm_sib_equilib_c_ch4[tt] <  v.perm_sib_ce_c_ch4[tt], v.perm_sib_ce_c_ch4[tt], ifelse( ((v.perm_sib_equilib_c_ch4[tt] - v.perm_sib_ce_c_ch4[tt])/p.perm_sib_limit_c)^(1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) < (1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) * yp / (p.perm_sib_lag_c_ch4*v.perm_sib_lag_c_ch4_correct[tt]), v.perm_sib_equilib_c_ch4[tt], ( v.perm_sib_equilib_c_ch4[tt] - p.perm_sib_limit_c * ( ( ((v.perm_sib_equilib_c_ch4[tt] - p.perm_sib_ce_c_ch4)/p.perm_sib_limit_c)^(1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) - (1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) * yp / (p.perm_sib_lag_c_ch4*v.perm_sib_lag_c_ch4_correct[tt]) )^( 1/(1-(1+p.perm_sib_pow_c_ch4)*v.perm_sib_pow_c_ch4_correct[tt]) ) ) ) ) )
+        end
         # Released perm cumulative CH4
         v.perm_sib_ce_ch4[tt] = v.perm_sib_ce_c_ch4[tt] * (16/12)
     end
