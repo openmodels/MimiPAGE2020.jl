@@ -85,7 +85,7 @@ function addmarketdamagesburke(model::Model)
     marketdamagesburkecomp[:rtl_0_realizedtemperature] = readpagedata(model, "data/rtl_0_realizedtemperature.csv")
 
     # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-    marketdamagesburkecomp[:wincf_weightsfactor_market] = [1, 1, 1, 1, 1, 1, 1, 1]
+    marketdamagesburkecomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
 
     return marketdamagesburkecomp
 end

@@ -87,7 +87,7 @@ function addmarketdamages(model::Model)
     marketdamagescomp[:impmax_maxtempriseforadaptpolicyM] = readpagedata(model, "data/impmax_economic.csv")
 
     # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-    marketdamagescomp[:wincf_weightsfactor_market] = [1, 1, 1, 1, 1, 1, 1, 1]
+    marketdamagescomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
 
     return marketdamagescomp
 end
