@@ -21,13 +21,13 @@ mcs = @defmcs begin
 
     save_savingsrate = TriangularDist(10, 20, 15) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages. GDP, SLRDamages
 
-    wincf_weightsfactor["USA"] = TriangularDist(.6, 1, .8) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages, , SLRDamages, Discountinuity
-    wincf_weightsfactor["OECD"] = TriangularDist(.4, 1.2, .8)
-    wincf_weightsfactor["USSR"] = TriangularDist(.2, .6, .4)
-    wincf_weightsfactor["China"] = TriangularDist(.4, 1.2, .8)
-    wincf_weightsfactor["SEAsia"] = TriangularDist(.4, 1.2, .8)
-    wincf_weightsfactor["Africa"] = TriangularDist(.4, .8, .6)
-    wincf_weightsfactor["LatAmerica"] = TriangularDist(.4, .8, .6)
+    wincf_weightsfactor_sea["USA"] = TriangularDist(.6, 1, .8) # components: SLRDamages, Discountinuity (weights for market and nonmarket are non-stochastic and uniformly 1)
+    wincf_weightsfactor_sea["OECD"] = TriangularDist(.4, 1.2, .8)
+    wincf_weightsfactor_sea["USSR"] = TriangularDist(.2, .6, .4)
+    wincf_weightsfactor_sea["China"] = TriangularDist(.4, 1.2, .8)
+    wincf_weightsfactor_sea["SEAsia"] = TriangularDist(.4, 1.2, .8)
+    wincf_weightsfactor_sea["Africa"] = TriangularDist(.4, .8, .6)
+    wincf_weightsfactor_sea["LatAmerica"] = TriangularDist(.4, .8, .6)
 
     automult_autonomouschange = TriangularDist(0.5, 0.8, 0.65)  #components: AdaptationCosts, AbatementCosts
 
