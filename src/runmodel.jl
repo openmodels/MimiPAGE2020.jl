@@ -9,8 +9,8 @@ using CSVFiles
 using DataFrames
 using CSV
 
-include("getpagefunction.jl")
-include("utils/mctools.jl")
+Base.include(Main, "getpagefunction.jl")
+Base.include(Main, "utils/mctools.jl")
 
 # define the model regions in the order that Mimi returns stuff
 myregions = ["EU", "US", "OT","EE","CA","IA","AF","LA"]
@@ -23,6 +23,7 @@ dir_output = "C:/Users/nasha/Documents/GitHub/damage-regressions/data/mimi-page-
 reset_masterparameters()
 m = getpage()
 run(m)
+
 
 # check whether the master parameters were executed correctly
 if ge_master != m[:GDP, :ge_growtheffects]
@@ -43,12 +44,6 @@ end
 if (permafr_master == "Yes" && m[:CH4Cycle, :permtce0_permafrostemissions0] == 0) || (permafr_master == "No" && m[:CH4Cycle, :permtce0_permafrostemissions0] != 0)
     error("permafr_master and permtce0_permafrostemissions in CH4Cycle are not aligned. Please correct this discrepancy in the source code")
 end
-if sccpulse_master != m[:co2emissions, :ep_CO2emissionpulse]
-    error("sccpulse_master and ep_CO2emissionpulse in CO2emissions are not aligned. Please correct this discrepancy in the source code")
-end
-if yearpulse_master != m[:co2emissions, :y_pulse]
-    error("yearpulse_master and y_pulse in CO2emissions are not aligned. Please correct this discrepancy in the source code")
-end
 if (gedisc_master == "Yes" && m[:GDP, :gedisc_included] != 1.0) || (gedisc_master == "No" && m[:GDP, :gedisc_included] != 0.0)
     error("gedisc_master and gedisc_included in GDP are not aligned. Please correct this discrepancy in the source code")
 end
@@ -57,8 +52,9 @@ end
 
 ### export some parameters which are (fairly) constant across master parameter settings
 
-# baseline GDP
+# baseline GDP and percap consumption
 writedlm(string(dir_output, "gdp_0.csv"), hcat(myregions, m[:GDP, :gdp_0]), ",")
+writedlm(string(dir_output, "cons_percap_consumption_0.csv"), hcat(myregions, m[:GDP, :cons_percap_consumption_0]), ",")
 
 # get scenario-dependent variables
 for jj_scen in ["NDCs"]
@@ -79,9 +75,15 @@ end
 
 # extract GDP for all relevant parameter combinations
 for jj_scen in ["NDCs"]
-    for jj_ge in [0., 0.05, 0.1, 0.15, 0.2]
+    for jj_ge in [0:0.05:1;]
         for jj_permafr in ["Yes", "No"]
             for jj_gedisc in ["No", "Yes"]
+                # jump certain parameter combinations
+                if jj_permafr == "No" && jj_ge > 0.1
+                    continue
+                elseif jj_gedisc == "Yes" && jj_ge > 0.2
+                    continue
+                end
 
                 # set the global parameters accordingly
                 reset_masterparameters()
@@ -105,7 +107,7 @@ end
 
 # extract isat for all relevant parameter combinations
 for jj_scen in ["NDCs"]
-    for jj_spec in ["RegionBayes", "PAGE09"]
+    for jj_spec in ["RegionBayes", "PAGE09", "Burke"]
         for jj_permafr in ["Yes"]
 
             # set master parameters
@@ -121,8 +123,12 @@ for jj_scen in ["NDCs"]
             elseif jj_spec == "PAGE09"
                 writedlm(string(dir_output, "isat_ImpactinclSaturationandAdaptation_scen", jj_scen, "_spec", jj_spec, "_permafr", jj_permafr,
                             ".csv"), hcat(["year"; myyears], [permutedims(myregions); m[:MarketDamages, :isat_ImpactinclSaturationandAdaptation]]), ",")
+            elseif jj_spec == "Burke"
+                writedlm(string(dir_output, "isat_ImpactinclSaturationandAdaptation_scen", jj_scen, "_spec", jj_spec, "_permafr", jj_permafr,
+                            ".csv"), hcat(["year"; myyears], [permutedims(myregions); m[:MarketDamagesBurke, :isat_ImpactinclSaturationandAdaptation]]), ",")
+
             else
-                error("The damage component used for extraction the isat variable is not specificed in the loop. Please adjust the loop")
+                error("The damage component used for extracting the isat variable is not specificed in the loop. Please adjust the loop")
             end
         end
     end
@@ -139,8 +145,21 @@ end
 df_out = DataFrame(modelspec = "-999", scen = "-999", ge = -999., equiw = "-999", gdploss = "-999", permafr = "-999", gedisc = "-999",
                         te = -999., absimpacts = -999.,
                         scc = -999.,
-                        yearpulse = -999, exppulse = -999,
+                        scc_womarket = -999., scc_wononmarket = -999., scc_woSLR = -999., scc_wodisc = -999., scc_interaction = -999.,
+                        scc_EU = -999.,
+                        scc_US = -999.,
+                        scc_OT = -999.,
+                        scc_EE = -999.,
+                        scc_CA = -999.,
+                        scc_IA = -999.,
+                        scc_AF = -999.,
+                        scc_LA = -999.,
+                        yearpulse = -999, pulse_size = -999,
                         gdp2100 = -999., gdp2200 = -999., gdp2300 = -999.,
+                        gdp2100_EU = -999., gdp2100_US = -999., gdp2100_OT = -999., gdp2100_EE = -999.,
+                        gdp2100_CA = -999., gdp2100_IA = -999., gdp2100_AF = -999., gdp2100_LA = -999.,
+                        gdp2200_EU = -999., gdp2200_US = -999., gdp2200_OT = -999., gdp2200_EE = -999.,
+                        gdp2200_CA = -999., gdp2200_IA = -999., gdp2200_AF = -999., gdp2200_LA = -999.,
                         gdp2300_EU = -999., gdp2300_US = -999., gdp2300_OT = -999., gdp2300_EE = -999.,
                         gdp2300_CA = -999., gdp2300_IA = -999., gdp2300_AF = -999., gdp2300_LA = -999.,
                         absi_EU = -999.,
@@ -158,8 +177,8 @@ df_out = DataFrame(modelspec = "-999", scen = "-999", ge = -999., equiw = "-999"
 # set parameters which are currently held constant but might be included in the loop
 reset_masterparameters()
 global jj_scen = "NDCs"
-global jj_exp = 0
 global jj_year = 2020
+global jj_pulse = 100000.
 
 # loop through different pulse years and magnitudes
 for jj_spec in ["RegionBayes", "Burke", "Region", "PAGE09"]
@@ -167,11 +186,13 @@ for jj_spec in ["RegionBayes", "Burke", "Region", "PAGE09"]
         for jj_equiw in ["Yes", "No", "DFC"]
             for jj_gdploss in ["Excl", "Incl"]
                 for jj_permafr in ["Yes", "No"]
-                    for jj_gedisc in ["No", "Yes"]
-                        # jump to next iteration immediately if the parameter combination is somehow toxic
+                    for jj_gedisc in ["No", "Yes", "Only"]
+                        # jump to next iteration immediately if the parameter combination is somehow toxic or not of interest
                         if jj_gedisc == "Yes" && jj_ge >= 0.7
                             continue
-                        elseif jj_spec in ["PAGE09", "Region"] && jj_ge > 0.6
+                        elseif jj_spec in ["PAGE09", "Region"] && jj_ge > 0.05
+                            continue
+                        elseif jj_permafr == "No" && (jj_ge > 0.05 || jj_spec != "RegionBayes" || jj_gedisc != "No" || jj_gdploss != "Excl" || jj_equiw == "No")
                             continue
                         end
 
@@ -187,50 +208,80 @@ for jj_spec in ["RegionBayes", "Burke", "Region", "PAGE09"]
                         global permafr_master = jj_permafr
                         global gedisc_master = jj_gedisc
 
-                        global sccpulse_master = 0.
-                        global yearpulse_master = jj_year
-
                         # train a model without a pulse
                         m_nopulse = getpage()
                         run(m_nopulse)
 
-                        # create a model with pulse
-                        global sccpulse_master = 10^(jj_exp)
-                        m_withpulse = getpage()
-                        run(m_withpulse)
+                        # compute SCC
+                        scc = compute_scc_mm(m_nopulse, year = jj_year, pulse_size = jj_pulse)
 
-                        # compute stuff only if the resulting emissions for the models check out
-                        if m_withpulse[:co2emissions, :e_globalCO2emissions][1] == m_nopulse[:co2emissions, :e_globalCO2emissions][1] .+ m_withpulse[:co2emissions, :ep_CO2emissionpulse] && m_withpulse[:co2emissions, :e_globalCO2emissions][2] == m_nopulse[:co2emissions, :e_globalCO2emissions][2]
-                            # pulse is 10^6 tCO2 and te_totaleffect is measured in million dollars --> no need for normalisation
-                            global scc = (m_withpulse[:EquityWeighting, :te_totaleffect] - m_nopulse[:EquityWeighting, :te_totaleffect]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
-                            # Note: disaggregation does not work as abatement costs are driven by baseline emissions and growth rate, not by levels at time t
-
-                            # disaggregate SCC by region and time
-                            scc_disaggregated = (m_withpulse[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] -
-                                                    m_nopulse[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
-
-                            # write out the disaggregated version for selected parameter ranges
-                            if jj_ge in [0, 0.05] && jj_equiw == "Yes" && jj_gdploss == "Excl" && jj_spec in ["RegionBayes"] && jj_permafr == "Yes"
+                        # write out the disaggregated version for selected parameter ranges
+                        if jj_ge in [0, 0.05] && jj_equiw == "Yes" && jj_gdploss == "Excl" && jj_spec in ["RegionBayes"] && jj_permafr == "Yes"
                                 writedlm(string(dir_output, "scc_disaggregated_modelspec", jj_spec, "_scen", jj_scen, "_ge", jj_ge,
                                                 "_equiw", jj_equiw, "_gdploss", jj_gdploss, "_permafr", jj_permafr, "_gedisc", jj_gedisc,
-                                                "_exppulse", jj_exp, "_yearpulse", jj_year, ".csv"),
-                                            hcat(["year"; myyears], [permutedims(myregions); scc_disaggregated]), ",")
-                            end
-                        else
-                            error("CO2 pulse was not executed correctly. Emissions differ in the second time period or do not have the pre-specified difference in the first.")
+                                                "_pulse", jj_pulse, "_yearpulse", jj_year, ".csv"),
+                                            hcat(["year"; myyears], [permutedims(myregions); scc[2]]), ",")
                         end
 
+                        # compute the SCCs with different damage components switched off
+                        update_param!(m, :switchoff_marketdamages, 1.)
+                        run(m)
+                        scc_womarket = scc[1] - compute_scc_mm(m, year = 2020)[1]
+
+                        update_param!(m, :switchoff_marketdamages, 0.)
+                        update_param!(m, :switchoff_nonmarketdamages, 1.)
+                        run(m)
+                        scc_wononmarket = scc[1] - compute_scc_mm(m, year = 2020)[1]
+
+                        update_param!(m, :switchoff_nonmarketdamages, 0.)
+                        update_param!(m, :switchoff_SLRdamages, 1.)
+                        run(m)
+                        scc_woSLR = scc[1] - compute_scc_mm(m, year = 2020)[1]
+
+                        update_param!(m, :switchoff_SLRdamages, 0.)
+                        update_param!(m, :switchoff_disc, 1.)
+                        run(m)
+                        scc_wodisc = scc[1] - compute_scc_mm(m, year = 2020)[1]
 
                         # write the SCC and the contributions from the components into df_out
                         push!(df_out, [jj_spec, jj_scen, jj_ge, jj_equiw, jj_gdploss, jj_permafr, jj_gedisc,
                                         m_nopulse[:EquityWeighting, :te_totaleffect], # total effect
                                         sum(((m_nopulse[:EquityWeighting, :cons_percap_aftercosts] .- m_nopulse[:EquityWeighting, :rcons_percap_dis]) .* m_nopulse[:Population, :pop_population])[:,:]),
-                                        scc, # XX change this once scc computations are merged in
+                                        scc[1],
+                                        scc_womarket,
+                                        scc_wononmarket,
+                                        scc_woSLR,
+                                        scc_wodisc,
+                                        scc[1] - scc_womarket - scc_wononmarket - scc_woSLR - scc_wodisc,
+                                        sum(scc[2][:, 1]),
+                                        sum(scc[2][:, 2]),
+                                        sum(scc[2][:, 3]),
+                                        sum(scc[2][:, 4]),
+                                        sum(scc[2][:, 5]),
+                                        sum(scc[2][:, 6]),
+                                        sum(scc[2][:, 7]),
+                                        sum(scc[2][:, 8]),
                                         jj_year,
-                                        jj_exp,
+                                        jj_pulse,
                                         sum(m_nopulse[:GDP, :gdp][6, :]), # GDP in 2100
                                         sum(m_nopulse[:GDP, :gdp][8, :]), # GDP in 2200
                                        sum(m_nopulse[:GDP, :gdp][10, :]), # GDP in 2300
+                                       m_nopulse[:GDP, :gdp][6, 1],
+                                       m_nopulse[:GDP, :gdp][6, 2],
+                                       m_nopulse[:GDP, :gdp][6, 3],
+                                       m_nopulse[:GDP, :gdp][6, 4],
+                                       m_nopulse[:GDP, :gdp][6, 5],
+                                       m_nopulse[:GDP, :gdp][6, 6],
+                                       m_nopulse[:GDP, :gdp][6, 7],
+                                       m_nopulse[:GDP, :gdp][6, 8],
+                                       m_nopulse[:GDP, :gdp][8, 1],
+                                       m_nopulse[:GDP, :gdp][8, 2],
+                                       m_nopulse[:GDP, :gdp][8, 3],
+                                       m_nopulse[:GDP, :gdp][8, 4],
+                                       m_nopulse[:GDP, :gdp][8, 5],
+                                       m_nopulse[:GDP, :gdp][8, 6],
+                                       m_nopulse[:GDP, :gdp][8, 7],
+                                       m_nopulse[:GDP, :gdp][8, 8],
                                        m_nopulse[:GDP, :gdp][10, 1],
                                        m_nopulse[:GDP, :gdp][10, 2],
                                        m_nopulse[:GDP, :gdp][10, 3],
@@ -264,185 +315,3 @@ df_out = df_out[df_out[:ge] .!= -999., :]
 
 # export the SCC and its decomposition for all pulse-year pairs into a csv file
 CSV.write(string(dir_output, "MimiPageResults.csv"), df_out)
-
-
-
-################################################################################
-###################### MORE DETAILED SCC DISAGGREGATION ########################
-################################################################################
-
-# create a data frame where SCCs will be stored
-df_outscc = DataFrame(modelspec = "-999", scen = "-999", ge = -999., equiw = "-999", gdploss = "-999", permafr = "-999", gedisc = "-999",
-                    exppulse = -999, yearpulse = -999,
-                    scc = -999., market_contr = -999.,
-                    nonmarket_contr = -999., SLR_contr = -999., disc_contr = -999., interaction_contr = -999.,
-                    scc_EU = -999.,
-                    scc_US = -999.,
-                    scc_OT = -999.,
-                    scc_EE = -999.,
-                    scc_CA = -999.,
-                    scc_IA = -999.,
-                    scc_AF = -999.,
-                    scc_LA = -999.)
-
-# set the master parameters which are currently not looped through
-reset_masterparameters()
-global jj_scen = "NDCs"
-global jj_gdploss = "Excl"
-global jj_permafr = "Yes"
-global jj_gedisc = "No"
-
-# loop through different pulse years and magnitudes
-for jj_spec in ["RegionBayes", "PAGE09"]
-    for jj_ge in [0., 0.05]
-        for jj_equiw in ["Yes", "DFC"]
-            for jj_year in [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250]
-                for jj_exp in [-6.:1:6.;]
-
-                    # jump to next iteration for too detailed combination of by-year and by-pulse disaggregation to cut runtime
-                    if jj_exp != 0 && jj_year != 2020
-                        continue
-                    end
-
-                    ### PART 1: compute the SCC and its disaggregation over time and regions
-
-                    # set the master parameters accordingly
-                    global modelspec_master = jj_spec
-                    global scen_master = jj_scen
-                    global ge_master = jj_ge
-                    global equiw_master = jj_equiw
-                    global gdploss_master = jj_gdploss
-                    global permafr_master = jj_permafr
-                    global gedisc_master = jj_gedisc
-
-                    # clear the parameters
-                    global getscc_womarket = false
-                    global getscc_wononmarket = false
-                    global getscc_woSLR = false
-                    global getscc_wodisc = false
-
-                    # set the pulse parameter zero, i.e. no pulse and compute the model
-                    global sccpulse_master = 0
-                    global yearpulse_master = jj_year
-                    m_nopulse = getpage()
-                    run(m_nopulse)
-
-                    # create a model with pulse of +1MT CO2 at t = 1
-                    global sccpulse_master = 10^(jj_exp)
-                    m_withpulse = getpage()
-                    run(m_withpulse)
-
-                    # get the time step
-                    ind = findall(x -> x == jj_year, m_nopulse[:co2emissions, :y_year])
-
-                    # compute stuff only if the resulting emissions for the models check out
-                    if m_withpulse[:co2emissions, :e_globalCO2emissions][ind] == m_nopulse[:co2emissions, :e_globalCO2emissions][ind] .+ m_withpulse[:co2emissions, :ep_CO2emissionpulse] && m_withpulse[:co2emissions, :e_globalCO2emissions][ind .+ 1] == m_nopulse[:co2emissions, :e_globalCO2emissions][ind .+ 1]
-                        # pulse is 10^6 tCO2 and te_totaleffect is measured in million dollars --> no need for normalisation
-                        global scc = (m_withpulse[:EquityWeighting, :te_totaleffect] - m_nopulse[:EquityWeighting, :te_totaleffect]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
-                        # Note: disaggregation does not work as abatement costs are driven by baseline emissions and growth rate, not by levels at time t
-                        #scc_imp = (m_withpulse[:EquityWeighting, :td_totaldiscountedimpacts] - m_nopulse[:EquityWeighting, :td_totaldiscountedimpacts]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
-                        #scc_adt = (m_withpulse[:EquityWeighting, :tac_totaladaptationcosts] - m_nopulse[:EquityWeighting, :tac_totaladaptationcosts]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
-                        #scc_abm = (m_withpulse[:EquityWeighting, :tpc_totalaggregatedcosts] - m_nopulse[:EquityWeighting, :tpc_totalaggregatedcosts]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
-
-                        # disaggregate SCC by region and time
-                        scc_disaggregated = (m_withpulse[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] -
-                                                m_nopulse[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]) / m_withpulse[:co2emissions, :ep_CO2emissionpulse]
-
-
-                        #### PART 2: calculate component contributions to overall SCC by switching them off
-
-                        # create a model without the market damages and run with and without pulse
-                        global getscc_womarket = true
-                        global sccpulse_master = 0
-                        m_nopulse_womarket = getpage()
-                        run(m_nopulse_womarket)
-                        global sccpulse_master = 10^(jj_exp)
-                        m_withpulse_womarket = getpage()
-                        run(m_withpulse_womarket)
-                        global getscc_womarket = false
-
-                        # model without SLR damages
-                        global getscc_woSLR = true
-                        global sccpulse_master = 0
-                        m_nopulse_woSLR = getpage()
-                        run(m_nopulse_woSLR)
-                        global sccpulse_master = 10^(jj_exp)
-                        m_withpulse_woSLR = getpage()
-                        run(m_withpulse_woSLR)
-                        global getscc_woSLR = false
-
-                        # create a model without nonmarket damages
-                        global getscc_wononmarket = true
-                        global sccpulse_master = 0
-                        m_nopulse_wononmarket = getpage()
-                        run(m_nopulse_wononmarket)
-                        global sccpulse_master = 10^(jj_exp)
-                        m_withpulse_wononmarket = getpage()
-                        run(m_withpulse_wononmarket)
-                        global getscc_wononmarket = false
-
-                        # without discontinuity
-                        global getscc_wodisc = true
-                        global sccpulse_master = 0
-                        m_nopulse_wodisc = getpage()
-                        run(m_nopulse_wodisc)
-                        global sccpulse_master = 10^(jj_exp)
-                        m_withpulse_wodisc = getpage()
-                        run(m_withpulse_wodisc)
-                        global getscc_wodisc = false
-
-
-                        # repeat the SCC computation for models without market damages
-                        global scc_womarket = scc - (m_withpulse_womarket[:EquityWeighting, :te_totaleffect] - m_nopulse_womarket[:EquityWeighting, :te_totaleffect]) / m_withpulse_womarket[:co2emissions, :ep_CO2emissionpulse]
-                        #sccchanges_womarket_disaggregated =  (m_withpulse_womarket[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] -
-                        #                        m_nopulse_womarket[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]) / m_withpulse_womarket[:co2emissions, :ep_CO2emissionpulse] .-
-                        #                        scc_disaggregated
-                        # repeat the SCC computation for models without nonmarket damages component
-                        global scc_wononmarket = scc - (m_withpulse_wononmarket[:EquityWeighting, :te_totaleffect] - m_nopulse_wononmarket[:EquityWeighting, :te_totaleffect]) / m_withpulse_wononmarket[:co2emissions, :ep_CO2emissionpulse]
-                        #sccchanges_wononmarket_disaggregated = (m_withpulse_wononmarket[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] -
-                        #                                            m_nopulse_wononmarket[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]) / m_withpulse_wononmarket[:co2emissions, :ep_CO2emissionpulse]  .-
-                        #                                            scc_disaggregated
-
-                        # repeat the SCC computation for models without SLR damages
-                        global scc_woSLR = scc - (m_withpulse_woSLR[:EquityWeighting, :te_totaleffect] - m_nopulse_woSLR[:EquityWeighting, :te_totaleffect]) / m_withpulse_woSLR[:co2emissions, :ep_CO2emissionpulse]
-                        #sccchanges_woSLR_disaggregated = (m_withpulse_woSLR[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] -
-                        #                                m_nopulse_woSLR[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]) / m_withpulse_woSLR[:co2emissions, :ep_CO2emissionpulse]  .-
-                        #                                scc_disaggregated
-
-                        # repeat the SCC computation for models without the discontinuity component
-                        global scc_wodisc = scc - (m_withpulse_wodisc[:EquityWeighting, :te_totaleffect] - m_nopulse_wodisc[:EquityWeighting, :te_totaleffect]) / m_withpulse_wodisc[:co2emissions, :ep_CO2emissionpulse]
-                        #sccchanges_wodisc_disaggregated = (m_withpulse_wodisc[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] -
-                        #                        m_nopulse_wodisc[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]) / m_withpulse_wodisc[:co2emissions, :ep_CO2emissionpulse]  .-
-                        #                                scc_disaggregated
-
-                        # write the SCC and the contributions from the components into df_outscc
-                        push!(df_outscc, [jj_spec, jj_scen, jj_ge, jj_equiw, jj_gdploss, jj_permafr, jj_gedisc, jj_exp, jj_year,
-                                        scc, scc_womarket, scc_wononmarket, scc_woSLR, scc_wodisc,
-                                        scc - (scc_womarket + scc_wononmarket + scc_woSLR + scc_wodisc),
-                                        sum(scc_disaggregated[:, 1]),
-                                        sum(scc_disaggregated[:, 2]),
-                                        sum(scc_disaggregated[:, 3]),
-                                        sum(scc_disaggregated[:, 4]),
-                                        sum(scc_disaggregated[:, 5]),
-                                        sum(scc_disaggregated[:, 6]),
-                                        sum(scc_disaggregated[:, 7]),
-                                        sum(scc_disaggregated[:, 8])])
-
-
-                    else
-                        error("CO2 pulse was not executed correctly. Emissions differ in the second time period or do not have the pre-specified difference in the first.")
-                    end
-
-                end
-            end
-        end
-    end
-end
-
-# remove the first placeholder row
-df_outscc = df_outscc[df_outscc[:scc] .!= -999., :]
-
-# add a column for
-
-# export the SCC and its decomposition for all pulse-year pairs into a csv file
-CSV.write(string(dir_output, "MimiPageSCCs.csv"), df_outscc)

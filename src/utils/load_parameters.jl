@@ -89,9 +89,7 @@ function reset_masterparameters()
     global equiw_master = "Yes"             # "Yes" (default), "No", "DFC"
     global gdploss_master = "Excl"          # "Excl" (default), "Incl"
     global permafr_master = "Yes"           # "Yes" (default), "No"
-    global sccpulse_master = 0.             # 0. (default), any other number
-    global yearpulse_master = 2020          # 2020 (default), any other model year
-    global gedisc_master = "No"             # "No" (default), "Yes"
+    global gedisc_master = "No"             # "No" (default), "Yes", "Only" (feeds only discontinuity impacts into growth rate)
 
     "All master parameters reset to defaults"
 end

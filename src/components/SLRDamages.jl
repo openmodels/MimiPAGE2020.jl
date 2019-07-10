@@ -43,6 +43,9 @@
     rcons_per_cap_SLRRemainConsumption = Variable(index=[time, region], unit = "\$/person") #include?
     rgdp_per_cap_SLRRemainGDP = Variable(index=[time, region], unit = "\$/person")
 
+    # add parameter to switch off this component
+    switchoff_SLRdamages = Parameter(default = 0.)
+
     function run_timestep(p, v, d, t)
 
         for r in d.region
@@ -81,11 +84,9 @@
                 v.rcons_per_cap_SLRRemainConsumption[t,r] = v.cons_percap_aftercosts[t,r] - v.isat_per_cap_SLRImpactperCapinclSaturationandAdaptation[t,r]
                 v.rgdp_per_cap_SLRRemainGDP[t,r] = v.rcons_per_cap_SLRRemainConsumption[t,r]/(1-p.save_savingsrate/100)
 
-                if @isdefined getscc_woSLR
-                    if getscc_woSLR == true
+                if p.switchoff_SLRdamages == 1.
                         v.rcons_per_cap_SLRRemainConsumption[t,r] = v.cons_percap_aftercosts[t,r]
                         v.rgdp_per_cap_SLRRemainGDP[t,r] = v.gdp_percap_aftercosts[t,r]
-                    end
                 end
 
         end

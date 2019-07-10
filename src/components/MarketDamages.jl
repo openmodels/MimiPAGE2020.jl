@@ -34,6 +34,9 @@
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
     pow_MarketImpactExponent=Parameter(unit="", default=2.1666666666666665)
 
+    # add parameter to switch off this component
+    switchoff_marketdamages = Parameter(default = 0.)
+
     function run_timestep(p, v, d, t)
 
         for r in d.region
@@ -76,11 +79,9 @@
             v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
             v.rgdp_per_cap_MarketRemainGDP[t,r] = v.rcons_per_cap_MarketRemainConsumption[t,r]/(1-p.save_savingsrate/100)
 
-            if @isdefined getscc_womarket
-                if getscc_womarket == true
+            if p.switchoff_marketdamages == 1.
                     v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r]
                     v.rgdp_per_cap_MarketRemainGDP[t,r] = p.rgdp_per_cap_SLRRemainGDP[t,r]
-                end
             end
 
         end

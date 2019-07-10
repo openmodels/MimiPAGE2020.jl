@@ -79,6 +79,10 @@
     # Final result: total effect of climate change
     te_totaleffect = Variable(unit="\$million")
 
+    # New parameter: total impacts as % of GDP
+    isat_AllImpactsinclSaturationandAdaptation = Variable(index=[time,region], unit = "%GDP")
+    gdp_percap_aftercosts = Parameter(index=[time, region], unit = "\$/person")
+
     function run_timestep(p, v, d, tt)
         if is_first(tt)
             v.tpc_totalaggregatedcosts = 0
@@ -116,6 +120,9 @@
         end
 
         for rr in d.region
+
+            # compute total damages as % of GDP
+            v.isat_AllImpactsinclSaturationandAdaptation[tt, rr] = 100*(p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr])/p.gdp_percap_aftercosts[tt, rr]
 
             ## Gas Costs Accounting
             # Weighted costs (Page 23 of Hope 2009)

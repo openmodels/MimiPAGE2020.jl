@@ -33,6 +33,9 @@
   rcons_per_cap_DiscRemainConsumption=Variable(index=[time, region], unit = "\$/person")
   rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, region], unit = "\$/person")
 
+  # add parameter to switch off this component
+  switchoff_disc = Parameter(default = 0.)
+
     function run_timestep(p, v, d, t)
 
         v.idis_lossfromdisc[t] = max(0, p.rt_g_globaltemperature[t] - p.tdis_tolerabilitydisc)
@@ -74,11 +77,10 @@
             v.isat_per_cap_DiscImpactperCapinclSaturation[t,r] = (v.isat_satdiscimpact[t,r]/100)*p.rgdp_per_cap_NonMarketRemainGDP[t,r]
             v.rcons_per_cap_DiscRemainConsumption[t,r] = p.rcons_per_cap_NonMarketRemainConsumption[t,r] - v.isat_per_cap_DiscImpactperCapinclSaturation[t,r]
 
-            if @isdefined getscc_wodisc
-                if getscc_wodisc == true
+            if p.switchoff_disc == 1.
                     v.rcons_per_cap_DiscRemainConsumption[t,r] = p.rcons_per_cap_NonMarketRemainConsumption[t,r]
-                end
             end
+
         end
     end
 end
