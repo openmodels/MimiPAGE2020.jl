@@ -21,13 +21,13 @@ mcs = @defmcs begin
 
     save_savingsrate = TriangularDist(10, 20, 15) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages. GDP, SLRDamages
 
-    wincf_weightsfactor_sea["USA"] = TriangularDist(.6, 1, .8) # components: SLRDamages, Discountinuity (weights for market and nonmarket are non-stochastic and uniformly 1)
-    wincf_weightsfactor_sea["OECD"] = TriangularDist(.4, 1.2, .8)
-    wincf_weightsfactor_sea["USSR"] = TriangularDist(.2, .6, .4)
-    wincf_weightsfactor_sea["China"] = TriangularDist(.4, 1.2, .8)
-    wincf_weightsfactor_sea["SEAsia"] = TriangularDist(.4, 1.2, .8)
-    wincf_weightsfactor_sea["Africa"] = TriangularDist(.4, .8, .6)
-    wincf_weightsfactor_sea["LatAmerica"] = TriangularDist(.4, .8, .6)
+    wincf_weightsfactor["USA"] = TriangularDist(.6, 1, .8) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages, , SLRDamages, Discountinuity
+    wincf_weightsfactor["OECD"] = TriangularDist(.4, 1.2, .8)
+    wincf_weightsfactor["USSR"] = TriangularDist(.2, .6, .4)
+    wincf_weightsfactor["China"] = TriangularDist(.4, 1.2, .8)
+    wincf_weightsfactor["SEAsia"] = TriangularDist(.4, 1.2, .8)
+    wincf_weightsfactor["Africa"] = TriangularDist(.4, .8, .6)
+    wincf_weightsfactor["LatAmerica"] = TriangularDist(.4, .8, .6)
 
     automult_autonomouschange = TriangularDist(0.5, 0.8, 0.65)  #components: AdaptationCosts, AbatementCosts
 
@@ -48,6 +48,16 @@ mcs = @defmcs begin
     t3_timeco2land=TriangularDist(2.8, 5.7, 4.3)
     rt_g0_baseglobaltemp=TriangularDist(0.903, 0.989, 0.946)
 
+    # SiBCASA Permafrost
+    PERM_SIB_AF = TriangularDist(1.42609149897258, 2.32504747848815, 1.87556948873036)
+    PERM_SIB_SENS_C_CO2 = TriangularDist(28191.1555428869, 35688.3253432574, 31939.7404430722)
+    PERM_SIB_LAG_C_CO2 = TriangularDist(35.4926669856915, 87.8949041341782, 61.6937855599349)
+    PERM_SIB_POW_C_CO2 = TriangularDist(0.107020247715729, 0.410961185142816, 0.258990716429273)
+    PERM_SIB_SENS_C_CH4 = TriangularDist(1240.3553299183, 3348.11995329232, 2294.23764160531)
+    PERM_SIB_LAG_C_CH4 = TriangularDist(75.1943160023131, 337.382510123922, 206.288413063117)
+    PERM_SIB_POW_C_CH4 = TriangularDist(-0.108779283732708, 0.610889007954489, 0.25105486211089)
+
+
     # SulphateForcing
     d_sulphateforcingbase = TriangularDist(-0.8, -0.2, -0.4)
     ind_slopeSEforcing_indirect = TriangularDist(-0.8, 0, -0.4)
@@ -57,6 +67,14 @@ mcs = @defmcs begin
     pole_polardifference = TriangularDist(1, 2, 1.5)
     frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation
     tcr_transientresponse = TriangularDist(0.8, 2.7, 1.8)   # from PAGE-ICE v6.2 documentation
+    ampf_amplification[1] = TriangularDist(1.05, 1.53, 1.23)
+    ampf_amplification[2] = TriangularDist(1.16, 1.54, 1.32)
+    ampf_amplification[3] = TriangularDist(1.14, 1.31, 1.21)
+    ampf_amplification[4] = TriangularDist(1.41, 1.9, 1.64)
+    ampf_amplification[5] = TriangularDist(1, 1.3, 1.21)
+    ampf_amplification[6] = TriangularDist(0.84, 1.15, 1.04)
+    ampf_amplification[7] = TriangularDist(0.99, 1.42, 1.22)
+    ampf_amplification[8] = TriangularDist(0.9, 1.18, 1.04)
 
     # SeaLevelRise
     s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
