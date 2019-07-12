@@ -20,6 +20,7 @@
 
     # GDP losses
     lgdp_gdploss =  Parameter(index=[time, region], unit="\$M")
+    lgdpe_gdplossexceedingcons = Variable(index=[time, region], unit="\$M")
 
     # Calculation of weighted costs
     emuc_utilityconvexity = Parameter(unit="none", default=1.1666666666666667)
@@ -121,15 +122,29 @@
 
         for rr in d.region
 
+            # set the excess GDP losses variable to zero (this will be overwritten later if GDP losses exceed remaining consumption)
+            v.lgdpe_gdplossexceedingcons[tt, rr] = 0.
+
             # compute total damages as % of GDP
-            v.isat_AllImpactsinclSaturationandAdaptation[tt, rr] = 100*(p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr])/p.gdp_percap_aftercosts[tt, rr]
+            if p.cons_percap_aftercosts[tt, rr] != 0.
+                v.isat_AllImpactsinclSaturationandAdaptation[tt, rr] = 100*(p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr])/p.gdp_percap_aftercosts[tt, rr]
+            else
+                v.isat_AllImpactsinclSaturationandAdaptation[tt, rr] = 0.
+            end
 
             ## Gas Costs Accounting
             # Weighted costs (Page 23 of Hope 2009)
-            v.wtct_percap_weightedcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr])^(1 - p.emuc_utilityconvexity))
+            if p.cons_percap_consumption[tt, rr] >= (p.tct_percap_totalcosts_total[tt, rr] + p.act_percap_adaptationcosts[tt, rr])
+                v.wtct_percap_weightedcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr])^(1 - p.emuc_utilityconvexity))
+                v.eact_percap_weightedadaptationcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr])^(1 - p.emuc_utilityconvexity))
+            else # if the costs exceed the remaining consumption, distribute the consumption based on their proportions to each cost component
+                v.wtct_percap_weightedcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) *
+                                                        ((p.cons_percap_consumption[tt, rr] * p.tct_percap_totalcosts_total[tt, rr] / (p.tct_percap_totalcosts_total[tt, rr] + p.act_percap_adaptationcosts[tt, rr]))^(1 - p.emuc_utilityconvexity))
 
-            # Add these into consumption
-            v.eact_percap_weightedadaptationcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr])^(1 - p.emuc_utilityconvexity))
+                v.eact_percap_weightedadaptationcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) *
+                                                                    ((p.cons_percap_consumption[tt, rr] * p.act_percap_adaptationcosts[tt, rr] / (p.tct_percap_totalcosts_total[tt, rr] + p.act_percap_adaptationcosts[tt, rr]))^(1 - p.emuc_utilityconvexity))
+            end
+
 
             # Do partial weighting
             if p.equity_proportion == 0
@@ -186,8 +201,9 @@
                 if p.gdploss_included == 0.0
                     v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
                 else
-                    if p.rcons_percap_dis[tt, rr] <= p.lgdp_gdploss[tt, rr]/p.pop_population[tt,rr] # set impacts equal to consumption after costs if they would exceed it
-                        v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                    if p.rcons_percap_dis[tt, rr] * p.pop_population[tt,rr] <= p.lgdp_gdploss[tt, rr] # only equityweight the remaining consumption (assuming that pcC cannot fall below 1) and add remainer unweighted on top
+                        v.lgdpe_gdplossexceedingcons[tt, rr] = p.lgdp_gdploss[tt, rr] - p.rcons_percap_dis[tt, rr] * p.pop_population[tt,rr]
+                        v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - 1^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr] + v.lgdpe_gdplossexceedingcons[tt, rr]
                     else
                         v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.rcons_percap_dis[tt, rr] - p.lgdp_gdploss[tt, rr]/p.pop_population[tt,rr])^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
                     end

@@ -56,8 +56,12 @@
             v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange[t,r]))
 
             # calculate impacts at actual GDP
-            v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
-                (p.rgdp_per_cap_SLRRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+            if p.rgdp_per_cap_SLRRemainGDP[t,r] != 1 /(1-p.save_savingsrate/100)
+                v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
+                    (p.rgdp_per_cap_SLRRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+            else
+                v.igdp_ImpactatActualGDPperCap[t,r]= 0.
+            end
 
             # send impacts down a logistic path if saturation threshold is exceeded
             if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation

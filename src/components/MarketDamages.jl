@@ -53,8 +53,12 @@
             v.iref_ImpactatReferenceGDPperCap[t,r]= p.wincf_weightsfactor_market[r]*((p.W_MarketImpactsatCalibrationTemp + p.iben_MarketInitialBenefit * p.tcal_CalibrationTemp)*
                 (v.i_regionalimpact[t,r]/p.tcal_CalibrationTemp)^p.pow_MarketImpactExponent - v.i_regionalimpact[t,r] * p.iben_MarketInitialBenefit)
 
-            v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
-                (p.rgdp_per_cap_SLRRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+            if p.rgdp_per_cap_SLRRemainGDP[t,r] != 1 /(1-p.save_savingsrate/100)
+                v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
+                    (p.rgdp_per_cap_SLRRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+            else
+                v.igdp_ImpactatActualGDPperCap[t,r] = 0.
+            end
 
             if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
                 v.isat_ImpactinclSaturationandAdaptation[t,r] = v.igdp_ImpactatActualGDPperCap[t,r]

@@ -33,6 +33,8 @@
   rcons_per_cap_DiscRemainConsumption=Variable(index=[time, region], unit = "\$/person")
   rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, region], unit = "\$/person")
 
+  save_savingsrate = Parameter(unit= "%", default=15.)
+
   # add parameter to switch off this component
   switchoff_disc = Parameter(default = 0.)
 
@@ -61,7 +63,11 @@
         for r in d.region
             v.irefeqdis_eqdiscimpact[r] = p.wincf_weightsfactor_sea[r]*p.wdis_gdplostdisc
 
-            v.igdpeqdis_eqdiscimpact[t,r] = v.irefeqdis_eqdiscimpact[r] * (p.rgdp_per_cap_NonMarketRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
+            if p.rgdp_per_cap_NonMarketRemainGDP[t,r] != 1 /(1-p.save_savingsrate/100)
+                v.igdpeqdis_eqdiscimpact[t,r] = v.irefeqdis_eqdiscimpact[r] * (p.rgdp_per_cap_NonMarketRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
+            else
+                v.igdpeqdis_eqdiscimpact[t,r] = 0.
+            end
 
             if is_first(t)
                 v.igdp_realizeddiscimpact[t,r]=v.occurdis_occurrencedummy[t]*(1-v.expfdis_discdecay[t])*v.igdpeqdis_eqdiscimpact[t,r]
