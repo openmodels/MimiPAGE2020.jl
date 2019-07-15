@@ -11,6 +11,7 @@ set_param!(m, :Discontinuity, :y_year_0, 2015.)
 set_param!(m, :Discontinuity, :y_year, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
 set_param!(m, :Discontinuity, :rgdp_per_cap_NonMarketRemainGDP, readpagedata(m, "test/validationdata/rgdp_per_cap_NonMarketRemainGDP.csv"))
 set_param!(m, :Discontinuity, :rcons_per_cap_NonMarketRemainConsumption, readpagedata(m, "test/validationdata/rcons_per_cap_NonMarketRemainConsumption.csv"))
+set_param!(m, :Discontinuity, :wincf_weightsfactor_sea, readpagedata(m, "data/wincf_weightsfactor_sea.csv"))
 set_param!(m, :Discontinuity, :isatg_saturationmodification, 28.333333333333336)
 ##running Model
 run(m)
