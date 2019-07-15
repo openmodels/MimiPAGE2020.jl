@@ -49,16 +49,7 @@ The emission pulse can be set manually and otherwise defaults to 100000.
 """
 function compute_scc(m::Model = getpage(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
                     pulse_size::Union{Float64, Nothing} = 100000.)
-    year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
-    !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
-
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
-
-    mm = get_marginal_model(m, year=year, pulse_size = pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
-
-    return scc
+    return compute_scc_mm(m; year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:scc]
 end
 
 """

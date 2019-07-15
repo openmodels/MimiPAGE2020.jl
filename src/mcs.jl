@@ -97,14 +97,14 @@ function getsim()
         w_NonImpactsatCalibrationTemp = TriangularDist(.1, 1, .5)
         pow_NonMarketExponent = TriangularDist(1.5, 3, 2)
         ipow_NonMarketIncomeFxnExponent = TriangularDist(-.2, .2, 0)
-        
+
         # SLRDamages
         scal_calibrationSLR = TriangularDist(0.45, 0.55, .5)
         #iben_SLRInitialBenefit = TriangularDist(0, 0, 0) # only usable if lb <> ub
         W_SatCalibrationSLR = TriangularDist(.5, 1.5, 1)
         pow_SLRImpactFxnExponent = TriangularDist(.5, 1, .7)
         ipow_SLRIncomeFxnExponent = TriangularDist(-.4, -.2, -.3)
-        
+
         # Discountinuity
         rand_discontinuity = Uniform(0, 1)
         tdis_tolerabilitydisc = TriangularDist(1, 2, 1.5)
@@ -112,46 +112,46 @@ function getsim()
         wdis_gdplostdisc = TriangularDist(1, 5, 3)
         ipow_incomeexponent = TriangularDist(-.3, 0, -.1)
         distau_discontinuityexponent = TriangularDist(20, 200, 50)
-        
+
         # EquityWeighting
         civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
         ptp_timepreference = TriangularDist(0.1,2,1)
         emuc_utilityconvexity = TriangularDist(0.5,2,1)
-        
+
         # AbatementCosts
         AbatementCostParametersCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,6.0,-22)
         AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67,6.0,-30)
         AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20,6.0,-7.0)
         AbatementCostParametersLin_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,50,0)
-        
+
         AbatementCostParametersCO2_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,40,20)
         AbatementCostParametersCH4_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,20,10)
         AbatementCostParametersN2O_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,20,10)
         AbatementCostParametersLin_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,20,10)
-        
+
         AbatementCostParametersCO2_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400,-100,-200)
         AbatementCostParametersCH4_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-8000,-1000,-4000)
         AbatementCostParametersN2O_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-15000,0,-7000)
         AbatementCostParametersLin_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400,-100,-200)
-        
+
         AbatementCostParametersCO2_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60,80,70)
         AbatementCostParametersCH4_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35,70,50)
         AbatementCostParametersN2O_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35,70,50)
         AbatementCostParametersLin_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60,80,70)
-        
+
         AbatementCostParametersCO2_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100,700,400)
         AbatementCostParametersCH4_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(3000,10000,6000)
         AbatementCostParametersN2O_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(2000,60000,20000)
         AbatementCostParametersLin_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100,600,300)
-        
+
         AbatementCostParametersCO2_ies_InitialExperienceStockofCutbacks = TriangularDist(100000,200000,150000)
         AbatementCostParametersCH4_ies_InitialExperienceStockofCutbacks = TriangularDist(1500,2500,2000)
         AbatementCostParametersN2O_ies_InitialExperienceStockofCutbacks = TriangularDist(30,80,50)
         AbatementCostParametersLin_ies_InitialExperienceStockofCutbacks = TriangularDist(1500,2500,2000)
-        
+
         #the following variables need to be set, but set the same in all 4 abatement cost components
         #note that for these regional variables, the first region is the focus region (EU), which is set in the preceding code, and so is always one for these variables
-        
+
         emitf_uncertaintyinBAUemissfactor["USA"] = TriangularDist(0.8,1.2,1.0)
         emitf_uncertaintyinBAUemissfactor["OECD"] = TriangularDist(0.8,1.2,1.0)
         emitf_uncertaintyinBAUemissfactor["USSR"] = TriangularDist(0.65,1.35,1.0)
@@ -159,7 +159,7 @@ function getsim()
         emitf_uncertaintyinBAUemissfactor["SEAsia"] = TriangularDist(0.5,1.5,1.0)
         emitf_uncertaintyinBAUemissfactor["Africa"] = TriangularDist(0.5,1.5,1.0)
         emitf_uncertaintyinBAUemissfactor["LatAmerica"] = TriangularDist(0.5,1.5,1.0)
-        
+
         q0f_negativecostpercentagefactor["USA"] = TriangularDist(0.75,1.5,1.0)
         q0f_negativecostpercentagefactor["OECD"] = TriangularDist(0.75,1.25,1.0)
         q0f_negativecostpercentagefactor["USSR"] = TriangularDist(0.4,1.0,0.7)
@@ -167,7 +167,7 @@ function getsim()
         q0f_negativecostpercentagefactor["SEAsia"] = TriangularDist(0.4,1.0,0.7)
         q0f_negativecostpercentagefactor["Africa"] = TriangularDist(0.4,1.0,0.7)
         q0f_negativecostpercentagefactor["LatAmerica"] = TriangularDist(0.4,1.0,0.7)
-        
+
         cmaxf_maxcostfactor["USA"] = TriangularDist(0.8,1.2,1.0)
         cmaxf_maxcostfactor["OECD"] = TriangularDist(1.0,1.5,1.2)
         cmaxf_maxcostfactor["USSR"] = TriangularDist(0.4,1.0,0.7)
@@ -175,7 +175,7 @@ function getsim()
         cmaxf_maxcostfactor["SEAsia"] = TriangularDist(1,1.5,1.2)
         cmaxf_maxcostfactor["Africa"] = TriangularDist(1,1.5,1.2)
         cmaxf_maxcostfactor["LatAmerica"] = TriangularDist(0.4,1.0,0.7)
-        
+
         q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3,1.2,0.7)
         qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1,1.5,1.3)
         c0mult_mostnegativecostinfinalyear = TriangularDist(0.5,1.2,0.8)
@@ -183,7 +183,7 @@ function getsim()
         curve_above_curvatureofMACcurveabovezerocost = TriangularDist(0.1,0.7,0.4)
         cross_experiencecrossoverratio = TriangularDist(0.1,0.3,0.2)
         learn_learningrate = TriangularDist(0.05,0.35,0.2)
-        
+
         # AdaptationCosts
         AdaptiveCostsSeaLevel_cp_costplateau_eu = TriangularDist(0.01, 0.04, 0.02)
         AdaptiveCostsSeaLevel_ci_costimpact_eu = TriangularDist(0.0005, 0.002, 0.001)
@@ -191,7 +191,7 @@ function getsim()
         AdaptiveCostsEconomic_ci_costimpact_eu = TriangularDist(0.001, 0.008, 0.003)
         AdaptiveCostsNonEconomic_cp_costplateau_eu = TriangularDist(0.01, 0.04, 0.02)
         AdaptiveCostsNonEconomic_ci_costimpact_eu = TriangularDist(0.002, 0.01, 0.005)
-        
+
         cf_costregional["USA"] = TriangularDist(0.6, 1, 0.8)
         cf_costregional["OECD"] = TriangularDist(0.4, 1.2, 0.8)
         cf_costregional["USSR"] = TriangularDist(0.2, 0.6, 0.4)
@@ -199,12 +199,12 @@ function getsim()
         cf_costregional["SEAsia"] = TriangularDist(0.4, 1.2, 0.8)
         cf_costregional["Africa"] = TriangularDist(0.4, 0.8, 0.6)
         cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
-        
-        
+
+
         ############################################################################
         # Indicate which parameters to save for each model run
         ############################################################################
-        
+
         save(EquityWeighting.td_totaldiscountedimpacts,
              EquityWeighting.tpc_totalaggregatedcosts,
              EquityWeighting.tac_totaladaptationcosts,
@@ -217,7 +217,7 @@ function getsim()
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP)
-        
+
     end #defsim
 end
 
@@ -264,14 +264,13 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
 end
 
 function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__DIR__, "../output"))
-
     # get simulation
     mcs = getsim()
-    
+
     # get a model
     m = getpage()
     run(m)
-    
+
     # Generate trial data for all RVs and save to a file
     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "trialdata.csv"))
 
@@ -285,4 +284,35 @@ function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
 
+function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
+                     eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
+                     pulse_size::Union{Float64, Nothing} = 100000.)
+    # Setup the marginal model
+    m = getpage()
+    mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
+
+    # Setup SCC calculation and place for results
+    scc_results = zeros(samplesize)
+
+    function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
+        base, marginal = mcs.models
+        println([marginal[:EquityWeighting, :td_totaldiscountedimpacts], base[:EquityWeighting, :td_totaldiscountedimpacts]])
+        scc_results[trialnum] = marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]
+    end
+
+    # Setup MC simulation
+    mcs = getsim()
+    set_models!(mcs, [mm.base, mm.marginal])
+    generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
+
+    # Run it!
+    run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+
+    scc_results
+end
+
 # do_monte_carlo_runs(100)
+
+# include("mcs.jl")
+# include("compute_scc.jl")
+# get_scc_mcs(100, 2020)
