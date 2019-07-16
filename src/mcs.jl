@@ -296,8 +296,7 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
 
     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
         base, marginal = mcs.models
-        println([marginal[:EquityWeighting, :td_totaldiscountedimpacts], base[:EquityWeighting, :td_totaldiscountedimpacts]])
-        scc_results[trialnum] = marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]
+        scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
     end
 
     # Setup MC simulation
