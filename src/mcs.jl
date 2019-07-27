@@ -111,7 +111,7 @@ function getsim()
         pdis_probability = TriangularDist(10, 30, 20)
         wdis_gdplostdisc = TriangularDist(1, 5, 3)
         ipow_incomeexponent = TriangularDist(-.3, 0, -.1)
-        distau_discontinuityexponent = TriangularDist(20, 200, 50)
+        distau_discontinuityexponent = TriangularDist(10, 30, 20)
 
         # EquityWeighting
         civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
