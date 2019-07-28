@@ -29,6 +29,11 @@
     lgdp_gdploss =  Variable(index=[time, region], unit="\$M")
     ge_growtheffects = Parameter(unit = "none", default =  0.)
     grwnet_realizedgdpgrowth = Variable(index=[time, region], unit = "%/year")
+    # bound variables
+    cbshare_pcconsumptionboundshare = Parameter(unit = "%", default = 1)
+    cbabs_pcconsumptionbound = Variable(unit = "\$/person")
+    gdpabs_pcgdpbound = Variable(unit = "\$/person")
+    cbreg_regionsatbound = Variable(unit = "regions")
 
     function init(p, v, d)
 
@@ -55,21 +60,38 @@
 
         v.yagg_periodspan[t] = yhi_periodend- ylo_periodstart
 
+        if is_first(t)
+            v.cbreg_regionsatbound = 0
+        end
+
+
         for r in d.region
             #eq.28 in Hope 2002
             if is_first(t)
                 v.gdp[t, r] = p.gdp_0[r] * (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year_0)
                 v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r]
                 v.gdp_leveleffect[t,r] = v.gdp[t,r]
+
+                v.cbabs_pcconsumptionbound = (p.cbshare_pcconsumptionboundshare/100) * v.cons_percap_consumption_0[1]
+                v.gdpabs_pcgdpbound = v.cbabs_pcconsumptionbound/(1-p.save_savingsrate/100)
             else
                 v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation[t-1,r]
                 v.gdp[t, r] = v.gdp[t-1, r] * (1 + (v.grwnet_realizedgdpgrowth[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
                 v.gdp_leveleffect[t,r] = v.gdp_leveleffect[t-1, r] *  (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
+
+                # let boundary take effect if necessary
+                if v.gdp[t,r]/p.pop_population[t,r] < v.gdpabs_pcgdpbound
+                    v.gdp[t,r] = v.gdpabs_pcgdpbound * p.pop_population[t,r]
+                end
             end
             v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
             v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
 
             v.lgdp_gdploss[t,r] = v.gdp_leveleffect[t,r] - v.gdp[t,r]
+
+            if is_last(t)
+                v.cbreg_regionsatbound = v.cbreg_regionsatbound + (v.gdp[t,r] == v.gdpabs_pcgdpbound * p.pop_population[t,r])
+            end
         end
     end
 end
