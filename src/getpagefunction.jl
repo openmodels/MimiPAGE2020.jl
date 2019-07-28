@@ -1,40 +1,42 @@
 using Mimi
 
-include("utils/load_parameters.jl")
-include("utils/mctools.jl")
+Base.include(Main, "utils/load_parameters.jl")
+Base.include(Main, "utils/mctools.jl")
 
-include("compute_scc.jl")
+Base.include(Main, "compute_scc.jl")
 
-include("components/RCPSSPScenario.jl")
-include("components/CO2emissions.jl")
-include("components/CO2cycle.jl")
-include("components/CO2forcing.jl")
-include("components/CH4emissions.jl")
-include("components/CH4cycle.jl")
-include("components/CH4forcing.jl")
-include("components/N2Oemissions.jl")
-include("components/N2Ocycle.jl")
-include("components/N2Oforcing.jl")
-include("components/LGemissions.jl")
-include("components/LGcycle.jl")
-include("components/LGforcing.jl")
-include("components/SulphateForcing.jl")
-include("components/TotalForcing.jl")
-include("components/ClimateTemperature.jl")
-include("components/SeaLevelRise.jl")
-include("components/GDP.jl")
-include("components/MarketDamages.jl")
-include("components/MarketDamagesBurke.jl")
-include("components/NonMarketDamages.jl")
-include("components/Discontinuity.jl")
-include("components/AdaptationCosts.jl")
-include("components/SLRDamages.jl")
-include("components/AbatementCostParameters.jl")
-include("components/AbatementCosts.jl")
-include("components/TotalAbatementCosts.jl")
-include("components/TotalAdaptationCosts.jl")
-include("components/Population.jl")
-include("components/EquityWeighting.jl")
+Base.include(Main, "components/RCPSSPScenario.jl")
+Base.include(Main, "components/CO2emissions.jl")
+Base.include(Main, "components/CO2cycle.jl")
+Base.include(Main, "components/CO2forcing.jl")
+Base.include(Main, "components/CH4emissions.jl")
+Base.include(Main, "components/CH4cycle.jl")
+Base.include(Main, "components/CH4forcing.jl")
+Base.include(Main, "components/N2Oemissions.jl")
+Base.include(Main, "components/N2Ocycle.jl")
+Base.include(Main, "components/N2Oforcing.jl")
+Base.include(Main, "components/LGemissions.jl")
+Base.include(Main, "components/LGcycle.jl")
+Base.include(Main, "components/LGforcing.jl")
+Base.include(Main, "components/SulphateForcing.jl")
+Base.include(Main, "components/TotalForcing.jl")
+Base.include(Main, "components/ClimateTemperature.jl")
+Base.include(Main, "components/SeaLevelRise.jl")
+Base.include(Main, "components/GDP.jl")
+Base.include(Main, "components/MarketDamages.jl")
+Base.include(Main, "components/MarketDamagesBurke.jl")
+Base.include(Main, "components/MarketDamagesRegion.jl")
+Base.include(Main, "components/MarketDamagesRegionBayes.jl")
+Base.include(Main, "components/NonMarketDamages.jl")
+Base.include(Main, "components/Discontinuity.jl")
+Base.include(Main, "components/AdaptationCosts.jl")
+Base.include(Main, "components/SLRDamages.jl")
+Base.include(Main, "components/AbatementCostParameters.jl")
+Base.include(Main, "components/AbatementCosts.jl")
+Base.include(Main, "components/TotalAbatementCosts.jl")
+Base.include(Main, "components/TotalAdaptationCosts.jl")
+Base.include(Main, "components/Population.jl")
+Base.include(Main, "components/EquityWeighting.jl")
 
 function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
 
@@ -83,6 +85,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     slrdamages = addslrdamages(m)
     marketdamages = addmarketdamages(m)
     marketdamagesburke = addmarketdamagesburke(m)
+    marketdamagesregion = addmarketdamagesregion(m)
+    marketdamagesregionbayes = addmarketdamagesregionbayes(m)
     nonmarketdamages = addnonmarketdamages(m)
     add_comp!(m, Discontinuity)
 
@@ -140,6 +144,22 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
 
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
     gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+#    connect_param!(m, :GDP => :isat_satdiscimpact, :Discontinuity => :isat_satdiscimpact)
+#    if @isdefined modelspec_master
+#        if modelspec_master == "PAGE09"
+#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamages => :isat_ImpactinclSaturationandAdaptation)
+#        elseif modelspec_master == "Burke"
+#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation)
+#        elseif modelspec_master == "Region"
+#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegion => :isat_ImpactinclSaturationandAdaptation)
+#        elseif modelspec_master == "RegionBayes"
+#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegionBayes => :isat_ImpactinclSaturationandAdaptation)
+#        else
+#            error("The modelspec_master parameter must be either Burke, Region, RegionBayes or PAGE09. Please adjust the parameter")
+#        end
+#    else # RegionBayes as default if the master parameter was not defined
+#        connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegionBayes => :isat_ImpactinclSaturationandAdaptation)
+#    end
 
     for allabatement in [
         (:AbatementCostParametersCO2, :AbatementCostsCO2, :er_CO2emissionsgrowth),
@@ -188,8 +208,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
     connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
     connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
-    connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits=true) # not required for Burke damages
-    connect_param!(m, :MarketDamages => :imp_actualreduction, :AdaptiveCostsEconomic => :imp_adaptedimpacts) # not required for Burke damages
+    connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits=true)
+    connect_param!(m, :MarketDamages => :imp_actualreduction, :AdaptiveCostsEconomic => :imp_adaptedimpacts)
     connect_param!(m, :MarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
     connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
@@ -197,9 +217,36 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
     connect_param!(m, :MarketDamagesBurke => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
+    connect_param!(m, :MarketDamagesRegion => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :MarketDamagesRegion => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
+    connect_param!(m, :MarketDamagesRegion => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
+    connect_param!(m, :MarketDamagesRegion => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
+
+    connect_param!(m, :MarketDamagesRegionBayes => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :MarketDamagesRegionBayes => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
+    connect_param!(m, :MarketDamagesRegionBayes => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
+    connect_param!(m, :MarketDamagesRegionBayes => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
+
     connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
-    connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP)
-    connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption)
+    if @isdefined modelspec_master
+        if modelspec_master == "PAGE09"
+            connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamages => :rgdp_per_cap_MarketRemainGDP)
+            connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamages => :rcons_per_cap_MarketRemainConsumption)
+        elseif modelspec_master == "Burke"
+            connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP)
+            connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption)
+        elseif modelspec_master == "Region"
+            connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesRegion => :rgdp_per_cap_MarketRemainGDP)
+            connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesRegion => :rcons_per_cap_MarketRemainConsumption)
+        elseif modelspec_master == "RegionBayes"
+            connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesRegionBayes => :rgdp_per_cap_MarketRemainGDP)
+            connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesRegionBayes => :rcons_per_cap_MarketRemainConsumption)
+        end
+    else # use RegionBayes as default if master parameter is not set
+        connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesRegion => :rgdp_per_cap_MarketRemainGDP)
+        connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesRegion => :rcons_per_cap_MarketRemainConsumption)
+    end
+
     connect_param!(m, :NonMarketDamages =>:atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic =>:atl_adjustedtolerablelevel, ignoreunits=true)
     connect_param!(m, :NonMarketDamages => :imp_actualreduction, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts)
     connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
@@ -216,7 +263,10 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
+#    connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth, :GDP => :grwnet_realizedgdpgrowth)
+#    connect_param!(m, :EquityWeighting => :lgdp_gdploss, :GDP => :lgdp_gdploss)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
+#    connect_param!(m, :EquityWeighting => :gdp_percap_aftercosts, :SLRDamages => :gdp_percap_aftercosts)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
     connect_param!(m, :EquityWeighting => :yagg_periodspan, :GDP => :yagg_periodspan)
     equityweighting[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
@@ -237,7 +287,17 @@ function getpage(scenario::String="NDCs", use_permafrost::Bool=true)
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
-    buildpage(m, scenario, use_permafrost)
+    if @isdefined permafr_master
+        if permafr_master == "No"
+            buildpage(m, scenario, false)
+        elseif permafr_master == "Yes"
+            buildpage(m, scenario, use_permafrost)
+        else
+            error("The permafr_master parameter must be set to Yes or No. Please adjust the parameter")
+        end
+    else
+        buildpage(m, scenario, use_permafrost)
+    end
 
     # next: add vector and panel example
     initpage(m)

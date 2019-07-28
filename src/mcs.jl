@@ -286,9 +286,21 @@ end
 
 function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-                     pulse_size::Union{Float64, Nothing} = 100000.)
+                     pulse_size::Union{Float64, Nothing} = 100000.,
+                     switch_off::String = "none")
     # Setup the marginal model
     m = getpage()
+
+    # optionally switch off a component
+    if switch_off == "market"
+        update_param!(m, :switchoff_marketdamages, 1.)
+    elseif switch_off == "nonmarket"
+        update_param!(m, :switchoff_nonmarketdamages, 1.)
+    elseif switch_off == "slr"
+        update_param!(m, :switchoff_SLRdamages, 1.)
+    elseif switch_off == "disc"
+        update_param!(m, :switchoff_discontinuity, 1.)
+    end
     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
 
     # Setup SCC calculation and place for results

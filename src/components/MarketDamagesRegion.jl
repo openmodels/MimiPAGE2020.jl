@@ -1,4 +1,4 @@
-@defcomp MarketDamagesBurke begin
+@defcomp MarketDamagesRegion begin
     region = Index()
     y_year = Parameter(index=[time], unit="year")
 
@@ -16,8 +16,9 @@
     # added impact parameters and variables specifically for Burke damage function
     rtl_abs_0_realizedabstemperature = Parameter(index = [region]) # 1979-2005 means, Yumashev et al. 2019 Supplementary Table 16, table in /data directory
     rtl_0_realizedtemperature = Parameter(index = [region]) # temperature change between PAGE base year temperature and rtl_abs_0 (?)
-    impf_coeff_lin = Parameter(default = -0.00829990966469437) # rescaled coefficients from Burke
-    impf_coeff_quadr = Parameter(default = -0.000500003403703578)
+    impf_coefflinearregion = Parameter(index = [region], unit = "none") # regional damage functions based on temperature and growth projections
+    impf_coeffquadrregion = Parameter(index = [region], unit = "none")
+    impf_coeffcubicregion = Parameter(index = [region], unit = "none")
     tcal_burke = Parameter(default = 21.) # calibration temperature for the impact function
     nlag_burke = Parameter(default = 1.) # Yumashev et al. (2019) allow for one or two lags
 
@@ -31,32 +32,37 @@
     iref_ImpactatReferenceGDPperCap=Variable(index=[time, region])
     igdp_ImpactatActualGDPperCap=Variable(index=[time, region])
 
-    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
+    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region], unit = "%GDP")
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
 
     # add parameter to switch off this component
     switchoff_marketdamages = Parameter(default = 0.)
 
-
     function run_timestep(p, v, d, t)
 
         for r in d.region
+            # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
+            p.wincf_weightsfactor_market[r] = 1.
 
             # calculate the regional temperature impact relative to baseline year and add it to baseline absolute value
             v.i_burke_regionalimpact[t,r] = (p.rtl_realizedtemperature[t,r] - p.rtl_0_realizedtemperature[r]) + p.rtl_abs_0_realizedabstemperature[r]
 
 
             # calculate the log change, depending on the number of lags specified
-            v.i1log_impactlogchange[t,r] = p.nlag_burke * (p.impf_coeff_lin  * (v.i_burke_regionalimpact[t,r] - p.rtl_abs_0_realizedabstemperature[r]) +
-                                p.impf_coeff_quadr * ((v.i_burke_regionalimpact[t,r] - p.tcal_burke)^2 -
-                                                      (p.rtl_abs_0_realizedabstemperature[r] - p.tcal_burke)^2))
+            v.i1log_impactlogchange[t,r] = p.nlag_burke * (p.impf_coefflinearregion[r]  * (v.i_burke_regionalimpact[t,r] - p.rtl_abs_0_realizedabstemperature[r]) +
+                                p.impf_coeffquadrregion[r] * (v.i_burke_regionalimpact[t,r]^2 - p.rtl_abs_0_realizedabstemperature[r]^2) +
+                                p.impf_coeffcubicregion[r] * (v.i_burke_regionalimpact[t,r]^3 - p.rtl_abs_0_realizedabstemperature[r]^3))
 
             # calculate the impact at focus region GDP p.c.
             v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange[t,r]))
 
             # calculate impacts at actual GDP
-            v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
-                (p.rgdp_per_cap_SLRRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+            if p.rgdp_per_cap_SLRRemainGDP[t,r] != 1 /(1-p.save_savingsrate/100)
+                v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
+                    (p.rgdp_per_cap_SLRRemainGDP[t,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+            else
+                v.igdp_ImpactatActualGDPperCap[t,r] = 0.
+            end
 
             # send impacts down a logistic path if saturation threshold is exceeded
             if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
@@ -78,7 +84,7 @@
                     v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r]
                     v.rgdp_per_cap_MarketRemainGDP[t,r] = p.rgdp_per_cap_SLRRemainGDP[t,r]
             end
-            
+
         end
 
     end
@@ -88,13 +94,10 @@ end
 # readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
 
-function addmarketdamagesburke(model::Model)
-    marketdamagesburkecomp = add_comp!(model, MarketDamagesBurke)
-    marketdamagesburkecomp[:rtl_abs_0_realizedabstemperature] = readpagedata(model, "data/rtl_abs_0_realizedabstemperature.csv")
-    marketdamagesburkecomp[:rtl_0_realizedtemperature] = readpagedata(model, "data/rtl_0_realizedtemperature.csv")
+function addmarketdamagesregion(model::Model)
+    marketdamagesregioncomp = add_comp!(model, MarketDamagesRegion)
+    marketdamagesregioncomp[:rtl_abs_0_realizedabstemperature] = readpagedata(model, "data/rtl_abs_0_realizedabstemperature.csv")
+    marketdamagesregioncomp[:rtl_0_realizedtemperature] = readpagedata(model, "data/rtl_0_realizedtemperature.csv")
 
-    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-    marketdamagesburkecomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
-
-    return marketdamagesburkecomp
+    return marketdamagesregioncomp
 end

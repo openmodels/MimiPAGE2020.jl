@@ -38,6 +38,9 @@
     isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region], unit="\$")
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit="\$/person")
 
+    # add switch
+    switchoff_nonmarketdamages = Parameter(default = 0.)
+
     function run_timestep(p, v, d, t)
 
         for r in d.region
@@ -77,6 +80,12 @@
             v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r] = (v.isat_ImpactinclSaturationandAdaptation[t,r]/100)*p.rgdp_per_cap_MarketRemainGDP[t,r]
             v.rcons_per_cap_NonMarketRemainConsumption[t,r] = p.rcons_per_cap_MarketRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
             v.rgdp_per_cap_NonMarketRemainGDP[t,r] = v.rcons_per_cap_NonMarketRemainConsumption[t,r]/(1-p.save_savingsrate/100)
+
+            # switch off the impacts
+            if p.switchoff_nonmarketdamages == 1.
+                    v.rcons_per_cap_NonMarketRemainConsumption[t,r] = p.rcons_per_cap_MarketRemainConsumption[t,r]
+                    v.rgdp_per_cap_NonMarketRemainGDP[t,r] = p.rgdp_per_cap_MarketRemainGDP[t,r]
+            end
         end
     end
 end
