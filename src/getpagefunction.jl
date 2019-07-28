@@ -144,22 +144,21 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
 
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
     gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
-#    connect_param!(m, :GDP => :isat_satdiscimpact, :Discontinuity => :isat_satdiscimpact)
-#    if @isdefined modelspec_master
-#        if modelspec_master == "PAGE09"
-#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamages => :isat_ImpactinclSaturationandAdaptation)
-#        elseif modelspec_master == "Burke"
-#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation)
-#        elseif modelspec_master == "Region"
-#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegion => :isat_ImpactinclSaturationandAdaptation)
-#        elseif modelspec_master == "RegionBayes"
-#            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegionBayes => :isat_ImpactinclSaturationandAdaptation)
-#        else
-#            error("The modelspec_master parameter must be either Burke, Region, RegionBayes or PAGE09. Please adjust the parameter")
-#        end
-#    else # RegionBayes as default if the master parameter was not defined
-#        connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegionBayes => :isat_ImpactinclSaturationandAdaptation)
-#    end
+    if @isdefined modelspec_master
+        if modelspec_master == "PAGE09"
+            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamages => :isat_ImpactinclSaturationandAdaptation)
+        elseif modelspec_master == "Burke"
+            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation)
+        elseif modelspec_master == "Region"
+            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegion => :isat_ImpactinclSaturationandAdaptation)
+        elseif modelspec_master == "RegionBayes"
+            connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegionBayes => :isat_ImpactinclSaturationandAdaptation)
+        else
+            error("The modelspec_master parameter must be either Burke, Region, RegionBayes or PAGE09. Please adjust the parameter")
+        end
+    else # RegionBayes as default if the master parameter was not defined
+        connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesRegionBayes => :isat_ImpactinclSaturationandAdaptation)
+    end
 
     for allabatement in [
         (:AbatementCostParametersCO2, :AbatementCostsCO2, :er_CO2emissionsgrowth),
@@ -263,7 +262,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
-#    connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth, :GDP => :grwnet_realizedgdpgrowth)
+    connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth, :GDP => :grwnet_realizedgdpgrowth)
 #    connect_param!(m, :EquityWeighting => :lgdp_gdploss, :GDP => :lgdp_gdploss)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
 #    connect_param!(m, :EquityWeighting => :gdp_percap_aftercosts, :SLRDamages => :gdp_percap_aftercosts)

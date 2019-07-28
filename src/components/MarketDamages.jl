@@ -30,7 +30,7 @@
     igdp_ImpactatActualGDPperCap=Variable(index=[time, region])
     impmax_maxtempriseforadaptpolicyM = Parameter(index=[region], unit= "degreeC")
 
-    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
+    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region],  unit = "%GDP")
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
     pow_MarketImpactExponent=Parameter(unit="", default=2.1666666666666665)
 

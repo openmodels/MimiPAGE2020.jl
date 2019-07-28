@@ -31,7 +31,7 @@
     iref_ImpactatReferenceGDPperCap=Variable(index=[time, region])
     igdp_ImpactatActualGDPperCap=Variable(index=[time, region])
 
-    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
+    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region],  unit = "%GDP")
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
 
     # add parameter to switch off this component
@@ -78,7 +78,7 @@
                     v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r]
                     v.rgdp_per_cap_MarketRemainGDP[t,r] = p.rgdp_per_cap_SLRRemainGDP[t,r]
             end
-            
+
         end
 
     end
