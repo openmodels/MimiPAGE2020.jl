@@ -1,11 +1,11 @@
 # Index: region
 
-Region,b2
-EU,1.23e-06
-US,1.16e-06
-OT,5.22e-07
-EE,1.46e-06
-CA,1.29e-07
-IA,-1.56e-07
-AF,-5.91e-07
-LA,8.51e-07
+Region,b2c
+EU,9.71e-08
+US,3.15e-08
+OT,6.45e-08
+EE,1.61e-07
+CA,2.85e-07
+IA,3.26e-08
+AF,-1.64e-08
+LA,-7.52e-08
