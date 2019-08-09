@@ -28,7 +28,7 @@ end
 @testset "mimi-page.jl" begin
 
 include("test_climatemodel.jl") # error
-include("test_AbatementCosts.jl") # error
+include("test_AbatementCosts.jl") # works
 include("test_AdaptationCosts.jl") # works
 include("test_CH4cycle.jl") # error
 include("test_CH4emissions.jl") # works
@@ -59,8 +59,8 @@ include("test_SulphateForcing.jl") # works
 include("test_TotalAbatementCosts.jl") # works
 include("test_TotalAdaptationCosts.jl") # works
 include("test_TotalForcing.jl") # works
-include("test_Permafrost.jl")
+include("test_Permafrost.jl") # works
 #include("test_mcs.jl")
-include("contrib/test_taxeffect.jl")
+include("contrib/test_taxeffect.jl") # works
 
 end

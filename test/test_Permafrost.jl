@@ -33,11 +33,11 @@ for testscen in 1:2
 
     permjcco2 = m[:PermafrostJULES,  :perm_jul_ce_c_co2]
     permjcco2_compare = readpagedata(m,"test/validationdata/$valdir/perm_jul_ce_c_co2.csv")
-    @test permjcco2 ≈ permco2_compare rtol=1e-4
+    @test permjcco2 ≈ permjcco2_compare rtol=1e-4
 
     permsco2 = m[:PermafrostSiBCASA,  :perm_sib_ce_co2]
     permsco2_compare = readpagedata(m,"test/validationdata/$valdir/perm_sib_ce_co2.csv")
-    @test permsco2 ≈ permco2_compare rtol=1e-4
+    @test permsco2 ≈ permsco2_compare rtol=1e-4
 
     permco2 = m[:PermafrostTotal,  :perm_tot_e_co2]
     permco2_compare = readpagedata(m,"test/validationdata/$valdir/perm_tot_e_co2.csv")

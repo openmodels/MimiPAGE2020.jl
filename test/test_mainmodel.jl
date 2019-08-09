@@ -64,7 +64,7 @@ for testscen in 1:2
     te = m[:EquityWeighting, :te_totaleffect]
     if scenario == "NDCs"
         te_compare = 1.0320923880568126e9
-    elseif scenario = "2c-sac"
+    elseif scenario == "2 degC Target"
         te_compare = 5.0496576104580307e8
     end
     @test te ≈ te_compare rtol=1e4
