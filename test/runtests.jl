@@ -30,11 +30,11 @@ end
 include("test_climatemodel.jl") # error
 include("test_AbatementCosts.jl") # works
 include("test_AdaptationCosts.jl") # works
-include("test_CH4cycle.jl") # error
+include("test_CH4cycle.jl") # works
 include("test_CH4emissions.jl") # works
 include("test_CH4forcing.jl") # works
 include("test_ClimateTemperature.jl") # error
-include("test_CO2cycle.jl") # error
+include("test_CO2cycle.jl") # works
 include("test_CO2emissions.jl") # works
 include("test_CO2forcing.jl") # works
 include("test_Discontinuity.jl") # works

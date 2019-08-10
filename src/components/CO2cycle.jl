@@ -103,12 +103,10 @@ function addco2cycle(model::Model, use_permafrost::Bool)
 
     if use_permafrost
         co2cycle[:permte0_permafrostemissions0] = 692.2476420621228
-        co2cycle[:permte_permafrostemissions] = readpagedata(model, "data/perm_tot_e_co2.csv")
         co2cycle[:corrf_correctionfactorco2_0] = 0.8177307839027955
         co2cycle[:thist_timescaleco2hist] = 49.59054463320648
     else
         co2cycle[:permte0_permafrostemissions0] = 0
-        co2cycle[:permte_permafrostemissions] = zeros(10)
         co2cycle[:corrf_correctionfactorco2_0] = 0.834514918731254
         co2cycle[:thist_timescaleco2hist] = 49.36461591688456
     end

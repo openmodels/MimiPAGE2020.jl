@@ -10,6 +10,7 @@ for testscen in 1:2
     addco2cycle(m, use_permafrost)
 
     set_param!(m, :CO2Cycle, :e_globalCO2emissions, readpagedata(m, "test/validationdata/$valdir/e_globalCO2emissions.csv"))
+    set_param!(m, :CO2Cycle, :permte_permafrostemissions, readpagedata(m, "test/validationdata/$valdir/perm_tot_e_co2.csv"))
     set_param!(m, :CO2Cycle, :y_year,[2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])#real values
     set_param!(m, :CO2Cycle, :y_year_0, 2015.)#real value
     set_param!(m, :CO2Cycle, :rt_g_globaltemperature, readpagedata(m, "test/validationdata/$valdir/rt_g_globaltemperature.csv"))

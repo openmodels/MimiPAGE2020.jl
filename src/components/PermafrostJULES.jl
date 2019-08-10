@@ -14,7 +14,7 @@
     perm_jul_pow_c_co2 = Parameter(default=0.457030756829357)
     perm_jul_lag_c_co2 = Parameter(default=543.6163557759747)
     perm_jul_ch4_co2_c_ratio = Parameter(default=6.116162272246744)
-    
+
     perm_jul_temp = Variable(index=[time], unit="degC")
     perm_jul_sens_c_co2_correct = Variable(index=[time])
     perm_jul_lag_c_co2_correct = Variable(index=[time])
