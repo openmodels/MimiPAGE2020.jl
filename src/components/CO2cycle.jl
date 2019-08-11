@@ -3,7 +3,7 @@ using Mimi
 use_permafrost = true
 
 @defcomp CO2Cycle begin
-    # Permafrost outputs (calculations not implemented yet)
+    # Permafrost outputs
     permte0_permafrostemissions0 = Parameter(unit="Mtonne")
     permte_permafrostemissions = Parameter(index=[time], unit="Mtonne")
 

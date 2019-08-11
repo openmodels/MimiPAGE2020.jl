@@ -1,5 +1,5 @@
 @defcomp PermafrostSiBCASA begin
-    rt_g = Parameter(index=[time],unit="degC")
+    rt_g = Parameter(index=[time],unit="degreeC")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
 

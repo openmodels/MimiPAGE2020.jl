@@ -63,6 +63,7 @@ mcs = @defmcs begin
     ind_slopeSEforcing_indirect = TriangularDist(-0.8, 0, -0.4)
 
     # ClimateTemperature
+    alb_emulator_rand = TriangularDist(-1., 1., 0.)
     rlo_ratiolandocean = TriangularDist(1.2, 1.6, 1.4)
     pole_polardifference = TriangularDist(1, 2, 1.5)
     frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation

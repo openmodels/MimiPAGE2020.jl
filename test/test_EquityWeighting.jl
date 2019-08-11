@@ -1,7 +1,11 @@
 using Test
 
 for testscen in 1:2
-    valdir, scenario, use_permafrost = get_scenario(testscen)
+    if testscen == 2
+        continue # this validation data is missing
+    end
+
+    valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = page_model()

@@ -1,3 +1,4 @@
+include("utils/load_parameters.jl")
 include("components/RCPSSPScenario.jl")
 include("components/CO2emissions.jl")
 include("components/CO2cycle.jl")
@@ -14,8 +15,11 @@ include("components/LGforcing.jl")
 include("components/SulphateForcing.jl")
 include("components/TotalForcing.jl")
 include("components/ClimateTemperature.jl")
+include("components/PermafrostSiBCASA.jl")
+include("components/PermafrostJULES.jl")
+include("components/PermafrostTotal.jl")
 
-function climatemodel(scenario::String, use_permafrost::Bool=true)
+function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::Bool=false)
     ##scenario = "NDCs"
     ##use_permafrost = true
 
@@ -25,11 +29,15 @@ function climatemodel(scenario::String, use_permafrost::Bool=true)
 
     #add all the components
     scenario = addrcpsspscenario(m, scenario)
+    climtemp = addclimatetemperature(m, use_seaice)
+    permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
+    permafrost_jules = add_comp!(m, PermafrostJULES)
+    permafrost = add_comp!(m, PermafrostTotal)
     co2emit = add_comp!(m,co2emissions)
-    addco2cycle(m, use_permafrost)
+    co2cycle = addco2cycle(m, use_permafrost)
     add_comp!(m, co2forcing)
     ch4emit = add_comp!(m, ch4emissions)
-    addch4cycle(m, use_permafrost)
+    ch4cycle = addch4cycle(m, use_permafrost)
     add_comp!(m, ch4forcing)
     n2oemit = add_comp!(m, n2oemissions)
     add_comp!(m, n2ocycle)
@@ -39,23 +47,37 @@ function climatemodel(scenario::String, use_permafrost::Bool=true)
     add_comp!(m, LGforcing)
     sulfemit = add_comp!(m, SulphateForcing)
     totalforcing = add_comp!(m, TotalForcing)
-    add_comp!(m, ClimateTemperature)
 
     #connect parameters together
+    set_param!(m, :ClimateTemperature, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
+    set_param!(m, :ClimateTemperature, :y_year_0, 2015.)
+    connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
+
+    permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
+    permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
+    permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
+    permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
+    permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
+    permafrost[:perm_jul_ce_co2] = permafrost_jules[:perm_jul_ce_co2]
+    permafrost[:perm_jul_e_co2] = permafrost_jules[:perm_jul_e_co2]
+    permafrost[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
+
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
-    set_param!(m, :CO2Cycle, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
-    set_param!(m, :CO2Cycle, :y_year_0, 2015.)
-    connect_param!(m, :CO2Cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
-    connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
+    co2cycle[:y_year] = [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.]
+    co2cycle[:y_year_0] = 2015.
+    co2cycle[:e_globalCO2emissions] = co2emit[:e_globalCO2emissions]
+    co2cycle[:rt_g_globaltemperature] = climtemp[:rt_g_globaltemperature]
+    co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
 
     connect_param!(m, :co2forcing => :c_CO2concentration, :CO2Cycle => :c_CO2concentration)
 
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
-    set_param!(m, :CH4Cycle, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
-    set_param!(m, :CH4Cycle, :y_year_0, 2015.)
-    connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
-    connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-    connect_param!(m, :CH4Cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    ch4cycle[:y_year] = [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.]
+    ch4cycle[:y_year_0] = 2015.
+    ch4cycle[:e_globalCH4emissions] = ch4emit[:e_globalCH4emissions]
+    ch4cycle[:rtl_g0_baselandtemp] = climtemp[:rtl_g0_baselandtemp]
+    ch4cycle[:rtl_g_landtemperature] = climtemp[:rtl_g_landtemperature]
+    ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
 
     connect_param!(m, :ch4forcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
@@ -86,11 +108,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :TotalForcing => :f_N2Oforcing, :n2oforcing => :f_N2Oforcing)
     connect_param!(m, :TotalForcing => :f_lineargasforcing, :LGforcing => :f_LGforcing)
     totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
-
-    set_param!(m, :ClimateTemperature, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
-    set_param!(m, :ClimateTemperature, :y_year_0, 2015.)
-    connect_param!(m, :ClimateTemperature => :ft_totalforcing, :TotalForcing => :ft_totalforcing)
-    connect_param!(m, :ClimateTemperature => :fs_sulfateforcing, :SulphateForcing => :fs_sulphateforcing)
+    connect_param!(m, :TotalForcing => :fs_sulfateforcing, :SulphateForcing => :fs_sulphateforcing)
 
     # next: add vector and panel example
     p = load_parameters(m)

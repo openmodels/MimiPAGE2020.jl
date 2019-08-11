@@ -2,7 +2,7 @@ using DataFrames
 using Test
 
 for testscen in 1:2
-    valdir, scenario, use_permafrost = get_scenario(testscen)
+    valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = page_model()

@@ -18,33 +18,33 @@ end
 function get_scenario(ii)
     Mimi.reset_compdefs()
     if ii == 1
-        return "ndcs", "NDCs", true
+        return "ndcs", "NDCs", true, false
     end
     if ii == 2
-        return "2c-saf", "2 degC Target", true
+        return "2c-saf", "2 degC Target", true, true
     end
 end
 
 @testset "mimi-page.jl" begin
 
-include("test_climatemodel.jl") # error
+include("test_climatemodel.jl") # works
 include("test_AbatementCosts.jl") # works
 include("test_AdaptationCosts.jl") # works
 include("test_CH4cycle.jl") # works
 include("test_CH4emissions.jl") # works
 include("test_CH4forcing.jl") # works
-include("test_ClimateTemperature.jl") # error
+include("test_ClimateTemperature.jl") # works
 include("test_CO2cycle.jl") # works
 include("test_CO2emissions.jl") # works
 include("test_CO2forcing.jl") # works
 include("test_Discontinuity.jl") # works
-include("test_EquityWeighting.jl") # error
+include("test_EquityWeighting.jl") # works
 include("test_GDP.jl") # works
 include("test_LGcycle.jl") # works
 include("test_LGemissions.jl") # works
 include("test_LGforcing.jl") # works
 include("test_loadparameters.jl") # works
-include("test_mainmodel.jl") # error
+include("test_mainmodel.jl") # works
 include("test_mainmodel_noperm.jl") # works
 include("test_MarketDamages.jl") # works
 include("test_MarketDamagesBurke.jl") # works

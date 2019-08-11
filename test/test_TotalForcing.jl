@@ -1,7 +1,7 @@
 using Test
 
 for testscen in 1:2
-    valdir, scenario, use_permafrost = get_scenario(testscen)
+    valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = page_model()
@@ -16,6 +16,7 @@ for testscen in 1:2
     totalforcing[:f_N2Oforcing] = readpagedata(m,"test/validationdata/$valdir/f_n2oforcing.csv")
     totalforcing[:f_lineargasforcing] = readpagedata(m,"test/validationdata/$valdir/f_LGforcing.csv")
     totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
+    totalforcing[:fs_sulfateforcing] = readpagedata(m, "test/validationdata/$valdir/fs_sulfateforcing.csv")
 
     run(m)
 

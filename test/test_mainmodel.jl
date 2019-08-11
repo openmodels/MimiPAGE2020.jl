@@ -1,25 +1,32 @@
 using Test
 
 for testscen in 1:2
-    valdir, scenario, use_permafrost = get_scenario(testscen)
+    valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     Mimi.reset_compdefs()
 
     include("../src/getpagefunction.jl")
 
-    m = getpage(scenario, use_permafrost)
+    m = getpage(scenario, use_permafrost, use_seaice)
     run(m)
 
-    while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,0.,0.,0.,0.,0.,0.,1.,1.,1.]
-        println(m[:Discontinuity,:occurdis_occurrencedummy])
-        run(m)
+    if scenario == "NDCs"
+        while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,0.,0.,0.,0.,0.,1.,1.,1.,1.]
+            println(m[:Discontinuity,:occurdis_occurrencedummy])
+            run(m)
+        end
+    else
+        while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,0.,0.,0.,0.,0.,0.,0.,0.,0.]
+            println(m[:Discontinuity,:occurdis_occurrencedummy])
+            run(m)
+        end
     end
 
     #climate component
     temp=m[:ClimateTemperature,:rt_g_globaltemperature]
     temp_compare=readpagedata(m,"test/validationdata/$valdir/rt_g_globaltemperature.csv")
-    @test temp ≈ temp_compare rtol=1e-4
+    @test temp ≈ temp_compare rtol=1e-3
 
     slr=m[:SeaLevelRise,:s_sealevel]
     slr_compare=readpagedata(m,"test/validationdata/$valdir/s_sealevel.csv")
