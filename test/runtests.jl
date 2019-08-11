@@ -27,40 +27,40 @@ end
 
 @testset "mimi-page.jl" begin
 
-include("test_climatemodel.jl") # works
-include("test_AbatementCosts.jl") # works
-include("test_AdaptationCosts.jl") # works
-include("test_CH4cycle.jl") # works
-include("test_CH4emissions.jl") # works
-include("test_CH4forcing.jl") # works
-include("test_ClimateTemperature.jl") # works
-include("test_CO2cycle.jl") # works
-include("test_CO2emissions.jl") # works
-include("test_CO2forcing.jl") # works
-include("test_Discontinuity.jl") # works
-include("test_EquityWeighting.jl") # works
-include("test_GDP.jl") # works
-include("test_LGcycle.jl") # works
-include("test_LGemissions.jl") # works
-include("test_LGforcing.jl") # works
-include("test_loadparameters.jl") # works
-include("test_mainmodel.jl") # works
-include("test_mainmodel_noperm.jl") # works
-include("test_MarketDamages.jl") # works
-include("test_MarketDamagesBurke.jl") # works
-include("test_N2Ocycle.jl") # works
-include("test_N2Oemissions.jl") # works
-include("test_N2Oforcing.jl") # works
-include("test_NonMarketDamages.jl") # works
-include("test_Population.jl") # works
-include("test_SeaLevelRise.jl") # works
-include("test_SLRDamages.jl") # error
-include("test_SulphateForcing.jl") # works
-include("test_TotalAbatementCosts.jl") # works
-include("test_TotalAdaptationCosts.jl") # works
-include("test_TotalForcing.jl") # works
-include("test_Permafrost.jl") # works
+include("test_climatemodel.jl")
+include("test_AbatementCosts.jl")
+include("test_AdaptationCosts.jl")
+include("test_CH4cycle.jl")
+include("test_CH4emissions.jl")
+include("test_CH4forcing.jl")
+include("test_ClimateTemperature.jl")
+include("test_CO2cycle.jl")
+include("test_CO2emissions.jl")
+include("test_CO2forcing.jl")
+include("test_Discontinuity.jl")
+include("test_EquityWeighting.jl")
+include("test_GDP.jl")
+include("test_LGcycle.jl")
+include("test_LGemissions.jl")
+include("test_LGforcing.jl")
+include("test_loadparameters.jl")
+include("test_mainmodel.jl")
+include("test_mainmodel_noperm.jl")
+include("test_MarketDamages.jl")
+include("test_MarketDamagesBurke.jl")
+include("test_N2Ocycle.jl")
+include("test_N2Oemissions.jl")
+include("test_N2Oforcing.jl")
+include("test_NonMarketDamages.jl")
+include("test_Population.jl")
+include("test_SeaLevelRise.jl")
+include("test_SLRDamages.jl")
+include("test_SulphateForcing.jl")
+include("test_TotalAbatementCosts.jl")
+include("test_TotalAdaptationCosts.jl")
+include("test_TotalForcing.jl")
+include("test_Permafrost.jl")
 #include("test_mcs.jl")
-include("contrib/test_taxeffect.jl") # works
+include("contrib/test_taxeffect.jl")
 
 end
