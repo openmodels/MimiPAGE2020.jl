@@ -15,10 +15,10 @@
     rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit = "\$/person")
 
     save_savingsrate = Parameter(unit= "%", default=15.)
-    wincf_weightsfactor =Parameter(index=[region], unit="")
-    W_MarketImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.0)
-    ipow_MarketIncomeFxnExponent =Parameter(default=0.0)
-    iben_MarketInitialBenefit=Parameter(default=0.0)
+    wincf_weightsfactor_market =Parameter(index=[region], unit="")
+    W_MarketImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.6)
+    ipow_MarketIncomeFxnExponent =Parameter(default=-0.13333333333333333)
+    iben_MarketInitialBenefit=Parameter(default=.1333333333333)
     tcal_CalibrationTemp = Parameter(default=3.)
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=34298.93698672955)
 
@@ -37,6 +37,7 @@
     function run_timestep(p, v, d, t)
 
         for r in d.region
+
             #calculate tolerability
             if (p.rtl_realizedtemperature[t,r]-p.atl_adjustedtolerableleveloftemprise[t,r]) < 0
                 v.i_regionalimpact[t,r] = 0
@@ -44,7 +45,7 @@
                 v.i_regionalimpact[t,r] = p.rtl_realizedtemperature[t,r]-p.atl_adjustedtolerableleveloftemprise[t,r]
             end
 
-            v.iref_ImpactatReferenceGDPperCap[t,r]= p.wincf_weightsfactor[r]*((p.W_MarketImpactsatCalibrationTemp + p.iben_MarketInitialBenefit * p.tcal_CalibrationTemp)*
+            v.iref_ImpactatReferenceGDPperCap[t,r]= p.wincf_weightsfactor_market[r]*((p.W_MarketImpactsatCalibrationTemp + p.iben_MarketInitialBenefit * p.tcal_CalibrationTemp)*
                 (v.i_regionalimpact[t,r]/p.tcal_CalibrationTemp)^p.pow_MarketImpactExponent - v.i_regionalimpact[t,r] * p.iben_MarketInitialBenefit)
 
             v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
@@ -84,6 +85,9 @@ end
 function addmarketdamages(model::Model)
     marketdamagescomp = add_comp!(model, MarketDamages)
     marketdamagescomp[:impmax_maxtempriseforadaptpolicyM] = readpagedata(model, "data/impmax_economic.csv")
+
+    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
+    marketdamagescomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
 
     return marketdamagescomp
 end

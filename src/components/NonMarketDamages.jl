@@ -21,7 +21,7 @@
     rgdp_per_cap_MarketRemainGDP = Parameter(index=[time, region], unit = "\$/person")
 
     save_savingsrate = Parameter(unit= "%", default=15.)
-    wincf_weightsfactor =Parameter(index=[region], unit="unitless")
+    wincf_weightsfactor_nonmarket =Parameter(index=[region], unit="")
     w_NonImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.6333333333333333)
     ipow_NonMarketIncomeFxnExponent =Parameter(unit="unitless", default=0.)
     iben_NonMarketInitialBenefit=Parameter(unit="%GDP/degreeC", default=0.08333333333333333)
@@ -48,7 +48,7 @@
                 v.i_regionalimpact[t,r] = p.rtl_realizedtemperature[t,r]-p.atl_adjustedtolerableleveloftemprise[t,r]
             end
 
-            v.iref_ImpactatReferenceGDPperCap[t,r]= p.wincf_weightsfactor[r]*
+            v.iref_ImpactatReferenceGDPperCap[t,r]= p.wincf_weightsfactor_nonmarket[r]*
                 ((p.w_NonImpactsatCalibrationTemp + p.iben_NonMarketInitialBenefit *p.tcal_CalibrationTemp)*
                     (v.i_regionalimpact[t,r]/p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact[t,r] * p.iben_NonMarketInitialBenefit)
 
@@ -88,6 +88,9 @@ end
 function addnonmarketdamages(model::Model)
     nonmarketdamagescomp = add_comp!(model, NonMarketDamages)
     nonmarketdamagescomp[:impmax_maxtempriseforadaptpolicyNM] = readpagedata(model, "data/impmax_noneconomic.csv")
+
+    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
+    nonmarketdamagescomp[:wincf_weightsfactor_nonmarket] = readpagedata(model, "data/wincf_weightsfactor_nonmarket.csv")
 
     return nonmarketdamagescomp
 end

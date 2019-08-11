@@ -9,7 +9,7 @@
     rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, region], unit = "\$/person")
     rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit = "\$/person")
     save_savingsrate = Parameter(unit= "%", default=15.)
-    wincf_weightsfactor =Parameter(index=[region], unit="")
+    wincf_weightsfactor_market =Parameter(index=[region], unit="")
     ipow_MarketIncomeFxnExponent =Parameter(default=0.0)
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=34298.93698672955)
 
@@ -38,6 +38,7 @@
     function run_timestep(p, v, d, t)
 
         for r in d.region
+
             # calculate the regional temperature impact relative to baseline year and add it to baseline absolute value
             v.i_burke_regionalimpact[t,r] = (p.rtl_realizedtemperature[t,r] - p.rtl_0_realizedtemperature[r]) + p.rtl_abs_0_realizedabstemperature[r]
 
@@ -48,7 +49,7 @@
                                                       (p.rtl_abs_0_realizedabstemperature[r] - p.tcal_burke)^2))
 
             # calculate the impact at focus region GDP p.c.
-            v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor[r] * (1 - exp(v.i1log_impactlogchange[t,r]))
+            v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange[t,r]))
 
             # calculate impacts at actual GDP
             v.igdp_ImpactatActualGDPperCap[t,r]= v.iref_ImpactatReferenceGDPperCap[t,r]*
@@ -82,6 +83,9 @@ function addmarketdamagesburke(model::Model)
     marketdamagesburkecomp = add_comp!(model, MarketDamagesBurke)
     marketdamagesburkecomp[:rtl_abs_0_realizedabstemperature] = readpagedata(model, "data/rtl_abs_0_realizedabstemperature.csv")
     marketdamagesburkecomp[:rtl_0_realizedtemperature] = readpagedata(model, "data/rtl_0_realizedtemperature.csv")
+
+    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
+    marketdamagesburkecomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
 
     return marketdamagesburkecomp
 end

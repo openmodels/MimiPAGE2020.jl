@@ -3,6 +3,8 @@ using Mimi
 include("utils/load_parameters.jl")
 include("utils/mctools.jl")
 
+include("compute_scc.jl")
+
 include("components/RCPSSPScenario.jl")
 include("components/CO2emissions.jl")
 include("components/CO2cycle.jl")
