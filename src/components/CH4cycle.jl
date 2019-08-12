@@ -88,6 +88,7 @@ function addch4cycle(model::Model, use_permafrost::Bool)
         ch4cycle[:permtce0_permafrostemissions0] = 934.2010230392067
     else
         ch4cycle[:permtce0_permafrostemissions0] = 0
+        ch4cycle[:permtce_permafrostemissions] = zeros(10)
     end
 
     ch4cycle

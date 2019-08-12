@@ -46,7 +46,7 @@ include("test_LGforcing.jl")
 include("test_loadparameters.jl")
 include("test_mainmodel.jl")
 include("test_mainmodel_noperm.jl")
-include("test_MarketDamages.jl")
+##include("test_MarketDamages.jl") # missing data
 include("test_MarketDamagesBurke.jl")
 include("test_N2Ocycle.jl")
 include("test_N2Oemissions.jl")
@@ -60,7 +60,7 @@ include("test_TotalAbatementCosts.jl")
 include("test_TotalAdaptationCosts.jl")
 include("test_TotalForcing.jl")
 include("test_Permafrost.jl")
-#include("test_mcs.jl")
+#include("test_mcs.jl") # missing data
 include("contrib/test_taxeffect.jl")
 
 end

@@ -44,9 +44,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     #add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
-    permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
-    permafrost_jules = add_comp!(m, PermafrostJULES)
-    permafrost = add_comp!(m, PermafrostTotal)
+    if use_permafrost
+        permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
+        permafrost_jules = add_comp!(m, PermafrostJULES)
+        permafrost = add_comp!(m, PermafrostTotal)
+    end
     co2emit = add_comp!(m, co2emissions)
     co2cycle = addco2cycle(m, use_permafrost)
     add_comp!(m, co2forcing)
@@ -98,21 +100,25 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     #connect parameters together
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
 
-    permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
-    permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
-    permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
-    permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
-    permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
-    permafrost[:perm_jul_ce_co2] = permafrost_jules[:perm_jul_ce_co2]
-    permafrost[:perm_jul_e_co2] = permafrost_jules[:perm_jul_e_co2]
-    permafrost[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
-
+    if use_permafrost
+        permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
+        permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
+        permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
+        permafrost[:perm_jul_ce_co2] = permafrost_jules[:perm_jul_ce_co2]
+        permafrost[:perm_jul_e_co2] = permafrost_jules[:perm_jul_e_co2]
+        permafrost[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
+    end
+    
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
 
     connect_param!(m, :CO2Cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
     connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
-    co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
-
+    if use_permafrost    
+        co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
+    end
+        
     connect_param!(m, :co2forcing => :c_CO2concentration, :CO2Cycle => :c_CO2concentration)
 
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
@@ -120,7 +126,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
     connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
     connect_param!(m, :CH4Cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
-    ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
+    if use_permafrost
+        ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
+    end
 
     connect_param!(m, :ch4forcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)

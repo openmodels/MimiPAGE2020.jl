@@ -5,6 +5,7 @@
     fslope_CH4forcingslope=Parameter(unit="W/m2", default=0.036)
     c0_baseN2Oconc=Parameter(unit="ppbv", default=324.)
     c0_baseCH4conc=Parameter(unit="ppbv", default=1803.)
+    fno_CH4forcing_nooverlap=Variable(index=[time], unit="W/m2")
     f_CH4forcing=Variable(index=[time],unit="W/m2")
     over_baseoverlap=Variable(unit="W/m2")
     over=Variable(index=[time],unit="W/m2")
@@ -17,7 +18,10 @@
             v.over_baseoverlap=-0.47*log(1+2.0e-5*(p.c0_baseN2Oconc*p.c0_baseCH4conc)^0.75+5.3e-15*p.c0_baseCH4conc*(p.c0_baseCH4conc*p.c0_baseN2Oconc)^1.52)
         end
 
+        v.fno_CH4forcing_nooverlap[t] = p.f0_CH4baseforcing+p.fslope_CH4forcingslope*(sqrt(p.c_CH4concentration[t]) - sqrt(p.c0_baseCH4conc))
+        
         v.over[t]=-0.47*log(1+2.0e-5*(p.c_CH4concentration[t]*p.c0_baseN2Oconc)^0.75+5.3e-15*p.c_CH4concentration[t]*(p.c0_baseN2Oconc*p.c_CH4concentration[t])^1.52)
-        v.f_CH4forcing[t]=p.f0_CH4baseforcing+p.fslope_CH4forcingslope*(sqrt(p.c_CH4concentration[t])-sqrt(p.c0_baseCH4conc))+v.over[t]-v.over_baseoverlap
+        
+        v.f_CH4forcing[t]=v.fno_CH4forcing_nooverlap[t]+v.over[t]-v.over_baseoverlap
     end
 end

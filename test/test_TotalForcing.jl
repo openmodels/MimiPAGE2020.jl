@@ -18,6 +18,11 @@ for testscen in 1:2
     totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
     totalforcing[:fs_sulfateforcing] = readpagedata(m, "test/validationdata/$valdir/fs_sulfateforcing.csv")
 
+    p = load_parameters(m)
+    p["y_year_0"] = 2015.
+    p["y_year"] = Mimi.dim_keys(m.md, :time)
+    set_leftover_params!(m, p)
+
     run(m)
 
     forcing=m[:TotalForcing, :ft_totalforcing]

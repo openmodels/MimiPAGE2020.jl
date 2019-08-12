@@ -20,9 +20,6 @@ include("components/PermafrostJULES.jl")
 include("components/PermafrostTotal.jl")
 
 function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::Bool=false)
-    ##scenario = "NDCs"
-    ##use_permafrost = true
-
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
@@ -30,9 +27,11 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     #add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
-    permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
-    permafrost_jules = add_comp!(m, PermafrostJULES)
-    permafrost = add_comp!(m, PermafrostTotal)
+    if use_permafrost
+        permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
+        permafrost_jules = add_comp!(m, PermafrostJULES)
+        permafrost = add_comp!(m, PermafrostTotal)
+    end
     co2emit = add_comp!(m,co2emissions)
     co2cycle = addco2cycle(m, use_permafrost)
     add_comp!(m, co2forcing)
@@ -53,21 +52,25 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     set_param!(m, :ClimateTemperature, :y_year_0, 2015.)
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
 
-    permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
-    permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
-    permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
-    permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
-    permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
-    permafrost[:perm_jul_ce_co2] = permafrost_jules[:perm_jul_ce_co2]
-    permafrost[:perm_jul_e_co2] = permafrost_jules[:perm_jul_e_co2]
-    permafrost[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
+    if use_permafrost
+        permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
+        permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
+        permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
+        permafrost[:perm_jul_ce_co2] = permafrost_jules[:perm_jul_ce_co2]
+        permafrost[:perm_jul_e_co2] = permafrost_jules[:perm_jul_e_co2]
+        permafrost[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
+    end
 
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
     co2cycle[:y_year] = [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.]
     co2cycle[:y_year_0] = 2015.
     co2cycle[:e_globalCO2emissions] = co2emit[:e_globalCO2emissions]
     co2cycle[:rt_g_globaltemperature] = climtemp[:rt_g_globaltemperature]
-    co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
+    if use_permafrost
+        co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
+    end
 
     connect_param!(m, :co2forcing => :c_CO2concentration, :CO2Cycle => :c_CO2concentration)
 
@@ -77,7 +80,9 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     ch4cycle[:e_globalCH4emissions] = ch4emit[:e_globalCH4emissions]
     ch4cycle[:rtl_g0_baselandtemp] = climtemp[:rtl_g0_baselandtemp]
     ch4cycle[:rtl_g_landtemperature] = climtemp[:rtl_g_landtemperature]
-    ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
+    if use_permafrost
+        ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
+    end
 
     connect_param!(m, :ch4forcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
