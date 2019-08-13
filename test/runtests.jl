@@ -15,6 +15,16 @@ function page_model()
     return m
 end
 
+function get_scenario(ii)
+    Mimi.reset_compdefs()
+    if ii == 1
+        return "ndcs", "NDCs", true, false
+    end
+    if ii == 2
+        return "2c-saf", "2 degC Target", true, true
+    end
+end
+
 @testset "mimi-page.jl" begin
 
 include("test_climatemodel.jl")
@@ -35,8 +45,8 @@ include("test_LGemissions.jl")
 include("test_LGforcing.jl")
 include("test_loadparameters.jl")
 include("test_mainmodel.jl")
-#include("test_mainmodel_policyb.jl")
-include("test_MarketDamages.jl")
+include("test_mainmodel_noperm.jl")
+##include("test_MarketDamages.jl") # missing data
 include("test_MarketDamagesBurke.jl")
 include("test_N2Ocycle.jl")
 include("test_N2Oemissions.jl")
@@ -49,7 +59,8 @@ include("test_SulphateForcing.jl")
 include("test_TotalAbatementCosts.jl")
 include("test_TotalAdaptationCosts.jl")
 include("test_TotalForcing.jl")
-#include("test_mcs.jl")
+include("test_Permafrost.jl")
+#include("test_mcs.jl") # missing data
 include("contrib/test_taxeffect.jl")
 
 end

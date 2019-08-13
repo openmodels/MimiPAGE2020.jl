@@ -86,7 +86,6 @@ function addch4cycle(model::Model, use_permafrost::Bool)
 
     if use_permafrost
         ch4cycle[:permtce0_permafrostemissions0] = 934.2010230392067
-        ch4cycle[:permtce_permafrostemissions] = readpagedata(model, "data/perm_tot_ce_ch4.csv")
     else
         ch4cycle[:permtce0_permafrostemissions0] = 0
         ch4cycle[:permtce_permafrostemissions] = zeros(10)

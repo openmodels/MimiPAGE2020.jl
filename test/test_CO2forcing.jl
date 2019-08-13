@@ -1,17 +1,22 @@
-
 using Test
 
-m = page_model()
-include("../src/components/CO2forcing.jl")
+for testscen in 1:2
+    valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
+    println(scenario)
 
-add_comp!(m, co2forcing)
+    m = page_model()
+    include("../src/components/CO2forcing.jl")
 
-set_param!(m, :co2forcing, :c_CO2concentration, readpagedata(m,"test/validationdata/c_co2concentration.csv"))
+    add_comp!(m, co2forcing)
 
-##running Model
-run(m)
+    set_param!(m, :co2forcing, :c_CO2concentration, readpagedata(m,"test/validationdata/$valdir/c_co2concentration.csv"))
 
-forcing=m[:co2forcing,:f_CO2forcing]
-forcing_compare=readpagedata(m,"test/validationdata/f_co2forcing.csv")
+    ##running Model
+    run(m)
 
-@test forcing ≈ forcing_compare rtol=1e-3
+    forcing=m[:co2forcing,:f_CO2forcing]
+    forcing_compare=readpagedata(m,"test/validationdata/$valdir/f_co2forcing.csv")
+
+    @test forcing ≈ forcing_compare rtol=1e-3
+end
+
