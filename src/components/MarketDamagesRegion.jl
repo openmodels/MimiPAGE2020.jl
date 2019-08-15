@@ -38,6 +38,10 @@
     # add parameter to switch off this component
     switchoff_marketdamages = Parameter(default = 0.)
 
+    # add parameter to include error variance for uncertainty
+    errvarregion_errorvarianceregion = Parameter(index = [region])
+    inclerr_includerrorvariance = Parameter(default = 0.)
+
     function run_timestep(p, v, d, t)
 
         for r in d.region
@@ -51,7 +55,9 @@
             # calculate the log change, depending on the number of lags specified
             v.i1log_impactlogchange[t,r] = p.nlag_burke * (p.impf_coefflinearregion[r]  * (v.i_burke_regionalimpact[t,r] - p.rtl_abs_0_realizedabstemperature[r]) +
                                 p.impf_coeffquadrregion[r] * (v.i_burke_regionalimpact[t,r]^2 - p.rtl_abs_0_realizedabstemperature[r]^2) +
-                                p.impf_coeffcubicregion[r] * (v.i_burke_regionalimpact[t,r]^3 - p.rtl_abs_0_realizedabstemperature[r]^3))
+                                p.impf_coeffcubicregion[r] * (v.i_burke_regionalimpact[t,r]^3 - p.rtl_abs_0_realizedabstemperature[r]^3) +
+                                p.inclerr_includerrorvariance * (rand(Normal(0, p.errvarregion_errorvarianceregion[r]^0.5), 1)[1] -
+                                                                 rand(Normal(0, p.errvarregion_errorvarianceregion[r]^0.5), 1)[1]))
 
             # calculate the impact at focus region GDP p.c.
             v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange[t,r]))

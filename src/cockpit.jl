@@ -9,42 +9,40 @@ using DataFrames
 using CSV
 
 include("getpagefunction.jl")
-include("utils/mctools.jl")
+include("mcs.jl")
 
-# set to default
-# define a function to reset the master parameters
-function reset_masterparameters()
-    global modelspec_master = "RegionBayes" # "RegionBayes" (default), "Region", "Burke" or "PAGE09"
-    global ge_master = 0.0                  # 0.0 (default), any other Float between 0 and 1
-    global equiw_master = "Yes"             # "Yes" (default), "No", "DFC"
-    global gdploss_master = "Excl"          # "Excl" (default), "Incl"
-    global permafr_master = "Yes"           # "Yes" (default), "No"
-    global gedisc_master = "No"             # "No" (default), "Yes", "Only" (feeds only discontinuity impacts into growth rate)
+# clean the master parameters and get the model for the chosen scenario
+reset_masterparameters()
+m = getpage("NDCs")
 
-    "All master parameters reset to defaults"
-end
+# update all parameters of interest
+ update_param!(m, :ge_growtheffects, 1.)                       # persistence parameter for growth effects, defaults to 1
+# update_param!(m, :equity_proportion, 0.)                      # whether equity weighting is applied (1.) or not (0.), defaults to 1.
+# update_param!(m, :cbshare_pcconsumptionboundshare, 10)        # the share of 2015 EU consumption for lower bound, defaults to 5 (unit: %)
+# update_param!(m, :eqwshare_shareofweighteddamages, 0.99)      # the share of consumption that is equity-weighted, defaults to 0.99
+# update_param!(m, :discfix_fixediscountrate, jj_disc)          # whether an exogenous fixed discount rate is used;
+                                                                # (0. = no, otherwise 3., 5. or 7. for rates), defaults to 0.
+update_param!(m, :lossinc_includegdplosses, 1.)       # whether to include counterfactual losses in damages, defaults o 0. (= no)
 
-# set parameters manually
-global modelspec_master = "PAGE09" # "RegionBayes" (default), "Region", "Burke" or "PAGE09"
-global scen_master = "NDCs"             # "NDCs" (default), tbd
-global ge_master = 1.                  # 0.0 (default), any other Float between 0 and 1
-global equiw_master = "Yes"             # "Yes" (default), "No", "DFC"
-global gdploss_master = "Incl"          # "Excl" (default), "Incl"
-global permafr_master = "Yes"           # "Yes" (default), "No"
-global gedisc_master = "Yes"             # "No" (default), "Yes"
-
-
-# run the model
-m = getpage()
 run(m)
+explore(m)
 
-m[:EquityWeighting, :te_totaleffect]
-m[:EquityWeighting, :td_totaldiscountedimpacts]
-m[:EquityWeighting, :tac_totaladaptationcosts]
-m[:EquityWeighting, :tpc_totalaggregatedcosts]
+writedlm(string(dir_output, "lgdp_gdploss_gdp_scenNDCs_ge", m[:GDP, :ge_growtheffects], "_modelspecRegionBayes_permafrYes_bound", m[:GDP, :cbshare_pcconsumptionboundshare], ".csv"),
+            hcat(["year"; myyears], [permutedims(myregions); m[:GDP, :lgdp_gdploss]]), ",")
 
-m[:EquityWeighting, :lgdpe_gdplossexceedingcons]
+include("mcs.jl")
+Random.seed!(1)
+get_scc_mcs(10, 2020)
+get_scc_mcs_ge(10, 2020, ge_minimum = 0.,)
 
-m[:SLRDamages, :cons_percap_consumption]
+get_scc_mcs_ge(10, 2020, ge_minimum = 0., ge_maximum = 1., ge_mode = 0.5)
 
-a = m[:EquityWeighting, :lgdpe_gdplossexceedingcons] ./ m[:EquityWeighting, :pop_population]
+scc_lowdistribution = get_scc_mcs_ge(500, 2020, dir_output, gdpincl = 1., ge_min = 0., ge_mode = 0., ge_max = 1.)
+mean(scc_lowdistribution)
+include("mcs.jl")
+Random.seed!(1)
+scc_middledistribution = get_scc_mcs_custom(500, 2020, dir_output, gdpincl = 1.)
+mean(scc_middledistribution)
+include("mcs.jl")
+scc_highdistribution = get_scc_mcs_custom(500, 2020, dir_output, gdpincl = 1.)
+mean(scc_highdistribution)

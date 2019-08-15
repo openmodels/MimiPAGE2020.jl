@@ -263,7 +263,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth, :GDP => :grwnet_realizedgdpgrowth)
-#    connect_param!(m, :EquityWeighting => :lgdp_gdploss, :GDP => :lgdp_gdploss)
+    connect_param!(m, :EquityWeighting => :lgdp_gdploss, :GDP => :lgdp_gdploss)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
 #    connect_param!(m, :EquityWeighting => :gdp_percap_aftercosts, :SLRDamages => :gdp_percap_aftercosts)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
@@ -302,4 +302,11 @@ function getpage(scenario::String="NDCs", use_permafrost::Bool=true)
     initpage(m)
 
     return m
+end
+
+function reset_masterparameters()
+    global modelspec_master = "RegionBayes" # "RegionBayes" (default), "Region", "Burke" or "PAGE09"
+    global permafr_master = "Yes"           # "Yes" (default), "No"
+
+    "All master parameters reset to defaults"
 end

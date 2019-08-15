@@ -30,7 +30,7 @@
     ge_growtheffects = Parameter(unit = "none", default =  0.)
     grwnet_realizedgdpgrowth = Variable(index=[time, region], unit = "%/year")
     # bound variables
-    cbshare_pcconsumptionboundshare = Parameter(unit = "%", default = 1)
+    cbshare_pcconsumptionboundshare = Parameter(unit = "%", default = 5.)
     cbabs_pcconsumptionbound = Variable(unit = "\$/person")
     gdpabs_pcgdpbound = Variable(unit = "\$/person")
     cbreg_regionsatbound = Variable(unit = "regions")
@@ -83,6 +83,9 @@
                 if v.gdp[t,r]/p.pop_population[t,r] < v.gdpabs_pcgdpbound
                     v.gdp[t,r] = v.gdpabs_pcgdpbound * p.pop_population[t,r]
                 end
+
+                # recalculate the realized growth rate in case the bound was hit
+                v.grwnet_realizedgdpgrowth[t,r] = 100 * ((v.gdp[t, r] / v.gdp[t-1, r])^(1/(p.y_year[t] - p.y_year[t-1])) - 1)
             end
             v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
             v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]

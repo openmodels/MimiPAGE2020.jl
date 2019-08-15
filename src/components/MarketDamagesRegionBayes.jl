@@ -38,20 +38,118 @@
     # add parameter to switch off this component
     switchoff_marketdamages = Parameter(default = 0.)
 
+    # add parameter to include error variance for uncertainty
+    errvarbayes_errorvariancebayes = Parameter(index = [region])
+    inclerr_includerrorvariance = Parameter(default = 0.)
+    impfseed_montecarloseedcoeffs = Parameter(default = 1.) # to implement multivariate Normal
+
     function run_timestep(p, v, d, t)
 
+        if is_first(t) && p.inclerr_includerrorvariance != 0.
+            # draw the parameters for a fixed seed from multivariate Gaussian if inclerr is not zero, i.e. in Monte Carlo
+                ### EU = 1
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[1] = rand(MvNormal([0.016778919178202237, -6.589588822829189e-4],
+                                                      [8.37310821714339E-08  -3.23802901733813E-09;
+                                                      -3.23802901733813E-09 1.25609945404031E-10]))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[1] = rand(MvNormal([0.016778919178202237, -6.589588822829189e-4],
+                                                      [8.37310821714339E-08  -3.23802901733813E-09;
+                                                      -3.23802901733813E-09 1.25609945404031E-10]))[2]
+
+
+                ### US = 2
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[2] = rand(MvNormal([0.013454251728767158, -4.930689164122343e-4],
+                                                      [1.40031875371829E-07 -4.33794288121924E-09;
+                                                      -4.33794288121924E-09  1.34599902884995E-10]))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[2] = rand(MvNormal([0.013454251728767158, -4.930689164122343e-4],
+                                                      [1.40031875371829E-07 -4.33794288121924E-09;
+                                                      -4.33794288121924E-09  1.34599902884995E-10]))[2]
+
+
+                ### OECD = 3
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[3] = rand(MvNormal([0.016494824209702184, -6.018588172029741e-4],
+                                                      [2.63399855738746E-07  -9.09251649796261E-09;
+                                                     -9.09251649796261E-09 3.14400766353161E-10]))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[3] = rand(MvNormal([0.016494824209702184, -6.018588172029741e-4],
+                                                      [2.63399855738746E-07  -9.09251649796261E-09;
+                                                     -9.09251649796261E-09 3.14400766353161E-10]))[2]
+
+                ### USSR = 4
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[4] = rand(MvNormal([0.01658623965486268, -6.503382557688012e-4],
+                                                        [1.81144828826549E-07  -8.74094674296174E-09;
+                                                        -8.74094674296174E-09 4.25328114262381E-10]
+                                                      ))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[4] = rand(MvNormal([0.01658623965486268, -6.503382557688012e-4],
+                                                        [1.81144828826549E-07  -8.74094674296174E-09;
+                                                        -8.74094674296174E-09 4.25328114262381E-10]))[2]
+
+                ### China = 5
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[5] = rand(MvNormal([0.014147304068527754, -4.8029953805059963e-4],
+                                                                [2.39627091985249E-07  -6.3945390287455E-09;
+                                                                -6.3945390287455E-09 1.7094331161796E-10]
+                                                                ))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[5] = rand(MvNormal([0.014147304068527754, -4.8029953805059963e-4],
+                                                                [2.39627091985249E-07  -6.3945390287455E-09;
+                                                                -6.3945390287455E-09 1.7094331161796E-10]
+                                                                ))[2]
+
+                ### SEAsia = 6
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[6] = rand(MvNormal([0.019680709697788883, -6.235809776305397e-4],
+                                                      [0.000000305809  -0.0000000001229;
+                                                      -0.0000000001229 0.00000000042025]))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[6] = rand(MvNormal([0.019680709697788883, -6.235809776305397e-4],
+                                                      [0.000000305809  -0.0000000001229;
+                                                      -0.0000000001229 0.00000000042025]))[2]
+
+                ### Africa = 7
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[7] = rand(MvNormal([0.01695479320678946, -5.449994771735894e-4],
+                                                      [0.00000001968409  -9.65785578713003E-11;
+                                                      -9.65785578713003E-11 0.0000000000300304]))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[7] = rand(MvNormal([0.01695479320678946, -5.449994771735894e-4],
+                                                      [0.00000001968409  -9.65785578713003E-11;
+                                                      -9.65785578713003E-11 0.0000000000300304]))[2]
+
+                ### LatAmerica = 8
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coefflinearregion_bayes[8] = rand(MvNormal([0.01743093912793151, -5.945701704729174e-4],
+                                                      [0.00000001423249  -3.08513859072823E-10;
+                                                      -3.08513859072823E-10 0.00000000002601]))[1]
+                Random.seed!(trunc(Int, p.impfseed_montecarloseedcoeffs))
+                p.impf_coeffquadrregion_bayes[8] = rand(MvNormal([0.01743093912793151, -5.945701704729174e-4],
+                                                      [0.00000001423249  -3.08513859072823E-10;
+                                                      -3.08513859072823E-10 0.00000000002601]))[2]
+
+        end
+
         for r in d.region
+
+
+
             # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
             p.wincf_weightsfactor_market[r] = 1.
 
             # calculate the regional temperature impact relative to baseline year and add it to baseline absolute value
             v.i_burke_regionalimpact[t,r] = (p.rtl_realizedtemperature[t,r] - p.rtl_0_realizedtemperature[r]) + p.rtl_abs_0_realizedabstemperature[r]
 
-
             # calculate the log change, depending on the number of lags specified
             v.i1log_impactlogchange[t,r] = p.nlag_burke * (p.impf_coefflinearregion_bayes[r]  * (v.i_burke_regionalimpact[t,r] - p.rtl_abs_0_realizedabstemperature[r]) +
                                 p.impf_coeffquadrregion_bayes[r] * (v.i_burke_regionalimpact[t,r]^2 - p.rtl_abs_0_realizedabstemperature[r]^2) +
-                                p.impf_coeffcubicregion_bayes[r] * (v.i_burke_regionalimpact[t,r]^3 - p.rtl_abs_0_realizedabstemperature[r]^3))
+                                p.impf_coeffcubicregion_bayes[r] * (v.i_burke_regionalimpact[t,r]^3 - p.rtl_abs_0_realizedabstemperature[r]^3) +
+                                p.inclerr_includerrorvariance * (rand(Normal(0, p.errvarbayes_errorvariancebayes[r]^0.5), 1)[1] -
+                                                                 rand(Normal(0, p.errvarbayes_errorvariancebayes[r]^0.5), 1)[1]))
 
             # calculate the impact at focus region GDP p.c.
             v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange[t,r]))

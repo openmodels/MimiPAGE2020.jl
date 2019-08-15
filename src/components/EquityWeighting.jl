@@ -64,7 +64,7 @@
     addt_equityweightedimpact_discountedaggregated = Variable(index=[time, region], unit="\$million")
     addt_gt_equityweightedimpact_discountedglobal = Variable(unit="\$million")
 
-    civvalue_civilizationvalue = Parameter(unit="\$million", default=6.1333333333333336e10) # Called "CIV_VALUE"
+    civvalue_civilizationvalue = Parameter(unit="\$million", default=6.1333333333333336e10*100) # Called "CIV_VALUE"
     td_totaldiscountedimpacts = Variable(unit="\$million")
 
     aact_equityweightedadaptation_discountedaggregated = Variable(index=[time, region], unit="\$million")
@@ -75,7 +75,17 @@
 
     # additional paramters and variables for growth effects and boundaries
     grwnet_realizedgdpgrowth = Parameter(index=[time, region], unit = "%/year")
-    dfc_feedback = Parameter(unit = "none", default = 1.)
+    lgdp_gdploss =  Parameter(index=[time, region], unit="\$M")
+    lossinc_includegdplosses = Parameter(unit = "none", default = 0.)
+    excdam_excessdamages = Variable(index=[time,region], unit = "\$million")
+    excdampv_excessdamagespresvalue = Variable(index=[time,region], unit = "\$million")
+    eqwshare_shareofweighteddamages = Parameter(unit = "none", default = 0.99)
+
+    currentdam_currentdamages = Variable(index=[time,region], unit = "\$million")
+    damshare_currentdamagesshare = Variable(index=[time,region], unit = "%GDP")
+    currentdampc_percapitacurrentdamages = Variable(index=[time,region], unit="\$/person")
+
+    discfix_fixediscountrate = Parameter(unit = "none", default = 0.) # override the discount rates with something exogenous
 
     function run_timestep(p, v, d, tt)
         if is_first(tt)
@@ -86,6 +96,10 @@
         end
 
         v.df_utilitydiscountrate[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
+
+        if p.discfix_fixediscountrate != 0.
+            v.df_utilitydiscountrate[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
+        end
 
         for rr in d.region
 
@@ -109,10 +123,10 @@
             v.wact_partiallyweighted[tt, rr] = v.wact_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
 
             # Discount rate calculations
-            if p.dfc_feedback == 1.
-                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grwnet_realizedgdpgrowth[tt, rr] - p.popgrw_populationgrowth[tt, rr])
-            elseif p.dfc_feedback == 0.
-                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+            v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grwnet_realizedgdpgrowth[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+
+            if p.discfix_fixediscountrate != 0.
+                v.dr_discountrate[tt, rr] = p.discfix_fixediscountrate
             end
 
             if is_first(tt)
@@ -127,6 +141,7 @@
                 v.dfc_consumptiondiscountrate[tt, rr] = v.dfc_consumptiondiscountrate[tt - 1, rr] * (1 + v.dr_discountrate[tt, rr] / 100)^(-v.yp_yearsperiod[tt])
             end
 
+
             # Discounted costs
             if p.equity_proportion == 0
                 v.pcdt_partiallyweighted_discounted[tt, rr] = v.pct_partiallyweighted[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
@@ -138,19 +153,38 @@
 
             v.pcdat_partiallyweighted_discountedaggregated[tt, rr] = v.pcdt_partiallyweighted_discounted[tt, rr] * p.yagg_periodspan[tt]
 
+            # calculate the total market damages
+            v.currentdam_currentdamages[tt, rr] = (p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr]
+            v.currentdampc_percapitacurrentdamages[tt, rr] = v.currentdam_currentdamages[tt, rr] / p.pop_population[tt, rr]
+            v.damshare_currentdamagesshare[tt, rr] = 100 * v.currentdampc_percapitacurrentdamages[tt, rr] / p.cons_percap_aftercosts[tt, rr]
+
             ## Equity weighted impacts (end of page 28, Hope 2009)
-            if p.equity_proportion == 0
-                v.wit_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr]
+            v.excdam_excessdamages[tt, rr] =  max(v.currentdam_currentdamages[tt, rr] + p.lgdp_gdploss[tt,rr] - p.eqwshare_shareofweighteddamages * p.cons_percap_aftercosts[tt, rr] * p.pop_population[tt, rr], 0)
+            if p.lossinc_includegdplosses == 0. && p.equity_proportion == 0.
+                    v.wit_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr]
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
-            else
-                v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
-                v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]
+            elseif p.lossinc_includegdplosses == 0. && p.equity_proportion == 1.
+                    v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                    v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]
+            elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 0.
+                    v.wit_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr] + p.lgdp_gdploss[tt, rr]
+                    v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
+            elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 1.
+                    if v.excdam_excessdamages[tt, rr] == 0
+                        v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                        v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]
+                    else
+                        v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - ((1 - p.eqwshare_shareofweighteddamages) * p.cons_percap_aftercosts[tt, rr])^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                        v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]  + v.excdam_excessdamages[tt, rr] *  v.dfc_consumptiondiscountrate[tt, rr]
+                    end
             end
 
+            v.excdampv_excessdamagespresvalue[tt, rr] = v.excdam_excessdamages[tt, rr] *  v.dfc_consumptiondiscountrate[tt, rr]
 
 
             v.addt_equityweightedimpact_discountedaggregated[tt, rr] = v.widt_equityweightedimpact_discounted[tt, rr] * p.yagg_periodspan[tt]
             v.aact_equityweightedadaptation_discountedaggregated[tt, rr] = v.wacdt_partiallyweighted_discounted[tt, rr] * p.yagg_periodspan[tt]
+
         end
 
         v.pct_g_partiallyweighted_global[tt] = sum(v.pct_partiallyweighted[tt, :])
@@ -165,5 +199,8 @@
 
         # Total effect of climate change
         v.te_totaleffect = min(v.td_totaldiscountedimpacts + v.tpc_totalaggregatedcosts + v.tac_totaladaptationcosts, p.civvalue_civilizationvalue)
+
+
+
     end
 end
