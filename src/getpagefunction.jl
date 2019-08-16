@@ -1,52 +1,59 @@
 using Mimi
 
-Base.include(Main, "utils/load_parameters.jl")
-Base.include(Main, "utils/mctools.jl")
+include("utils/load_parameters.jl")
+include("utils/mctools.jl")
 
-Base.include(Main, "compute_scc.jl")
+include("compute_scc.jl")
 
-Base.include(Main, "components/RCPSSPScenario.jl")
-Base.include(Main, "components/CO2emissions.jl")
-Base.include(Main, "components/CO2cycle.jl")
-Base.include(Main, "components/CO2forcing.jl")
-Base.include(Main, "components/CH4emissions.jl")
-Base.include(Main, "components/CH4cycle.jl")
-Base.include(Main, "components/CH4forcing.jl")
-Base.include(Main, "components/N2Oemissions.jl")
-Base.include(Main, "components/N2Ocycle.jl")
-Base.include(Main, "components/N2Oforcing.jl")
-Base.include(Main, "components/LGemissions.jl")
-Base.include(Main, "components/LGcycle.jl")
-Base.include(Main, "components/LGforcing.jl")
-Base.include(Main, "components/SulphateForcing.jl")
-Base.include(Main, "components/TotalForcing.jl")
-Base.include(Main, "components/ClimateTemperature.jl")
-Base.include(Main, "components/SeaLevelRise.jl")
-Base.include(Main, "components/GDP.jl")
-Base.include(Main, "components/MarketDamages.jl")
-Base.include(Main, "components/MarketDamagesBurke.jl")
-Base.include(Main, "components/MarketDamagesRegion.jl")
-Base.include(Main, "components/MarketDamagesRegionBayes.jl")
-Base.include(Main, "components/NonMarketDamages.jl")
-Base.include(Main, "components/Discontinuity.jl")
-Base.include(Main, "components/AdaptationCosts.jl")
-Base.include(Main, "components/SLRDamages.jl")
-Base.include(Main, "components/AbatementCostParameters.jl")
-Base.include(Main, "components/AbatementCosts.jl")
-Base.include(Main, "components/TotalAbatementCosts.jl")
-Base.include(Main, "components/TotalAdaptationCosts.jl")
-Base.include(Main, "components/Population.jl")
-Base.include(Main, "components/EquityWeighting.jl")
+include("components/RCPSSPScenario.jl")
+include("components/CO2emissions.jl")
+include("components/CO2cycle.jl")
+include("components/CO2forcing.jl")
+include("components/CH4emissions.jl")
+include("components/CH4cycle.jl")
+include("components/CH4forcing.jl")
+include("components/N2Oemissions.jl")
+include("components/N2Ocycle.jl")
+include("components/N2Oforcing.jl")
+include("components/LGemissions.jl")
+include("components/LGcycle.jl")
+include("components/LGforcing.jl")
+include("components/SulphateForcing.jl")
+include("components/TotalForcing.jl")
+include("components/ClimateTemperature.jl")
+include("components/SeaLevelRise.jl")
+include("components/GDP.jl")
+include("components/MarketDamages.jl")
+include("components/MarketDamagesBurke.jl")
+include("components/NonMarketDamages.jl")
+include("components/Discontinuity.jl")
+include("components/AdaptationCosts.jl")
+include("components/SLRDamages.jl")
+include("components/AbatementCostParameters.jl")
+include("components/AbatementCosts.jl")
+include("components/TotalAbatementCosts.jl")
+include("components/TotalAdaptationCosts.jl")
+include("components/Population.jl")
+include("components/EquityWeighting.jl")
+include("components/PermafrostSiBCASA.jl")
+include("components/PermafrostJULES.jl")
+include("components/PermafrostTotal.jl")
 
-function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
+function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=false)
 
     #add all the components
     scenario = addrcpsspscenario(m, scenario)
+    climtemp = addclimatetemperature(m, use_seaice)
+    if use_permafrost
+        permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
+        permafrost_jules = add_comp!(m, PermafrostJULES)
+        permafrost = add_comp!(m, PermafrostTotal)
+    end
     co2emit = add_comp!(m, co2emissions)
-    addco2cycle(m, use_permafrost)
+    co2cycle = addco2cycle(m, use_permafrost)
     add_comp!(m, co2forcing)
     ch4emit = add_comp!(m, ch4emissions)
-    addch4cycle(m, use_permafrost)
+    ch4cycle = addch4cycle(m, use_permafrost)
     add_comp!(m, ch4forcing)
     n2oemit = add_comp!(m, n2oemissions)
     add_comp!(m, n2ocycle)
@@ -56,7 +63,6 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     add_comp!(m, LGforcing)
     sulfemit = add_comp!(m, SulphateForcing)
     totalforcing = add_comp!(m, TotalForcing)
-    add_comp!(m, ClimateTemperature)
     add_comp!(m, SeaLevelRise)
 
     #Socio-Economics
@@ -94,10 +100,26 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     equityweighting = add_comp!(m, EquityWeighting)
 
     #connect parameters together
+    connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
+
+    if use_permafrost
+        permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
+        permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
+        permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
+        permafrost[:perm_jul_ce_co2] = permafrost_jules[:perm_jul_ce_co2]
+        permafrost[:perm_jul_e_co2] = permafrost_jules[:perm_jul_e_co2]
+        permafrost[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
+    end
+
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
 
     connect_param!(m, :CO2Cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
     connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
+    if use_permafrost
+        co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
+    end
 
     connect_param!(m, :co2forcing => :c_CO2concentration, :CO2Cycle => :c_CO2concentration)
 
@@ -106,6 +128,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
     connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
     connect_param!(m, :CH4Cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    if use_permafrost
+        ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
+    end
 
     connect_param!(m, :ch4forcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
@@ -134,9 +159,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true)
     connect_param!(m, :TotalForcing => :f_N2Oforcing, :n2oforcing => :f_N2Oforcing)
     connect_param!(m, :TotalForcing => :f_lineargasforcing, :LGforcing => :f_LGforcing)
     totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
-
-    connect_param!(m, :ClimateTemperature => :ft_totalforcing, :TotalForcing => :ft_totalforcing)
-    connect_param!(m, :ClimateTemperature => :fs_sulfateforcing, :SulphateForcing => :fs_sulphateforcing)
+    connect_param!(m, :TotalForcing => :fs_sulfateforcing, :SulphateForcing => :fs_sulphateforcing)
 
     connect_param!(m, :SeaLevelRise => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
 
@@ -281,7 +304,7 @@ function initpage(m::Model)
     set_leftover_params!(m, p)
 end
 
-function getpage(scenario::String="NDCs", use_permafrost::Bool=true)
+function getpage(scenario::String="NDCs", use_permafrost::Bool=true, use_seaice::Bool=false)
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])

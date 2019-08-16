@@ -3,7 +3,7 @@ using Test
 Mimi.reset_compdefs()
 
 include("../src/getpagefunction.jl")
-m = getpage("NDCs", false)
+m = getpage("NDCs", false, false)
 run(m)
 
 while m[:Discontinuity,:occurdis_occurrencedummy] != [0.,0.,0.,0.,0.,0.,0.,1.,1.,1.]

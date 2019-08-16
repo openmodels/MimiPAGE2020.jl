@@ -46,6 +46,15 @@ function getsim()
         t3_timeco2land=TriangularDist(2.8, 5.7, 4.3)
         rt_g0_baseglobaltemp=TriangularDist(0.903, 0.989, 0.946)
 
+        # SiBCASA Permafrost
+        PERM_SIB_AF = TriangularDist(1.42609149897258, 2.32504747848815, 1.87556948873036)
+        PERM_SIB_SENS_C_CO2 = TriangularDist(28191.1555428869, 35688.3253432574, 31939.7404430722)
+        PERM_SIB_LAG_C_CO2 = TriangularDist(35.4926669856915, 87.8949041341782, 61.6937855599349)
+        PERM_SIB_POW_C_CO2 = TriangularDist(0.107020247715729, 0.410961185142816, 0.258990716429273)
+        PERM_SIB_SENS_C_CH4 = TriangularDist(1240.3553299183, 3348.11995329232, 2294.23764160531)
+        PERM_SIB_LAG_C_CH4 = TriangularDist(75.1943160023131, 337.382510123922, 206.288413063117)
+        PERM_SIB_POW_C_CH4 = TriangularDist(-0.108779283732708, 0.610889007954489, 0.25105486211089)
+
         # SulphateForcing
         d_sulphateforcingbase = TriangularDist(-0.8, -0.2, -0.4)
         ind_slopeSEforcing_indirect = TriangularDist(-0.8, 0, -0.4)
@@ -53,6 +62,7 @@ function getsim()
         # ClimateTemperature
         frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation
         tcr_transientresponse = TriangularDist(0.8, 2.7, 1.8)   # from PAGE-ICE v6.2 documentation
+        alb_emulator_rand = TriangularDist(-1., 1., 0.)
         ampf_amplification["EU"] = TriangularDist(1.05, 1.53, 1.23)
         ampf_amplification["USA"] = TriangularDist(1.16, 1.54, 1.32)
         ampf_amplification["OECD"] = TriangularDist(1.14, 1.31, 1.21)
