@@ -47,13 +47,20 @@ function getsim()
         rt_g0_baseglobaltemp=TriangularDist(0.903, 0.989, 0.946)
 
         # SiBCASA Permafrost
-        PERM_SIB_AF = TriangularDist(1.42609149897258, 2.32504747848815, 1.87556948873036)
-        PERM_SIB_SENS_C_CO2 = TriangularDist(28191.1555428869, 35688.3253432574, 31939.7404430722)
-        PERM_SIB_LAG_C_CO2 = TriangularDist(35.4926669856915, 87.8949041341782, 61.6937855599349)
-        PERM_SIB_POW_C_CO2 = TriangularDist(0.107020247715729, 0.410961185142816, 0.258990716429273)
-        PERM_SIB_SENS_C_CH4 = TriangularDist(1240.3553299183, 3348.11995329232, 2294.23764160531)
-        PERM_SIB_LAG_C_CH4 = TriangularDist(75.1943160023131, 337.382510123922, 206.288413063117)
-        PERM_SIB_POW_C_CH4 = TriangularDist(-0.108779283732708, 0.610889007954489, 0.25105486211089)
+        perm_sib_af = TriangularDist(1.42609149897258, 2.32504747848815, 1.87556948873036)
+        perm_sib_sens_c_co2 = TriangularDist(28191.1555428869, 35688.3253432574, 31939.7404430722)
+        perm_sib_lag_c_co2 = TriangularDist(35.4926669856915, 87.8949041341782, 61.6937855599349)
+        perm_sib_pow_c_co2 = TriangularDist(0.107020247715729, 0.410961185142816, 0.258990716429273)
+        perm_sib_sens_c_ch4 = TriangularDist(1240.3553299183, 3348.11995329232, 2294.23764160531)
+        perm_sib_lag_c_ch4 = TriangularDist(75.1943160023131, 337.382510123922, 206.288413063117)
+        perm_sib_pow_c_ch4 = TriangularDist(-0.108779283732708, 0.610889007954489, 0.25105486211089)
+
+        # JULES Permafrost
+        perm_jul_af = TriangularDist(1.70960411816136, 2.16221162526313, 1.93590787171224)
+        perm_jul_sens_c_co2 = TriangularDist(24726.8035695649, 99008.7553497378, 61867.7794596514)
+        perm_jul_lag_c_co2 = TriangularDist(252.558368389676, 834.674343162273, 543.616355775975)
+        perm_jul_pow_c_co2 = TriangularDist(-0.226045987062471, 1.14010750072118, 0.457030756829357)
+        perm_jul_ch4_co2_c_ratio = TriangularDist(2.77492291880781, 9.52902519167579, 6.04453870625663)
 
         # SulphateForcing
         d_sulphateforcingbase = TriangularDist(-0.8, -0.2, -0.4)
@@ -320,8 +327,7 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
     scc_results
 end
 
-# do_monte_carlo_runs(100)
-
 # include("mcs.jl")
+# do_monte_carlo_runs(100)
 # include("compute_scc.jl")
 # get_scc_mcs(100, 2020)
