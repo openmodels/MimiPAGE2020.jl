@@ -62,5 +62,6 @@ include("test_TotalForcing.jl")
 include("test_Permafrost.jl")
 #include("test_mcs.jl") # missing data
 include("contrib/test_taxeffect.jl")
-
+include("test_scenarios.jl")
+    
 end
