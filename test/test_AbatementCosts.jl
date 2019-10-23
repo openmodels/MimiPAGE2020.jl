@@ -2,7 +2,6 @@ include("../src/components/RCPSSPScenario.jl")
 include("../src/components/AbatementCostParameters.jl")
 include("../src/components/AbatementCosts.jl")
 
-
 using DataFrames
 using Test
 

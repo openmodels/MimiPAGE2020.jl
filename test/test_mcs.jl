@@ -1,12 +1,7 @@
 using Test
 using CSVFiles
-using Missings
 using DataFrames
 using Distributions
-
-Mimi.reset_compdefs()
-
-include("../src/mcs.jl")
 
 regenerate = false # do a large MC run, to regenerate information needed for std. errors
 samplesize = 1000 # normal MC sample size (takes ~5 seconds)
@@ -31,7 +26,7 @@ if regenerate
     println("Regenerating MC distribution information")
 
     # Perform a large MC run and extract statistics
-    do_monte_carlo_runs(100_000)
+    MimiPAGE2009.do_monte_carlo_runs(100_000)
     df = DataFrame(load(joinpath(@__DIR__, "../output/mimipagemontecarlooutput.csv")))
 
      for ii in 1:nrow(compare)
@@ -48,11 +43,11 @@ if regenerate
         if ii != nrow(compare)
             println(",")
         end
-    end 
+    end
 else
     println("Performing MC sample")
     # Perform a small MC run
-    do_monte_carlo_runs(samplesize)
+    MimiPAGE2009.do_monte_carlo_runs(samplesize)
     df = DataFrame(load(joinpath(@__DIR__, "../output/mimipagemontecarlooutput.csv")))
 end
 
@@ -62,7 +57,7 @@ for ii in 1:nrow(compare)
     transform = information[name][:transform]
     distribution = Normal(information[name][:mu], information[name][:sigma])
     for qval in [.05, .10, .25, .50, .75, .90, .95]
-        estimated = transform(quantile(collect(Missings.skipmissing(df[name])), qval)) # perform transform *after* quantile, so captures effect of all values
+        estimated = transform(quantile(collect(Missings.skipmissing(df[!, name])), qval)) # perform transform *after* quantile, so captures effect of all values
         stderr = sqrt(qval * (1 - qval) / (samplesize * pdf(distribution, estimated)^2))
 
         expected = transform(compare[ii, Symbol("perc_$(trunc(Int, qval * 100))")])

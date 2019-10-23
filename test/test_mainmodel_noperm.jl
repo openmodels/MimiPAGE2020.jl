@@ -1,7 +1,5 @@
 using Test
 
-Mimi.reset_compdefs()
-
 include("../src/getpagefunction.jl")
 m = getpage("NDCs", false, false)
 run(m)

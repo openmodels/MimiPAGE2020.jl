@@ -22,6 +22,12 @@ the
 [technical documentation](https://github.com/openmodels/PAGE-ICE/blob/master/PAGE-ICE%20v6.22%20Technical%20Description%20-%20v%2024%20Apr%202019.pdf?raw=true) for
 more information.
 
+## Software Requirements
+You need to install [julia 1.1](https://julialang.org) or newer to run this model.
+
+## Running the Model
+The model uses the Mimi framework and it is highly recommended to read the Mimi documentation first to understand the code structure. For starter code on running the model just once, see the code in the file `examples/main.jl`.
+
 The original version of PAGE-ICE is written in Excel, like the
 previous versions of PAGE.  The Excel version of PAGE-ICE requires
 the [@RISK](https://www.palisade.com/risk/) Monte Carlo system.  You

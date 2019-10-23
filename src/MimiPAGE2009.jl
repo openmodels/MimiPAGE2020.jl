@@ -1,8 +1,13 @@
+module MimiPAGE2009
+
 using Mimi
+
+export getpage
 
 include("utils/load_parameters.jl")
 include("utils/mctools.jl")
 
+include("mcs.jl")
 include("compute_scc.jl")
 
 include("components/RCPSSPScenario.jl")
@@ -273,4 +278,8 @@ function getpage(scenario::String="NDCs", use_permafrost::Bool=true, use_seaice:
     initpage(m)
 
     return m
+end
+
+getpage = get_model
+
 end

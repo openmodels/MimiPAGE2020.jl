@@ -41,35 +41,42 @@ end
 
 """
 compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
-Computes the social cost of CO2 for an emissions pulse in `year` for the provided MimiPAGE2009 model.
-If no model is provided, the default model from MimiPAGE2009.get_model() is used.
-Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
-If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
-The emission pulse can be set manually and otherwise defaults to 100000.
-"""
-function compute_scc(m::Model = getpage(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-                    pulse_size::Union{Float64, Nothing} = 100000.)
-    return compute_scc_mm(m; year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:scc]
-end
 
-"""
-compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
-Returns a NamedTuple (scc=scc, scc_disaggregated=scc_disaggregated, mm=mm) of the social cost of carbon, its disaggregation by region and year, and the MarginalModel used to compute it.
 Computes the social cost of CO2 for an emissions pulse in `year` for the provided MimiPAGE2009 model.
 If no model is provided, the default model from MimiPAGE2009.get_model() is used.
 Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
 If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
-The emission pulse can be set manually and otherwise defaults to 100000.
 """
-function compute_scc_mm(m::Model = getpage(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-                            pulse_size::Union{Float64, Nothing} = 100000.)
+function compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
     eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
-    mm = get_marginal_model(m, year=year, pulse_size = pulse_size)   # Returns a marginal model that has already been run
+    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
+    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
+
+    return scc
+end
+
+"""
+compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
+
+Returns a NamedTuple (scc=scc, mm=mm) of the social cost of carbon and the MarginalModel used to compute it.
+Computes the social cost of CO2 for an emissions pulse in `year` for the provided MimiPAGE2009 model.
+If no model is provided, the default model from MimiPAGE2009.get_model() is used.
+Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
+If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
+"""
+function compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)
+    year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
+    !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
+
+    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+
+    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
     scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
     scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]
 
@@ -82,10 +89,9 @@ Returns a Mimi MarginalModel where the provided m is the base model, and the mar
 If no Model m is provided, the default model from MimiPAGE2009.get_model() is used as the base model.
 Note that the returned MarginalModel has already been run.
 """
-function get_marginal_model(m::Model = getpage(); year::Union{Int, Nothing} = nothing, pulse_size::Union{Float64, Nothing} = nothing)
+function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing, pulse_size = 100000.)
     year === nothing ? error("Must specify an emission year. Try `get_marginal_model(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot add marginal emissions in $year, year must be within the model's time index $page_years.") : nothing
-    pulse_size === nothing ? error("Must specify an emission pulse size. Try `get_marginal_model(m, year=2020, pulse_size = 10000.)`.") : nothing
 
     mm = create_marginal_model(m, pulse_size)
 
