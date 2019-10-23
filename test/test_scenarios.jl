@@ -9,12 +9,14 @@ terow0 = findfirst(x -> !ismissing(x) && x == "Total effect NPV", df[!, 1])
 
 for testscen in 2:size(df)[2]
     println(testscen)
-    
+
     feedback = df[1, testscen]
     scenario = df[2, testscen]
     econfunc = df[3, testscen]
     eqweight = df[4, testscen] == "Equity weighting ON, PTP discounting"
     isdeterm = df[5, testscen] == "Deterministic"
+
+    println(df[1:5, testscen])
 
     if feedback == "Nonlinear PCF"
         use_permafrost = true
@@ -36,12 +38,16 @@ for testscen in 2:size(df)[2]
         ##@test false
         continue
     end
-    
+
     Mimi.reset_compdefs()
 
     include("../src/getpagefunction.jl")
 
-    m = getpage(scenario, use_permafrost, use_seaice)
+    m = getpage(scenario, use_permafrost, use_seaice, econfunc == "PAGE09 Default")
+    if !eqweight
+        set_param!(m, :EquityWeighting, :equity_proportion, 0.)
+    end
+
     run(m)
 
     ## This isn't quite the right comparison

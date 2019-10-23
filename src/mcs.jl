@@ -1,6 +1,5 @@
 using Mimi
 using Distributions
-using CSVFiles
 using DataFrames
 
 include("getpagefunction.jl")
@@ -301,31 +300,31 @@ function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
 
-function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
-                     eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-                     pulse_size::Union{Float64, Nothing} = 100000.)
-    # Setup the marginal model
-    m = getpage()
-    mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
+# function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
+#                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
+#                      pulse_size::Union{Float64, Nothing} = 100000.)
+#     # Setup the marginal model
+#     m = getpage()
+#     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
 
-    # Setup SCC calculation and place for results
-    scc_results = zeros(samplesize)
+#     # Setup SCC calculation and place for results
+#     scc_results = zeros(samplesize)
 
-    function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
-        base, marginal = mcs.models
-        scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
-    end
+#     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
+#         base, marginal = mcs.models
+#         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
+#     end
 
-    # Setup MC simulation
-    mcs = getsim()
-    set_models!(mcs, [mm.base, mm.marginal])
-    generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
+#     # Setup MC simulation
+#     mcs = getsim()
+#     set_models!(mcs, [mm.base, mm.marginal])
+#     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 
-    # Run it!
-    run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+#     # Run it!
+#     run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
 
-    scc_results
-end
+#     scc_results
+# end
 
 # include("mcs.jl")
 # do_monte_carlo_runs(100)
