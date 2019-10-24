@@ -44,7 +44,7 @@ version of PAGE-ICE is based on Mimi-PAGE-2009
 ([Moore et al., 2018](https://www.nature.com/articles/sdata2018187)).
 The documentation for Mimi-PAGE-2020.jl can be
 accessed
-[here](http://anthofflab.berkeley.edu/MimiPAGE2009.jl/stable/), and
+[here](https://github.com/openmodels/mimi-page-2020.jl), and
 the code is available in this repository.  More
 details on downloading and running the Mimi version of the model are
 available below.

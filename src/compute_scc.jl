@@ -42,8 +42,8 @@ end
 """
 compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
 
-Computes the social cost of CO2 for an emissions pulse in `year` for the provided MimiPAGE2009 model.
-If no model is provided, the default model from MimiPAGE2009.get_model() is used.
+Computes the social cost of CO2 for an emissions pulse in `year` for the provided Mimi-PAGE model.
+If no model is provided, the default model from main_model.get_model() is used.
 Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
 If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
 """
@@ -64,8 +64,8 @@ end
 compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
 
 Returns a NamedTuple (scc=scc, mm=mm) of the social cost of carbon and the MarginalModel used to compute it.
-Computes the social cost of CO2 for an emissions pulse in `year` for the provided MimiPAGE2009 model.
-If no model is provided, the default model from MimiPAGE2009.get_model() is used.
+Computes the social cost of CO2 for an emissions pulse in `year` for the provided Mimi-PAGE model.
+If no model is provided, the default model from main_model.get_model() is used.
 Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
 If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
 """
@@ -86,7 +86,7 @@ end
 """
 get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing)
 Returns a Mimi MarginalModel where the provided m is the base model, and the marginal model has additional emissions of CO2 in year `year`.
-If no Model m is provided, the default model from MimiPAGE2009.get_model() is used as the base model.
+If no Model m is provided, the default model from main_model.get_model() is used as the base model.
 Note that the returned MarginalModel has already been run.
 """
 function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing, pulse_size = 100000.)

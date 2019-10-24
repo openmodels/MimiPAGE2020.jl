@@ -1,8 +1,7 @@
 using Test
 using Mimi
-using MimiPAGE2009
 
-using MimiPAGE2009: readpagedata, buildpage, initpage, load_parameters, setdistinctparameter
+include("../src/main_model.jl")
 
 function page_model()
     m = Model()
@@ -23,7 +22,7 @@ function get_scenario(ii)
     end
 end
 
-@testset "MimiPAGE2009.jl" begin
+@testset "mimi-page-2020" begin
 
 include("test_climatemodel.jl")
 include("test_AbatementCosts.jl")

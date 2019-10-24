@@ -48,7 +48,7 @@ Clone or download the Mimi-PAGE repository from the Mimi-PAGE [Github website](h
 
 To run the model, run the `main.jl` file in the examples folder. This
 runs the deterministic version of Mimi-PAGE with central parameter
-estimates. The `MimiPAGE209.get_model` function used in that file create the
+estimates. The `main_model.get_model` function used in that file create the
 initialized PAGE model. You can print the model, by typing `m`, which
 returns a list of components and each of their incoming parameters and
 outgoing variables. Results can be viewed by running `m[:ComponentName, :VariableName]` 
@@ -61,7 +61,7 @@ To run the stochastic version of Mimi-PAGE, which uses parameter
 distributions, see the `mcs.jl` file in the src folder and the documentation for
 Mimi Monte Carlo support [here](https://github.com/anthofflab/Mimi.jl/blob/master/docs/src/internals/montecarlo.md). The simplest version of the stochastic can be implemented as follows:
 ```julia
-julia> MimiPAGE2009.do_monte_carlo_runs(1000) #1000 runs
+julia> do_monte_carlo_runs(1000) #1000 runs
 ```
 The current Monte Carlo process outputs a selection of variables that are
 important for validation, but these can be modified by the user if

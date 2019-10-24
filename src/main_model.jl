@@ -1,5 +1,3 @@
-module MimiPAGE2009
-
 using Mimi
 
 export getpage
@@ -281,5 +279,3 @@ function getpage(scenario::String="NDCs", use_permafrost::Bool=true, use_seaice:
 end
 
 getpage = get_model
-
-end
