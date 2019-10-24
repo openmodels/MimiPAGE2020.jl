@@ -278,4 +278,4 @@ function getpage(scenario::String="NDCs", use_permafrost::Bool=true, use_seaice:
     return m
 end
 
-getpage = get_model
+get_model = getpage

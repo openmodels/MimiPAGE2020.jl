@@ -1,7 +1,6 @@
 using Distributions
 using DataFrames
 
-include("getpagefunction.jl")
 include("utils/mctools.jl")
 
 function getsim()
