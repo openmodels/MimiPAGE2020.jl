@@ -286,7 +286,7 @@ function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__
     run(m)
 
     # Run
-    res = run(mcs, m, samplesize; trials_output_filename = joinpath(output_dir, "trialdata.csv"), results_output_dir = output_dir)
+    res = run(mcs, m, samplesize; trials_output_filename = joinpath(output_path, "trialdata.csv"), results_output_dir = output_path)
 
     # reformat outputs for testing and analysis
     reformat_RV_outputs(samplesize, output_path=output_path)

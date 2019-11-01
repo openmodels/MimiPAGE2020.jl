@@ -10,6 +10,7 @@
     s_sealevel = Parameter(index=[time], unit="m")
     #incoming parameters to calculate consumption per capita after Costs
     cons_percap_consumption = Parameter(index=[time, region], unit="\$/person")
+    cons_percap_consumption_0 = Parameter(index=[region], unit="\$/person")
     tct_per_cap_totalcostspercap = Parameter(index=[time,region], unit= "\$/person")
     act_percap_adaptationcosts = Parameter(index=[time, region], unit="\$/person")
 
@@ -47,6 +48,10 @@
 
         for r in d.region
             v.cons_percap_aftercosts[t, r] = p.cons_percap_consumption[t, r] - p.tct_per_cap_totalcostspercap[t, r] - p.act_percap_adaptationcosts[t, r]
+            if (v.cons_percap_aftercosts[t, r] < 0.01*p.cons_percap_consumption_0[1])
+                v.cons_percap_aftercosts[t, r] = 0.01*p.cons_percap_consumption_0[1] # happens in some MC draws
+            end
+
             v.gdp_percap_aftercosts[t,r]=v.cons_percap_aftercosts[t, r]/(1 - p.save_savingsrate/100)
 
             if (p.s_sealevel[t]-p.atl_adjustedtolerablelevelofsealevelrise[t,r]) < 0

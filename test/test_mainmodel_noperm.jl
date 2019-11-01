@@ -1,6 +1,6 @@
 using Test
 
-include("../src/getpagefunction.jl")
+include("../src/main_model.jl")
 m = getpage("NDCs", false, false)
 run(m)
 

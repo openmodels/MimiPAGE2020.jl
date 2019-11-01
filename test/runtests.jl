@@ -60,6 +60,7 @@ include("test_Permafrost.jl")
 #include("test_mcs.jl") # missing data
 include("contrib/test_taxeffect.jl")
 include("test_scenarios.jl")
+include("test_scenarios_mcs.jl")
 include("test_standard_api.jl")
 
 end

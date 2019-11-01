@@ -19,7 +19,7 @@ scc3 = compute_scc(m, year=2020)
 
 # Test get_marginal_model
 mm = get_marginal_model(year = 2040)
-mm[:ClimateTemperature, :rt_realizedtemperature]
+mm[:ClimateTemperature, :rt_g_globaltemperature]
 
 # Test compute_scc_mm
 result = compute_scc_mm(year=2050)

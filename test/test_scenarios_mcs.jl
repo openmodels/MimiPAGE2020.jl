@@ -1,17 +1,21 @@
+using Mimi
 using Test
 using CSV
 
+include("../src/mcs.jl")
 df = CSV.read("validationdata/allscenarios.csv", header=false)
 rfrow0 = findfirst(x -> !ismissing(x) && x == "RF in 2100", df[!, 1])
 gmstrow0 = findfirst(x -> !ismissing(x) && x == "Temp. in 2100", df[!, 1])
 slrrow0 = findfirst(x -> !ismissing(x) && x == "SLR in 2100", df[!, 1])
 terow0 = findfirst(x -> !ismissing(x) && x == "Total effect NPV", df[!, 1])
 
+mcs = getsim()
+
 for testscen in 2:size(df)[2]
     isdeterm = df[5, testscen] == "Deterministic"
 
-    if !isdeterm
-        continue # handle these in test_scenarios_mcs.jl
+    if isdeterm
+        continue # handle these in test_scenarios.jl
     end
 
     feedback = df[1, testscen]
@@ -45,22 +49,35 @@ for testscen in 2:size(df)[2]
         set_param!(m, :EquityWeighting, :equity_proportion, 0.)
     end
 
+    # Run a single time
     run(m)
+
+    # Run for MC
+    output_path = joinpath(@__DIR__, "../output")
+    res = run(mcs, m, 1000; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)
 
     ## This isn't quite the right comparison
     # forcing = m[:TotalForcing, :ft_totalforcing][6]
     # forcing_compare = df[rfrow0 + 3, testscen]
     # @test forcing ≈ forcing_compare rtol=1e-3
 
-    rt_g = m[:ClimateTemperature, :rt_g_globaltemperature][6]
-    rt_g_compare = parse(Float64, df[gmstrow0 + 3, testscen])
-    @test rt_g ≈ rt_g_compare rtol=1e-2
+    dfallrt_g = res.results[1][:ClimateTemperature, :rt_g_globaltemperature]
+    allrt_g = dfallrt_g[dfallrt_g[:, :time] .== 2100, 2]
+    dfallslr = res.results[1][:SeaLevelRise, :s_sealevel]
+    allslr = dfallslr[dfallslr[:, :time] .== 2100, 2]
+    dfallte = res.results[1][:EquityWeighting, :te_totaleffect]
+    allte = dfallte[:, 1]
+    for (quant, drow, rtolmult) in [(0.05, 1, 100), (.25, 2, 60), (.5, 3, 30), (.75, 4, 60), (.95, 5, 100)]
+        rt_g = quantile(allrt_g, quant)
+        rt_g_compare = parse(Float64, df[gmstrow0 + drow, testscen])
+        @test rt_g ≈ rt_g_compare rtol=1e-2*rtolmult
 
-    slr = m[:SeaLevelRise,:s_sealevel][6]
-    slr_compare = parse(Float64, df[slrrow0 + 3, testscen])
-    @test slr ≈ slr_compare rtol=1e-2
+        slr = quantile(allslr, quant)
+        slr_compare = parse(Float64, df[slrrow0 + drow, testscen])
+        @test slr ≈ slr_compare rtol=1e-2*rtolmult
 
-    te = m[:EquityWeighting, :te_totaleffect]
-    te_compare = parse(Float64, df[terow0 + 3, testscen])
-    @test te ≈ te_compare rtol=1e4
+        te = quantile(allte, quant)
+        te_compare = parse(Float64, df[terow0 + drow, testscen])
+        @test te ≈ te_compare rtol=1e4*rtolmult
+    end
 end
