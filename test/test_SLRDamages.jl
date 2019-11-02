@@ -16,6 +16,7 @@ for testscen in 1:2
     set_param!(m, :SLRDamages, :y_year_0, 2015.)
     set_param!(m, :SLRDamages, :s_sealevel, readpagedata(m, "test/validationdata/$valdir/s_sealevel.csv"))
     set_param!(m, :SLRDamages, :cons_percap_consumption, readpagedata(m, "test/validationdata/$valdir/cons_percap_consumption.csv"))
+    set_param!(m, :SLRDamages, :cons_percap_consumption_0, readpagedata(m, "test/validationdata/$valdir/cons_percap_consumption_0.csv"))
     set_param!(m, :SLRDamages, :tct_per_cap_totalcostspercap, readpagedata(m, "test/validationdata/$valdir/tct_per_cap_totalcostspercap.csv"))
     set_param!(m, :SLRDamages, :act_percap_adaptationcosts, readpagedata(m, "test/validationdata/$valdir/act_percap_adaptationcosts.csv"))
     set_param!(m, :SLRDamages, :isatg_impactfxnsaturation, 28.333333333333336)
