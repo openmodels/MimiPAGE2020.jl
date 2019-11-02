@@ -1,7 +1,7 @@
 using Test
 using CSV
 
-df = CSV.read("validationdata/allscenarios.csv", header=false)
+df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header=false)
 rfrow0 = findfirst(x -> !ismissing(x) && x == "RF in 2100", df[!, 1])
 gmstrow0 = findfirst(x -> !ismissing(x) && x == "Temp. in 2100", df[!, 1])
 slrrow0 = findfirst(x -> !ismissing(x) && x == "SLR in 2100", df[!, 1])
