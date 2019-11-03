@@ -4,9 +4,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    Mimi.reset_compdefs()
-
-    include("../src/getpagefunction.jl")
+    include("../src/main_model.jl")
 
     m = getpage(scenario, use_permafrost, use_seaice)
     run(m)

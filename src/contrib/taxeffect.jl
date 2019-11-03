@@ -1,5 +1,3 @@
-# using OptiMimi
-
 @defcomp TaxDrivenGrowth begin
     region = Index()
 

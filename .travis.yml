@@ -9,6 +9,7 @@ notifications:
 script:
   - julia -e 'using Pkg; Pkg.add("Mimi")'
   - julia -e 'using Pkg; Pkg.add("CSVFiles")'
+  - julia -e 'using Pkg; Pkg.add("CSV")'
   - julia -e 'using Pkg; Pkg.add("Query")'
   - julia -e 'using Pkg; Pkg.add("DataFrames")'
   - julia -e 'using Pkg; Pkg.add("Distributions")'

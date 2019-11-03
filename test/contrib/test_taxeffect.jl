@@ -1,5 +1,5 @@
 using Test
-include("../../src/getpagefunction.jl")
+include("../../src/main_model.jl")
 include("../../src/contrib/taxeffect.jl")
 
 taxes = rand(10) * 100

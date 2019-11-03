@@ -1,12 +1,9 @@
 using Test
 using Mimi
 
+include("../src/main_model.jl")
+
 function page_model()
-    Mimi.reset_compdefs()
-
-    include("../src/utils/load_parameters.jl")
-    include("../src/utils/mctools.jl")
-
     m = Model()
 
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
@@ -25,7 +22,7 @@ function get_scenario(ii)
     end
 end
 
-@testset "mimi-page.jl" begin
+@testset "mimi-page-2020" begin
 
 include("test_climatemodel.jl")
 include("test_AbatementCosts.jl")
@@ -62,5 +59,8 @@ include("test_TotalForcing.jl")
 include("test_Permafrost.jl")
 #include("test_mcs.jl") # missing data
 include("contrib/test_taxeffect.jl")
+include("test_scenarios.jl")
+include("test_scenarios_mcs.jl")
+include("test_standard_api.jl")
 
 end

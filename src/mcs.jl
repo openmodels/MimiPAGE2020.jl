@@ -1,9 +1,6 @@
-using Mimi
 using Distributions
-using CSVFiles
 using DataFrames
 
-include("getpagefunction.jl")
 include("utils/mctools.jl")
 
 function getsim()
@@ -18,6 +15,7 @@ function getsim()
         #so that they are not set more than once.
 
         save_savingsrate = TriangularDist(10, 20, 15) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages. GDP, SLRDamages
+        tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.) # components: MarketDamages, NonMarketDamages, SLRDamages, Discountinuity
 
         wincf_weightsfactor_sea["USA"] = TriangularDist(.6, 1, .8) # components: SLRDamages, Discountinuity (weights for market and nonmarket are non-stochastic and uniformly 1)
         wincf_weightsfactor_sea["OECD"] = TriangularDist(.4, 1.2, .8)
@@ -89,7 +87,6 @@ function getsim()
         isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
 
         # MarketDamages
-        tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.)
         iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
         W_MarketImpactsatCalibrationTemp = TriangularDist(.2, .8, .5)
         pow_MarketImpactExponent = TriangularDist(1.5, 3, 2)
@@ -122,7 +119,7 @@ function getsim()
         pow_SLRImpactFxnExponent = TriangularDist(.5, 1, .7)
         ipow_SLRIncomeFxnExponent = TriangularDist(-.4, -.2, -.3)
 
-        # Discountinuity
+        # Discontinuity
         rand_discontinuity = Uniform(0, 1)
         tdis_tolerabilitydisc = TriangularDist(1, 2, 1.5)
         pdis_probability = TriangularDist(10, 30, 20)
@@ -235,11 +232,12 @@ function getsim()
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP)
 
-    end #defsim
+    end #de
+    return mcs
 end
 
 #Reformat the RV results into the format used for testing
-function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../output/"))
+function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../output"))
 
     #create vectors to hold results of Monte Carlo runs
     td=zeros(samplesize);
@@ -257,23 +255,22 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
 
     #load raw data
     #no filter
-    td      = load_RV("td_totaldiscountedimpacts"; output_path = output_path)
-    tpc     = load_RV("tpc_totalaggregatedcosts"; output_path = output_path)
-    tac     = load_RV("tac_totaladaptationcosts"; output_path = output_path)
-    te      = load_RV("te_totaleffect"; output_path = output_path)
+    td      = load_RV("EquityWeighting_td_totaldiscountedimpacts", "td_totaldiscountedimpacts"; output_path = output_path)
+    tpc     = load_RV("EquityWeighting_tpc_totalaggregatedcosts", "tpc_totalaggregatedcosts"; output_path = output_path)
+    tac     = load_RV("EquityWeighting_tac_totaladaptationcosts", "tac_totaladaptationcosts"; output_path = output_path)
+    te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path = output_path)
 
     #time index
-    c_co2concentration = load_RV("c_CO2concentration"; output_path = output_path)
-    ft      = load_RV("ft_totalforcing"; output_path = output_path)
-    rt_g    = load_RV("rt_g_globaltemperature"; output_path = output_path)
-    s       = load_RV("s_sealevel"; output_path = output_path)
+    c_co2concentration = load_RV("co2cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
+    ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path = output_path)
+    rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
+    s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path = output_path)
 
     #region index
-    rgdppercap_slr          = load_RV("rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
-    rgdppercap_slr          = load_RV("rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
-    rgdppercap_market       = load_RV("rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
-    rgdppercap_nonmarket    =load_RV("rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
-    rgdppercap_disc         = load_RV("rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
+    rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
+    rgdppercap_market       = load_RV("MarketDamages_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
+    rgdppercap_nonmarket    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
+    rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
 
     #resave data
     df=DataFrame(td=td,tpc=tpc,tac=tac,te=te,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
@@ -288,44 +285,38 @@ function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__
     m = getpage()
     run(m)
 
-    # Generate trial data for all RVs and save to a file
-    generate_trials!(mcs, samplesize, filename = joinpath(output_path, "trialdata.csv"))
-
-    # set model
-    set_models!(mcs, m)
-
-    # Run trials 1:samplesize, and save results to the indicated directory, one CSV file per RV
-    run_sim(mcs, output_dir = output_path)
+    # Run
+    res = run(mcs, m, samplesize; trials_output_filename = joinpath(output_path, "trialdata.csv"), results_output_dir = output_path)
 
     # reformat outputs for testing and analysis
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
 
-function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
-                     eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-                     pulse_size::Union{Float64, Nothing} = 100000.)
-    # Setup the marginal model
-    m = getpage()
-    mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
+# function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
+#                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
+#                      pulse_size::Union{Float64, Nothing} = 100000.)
+#     # Setup the marginal model
+#     m = getpage()
+#     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
 
-    # Setup SCC calculation and place for results
-    scc_results = zeros(samplesize)
+#     # Setup SCC calculation and place for results
+#     scc_results = zeros(samplesize)
 
-    function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
-        base, marginal = mcs.models
-        scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
-    end
+#     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
+#         base, marginal = mcs.models
+#         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
+#     end
 
-    # Setup MC simulation
-    mcs = getsim()
-    set_models!(mcs, [mm.base, mm.marginal])
-    generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
+#     # Setup MC simulation
+#     mcs = getsim()
+#     set_models!(mcs, [mm.base, mm.marginal])
+#     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 
-    # Run it!
-    run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+#     # Run it!
+#     run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
 
-    scc_results
-end
+#     scc_results
+# end
 
 # include("mcs.jl")
 # do_monte_carlo_runs(100)

@@ -56,12 +56,12 @@
         elseif p.rcp == 260
             # Fill in within run_timestep
         elseif p.rcp == 0
-            v.er_CO2emissionsgrowth[:, :] = 0.
-            v.er_CH4emissionsgrowth[:, :] = 0.
-            v.er_N2Oemissionsgrowth[:, :] = 0.
-            v.er_LGemissionsgrowth[:, :] = 0.
-            v.pse_sulphatevsbase[:, :] = 0.
-            v.exf_excessforcing[:] = 0.
+            v.er_CO2emissionsgrowth[:, :] .= 0.
+            v.er_CH4emissionsgrowth[:, :] .= 0.
+            v.er_N2Oemissionsgrowth[:, :] .= 0.
+            v.er_LGemissionsgrowth[:, :] .= 0.
+            v.pse_sulphatevsbase[:, :] .= 0.
+            v.exf_excessforcing[:] .= 0.
         else
             v.er_CO2emissionsgrowth[:, :] = readpagedata(nothing, "data/rcps/rcp$(p.rcp)_co2.csv")
             v.er_CH4emissionsgrowth[:, :] = readpagedata(nothing, "data/rcps/rcp$(p.rcp)_ch4.csv")
