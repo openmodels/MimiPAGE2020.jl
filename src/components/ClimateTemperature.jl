@@ -122,7 +122,7 @@
                 if v.rt_g_globaltemperature[tt-1] <= p.alb_t_switch
                     alb_fsaf_adjust = ((p.alb_saf_quadr_mean_t2_coeff*(v.rt_g_globaltemperature[tt-1]^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(v.rt_g_globaltemperature[tt-1]^2)/2 + p.alb_saf_quadr_mean_t0_coeff*v.rt_g_globaltemperature[tt-1]) + (p.alb_saf_quadr_std*v.rt_g_globaltemperature[tt-1]) * p.alb_emulator_rand) - alb_saf_approx * v.rt_g_globaltemperature[tt-1]
                 else
-                    alb_fasf_adjust = p.alb_fsaf_t_switch + p.alb_saf_lin_mean*(v.rt_g_globaltemperature[tt-1] - p.alb_t_switch) + (p.alb_saf_lin_std*(v.rt_g_globaltemperature[tt-1] - p.alb_t_switch)) * p.alb_emulator_rand - alb_saf_approx * v.rt_g_globaltemperature[tt-1]
+                    alb_fsaf_adjust = v.alb_fsaf_t_switch + p.alb_saf_lin_mean*(v.rt_g_globaltemperature[tt-1] - p.alb_t_switch) + (p.alb_saf_lin_std*(v.rt_g_globaltemperature[tt-1] - p.alb_t_switch)) * p.alb_emulator_rand - alb_saf_approx * v.rt_g_globaltemperature[tt-1]
                 end
                 v.rt_g_globaltemperature[tt] = v.rt_g_globaltemperature[tt-1] + (ecs_alb_adj * (p.fant_anthroforcing[tt-1] - rate_fant*frt_alb_adj + alb_fsaf_adjust) / (log(2)*p.fslope_CO2forcingslope) - v.rt_g_globaltemperature[tt-1]) * (1 - exp(-deltat/frt_alb_adj)) + ecs_alb_adj * (rate_fant*deltat) / (log(2)*p.fslope_CO2forcingslope)
             end

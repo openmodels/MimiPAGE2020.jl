@@ -11,7 +11,7 @@
     save_savingsrate = Parameter(unit= "%", default=15.)
     wincf_weightsfactor_market =Parameter(index=[region], unit="")
     ipow_MarketIncomeFxnExponent =Parameter(default=0.0)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(default=34298.93698672955)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
 
     # added impact parameters and variables specifically for Burke damage function
     rtl_abs_0_realizedabstemperature = Parameter(index = [region]) # 1979-2005 means, Yumashev et al. 2019 Supplementary Table 16, table in /data directory

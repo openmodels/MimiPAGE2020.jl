@@ -51,7 +51,7 @@
         # Released perm cumulative CO2
         v.perm_jul_ce_co2[tt] = v.perm_jul_ce_c_co2[tt] * (44/12)
         # Annual emissions CO2 perm
-        v.perm_jul_e_co2[tt] = (44/12) * (p.perm_jul_limit_c / (p.perm_jul_lag_c_co2 * v.perm_jul_lag_c_co2_correct[tt])) * (ifelse(v.perm_jul_equilib_c_co2[tt] > v.perm_jul_ce_c_co2[tt], ((v.perm_jul_equilib_c_co2[tt] - v.perm_jul_ce_c_co2[tt])/p.perm_jul_limit_c)^((1 + p.perm_jul_pow_c_co2)*v.perm_jul_pow_c_co2_correct[tt]), 0))
+        v.perm_jul_e_co2[tt] = (44/12) * (p.perm_jul_limit_c / (p.perm_jul_lag_c_co2 * v.perm_jul_lag_c_co2_correct[tt])) * ((v.perm_jul_equilib_c_co2[tt] > v.perm_jul_ce_c_co2[tt]) ? ((v.perm_jul_equilib_c_co2[tt] - v.perm_jul_ce_c_co2[tt])/p.perm_jul_limit_c)^((1 + p.perm_jul_pow_c_co2)*v.perm_jul_pow_c_co2_correct[tt]) : 0)
         # Released perm cumulative CH4
         v.perm_jul_ce_ch4[tt] = v.perm_jul_ce_c_co2[tt] * (p.perm_jul_ch4_co2_c_ratio/100) * (16/12)
     end
