@@ -119,3 +119,28 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
 
     return mm
 end
+
+function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)
+    # Setup of location of final results
+    scc_results = zeros(samplesize)
+
+    function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
+        marginal = sim_inst.models[1]
+        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
+        scc_results[trialnum] = marg_damages
+    end
+
+    # get simulation
+    mcs = getsim()
+
+    # Setup models
+    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+
+    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
+
+    # Run
+    res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
+
+    scc_results
+end
