@@ -62,6 +62,6 @@ include("contrib/test_taxeffect.jl")
 include("test_scenarios.jl")
 include("test_scenarios_mcs.jl")
 include("test_standard_api.jl")
-include("test_scc.jl")
+##include("test_scc.jl") # Takes very long to run.
 
 end
