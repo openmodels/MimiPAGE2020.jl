@@ -215,6 +215,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :SLRDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
     connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :MarketDamages => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
     connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
     connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
     connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits=true) # not required for Burke damages
@@ -222,27 +223,40 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :MarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
     connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
     connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
     connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
     connect_param!(m, :MarketDamagesBurke => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
+    connect_param!(m, :MarketDamagesBurke => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
     connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
     if use_page09damages
         connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamages => :rgdp_per_cap_MarketRemainGDP)
+        connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP_ann, :MarketDamages => :rgdp_per_cap_MarketRemainGDP_ann)
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamages => :rcons_per_cap_MarketRemainConsumption)
+        connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamages => :rcons_per_cap_MarketRemainConsumption_ann)
     else
         connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP)
+        connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP_ann, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP_ann)
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption)
+        connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption_ann)
     end
     connect_param!(m, :NonMarketDamages =>:atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic =>:atl_adjustedtolerablelevel, ignoreunits=true)
     connect_param!(m, :NonMarketDamages => :imp_actualreduction, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts)
     connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
+    connect_param!(m, :NonMarketDamages => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
+    connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP_ann, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP_ann)
     connect_param!(m, :Discontinuity => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
+    connect_param!(m, :Discontinuity => :rt_g_globaltemperature_ann, :ClimateTemperature => :rt_g_globaltemperature_ann)
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
+    connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP_ann, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP_ann)
     connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption)
+    connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption_ann, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption_ann)
     connect_param!(m, :Discontinuity => :isatg_saturationmodification, :GDP => :isatg_impactfxnsaturation)
+    connect_param!(m, :Discontinuity => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
     connect_param!(m, :EquityWeighting => :pop_population, :Population => :pop_population)
     connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)
@@ -252,6 +266,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
+    connect_param!(m, :EquityWeighting => :rcons_percap_dis_ann, :Discontinuity => :rcons_per_cap_DiscRemainConsumption_ann)
     connect_param!(m, :EquityWeighting => :yagg_periodspan, :GDP => :yagg_periodspan)
     equityweighting[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
     equityweighting[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
@@ -260,6 +275,12 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 end
 
 function initpage(m::Model)
+    set_param!(m, :ClimateTemperature, :y_year_ann, collect(2015:2300))
+    set_param!(m, :MarketDamages, :y_year_ann, collect(2015:2300))
+    set_param!(m, :MarketDamagesBurke, :y_year_ann, collect(2015:2300))
+    set_param!(m, :NonMarketDamages, :y_year_ann, collect(2015:2300))
+    set_param!(m, :Discontinuity, :y_year_ann, collect(2015:2300))
+    set_param!(m, :EquityWeighting, :y_year_ann, collect(2015:2300))
     p = load_parameters(m)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
@@ -268,6 +289,7 @@ end
 
 function getpage(scenario::String="NDCs", use_permafrost::Bool=true, use_seaice::Bool=false, use_page09damages::Bool=false)
     m = Model()
+    set_dimension!(m, :year, collect(2015:2300))
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
