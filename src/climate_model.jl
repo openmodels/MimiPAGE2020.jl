@@ -21,6 +21,7 @@ include("components/PermafrostTotal.jl")
 
 function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::Bool=false)
     m = Model()
+    set_dimension!(m, :year, collect(2015:2300))
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
@@ -48,6 +49,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     totalforcing = add_comp!(m, TotalForcing)
 
     #connect parameters together
+    set_param!(m, :ClimateTemperature, :y_year_ann, collect(2015:2300))
     set_param!(m, :ClimateTemperature, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
     set_param!(m, :ClimateTemperature, :y_year_0, 2015.)
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
@@ -117,6 +119,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
 
     # next: add vector and panel example
     p = load_parameters(m)
+    p["y_year_ann"] = Mimi.dim_keys(m.md, :year)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
     set_leftover_params!(m, p)
