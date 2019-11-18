@@ -55,7 +55,11 @@ function compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
+    if use_annual
+        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
+    else
+        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
+    end
 
     return scc
 end
@@ -77,8 +81,14 @@ function compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = noth
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
-    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]
+
+    if use_annual
+        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
+        scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated_ann]
+    else
+        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
+        scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]
+    end
 
     return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
 end
@@ -126,7 +136,11 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
 
     function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
         marginal = sim_inst.models[1]
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
+        if use_annual
+            marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts_ann]
+        else
+            marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
+        end
         scc_results[trialnum] = marg_damages
     end
 
