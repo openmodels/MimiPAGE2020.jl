@@ -80,6 +80,7 @@
   distau_discontinuityexponent=Parameter(unit="unitless", default=20.)
 
   idis_lossfromdisc=Variable(index=[time], unit="degreeC")
+  idis_lossfromdisc_ann = Variable(index=[year], unit="degreeC")
   tdis_tolerabilitydisc=Parameter(unit="degreeC", default=1.5)
   rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
   rt_g_globaltemperature_ann = Parameter(index=[year], unit="degreeC")

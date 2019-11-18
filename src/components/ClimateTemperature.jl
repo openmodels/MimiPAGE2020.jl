@@ -67,6 +67,7 @@
     # Unadjusted temperature calculations
     fslope_CO2forcingslope = Parameter(unit="W/m2", default=5.5)
     pt_g_preliminarygmst = Variable(index=[time], unit="degreeC")
+    pt_g_preliminarygmst_ann = Variable(index=[year], unit="degreeC")
 
     # Surface albedo parameters
     alb_t_switch = Parameter(default=10.0)
