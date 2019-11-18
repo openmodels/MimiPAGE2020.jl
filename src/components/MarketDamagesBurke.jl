@@ -1,89 +1,89 @@
+function interpolate_parameters_marketdamagesburke(p, v, d, t)
+    if is_first(t)
+        for annual_year = 2015:(gettime(t))
+            yr = annual_year - 2015 + 1
+            for r in d.region
+
+                # for the years before 2020, we assume the numbers to be the same as the figures of 2020
+                v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]
+                v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]
+            end
+        end
+    else
+        for annual_year = (gettime(t-1)+1):(gettime(t))
+            yr = annual_year - 2015 + 1
+            frac = annual_year - gettime(t-1)
+            fraction_timestep = frac/((gettime(t))-(gettime(t-1)))
+
+            for r in d.region
+
+                if use_linear
+                    # for the years after 2020, we use linear interpolation between the years of analysis
+                    v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]*(fraction_timestep) +
+                                    p.rcons_per_cap_SLRRemainConsumption[t-1, r]*(1-fraction_timestep)
+                    v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]*(fraction_timestep) +
+                                    p.rgdp_per_cap_SLRRemainGDP[t-1, r]*(1-fraction_timestep)
+                elseif use_logburke
+                    # for the years after 2020, we use linear interpolation between the years of analysis
+                    v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]^(fraction_timestep) *
+                                    p.rcons_per_cap_SLRRemainConsumption[t-1, r]^(1-fraction_timestep)
+                    v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]^(fraction_timestep) *
+                                    p.rgdp_per_cap_SLRRemainGDP[t-1, r]^(1-fraction_timestep)
+                elseif use_logpopulation
+                    # all linear
+                    v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]*(fraction_timestep) +
+                                    p.rcons_per_cap_SLRRemainConsumption[t-1, r]*(1-fraction_timestep)
+                    v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]*(fraction_timestep) +
+                                    p.rgdp_per_cap_SLRRemainGDP[t-1, r]*(1-fraction_timestep)
+                else
+                    error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
+                end
+            end
+        end
+    end
+end
+
+function calc_marketdamagesburke(p, v, d, t, annual_year, r)
+    # setting the year for entry in lists.
+    yr = annual_year - 2015 + 1 # + 1 because of 1-based indexing in Julia
+
+
+    # calculate the regional temperature impact relative to baseline year and add it to baseline absolute value
+    v.i_burke_regionalimpact_ann[yr,r] = (p.rtl_realizedtemperature_ann[yr,r] - p.rtl_0_realizedtemperature[r]) + p.rtl_abs_0_realizedabstemperature[r]
+
+
+    # calculate the log change, depending on the number of lags specified
+    v.i1log_impactlogchange_ann[yr,r] = p.nlag_burke * (p.impf_coeff_lin  * (v.i_burke_regionalimpact_ann[yr,r] - p.rtl_abs_0_realizedabstemperature[r]) +
+                        p.impf_coeff_quadr * ((v.i_burke_regionalimpact_ann[yr,r] - p.tcal_burke)^2 -
+                                              (p.rtl_abs_0_realizedabstemperature[r] - p.tcal_burke)^2))
+
+    # calculate the impact at focus region GDP p.c.
+    v.iref_ImpactatReferenceGDPperCap_ann[yr,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange_ann[yr,r]))
+
+    # calculate impacts at actual GDP
+    v.igdp_ImpactatActualGDPperCap_ann[yr,r]= v.iref_ImpactatReferenceGDPperCap_ann[yr,r] *
+        (v.rgdp_per_cap_SLRRemainGDP_ann[yr,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+
+    # send impacts down a logistic path if saturation threshold is exceeded
+    if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
+        v.isat_ImpactinclSaturationandAdaptation_ann[yr,r] = v.igdp_ImpactatActualGDPperCap_ann[yr,r]
+    else
+        v.isat_ImpactinclSaturationandAdaptation_ann[yr,r] = p.isatg_impactfxnsaturation+
+            ((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)*
+            ((v.igdp_ImpactatActualGDPperCap_ann[yr,r]-p.isatg_impactfxnsaturation)/
+            (((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)+
+            (v.igdp_ImpactatActualGDPperCap_ann[yr,r]-
+            p.isatg_impactfxnsaturation)))
+    end
+
+    v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r] = (v.isat_ImpactinclSaturationandAdaptation_ann[yr,r]/100)*v.rgdp_per_cap_SLRRemainGDP_ann[yr,r]
+    v.rcons_per_cap_MarketRemainConsumption_ann[yr,r] = v.rcons_per_cap_SLRRemainConsumption_ann[yr,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r]
+    v.rgdp_per_cap_MarketRemainGDP_ann[yr,r] = v.rcons_per_cap_MarketRemainConsumption_ann[yr,r]/(1-p.save_savingsrate/100)
+
+end
+
+
 @defcomp MarketDamagesBurke begin
-
-    function interpolate_parameters_marketdamagesburke(p, v, d, t)
-        if is_first(t)
-            for annual_year = 2015:(gettime(t))
-                yr = annual_year - 2015 + 1
-                for r in d.region
-
-                    # for the years before 2020, we assume the numbers to be the same as the figures of 2020
-                    v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]
-                    v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]
-                end
-            end
-        else
-            for annual_year = (gettime(t-1)+1):(gettime(t))
-                yr = annual_year - 2015 + 1
-                frac = annual_year - gettime(t-1)
-                fraction_timestep = frac/((gettime(t))-(gettime(t-1)))
-
-                for r in d.region
-
-                    if use_linear
-                        # for the years after 2020, we use linear interpolation between the years of analysis
-                        v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]*(fraction_timestep) +
-                                        p.rcons_per_cap_SLRRemainConsumption[t-1, r]*(1-fraction_timestep)
-                        v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]*(fraction_timestep) +
-                                        p.rgdp_per_cap_SLRRemainGDP[t-1, r]*(1-fraction_timestep)
-                    elseif use_logburke
-                        # for the years after 2020, we use linear interpolation between the years of analysis
-                        v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]^(fraction_timestep) *
-                                        p.rcons_per_cap_SLRRemainConsumption[t-1, r]^(1-fraction_timestep)
-                        v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]^(fraction_timestep) *
-                                        p.rgdp_per_cap_SLRRemainGDP[t-1, r]^(1-fraction_timestep)
-                    elseif use_logpopulation
-                        # all linear
-                        v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]*(fraction_timestep) +
-                                        p.rcons_per_cap_SLRRemainConsumption[t-1, r]*(1-fraction_timestep)
-                        v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]*(fraction_timestep) +
-                                        p.rgdp_per_cap_SLRRemainGDP[t-1, r]*(1-fraction_timestep)
-                    else
-                        error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
-                    end
-                end
-            end
-        end
-    end
-
-    function calc_marketdamagesburke(p, v, d, t, annual_year, r)
-        # setting the year for entry in lists.
-        yr = annual_year - 2015 + 1 # + 1 because of 1-based indexing in Julia
-
-
-        # calculate the regional temperature impact relative to baseline year and add it to baseline absolute value
-        v.i_burke_regionalimpact_ann[yr,r] = (p.rtl_realizedtemperature_ann[yr,r] - p.rtl_0_realizedtemperature[r]) + p.rtl_abs_0_realizedabstemperature[r]
-
-
-        # calculate the log change, depending on the number of lags specified
-        v.i1log_impactlogchange_ann[yr,r] = p.nlag_burke * (p.impf_coeff_lin  * (v.i_burke_regionalimpact_ann[yr,r] - p.rtl_abs_0_realizedabstemperature[r]) +
-                            p.impf_coeff_quadr * ((v.i_burke_regionalimpact_ann[yr,r] - p.tcal_burke)^2 -
-                                                  (p.rtl_abs_0_realizedabstemperature[r] - p.tcal_burke)^2))
-
-        # calculate the impact at focus region GDP p.c.
-        v.iref_ImpactatReferenceGDPperCap_ann[yr,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange_ann[yr,r]))
-
-        # calculate impacts at actual GDP
-        v.igdp_ImpactatActualGDPperCap_ann[yr,r]= v.iref_ImpactatReferenceGDPperCap_ann[yr,r] *
-            (v.rgdp_per_cap_SLRRemainGDP_ann[yr,r]/p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
-
-        # send impacts down a logistic path if saturation threshold is exceeded
-        if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
-            v.isat_ImpactinclSaturationandAdaptation_ann[yr,r] = v.igdp_ImpactatActualGDPperCap_ann[yr,r]
-        else
-            v.isat_ImpactinclSaturationandAdaptation_ann[yr,r] = p.isatg_impactfxnsaturation+
-                ((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)*
-                ((v.igdp_ImpactatActualGDPperCap_ann[yr,r]-p.isatg_impactfxnsaturation)/
-                (((100-p.save_savingsrate)-p.isatg_impactfxnsaturation)+
-                (v.igdp_ImpactatActualGDPperCap_ann[yr,r]-
-                p.isatg_impactfxnsaturation)))
-        end
-
-        v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r] = (v.isat_ImpactinclSaturationandAdaptation_ann[yr,r]/100)*v.rgdp_per_cap_SLRRemainGDP_ann[yr,r]
-        v.rcons_per_cap_MarketRemainConsumption_ann[yr,r] = v.rcons_per_cap_SLRRemainConsumption_ann[yr,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r]
-        v.rgdp_per_cap_MarketRemainGDP_ann[yr,r] = v.rcons_per_cap_MarketRemainConsumption_ann[yr,r]/(1-p.save_savingsrate/100)
-
-    end
-
 
     region = Index()
     year = Index()
