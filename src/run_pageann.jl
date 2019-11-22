@@ -13,8 +13,10 @@ set_globalbools()
 #run main_model file
 include("main_model.jl")
 
-# get/define model, with default settings (i.e. NDCs scenario, permafrost, no sea-ice, burkedamages)
-m = getpage()
+# get/define model, with default settings (i.e. NDCs scenario, permafrost, no sea-ice, use_page09damages)
+# m = getpage()
+# or alternatively, with different configurations:
+m = getpage("2 degC Target", true, true)
 # run model
 run(m)
 
@@ -24,3 +26,9 @@ println(scc)
 
 # open up Explorer UI, for visual exploration of the variables
 # explore(m)
+
+
+# get the social cost of carbon for the Monte Carlo simulations, for selected quantiles.
+# sccs = compute_scc_mcs(m, 5000, year=2020)
+# sccobs = [quantile(sccs, [.05, .25, .5, .75, .95]); mean(sccs)]
+# println(sccobs)
