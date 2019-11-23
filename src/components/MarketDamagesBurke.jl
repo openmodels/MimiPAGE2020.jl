@@ -35,6 +35,12 @@ function interpolate_parameters_marketdamagesburke(p, v, d, t)
                                     p.rcons_per_cap_SLRRemainConsumption[t-1, r]*(1-fraction_timestep)
                     v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]*(fraction_timestep) +
                                     p.rgdp_per_cap_SLRRemainGDP[t-1, r]*(1-fraction_timestep)
+                elseif use_logwherepossible
+                    # for the years after 2020, we use linear interpolation between the years of analysis
+                    v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]^(fraction_timestep) *
+                                    p.rcons_per_cap_SLRRemainConsumption[t-1, r]^(1-fraction_timestep)
+                    v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]^(fraction_timestep) *
+                                    p.rgdp_per_cap_SLRRemainGDP[t-1, r]^(1-fraction_timestep)
                 else
                     error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
                 end

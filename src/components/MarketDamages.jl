@@ -36,6 +36,11 @@ function interpolate_parameters_marketdamages(p, v, d, t)
                     v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]*(fraction_timestep) + p.rgdp_per_cap_SLRRemainGDP[t-1, r]*(1-fraction_timestep)
                     v.atl_adjustedtolerableleveloftemprise_ann[yr, r] = p.atl_adjustedtolerableleveloftemprise[t, r]*(fraction_timestep) + p.atl_adjustedtolerableleveloftemprise[t-1, r]*(1-fraction_timestep)
                     v.imp_actualreduction_ann[yr, r] = p.imp_actualreduction[t, r]*(fraction_timestep) + p.imp_actualreduction[t-1, r]*(1-fraction_timestep)
+                elseif use_logwherepossible
+                    v.rcons_per_cap_SLRRemainConsumption_ann[yr, r] = p.rcons_per_cap_SLRRemainConsumption[t, r]^(fraction_timestep) * p.rcons_per_cap_SLRRemainConsumption[t-1, r]^(1-fraction_timestep)
+                    v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] = p.rgdp_per_cap_SLRRemainGDP[t, r]^(fraction_timestep) * p.rgdp_per_cap_SLRRemainGDP[t-1, r]^(1-fraction_timestep)
+                    v.atl_adjustedtolerableleveloftemprise_ann[yr, r] = p.atl_adjustedtolerableleveloftemprise[t, r]^(fraction_timestep) * p.atl_adjustedtolerableleveloftemprise[t-1, r]^(1-fraction_timestep)
+                    v.imp_actualreduction_ann[yr, r] = p.imp_actualreduction[t, r]^(fraction_timestep) * p.imp_actualreduction[t-1, r]^(1-fraction_timestep)
                 else
                     error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
                 end

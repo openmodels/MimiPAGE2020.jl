@@ -3,8 +3,9 @@ using Mimi
 function set_globalbools()
     global use_annual = true
     global use_linear = false
-    global use_logburke = true
+    global use_logburke = false
     global use_logpopulation = false
+    global use_logwherepossible = true
 end
 
 # set global values for technical configuration options
@@ -16,7 +17,8 @@ include("main_model.jl")
 # get/define model, with default settings (i.e. NDCs scenario, permafrost, no sea-ice, use_page09damages)
 # m = getpage()
 # or alternatively, with different configurations:
-m = getpage("2 degC Target", true, true)
+# m = getpage("2 degC Target", true, true)
+m = getpage("NDCs", true, false)
 # run model
 run(m)
 

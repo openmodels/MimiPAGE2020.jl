@@ -70,11 +70,25 @@ function interpolate_parameters_equityweighting(p, v, d, t)
 
                     # log
                     v.pop_population_ann[yr, r] = p.pop_population[t, r]^fraction_timestep * p.pop_population[t-1, r]^(1-fraction_timestep)
+                elseif use_logwherepossible
+                    # linear
+                    v.tct_percap_totalcosts_total_ann[yr, r] = p.tct_percap_totalcosts_total[t, r]*fraction_timestep + p.tct_percap_totalcosts_total[t-1, r]*(1-fraction_timestep)
+                    v.act_adaptationcosts_total_ann[yr, r] = p.act_adaptationcosts_total[t, r]*fraction_timestep + p.tct_percap_totalcosts_total[t-1, r]*(1-fraction_timestep)
+                    v.act_percap_adaptationcosts_ann[yr, r] = p.act_percap_adaptationcosts[t, r]*fraction_timestep + p.tct_percap_totalcosts_total[t-1, r]*(1-fraction_timestep)
+
+                    v.cons_percap_consumption_ann[yr, r] = p.cons_percap_consumption[t, r]*fraction_timestep + p.cons_percap_consumption[t-1, r]*(1-fraction_timestep)
+                    v.cons_percap_aftercosts_ann[yr, r] = p.cons_percap_aftercosts[t, r]*fraction_timestep + p.cons_percap_aftercosts[t-1, r]*(1-fraction_timestep)
+
+                    v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r]*fraction_timestep + p.grw_gdpgrowthrate[t-1, r]*(1-fraction_timestep)
+                    v.popgrw_populationgrowth_ann[yr, r] = p.popgrw_populationgrowth[t, r]*fraction_timestep + p.popgrw_populationgrowth[t-1, r]*(1-fraction_timestep)
+
+                    # log
+                    v.pop_population_ann[yr, r] = p.pop_population[t, r]^fraction_timestep * p.pop_population[t-1, r]^(1-fraction_timestep)
                 else
                     error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
                 end
 
-                v.yagg_periodspan_ann[yr] = 1 
+                v.yagg_periodspan_ann[yr] = 1
             end
         end
     end

@@ -25,6 +25,9 @@ function interpolate_parameters_nonmarketdamages(p, v, d, t)
                     # all linear.
                     v.atl_adjustedtolerableleveloftemprise_ann[yr, r] = p.atl_adjustedtolerableleveloftemprise[t, r]*(fraction_timestep) + p.atl_adjustedtolerableleveloftemprise[t-1, r]*(1-fraction_timestep)
                     v.imp_actualreduction_ann[yr, r] = p.imp_actualreduction[t, r]*(fraction_timestep) + p.imp_actualreduction[t-1, r]*(1-fraction_timestep)
+                elseif use_logwherepossible
+                    v.atl_adjustedtolerableleveloftemprise_ann[yr, r] = p.atl_adjustedtolerableleveloftemprise[t, r]^(fraction_timestep) * p.atl_adjustedtolerableleveloftemprise[t-1, r]^(1-fraction_timestep)
+                    v.imp_actualreduction_ann[yr, r] =  p.imp_actualreduction[t, r]^(fraction_timestep) * p.imp_actualreduction[t-1, r]^(1-fraction_timestep)
                 else
                     error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
                 end
