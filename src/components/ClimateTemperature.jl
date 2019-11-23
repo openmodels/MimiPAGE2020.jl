@@ -16,14 +16,29 @@ function calc_temp(p, v, d, tt, annual_year)
         v.pt_g_preliminarygmst_ann[yr] = (v.pt_g_preliminarygmst[tt] )*(fraction_timestep) + v.pt_g_preliminarygmst[tt-1]*(1-fraction_timestep) # difference_to_next_tt * ratio_to_there
     end
     # Without surface albedo, just equal
-    v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr] # this feeds into Discontinuity.jl, gets variability through pt_g_preliminarygmst -> pt_g_preliminarygmst_ann
+    v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr]
 
-    # Adding adjustment, from Hope (2009)
+
+    # Setting regional temperature
     for r in d.region
-        v.rtl_realizedtemperature_ann[yr, r] = v.rt_g_globaltemperature_ann[yr] * p.ampf_amplification[r]
+        if use_variability
+            r_variationtemp = rand(Normal(0.0, max(0., p.rvarsd_regionalvariabilitystandarddeviation[r]))) # NEW - with variation
+            # r_variationtemp = r_variationtemp * p.var_multiplier # for sensitivity analysis for variability
+        else
+            r_variationtemp = 0 # NEW - no variation
+        end
+        v.rtl_realizedtemperature_ann[yr, r] = v.rt_g_globaltemperature_ann[yr] * p.ampf_amplification[r] + r_variationtemp # NEW - add interannual variability
     end
 
-    v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr]
+
+    # Setting global temperature
+    if use_variability
+        g_variationtemp = rand(Normal(0.0, max(0., p.gvarsd_globalvariabilitystandarddeviation)))
+        # g_variationtemp = g_variationtemp * p.var_multiplier # for sensitivity analysis for variability
+    else
+        g_variationtemp = 0
+    end
+    v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr] + g_variationtemp
 
     # Land average temperature
     v.rtl_g_landtemperature_ann[yr] = sum(v.rtl_realizedtemperature_ann[yr, :]' .* p.area') / sum(p.area)
@@ -51,6 +66,10 @@ end
     rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) #needed for feedback in CO2 cycle component
     rtl_0_baselandtemp = Variable(index=[region], unit="degreeC")
     rtl_g0_baselandtemp = Variable(unit="degreeC") #needed for feedback in CH4 and N2O cycles
+
+    # variability parameters
+    gvarsd_globalvariabilitystandarddeviation = Parameter(unit="degreeC", default=0.11294)  # default from https://github.com/jkikstra/climvar
+    rvarsd_regionalvariabilitystandarddeviation = Parameter(index=[region], unit = "degreeC") # provided in data folder
 
     # Rate of change of forcing
     fant_anthroforcing = Parameter(index=[time], unit="W/m2")
