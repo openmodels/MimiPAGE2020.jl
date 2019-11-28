@@ -145,7 +145,7 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
     return mm
 end
 
-function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 2000.)#, varseed::Union{Int, Nothing} = nothing)
+function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)#, varseed::Union{Int, Nothing} = nothing)
     # Setup of location of final results
     scc_results = zeros(samplesize)
 
