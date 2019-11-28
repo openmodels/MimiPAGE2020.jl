@@ -47,7 +47,7 @@ println(scc)
 samplesize = 5000
 sccs = zeros(samplesize)
 for i in range(1, samplesize)
-    sccs[i] = mean(compute_scc_mcs(m, 1, year=2020))
+    sccs[i] = mean(compute_scc_mcs(m, 1, year=2020, pulse_size = 100000.))
 end
 sccobs = [quantile(sccs, [.05, .25, .5, .75, .95]); mean(sccs)]
 println(sccobs)
