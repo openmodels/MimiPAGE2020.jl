@@ -1,4 +1,5 @@
 using Mimi
+using Random
 
 page_years = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
 page_year_0 = 2015
@@ -111,7 +112,15 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
 
     i = getpageindexfromyear(year)
 
-    # Base model
+    # set random seed to have similar variability development in the base and the marginal model.
+
+
+    # TODO: write wrapper arround get_marginal_model(), as all base and all marginal models are now run in batches, making the random seed setting only fruitful if one model is run at a time.
+    # set variability seed
+    if varseed != nothing
+        Random.seed!(varseed);
+    end
+    # run base model
     run(mm.base)
     base_glob0_emissions = mm.base[:CO2Cycle, :e0_globalCO2emissions]
     er_co2_a = mm.base[:co2emissions, :er_CO2emissionsgrowth][i, :]
@@ -125,6 +134,12 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
 
     # Marginal emissions model
     update_param!(mm.marginal, :marginal_emissions_growth, marginal_emissions_growth)
+
+    # set variability seed.
+    if varseed != nothing
+        Random.seed!(varseed);
+    end
+    # run marginal model
     run(mm.marginal)
 
     return mm
@@ -156,5 +171,5 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
     # Run
     res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
 
-    scc_results
+    return scc_results
 end
