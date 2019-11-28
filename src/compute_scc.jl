@@ -113,11 +113,7 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
     i = getpageindexfromyear(year)
 
     # set random seed to have similar variability development in the base and the marginal model.
-
-
-    # TODO: write wrapper arround get_marginal_model(), as all base and all marginal models are now run in batches, making the random seed setting only fruitful if one model is run at a time.
-    # set variability seed
-    if varseed != nothing
+    if use_variability
         Random.seed!(varseed);
     end
     # run base model
@@ -135,8 +131,8 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
     # Marginal emissions model
     update_param!(mm.marginal, :marginal_emissions_growth, marginal_emissions_growth)
 
-    # set variability seed.
-    if varseed != nothing
+    # set random seed to have similar variability development in the base and the marginal model.
+    if use_variability
         Random.seed!(varseed);
     end
     # run marginal model
