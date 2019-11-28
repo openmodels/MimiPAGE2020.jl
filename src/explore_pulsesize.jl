@@ -7,7 +7,6 @@ function set_globalbools()
     global use_annual = true
 
     # set random seed to have similar variability development in the base and the marginal model.
-    # set variability seed.
     if use_variability
         global varseed = rand(1:1000000000000)
     end
@@ -33,7 +32,7 @@ include("compute_scc.jl")
 # m = getpage()
 # or alternatively, with different configurations:
 # m = getpage("2 degC Target", true, true)
-m = getpage("NDCs", true, false)
+m = getpage("RCP4.5 & SSP2", true, true)
 # run model
 run(m)
 
@@ -49,49 +48,74 @@ run(m)
 # ad-hoc hack to run Monte Carlo simulation for stochastic model.
 
 
-samplesize = 2000
+samplesize = 10000
 
-testpulses = [2, 4, 6, 8, 10, 15, 20, 25, 50, 100, 200]*1000.
+testpulses = [2, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 200]*1000.
 # testpulses = [Int(x) for x in testpulses]
 
-# some preparations for Julia DataFrame
-testpulsesnames = [string(x) for x in testpulses]
-df_VAR = DataFrame(p2=zeros(samplesize), p4=zeros(samplesize), p6=zeros(samplesize), p8=zeros(samplesize), p10=zeros(samplesize), p15=zeros(samplesize), p20=zeros(samplesize), p25=zeros(samplesize), p50=zeros(samplesize), p100=zeros(samplesize), p200=zeros(samplesize))
-df_ANN = DataFrame(p2=zeros(samplesize), p4=zeros(samplesize), p6=zeros(samplesize), p8=zeros(samplesize), p10=zeros(samplesize), p15=zeros(samplesize), p20=zeros(samplesize), p25=zeros(samplesize), p50=zeros(samplesize), p100=zeros(samplesize), p200=zeros(samplesize))
-
+# # some preparations for Julia DataFrame
+# testpulsesnames = [string(x) for x in testpulses]
+# df_VAR = DataFrame(p2=zeros(samplesize), p4=zeros(samplesize), p6=zeros(samplesize), p8=zeros(samplesize), p10=zeros(samplesize), p15=zeros(samplesize), p20=zeros(samplesize), p25=zeros(samplesize), p50=zeros(samplesize), p100=zeros(samplesize), p200=zeros(samplesize))
+# df_ANN = DataFrame(p2=zeros(samplesize), p4=zeros(samplesize), p6=zeros(samplesize), p8=zeros(samplesize), p10=zeros(samplesize), p15=zeros(samplesize), p20=zeros(samplesize), p25=zeros(samplesize), p50=zeros(samplesize), p100=zeros(samplesize), p200=zeros(samplesize))
+df_VAR = DataFrame(SCC=Float64[], Pulse=Float64[])
+df_ANN = DataFrame(SCC=Float64[], Pulse=Float64[])
+df_ICE = DataFrame(SCC=Float64[], Pulse=Float64[])
 
 println("For variability")
-sccs = zeros(length(testpulses), samplesize)
 for i in range(1,length(testpulses))
 
-    for ii in range(1, samplesize)
-        sccs[i, ii] = mean(compute_scc_mcs(m, 1, year=2020, pulse_size = testpulses[i]))
-    end
+    # for ii in range(1, samplesize)
+    #     sccs[i, ii] = mean(compute_scc_mcs(m, 1, year=2020, pulse_size = testpulses[i]))
+    # end
+    sccs = DataFrame(SCC=zeros(samplesize), Pulse=zeros(samplesize))
+    sccs[:SCC] = compute_scc_mcs(m, samplesize, year=2020, pulse_size = testpulses[i])
+    sccs[:Pulse] = fill(testpulses[i], samplesize)
 
     # add results to Dataframe
-    df_VAR[i] = sccs[i,:]
+    append!(df_VAR, sccs)
 
     # print some results just for progress checking
     println("pulse_size = ", testpulses[i])
-    println(mean(sccs[i,:]))
+    println(mean(df_VAR.SCC))
 end
 # write out results to CSV
-CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pagevar_pulsesizetest.csv", df_VAR)
+CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pagevar_pulsesizetest_10000.csv", df_VAR)
 
 
 println("For annual, no variability")
-sccs = zeros(length(testpulses), samplesize)
 for i in range(1,length(testpulses))
     global use_variability = false
 
-    sccs[i,:] = compute_scc_mcs(m, samplesize, year=2020, pulse_size = testpulses[i])
+    sccs = DataFrame(SCC=zeros(samplesize), Pulse=zeros(samplesize))
+    sccs[:SCC] = compute_scc_mcs(m, samplesize, year=2020, pulse_size = testpulses[i])
+    sccs[:Pulse] = fill(testpulses[i], samplesize)
 
     # add results to Dataframe
-    df_ANN[i] = sccs[i,:]
+    append!(df_ANN, sccs)
 
     # print some results just for progress checking
     println("pulse_size = ", testpulses[i])
-    println(mean(sccs[i,:]))
+    println(mean(df_ANN.SCC))
 end
 # write out results to CSV
-CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pageann_pulsesizetest.csv", df_ANN)
+CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pageann_pulsesizetest_10000.csv", df_ANN)
+
+
+println("For default PAGE-ICE")
+for i in range(1,length(testpulses))
+    global use_variability = false
+    global use_annual = false
+
+    sccs = DataFrame(SCC=zeros(samplesize), Pulse=zeros(samplesize))
+    sccs[:SCC] = compute_scc_mcs(m, samplesize, year=2020, pulse_size = testpulses[i])
+    sccs[:Pulse] = fill(testpulses[i], samplesize)
+
+    # add results to Dataframe
+    append!(df_ICE, sccs)
+
+    # print some results just for progress checking
+    println("pulse_size = ", testpulses[i])
+    println(mean(df_ICE.SCC))
+end
+# write out results to CSV
+CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pageice_pulsesizetest_10000.csv", df_ICE)
