@@ -4,6 +4,13 @@ function set_globalbools()
     global use_variability = true
     global use_annual = true
 
+    # set random seed to have similar variability development in the base and the marginal model.
+    # set variability seed.
+    if use_variability
+        global varseed = rand(1:1000000000000)
+    end
+
+    global set_varseed = false
 
     global use_linear = false
     global use_logburke = false
@@ -16,6 +23,8 @@ set_globalbools()
 
 #run main_model file
 include("main_model.jl")
+include("mcs.jl")
+include("compute_scc.jl")
 
 # get/define model, with default settings (i.e. NDCs scenario, permafrost, no sea-ice, use_page09damages)
 # m = getpage()
@@ -34,6 +43,11 @@ println(scc)
 
 
 # get the social cost of carbon for the Monte Carlo simulations, for selected quantiles.
-# sccs = compute_scc_mcs(m, 5000, year=2020)
-# sccobs = [quantile(sccs, [.05, .25, .5, .75, .95]); mean(sccs)]
-# println(sccobs)
+# ad-hoc hack to run Monte Carlo simulation for stochastic model.
+samplesize = 5000
+sccs = zeros(samplesize)
+for i in range(1, samplesize)
+    sccs[i] = mean(compute_scc_mcs(m, 1, year=2020))
+end
+sccobs = [quantile(sccs, [.05, .25, .5, .75, .95]); mean(sccs)]
+println(sccobs)
