@@ -100,7 +100,7 @@ Returns a Mimi MarginalModel where the provided m is the base model, and the mar
 If no Model m is provided, the default model from main_model.get_model() is used as the base model.
 Note that the returned MarginalModel has already been run.
 """
-function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing, pulse_size = 2000.)
+function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing, pulse_size = 2000.)#, varseed::Union{Int, Nothing} = nothing)
     year === nothing ? error("Must specify an emission year. Try `get_marginal_model(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot add marginal emissions in $year, year must be within the model's time index $page_years.") : nothing
 
@@ -145,7 +145,7 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
     return mm
 end
 
-function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 2000.)
+function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 2000.)#, varseed::Union{Int, Nothing} = nothing)
     # Setup of location of final results
     scc_results = zeros(samplesize)
 
@@ -166,7 +166,7 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
     eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
-    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
+    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)#, varseed=varseed)   # Returns a marginal model that has already been run
 
     # Run
     res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
