@@ -249,39 +249,57 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
 
     #create vectors to hold results of Monte Carlo runs
     td=zeros(samplesize);
+    td_ann=zeros(samplesize);
     tpc=zeros(samplesize);
+    tpc_ann=zeros(samplesize);
     tac=zeros(samplesize);
+    tac_ann=zeros(samplesize);
     te=zeros(samplesize);
+    te_ann=zeros(samplesize);
     ft=zeros(samplesize);
     rt_g=zeros(samplesize);
+    rt_g_ann=zeros(samplesize);
     s=zeros(samplesize);
     c_co2concentration=zeros(samplesize);
     rgdppercap_slr=zeros(samplesize);
+    rgdppercap_slr_ann=zeros(samplesize);
     rgdppercap_market=zeros(samplesize);
+    rgdppercap_market_ann=zeros(samplesize);
     rgdppercap_nonmarket=zeros(samplesize);
+    rgdppercap_nonmarket_ann=zeros(samplesize);
     rgdppercap_disc=zeros(samplesize);
+    rgdppercap_disc_ann=zeros(samplesize);
 
     #load raw data
     #no filter
     td      = load_RV("EquityWeighting_td_totaldiscountedimpacts", "td_totaldiscountedimpacts"; output_path = output_path)
+    td_ann      = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann", "td_totaldiscountedimpacts_ann"; output_path = output_path)
     tpc     = load_RV("EquityWeighting_tpc_totalaggregatedcosts", "tpc_totalaggregatedcosts"; output_path = output_path)
+    tpc_ann     = load_RV("EquityWeighting_tpc_totalaggregatedcosts_ann", "tpc_totalaggregatedcosts_ann"; output_path = output_path)
     tac     = load_RV("EquityWeighting_tac_totaladaptationcosts", "tac_totaladaptationcosts"; output_path = output_path)
+    tac_ann     = load_RV("EquityWeighting_tac_totaladaptationcosts_ann", "tac_totaladaptationcosts_ann"; output_path = output_path)
     te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path = output_path)
+    te_ann      = load_RV("EquityWeighting_te_totaleffect_ann", "te_totaleffect_ann"; output_path = output_path)
 
     #time index
     c_co2concentration = load_RV("co2cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
     ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path = output_path)
     rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
+    rt_g_ann    = load_RV("ClimateTemperature_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path = output_path)
     s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path = output_path)
 
     #region index
     rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
+    rgdppercap_slr_ann          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path = output_path)
     rgdppercap_market       = load_RV("MarketDamages_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
+    rgdppercap_market_ann       = load_RV("MarketDamages_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path = output_path)
     rgdppercap_nonmarket    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
+    rgdppercap_nonmarket_ann    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
     rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
+    rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
 
     #resave data
-    df=DataFrame(td=td,tpc=tpc,tac=tac,te=te,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
+    df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,rt_g_ann=rt_g_ann,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_slr_ann=rgdppercap_slr_ann,rgdppercap_market=rgdppercap_market,rgdppercap_market_ann=rgdppercap_market_ann,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann,rgdppercap_di=rgdppercap_disc, rgdppercap_di_ann=rgdppercap_disc_ann)
     save(joinpath(output_path, "mimipagemontecarlooutput.csv"),df)
 end
 
