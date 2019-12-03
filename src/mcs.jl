@@ -220,17 +220,25 @@ function getsim()
         ############################################################################
 
         save(EquityWeighting.td_totaldiscountedimpacts,
+             EquityWeighting.td_totaldiscountedimpacts_ann,
              EquityWeighting.tpc_totalaggregatedcosts,
+             EquityWeighting.tpc_totalaggregatedcosts_ann,
              EquityWeighting.tac_totaladaptationcosts,
+             EquityWeighting.tac_totaladaptationcosts_ann,
              EquityWeighting.te_totaleffect,
+             EquityWeighting.te_totaleffect_ann,
              CO2Cycle.c_CO2concentration,
              TotalForcing.ft_totalforcing,
              ClimateTemperature.rt_g_globaltemperature,
+             ClimateTemperature.rt_g_globaltemperature_ann,
              SeaLevelRise.s_sealevel,
              SLRDamages.rgdp_per_cap_SLRRemainGDP,
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
+             MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP_ann,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
-             Discontinuity.rgdp_per_cap_NonMarketRemainGDP)
+             NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP_ann,
+             Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
+             Discontinuity.rgdp_per_cap_NonMarketRemainGDP_ann)
 
     end #de
     return mcs
