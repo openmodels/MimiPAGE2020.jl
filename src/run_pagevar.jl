@@ -10,8 +10,6 @@ function set_globalbools()
         global varseed = rand(1:1000000000000)
     end
 
-    global set_varseed = false
-
     global use_linear = false
     global use_logburke = false
     global use_logpopulation = false
@@ -30,7 +28,10 @@ include("compute_scc.jl")
 # m = getpage()
 # or alternatively, with different configurations:
 # m = getpage("2 degC Target", true, true)
-m = getpage("NDCs", true, false)
+# m = getpage("RCP4.5 & SSP2", true, false)
+scenario = "RCP4.5 & SSP2"
+model = "PAGE-VAR"
+m = getpage(scenario)
 # run model
 run(m)
 
@@ -42,12 +43,16 @@ println(scc)
 # explore(m)
 
 
+samplesize = 10000
 # get the social cost of carbon for the Monte Carlo simulations, for selected quantiles.
 # ad-hoc hack to run Monte Carlo simulation for stochastic model.
-samplesize = 5000
-sccs = zeros(samplesize)
-for i in range(1, samplesize)
-    sccs[i] = mean(compute_scc_mcs(m, 1, year=2020, pulse_size = 100000.))
-end
-sccobs = [quantile(sccs, [.05, .25, .5, .75, .95]); mean(sccs)]
-println(sccobs)
+# sccs = zeros(samplesize)
+# for i in range(1, samplesize)
+#     sccs[i] = mean(compute_scc_mcs(m, 1, year=2020, pulse_size = 100000.))
+# end
+# sccobs = [quantile(sccs, [.05, .25, .5, .75, .95]); mean(sccs)]
+# println(sccobs)
+
+
+# do general monte carlo simulation
+do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output", scenario, model))
