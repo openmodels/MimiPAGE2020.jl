@@ -18,7 +18,10 @@ include("main_model.jl")
 # m = getpage()
 # or alternatively, with different configurations:
 # m = getpage("2 degC Target", true, true)
-m = getpage("NDCs", true, false)
+# m = getpage("NDCs", true, false)
+scenario = "RCP4.5 & SSP2"
+model = "PAGE-ANN"
+m = getpage(scenario)
 # run model
 run(m)
 
@@ -30,7 +33,12 @@ println(scc)
 # explore(m)
 
 
+samplesize = 10000
 # get the social cost of carbon for the Monte Carlo simulations, for selected quantiles.
 # sccs = compute_scc_mcs(m, 5000, year=2020)
 # sccobs = [quantile(sccs, [.05, .25, .5, .75, .95]); mean(sccs)]
 # println(sccobs)
+
+
+# do general monte carlo simulation
+do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output", scenario, model))

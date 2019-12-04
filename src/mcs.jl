@@ -233,6 +233,7 @@ function getsim()
              ClimateTemperature.rt_g_globaltemperature_ann,
              SeaLevelRise.s_sealevel,
              SLRDamages.rgdp_per_cap_SLRRemainGDP,
+             MarketDamagesBurke.rgdp_per_cap_SLRRemainGDP_ann, # note that the SLR module in itself is not annualised, Burke=default
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP_ann,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
@@ -290,25 +291,32 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
 
     #region index
     rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
-    rgdppercap_slr_ann          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path = output_path)
-    rgdppercap_market       = load_RV("MarketDamages_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
-    rgdppercap_market_ann       = load_RV("MarketDamages_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path = output_path)
+    rgdppercap_slr_ann          = load_RV("MarketDamagesBurke_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path = output_path) # note that the SLR module in itself is not annualised, Burke=default
+    rgdppercap_market       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
+    rgdppercap_market_ann       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path = output_path)
     rgdppercap_nonmarket    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
     rgdppercap_nonmarket_ann    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
     rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
     rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
 
-    #resave data
-    df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,rt_g_ann=rt_g_ann,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_slr_ann=rgdppercap_slr_ann,rgdppercap_market=rgdppercap_market,rgdppercap_market_ann=rgdppercap_market_ann,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann,rgdppercap_di=rgdppercap_disc, rgdppercap_di_ann=rgdppercap_disc_ann)
-    save(joinpath(output_path, "mimipagemontecarlooutput.csv"),df)
+    #resave aggregate data
+    df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
+    CSV.write(joinpath(output_path, "mimipagemontecarlooutput_aggregate_global.csv"),df)
+    #resave annual data
+    df=DataFrame(rt_g_ann=rt_g_ann)
+    CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"),df)
+    #resave annual and regional data
+    df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann)
+    CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_regional.csv"),df)
+
 end
 
-function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__DIR__, "../output"))
+function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../output"))
     # get simulation
     mcs = getsim()
 
     # get a model
-    m = getpage()
+    m = getpage(scenario)
     run(m)
 
     # Run
