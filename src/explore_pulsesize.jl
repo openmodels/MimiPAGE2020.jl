@@ -48,9 +48,9 @@ run(m)
 # ad-hoc hack to run Monte Carlo simulation for stochastic model.
 
 
-samplesize = 10000
+samplesize = 50000
 
-testpulses = [2, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 200]*1000.
+testpulses = [2, 5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 175, 200]*1000.
 # testpulses = [Int(x) for x in testpulses]
 
 # # some preparations for Julia DataFrame
@@ -79,7 +79,7 @@ for i in range(1,length(testpulses))
     println(mean(df_VAR.SCC))
 end
 # write out results to CSV
-CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pagevar_pulsesizetest_10000.csv", df_VAR)
+CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pagevar_pulsesizetest_50000.csv", df_VAR)
 
 
 println("For annual, no variability")
@@ -98,7 +98,7 @@ for i in range(1,length(testpulses))
     println(mean(df_ANN.SCC))
 end
 # write out results to CSV
-CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pageann_pulsesizetest_10000.csv", df_ANN)
+CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pageann_pulsesizetest_50000.csv", df_ANN)
 
 
 println("For default PAGE-ICE")
@@ -118,4 +118,4 @@ for i in range(1,length(testpulses))
     println(mean(df_ICE.SCC))
 end
 # write out results to CSV
-CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pageice_pulsesizetest_10000.csv", df_ICE)
+CSV.write("C:\\Users\\kikstra\\Documents\\GitHub\\mimi-page-2020.jl\\output\\pageice_pulsesizetest_50000.csv", df_ICE)
