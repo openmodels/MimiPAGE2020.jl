@@ -3,7 +3,10 @@ using DataFrames
 
 include("utils/mctools.jl")
 
-function getsim()
+function getsim(ge_minimum::Union{Float64, Nothing} = 0.,
+                ge_maximum::Union{Float64, Nothing} = 1.,
+                ge_mode::Union{Float64, Nothing} = nothing,
+                civvalue_multiplier::Union{Float64, Nothing} = 1.)
     mcs = @defsim begin
 
         ############################################################################
@@ -85,6 +88,7 @@ function getsim()
 
         # GDP
         isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
+        ge_growtheffects = TriangularDist(ge_minimum, ge_maximum, ge_mode)
 
         # MarketDamages
         iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
@@ -128,7 +132,9 @@ function getsim()
         distau_discontinuityexponent = TriangularDist(10, 30, 20)
 
         # EquityWeighting
-        civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
+        civvalue_civilizationvalue = TriangularDist(1e10*civvalue_multiplier,
+                                                    1e11*civvalue_multiplier,
+                                                    5e10*civvalue_multiplier)
         ptp_timepreference = TriangularDist(0.1,2,1)
         emuc_utilityconvexity = TriangularDist(0.5,2,1)
 
@@ -230,7 +236,13 @@ function getsim()
              SLRDamages.rgdp_per_cap_SLRRemainGDP,
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
-             Discontinuity.rgdp_per_cap_NonMarketRemainGDP)
+             Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
+             GDP.ge_growtheffects,
+             EquityWeighting.lossinc_includegdplosses,
+             EquityWeighting.lgdp_gdploss,
+             EquityWeighting.grwnet_realizedgdpgrowth,
+             Discontinuity.occurdis_occurrencedummy,
+             GDP.cbreg_regionsatbound)
 
     end #de
     return mcs
