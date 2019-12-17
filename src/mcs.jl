@@ -232,12 +232,14 @@ function getsim()
 
         save(EquityWeighting.td_totaldiscountedimpacts,
              EquityWeighting.td_totaldiscountedimpacts_ann,
+             EquityWeighting.td_totaldiscountedimpacts_ann_yr,
              EquityWeighting.tpc_totalaggregatedcosts,
              EquityWeighting.tpc_totalaggregatedcosts_ann,
              EquityWeighting.tac_totaladaptationcosts,
              EquityWeighting.tac_totaladaptationcosts_ann,
              EquityWeighting.te_totaleffect,
              EquityWeighting.te_totaleffect_ann,
+             EquityWeighting.te_totaleffect_ann_yr,
              CO2Cycle.c_CO2concentration,
              TotalForcing.ft_totalforcing,
              ClimateTemperature.rt_g_globaltemperature,
@@ -281,6 +283,8 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rgdppercap_nonmarket_ann=zeros(samplesize);
     rgdppercap_disc=zeros(samplesize);
     rgdppercap_disc_ann=zeros(samplesize);
+    te_totaleffect_ann_yr=zeros(samplesize);
+    td_totaldiscountedimpacts_ann_yr=zeros(samplesize);
 
     #load raw data
     #no filter
@@ -299,6 +303,8 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
     rt_g_ann    = load_RV("ClimateTemperature_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path = output_path)
     s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path = output_path)
+    te_ann_yr      = load_RV("EquityWeighting_te_totaleffect_ann_yr", "te_totaleffect_ann_yr"; output_path = output_path)
+    td_ann_yr   = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann_yr", "td_totaldiscountedimpacts_ann_yr"; output_path = output_path)
 
     #region index
     rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
@@ -314,7 +320,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_aggregate_global.csv"),df)
     #resave annual data
-    df=DataFrame(rt_g_ann=rt_g_ann)
+    df=DataFrame(rt_g_ann=rt_g_ann, te_ann_yr=te_ann_yr, td_ann_yr=td_ann_yr)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"),df)
     #resave annual and regional data
     df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann)
