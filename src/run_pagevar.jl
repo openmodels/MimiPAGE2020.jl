@@ -20,9 +20,6 @@ end
 set_globalbools()
 
 #run main_model file
-include("main_model.jl")
-include("mcs.jl")
-include("compute_scc.jl")
 
 # get/define model, with default settings (i.e. NDCs scenario, permafrost, no sea-ice, use_page09damages)
 # m = getpage()
@@ -34,6 +31,8 @@ include("compute_scc.jl")
 # scenario = "RCP8.5 & SSP5"
 
 for scenario in ["RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
+include("main_model_annual.jl")
+include("mcs_annual.jl")
     model = "PAGE-VAR"
     m = getpage(scenario, true, true)
     # run model

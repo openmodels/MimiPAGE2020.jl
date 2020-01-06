@@ -19,10 +19,9 @@ end
 # set global values for technical configuration options
 set_globalbools()
 
-#run main_model file
-include("main_model.jl")
-include("mcs.jl")
-include("compute_scc.jl")
+# get main_model file
+include("main_model_annual.jl")
+include("mcs_annual.jl")
 
 # get/define model, with default settings (i.e. NDCs scenario, permafrost, no sea-ice, use_page09damages)
 # m = getpage()
