@@ -4,7 +4,6 @@ using DataFrames
 
 function set_globalbools()
     global use_variability = true
-    global use_annual = true
 
     # set random seed to have similar variability development in the base and the marginal model.
     # set variability seed.

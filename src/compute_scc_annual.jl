@@ -56,11 +56,7 @@ function compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    if use_annual
-        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
-    else
-        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
-    end
+    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
 
     return scc
 end
@@ -83,13 +79,8 @@ function compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = noth
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
 
-    if use_annual
-        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
-        scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated_ann]
-    else
-        scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
-        scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]
-    end
+    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
+    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated_ann]
 
     return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
 end
