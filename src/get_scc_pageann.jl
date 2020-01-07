@@ -2,11 +2,6 @@ using Mimi
 using CSV
 using DataFrames
 
-# get main_model file
-include("main_model_annual.jl")
-include("mcs_annual.jl")
-include("compute_scc_annual.jl")
-
 function set_globalbools()
     global use_variability = false
 
@@ -24,6 +19,12 @@ end
 
 # set global values for technical configuration options
 set_globalbools()
+
+# get main_model file
+include("main_model_annual.jl")
+include("mcs_annual.jl")
+include("compute_scc_annual.jl")
+
 
 for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
     model = "PAGE-ANN"
