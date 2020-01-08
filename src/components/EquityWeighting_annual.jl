@@ -161,15 +161,15 @@ function calc_equityweighting(p, v, d, t, annual_year, r)
         v.tac_totaladaptationcosts_ann = v.tac_totaladaptationcosts_ann + sum(v.aact_equityweightedadaptation_discountedaggregated_ann[yr, :])
 
         # without civilisation value
-        v.td_totaldiscountedimpacts_ann = v.addt_gt_equityweightedimpact_discountedglobal_ann
+        # v.td_totaldiscountedimpacts_ann = v.addt_gt_equityweightedimpact_discountedglobal_ann
         # with civilisation value
-        # v.td_totaldiscountedimpacts_ann = min(v.addt_gt_equityweightedimpact_discountedglobal_ann, p.civvalue_civilizationvalue)
+        v.td_totaldiscountedimpacts_ann = min(v.addt_gt_equityweightedimpact_discountedglobal_ann, p.civvalue_civilizationvalue)
 
         # Total effect of climate change
         # without civilisation value
-        v.te_totaleffect_ann = v.td_totaldiscountedimpacts_ann + v.tpc_totalaggregatedcosts_ann + v.tac_totaladaptationcosts_ann
+        # v.te_totaleffect_ann = v.td_totaldiscountedimpacts_ann + v.tpc_totalaggregatedcosts_ann + v.tac_totaladaptationcosts_ann
         # with civilisation value
-        # v.te_totaleffect_ann = min(v.td_totaldiscountedimpacts_ann + v.tpc_totalaggregatedcosts_ann + v.tac_totaladaptationcosts_ann, p.civvalue_civilizationvalue)
+        v.te_totaleffect_ann = min(v.td_totaldiscountedimpacts_ann + v.tpc_totalaggregatedcosts_ann + v.tac_totaladaptationcosts_ann, p.civvalue_civilizationvalue)
 
         # for analysis / debugging / code analysis
         v.td_totaldiscountedimpacts_ann_yr[yr] = v.td_totaldiscountedimpacts_ann
