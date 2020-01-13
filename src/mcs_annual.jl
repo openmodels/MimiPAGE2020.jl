@@ -253,8 +253,10 @@ function getsim()
              MarketDamagesBurke.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP_ann,
+             NonMarketDamages.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
-             Discontinuity.rgdp_per_cap_NonMarketRemainGDP_ann)
+             Discontinuity.rgdp_per_cap_NonMarketRemainGDP_ann,
+             Discontinuity.isat_per_cap_DiscImpactperCapinclSaturation_ann)
 
     end #de
     return mcs
