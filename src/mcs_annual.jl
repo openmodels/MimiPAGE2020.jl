@@ -230,7 +230,8 @@ function getsim()
         # Indicate which parameters to save for each model run
         ############################################################################
 
-        save(EquityWeighting.td_totaldiscountedimpacts,
+        save(
+             EquityWeighting.td_totaldiscountedimpacts,
              EquityWeighting.td_totaldiscountedimpacts_ann,
              EquityWeighting.td_totaldiscountedimpacts_ann_yr,
              EquityWeighting.tpc_totalaggregatedcosts,
