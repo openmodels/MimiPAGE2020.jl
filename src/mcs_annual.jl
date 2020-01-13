@@ -230,7 +230,8 @@ function getsim()
         # Indicate which parameters to save for each model run
         ############################################################################
 
-        save(EquityWeighting.td_totaldiscountedimpacts,
+        save(
+             EquityWeighting.td_totaldiscountedimpacts,
              EquityWeighting.td_totaldiscountedimpacts_ann,
              EquityWeighting.td_totaldiscountedimpacts_ann_yr,
              EquityWeighting.tpc_totalaggregatedcosts,
@@ -249,6 +250,7 @@ function getsim()
              MarketDamagesBurke.rgdp_per_cap_SLRRemainGDP_ann, # note that the SLR module in itself is not annualised, Burke=default
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP_ann,
+             MarketDamagesBurke.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP_ann,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
@@ -279,6 +281,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rgdppercap_slr_ann=zeros(samplesize);
     rgdppercap_market=zeros(samplesize);
     rgdppercap_market_ann=zeros(samplesize);
+    rimpactpercap_market_ann=zeros(samplesize);
     rgdppercap_nonmarket=zeros(samplesize);
     rgdppercap_nonmarket_ann=zeros(samplesize);
     rgdppercap_disc=zeros(samplesize);
@@ -311,6 +314,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rgdppercap_slr_ann          = load_RV("MarketDamagesBurke_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path = output_path) # note that the SLR module in itself is not annualised, Burke=default
     rgdppercap_market       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
     rgdppercap_market_ann       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path = output_path)
+    rimpactpercap_market_ann       = load_RV("MarketDamagesBurke_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path = output_path)
     rgdppercap_nonmarket    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
     rgdppercap_nonmarket_ann    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
     rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
@@ -323,7 +327,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     df=DataFrame(rt_g_ann=rt_g_ann, te_ann_yr=te_ann_yr, td_ann_yr=td_ann_yr)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"),df)
     #resave annual and regional data
-    df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann)
+    df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_regional.csv"),df)
 
 end
