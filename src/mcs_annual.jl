@@ -1,5 +1,6 @@
 using Distributions
 using DataFrames
+using CSV
 
 include("utils/mctools.jl")
 
@@ -333,8 +334,8 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     df=DataFrame(rt_g_ann=rt_g_ann, te_ann_yr=te_ann_yr, td_ann_yr=td_ann_yr)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"),df)
     #resave annual and regional data
-    df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann)
-    df = DataFrame(rimpactpercap_market_ann=rimpactpercap_market_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_disc_ann=rgdppercap_disc_ann)
+    # df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann)
+    df = DataFrame(rimpactpercap_market_ann=rimpactpercap_market_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rimpactpercap_disc_ann=rimpactpercap_disc_ann)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_regional.csv"),df)
 
 end
