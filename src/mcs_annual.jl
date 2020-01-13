@@ -284,8 +284,10 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rimpactpercap_market_ann=zeros(samplesize);
     rgdppercap_nonmarket=zeros(samplesize);
     rgdppercap_nonmarket_ann=zeros(samplesize);
+    rimpactpercap_nonmarket_ann=zeros(samplesize);
     rgdppercap_disc=zeros(samplesize);
     rgdppercap_disc_ann=zeros(samplesize);
+    rimpactpercap_disc_ann=zeros(samplesize);
     te_totaleffect_ann_yr=zeros(samplesize);
     td_totaldiscountedimpacts_ann_yr=zeros(samplesize);
 
@@ -317,8 +319,10 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rimpactpercap_market_ann       = load_RV("MarketDamagesBurke_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path = output_path)
     rgdppercap_nonmarket    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
     rgdppercap_nonmarket_ann    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
-    rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
-    rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
+    rimpactpercap_nonmarket_ann    = load_RV("NonMarketDamages_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path = output_path)
+    rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path) # redundant?
+    rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path) # redundant?
+    rimpactpercap_disc_ann         = load_RV("Discontinuity_isat_per_cap_DiscImpactperCapinclSaturation_ann", "isat_per_cap_DiscImpactperCapinclSaturation_ann"; output_path = output_path)
 
     #resave aggregate data
     df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
@@ -327,7 +331,8 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     df=DataFrame(rt_g_ann=rt_g_ann, te_ann_yr=te_ann_yr, td_ann_yr=td_ann_yr)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"),df)
     #resave annual and regional data
-    df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann)
+    df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann)
+    df = DataFrame(rimpactpercap_market_ann=rimpactpercap_market_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_disc_ann=rgdppercap_disc_ann)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_regional.csv"),df)
 
 end
