@@ -76,7 +76,7 @@
     # additional paramters and variables for growth effects and boundaries
     grwnet_realizedgdpgrowth = Parameter(index=[time, region], unit = "%/year")
     lgdp_gdploss =  Parameter(index=[time, region], unit="\$M")
-    lossinc_includegdplosses = Parameter(unit = "none", default = 0.)
+    lossinc_includegdplosses = Parameter(unit = "none", default = 1.)
     excdam_excessdamages = Variable(index=[time,region], unit = "\$million")
     excdampv_excessdamagespresvalue = Variable(index=[time,region], unit = "\$million")
 

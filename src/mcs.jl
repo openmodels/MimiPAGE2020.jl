@@ -3,8 +3,8 @@ using DataFrames
 
 include("utils/mctools.jl")
 
-function getsim(ge_minimum::Union{Float64, Nothing} = 0.,
-                ge_maximum::Union{Float64, Nothing} = 1.,
+function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
+                ge_maximum::Union{Float64, Nothing} = nothing,
                 ge_mode::Union{Float64, Nothing} = nothing,
                 civvalue_multiplier::Union{Float64, Nothing} = 1.)
     mcs = @defsim begin
@@ -238,11 +238,14 @@ function getsim(ge_minimum::Union{Float64, Nothing} = 0.,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
              GDP.ge_growtheffects,
-             EquityWeighting.lossinc_includegdplosses,
+             GDP.gdp,
              EquityWeighting.lgdp_gdploss,
              EquityWeighting.grwnet_realizedgdpgrowth,
              Discontinuity.occurdis_occurrencedummy,
-             GDP.cbreg_regionsatbound)
+             GDP.cbreg_regionsatbound,
+             EquityWeighting.excdampv_excessdamagespresvalue,
+             MarketDamagesBurke.isat_ImpactinclSaturationandAdaptation
+             )
 
     end #de
     return mcs
@@ -304,31 +307,50 @@ function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
 
-# function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
-#                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-#                      pulse_size::Union{Float64, Nothing} = 100000.)
-#     # Setup the marginal model
-#     m = getpage()
-#     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
+ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
+                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
+                      pulse_size::Union{Float64, Nothing} = 100000.,
+                      scenario::String = "RCP4.5 & SSP2",
+                      use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false,
+                      ge_minimum::Union{Float64, Nothing} = nothing,
+                      ge_maximum::Union{Float64, Nothing} = nothing,
+                      ge_mode::Union{Float64, Nothing} = nothing,
+                      civvalue_multiplier::Union{Float64, Nothing} = 1.,
+                      use_convergence::Union{Float64, Nothing} = nothing,
+                      cbshare::Union{Float64, Nothing} = nothing,
+                      eqwbound::Union{Float64, Nothing} = nothing)
 
-#     # Setup SCC calculation and place for results
-#     scc_results = zeros(samplesize)
+     # Setup the marginal model
+     m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
+     if use_convergence != nothing
+         update_param!(m, :use_convergence, use_convergence)
+    end
+    if cbshare != nothing
+        update_param!(m, :cbshare_pcconsumptionboundshare, cbshare)
+    end
+    if eqwbound != nothing
+        update_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
+    end
+     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
 
-#     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
-#         base, marginal = mcs.models
-#         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
-#     end
+     # Setup SCC calculation and place for results
+     scc_results = zeros(samplesize)
 
-#     # Setup MC simulation
-#     mcs = getsim()
-#     set_models!(mcs, [mm.base, mm.marginal])
-#     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
+     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
+         base, marginal = mcs.models
+         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
+     end
 
-#     # Run it!
-#     run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+     # Setup MC simulation
+     mcs = getsim(ge_minimum, ge_maximum, ge_mode, civvalue_multiplier)
+     set_models!(mcs, [mm.base, mm.marginal])
+     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 
-#     scc_results
-# end
+     # Run it!
+     run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+
+     scc_results
+ end
 
 # include("mcs.jl")
 # do_monte_carlo_runs(100)
