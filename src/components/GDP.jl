@@ -38,6 +38,9 @@
     cbreg_regionsatbound = Variable(index=[time, region], unit = "regions")
     cons_consumption_noconvergence = Variable(index=[time, region], unit="\$million")
     cons_percap_consumption_noconvergence = Variable(index=[time, region], unit="\$/person")
+    # switch to overwrite the growth effects parameter with empirical distribution
+    ge_empirical_distribution = Parameter(index=[draw], unit="none")
+    ge_use_empiricaldistribution = Parameter(unit = "none", default = 1.)
 
     function init(p, v, d)
 
@@ -71,6 +74,11 @@
             # define auxiliary parameters for the convergence system to make formulas easier to read
             v.cbaux1_pcconsumptionbound_auxiliary1 = 2*(p.cbabs_pcconsumptionbound - v.cbabsn_pcconsumptionbound_neighbourhood)
             v.cbaux2_pcconsumptionbound_auxiliary2 = 4 / v.cbaux1_pcconsumptionbound_auxiliary1
+
+            # if the switch is set to one, overwrite the growth effects parameter with an empirical distribution, using the seed parameter
+            if p.ge_use_empiricaldistribution == 1.
+                p.ge_growtheffects = p.ge_empirical_distribution[Random.rand(1:10^6)]
+            end
         end
 
         for r in d.region

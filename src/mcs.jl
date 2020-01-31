@@ -6,6 +6,7 @@ include("utils/mctools.jl")
 function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
                 ge_maximum::Union{Float64, Nothing} = nothing,
                 ge_mode::Union{Float64, Nothing} = nothing,
+                ge_use_empirical::Union{Float64, Nothing} = nothing,
                 civvalue_multiplier::Union{Float64, Nothing} = 1.)
     mcs = @defsim begin
 
@@ -89,6 +90,7 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
         # GDP
         isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
         ge_growtheffects = TriangularDist(ge_minimum, ge_maximum, ge_mode)
+        ge_use_empiricaldistribution = Normal(ge_use_empirical, 0.) # Gaussian with zero variance and mean one
 
         # MarketDamages
         iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
@@ -244,7 +246,9 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
              Discontinuity.occurdis_occurrencedummy,
              GDP.cbreg_regionsatbound,
              EquityWeighting.excdampv_excessdamagespresvalue,
-             MarketDamagesBurke.isat_ImpactinclSaturationandAdaptation
+             MarketDamagesBurke.isat_ImpactinclSaturationandAdaptation,
+             GDP.ge_growtheffects,
+             GDP.ge_use_empiricaldistribution
              )
 
     end #de
@@ -315,9 +319,10 @@ end
                       ge_minimum::Union{Float64, Nothing} = nothing,
                       ge_maximum::Union{Float64, Nothing} = nothing,
                       ge_mode::Union{Float64, Nothing} = nothing,
+                      ge_use_empirical::Union{Float64, Nothing} = nothing,
                       civvalue_multiplier::Union{Float64, Nothing} = 1.,
                       use_convergence::Union{Float64, Nothing} = nothing,
-                      cbshare::Union{Float64, Nothing} = nothing,
+                      cbabs::Union{Float64, Nothing} = nothing,
                       eqwbound::Union{Float64, Nothing} = nothing)
 
      # Setup the marginal model
@@ -325,8 +330,11 @@ end
      if use_convergence != nothing
          update_param!(m, :use_convergence, use_convergence)
     end
-    if cbshare != nothing
-        update_param!(m, :cbshare_pcconsumptionboundshare, cbshare)
+    if ge_use_empirical != nothing
+        update_param!(m, :ge_use_empiricaldistribution, ge_use_empirical)
+   end
+    if cbabs != nothing
+        update_param!(m, :cbabs_pcconsumptionbound, cbabs)
     end
     if eqwbound != nothing
         update_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
@@ -342,7 +350,7 @@ end
      end
 
      # Setup MC simulation
-     mcs = getsim(ge_minimum, ge_maximum, ge_mode, civvalue_multiplier)
+     mcs = getsim(ge_minimum, ge_maximum, ge_mode, ge_use_empirical, civvalue_multiplier)
      set_models!(mcs, [mm.base, mm.marginal])
      generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 
