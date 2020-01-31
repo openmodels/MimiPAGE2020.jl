@@ -46,7 +46,7 @@
 
     # new parameters for convergence boundary system
     use_convergence =                           Parameter(unit = "none", default = 1.)
-    cbabs_pcconsumptionbound =                  Parameter(unit = "\$/person")
+    cbabs_pcconsumptionbound =                  Parameter(unit = "\$/person", default = 740.65)
     cbabsn_pcconsumptionbound_neighbourhood =   Parameter(unit = "\$/person")
     cbaux1_pcconsumptionbound_auxiliary1 =      Parameter(unit = "none")
     cbaux2_pcconsumptionbound_auxiliary2 =      Parameter(unit = "none")

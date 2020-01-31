@@ -19,7 +19,7 @@ myyears = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
 
 # define the output directory
 #dir_output = "E:/Paul SCC/"
-dir_output = "C:/Users/nasha/Documents/GitHub/damage-regressions/data/mimi-page-output_Dec19/"
+dir_output = "E:/Paul SCC/"
 
 # define number of Monte Carlo runs
 global numberofmontecarlo = 50000
@@ -132,7 +132,7 @@ for jj_page09damages in [false, true] # RegionBayes default
                         end
 
                         m = getpage(jj_scen, jj_permafr, jj_seaice, jj_page09damages)
-                        update_param!(m, :civvalue_civilizationvalue, 6.1333333333333336e10*10^9) # relax the civilization value boundary
+                        #update_param!(m, :civvalue_civilizationvalue, 6.1333333333333336e10*10^9) # relax the civilization value boundary
                         update_param!(m, :ge_growtheffects, jj_ge)
                         update_param!(m, :cbshare_pcconsumptionboundshare, jj_consbound)
                         run(m)
@@ -305,19 +305,21 @@ writedlm(string(dir_output, "isat_market_scenRCP4.5 & SSP2_permafrYes_specRegioi
 # PART I: fixed rho (growth effects)
 
 df_sccMC_singleGE = DataFrame(damagePAGE09 = false, permafr = false, seaice = false, ge = -999., scen = "-999", pulse_size = -999.,
+                                 civvalue = -999.,
                                   mean = -999., median = -999., min = -999., max = -999., perc25 = -999.,
                                   perc75 = -999., sd = -999., varcoeff = -999., perc05 = -999., perc95 = -999.,
                                   perc10 = -999., perc90 = -999.)
-for jj_page09damages in [false, true]
+for jj_page09damages in [false]
     for jj_permafr in [true, false]
         for jj_seaice in [true, false]
             for jj_scen in ["RCP4.5 & SSP2"]
+                for jj_civvalue in [1., 10.0^20]
 #              for jj_gdploss in [1., 0.]
 
                     # jump undesired combinations
-                    if jj_page09damages != false && (jj_permafr != true  || jj_seaice != true)
+                    if jj_page09damages != false && (jj_permafr != true  || jj_seaice != true || jj_civvalue != 1.)
                         continue
-                    elseif jj_permafr != true && (jj_seaice != true)
+                    elseif jj_permafr != true && (jj_seaice != true || jj_civvalue != 1.)
                         continue
                     elseif jj_permafr != jj_seaice
                         continue
@@ -334,7 +336,8 @@ for jj_page09damages in [false, true]
 
                         # define the output for the Monte Carlo files
                         dir_MCoutput = string(dir_output, "montecarlo-singleGE/scen", jj_scen, "_permafr", jj_permafr, "_seaice", jj_seaice,
-                                                        "_page09", jj_page09damages, "/", "ge", jj_ge, "/")
+                                                        "_page09", jj_page09damages, "/", "ge", jj_ge,
+                                                        "_civ", jj_civvalue, "/")
 
                         # fix the seed and calculate the SCC using a triangular distribution collapsing to a single value and removing the civilization value bound
                         Random.seed!(masterseed)
@@ -347,11 +350,11 @@ for jj_page09damages in [false, true]
                                                                 ge_minimum = jj_ge,
                                                                 ge_maximum = jj_ge + 10^(-10),
                                                                 ge_mode = jj_ge,
-                                                                civvalue_multiplier = 10.0^20)
+                                                                civvalue_multiplier = jj_civvalue)
 
                         # write results into the data frame
                         push!(df_sccMC_singleGE, [jj_page09damages, jj_permafr, jj_seaice, jj_ge,
-                                                      jj_scen, scc_pulse_size,
+                                                      jj_scen, scc_pulse_size, jj_civvalue,
                                                       mean(scc_mcs_object[:, 1]),
                                                       median(scc_mcs_object[:, 1]),
                                                       minimum(scc_mcs_object[:, 1]),
@@ -367,7 +370,8 @@ for jj_page09damages in [false, true]
 
                       # clean out the MCS objects
                       scc_mcs_object = nothing
-                  end
+                    end
+                end
             end
         end
     end
@@ -390,7 +394,7 @@ df_sccMC = DataFrame(permafr = false, seaice = false, ge_string = "-999", scen =
 
 # get the SCC for three different growth effects distributions and scenarios
 for jj_scen in ["RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5", "1.5 degC Target"]
-    for jj_gestring in ["MILD", "MILD+TAILS", "MEDIUM", "SEVERE"]
+    for jj_gestring in ["MILD", "MEDIUM"]
         for jj_permafr in [true]
             for jj_seaice in [true]
                 for jj_civvalue in [1., 10.0^20]
@@ -400,21 +404,21 @@ for jj_scen in ["RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5", "1.5 degC Tar
                                 for jj_pulse in [scc_pulse_size, scc_pulse_size/1000., scc_pulse_size/10., scc_pulse_size*10.]
 
                                     # jump undesired or infeasible combinations
-                                    if  jj_scen != "RCP4.5 & SSP2" && (jj_gestring != "MILD" || jj_permafr != true ||
-                                                                        jj_seaice != true || jj_civvalue != 10.0^20 || jj_consbound != 1. ||
+                                    if  jj_scen != "RCP4.5 & SSP2" && (jj_gestring != "MEDIUM" || jj_permafr != true ||
+                                                                        jj_seaice != true || jj_civvalue != 1. || jj_consbound != 1. ||
                                                                         jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
                                         continue
                                     elseif jj_permafr != jj_seaice
                                         continue
-                                    elseif jj_gestring != "MILD" && (jj_civvalue != 10.0^20 || jj_consbound != 1. || jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
+                                    elseif jj_gestring != "MEDIUM" && (jj_consbound != 1. || jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
                                         continue
-                                    elseif jj_civvalue != 10.0^20 && (jj_consbound != 1. || jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
+                                    elseif jj_civvalue != 1. && (jj_consbound != 1. || jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
                                         continue
-                                    elseif jj_consbound != 1. && (jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
+                                    elseif jj_consbound != 1. && (jj_civvalue != 1. || jj_gestring != "MEDIUM" || jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
                                         continue
-                                    elseif jj_eqwshare != 0.99 && (jj_convergence != 1. || jj_pulse != scc_pulse_size)
+                                    elseif jj_eqwshare != 0.99 && (jj_civvalue != 1. || jj_gestring != "MEDIUM" || jj_convergence != 1. || jj_pulse != scc_pulse_size)
                                         continue
-                                    elseif jj_convergence != 1. && jj_pulse != scc_pulse_size
+                                    elseif jj_convergence != 1. && (jj_civvalue != 1. || jj_gestring != "MEDIUM" || jj_pulse != scc_pulse_size)
                                         continue
                                     end
 
@@ -422,19 +426,13 @@ for jj_scen in ["RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5", "1.5 degC Tar
                                     if jj_gestring == "MILD"
                                         ge_string_min = 0.
                                         ge_string_mode = 0.
-                                        ge_string_max = 0.1
-                                    elseif jj_gestring == "MILD+TAILS"
-                                        ge_string_min = 0.
-                                        ge_string_mode = 0.
-                                        ge_string_max = 1.
+                                        ge_string_max = 0.5280681 # value based on converging ratio of marginal impacts from Burke et al regression for 1Lag (temperature and precipitation)
                                     elseif jj_gestring == "MEDIUM"
                                         ge_string_min = 0.
-                                        ge_string_mode = 0.5
+                                        ge_string_mode = 0.5280681
                                         ge_string_max = 1.
-                                    elseif jj_gestring == "SEVERE"
-                                        ge_string_min = 0.
-                                        ge_string_mode = 1.
-                                        ge_string_max = 1.
+                                    #elseif jj_gestring == "GAUSSIAN"
+                                        # XX tbd
                                     end
 
                                     # print out the parameters to track progress

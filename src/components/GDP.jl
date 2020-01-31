@@ -31,8 +31,7 @@
     grwnet_realizedgdpgrowth = Variable(index=[time, region], unit = "%/year")
     # bound variables
     use_convergence = Parameter(unit = "none", default = 1.)
-    cbshare_pcconsumptionboundshare = Parameter(unit = "%", default = 1.)
-    cbabs_pcconsumptionbound = Variable(unit = "\$/person")
+    cbabs_pcconsumptionbound = Parameter(unit = "\$/person", default = 740.65)
     cbabsn_pcconsumptionbound_neighbourhood = Variable(unit = "\$/person")
     cbaux1_pcconsumptionbound_auxiliary1 = Variable(unit = "none")
     cbaux2_pcconsumptionbound_auxiliary2 = Variable(unit = "none")
@@ -67,11 +66,10 @@
 
         if is_first(t)
             # calculate the lower consumption bound and the consumption level which triggers the convergence system
-            v.cbabs_pcconsumptionbound = (p.cbshare_pcconsumptionboundshare/100) * v.cons_percap_consumption_0[1]
-            v.cbabsn_pcconsumptionbound_neighbourhood = v.cbabs_pcconsumptionbound*1.5
+            v.cbabsn_pcconsumptionbound_neighbourhood = p.cbabs_pcconsumptionbound*1.5
 
             # define auxiliary parameters for the convergence system to make formulas easier to read
-            v.cbaux1_pcconsumptionbound_auxiliary1 = 2*(v.cbabs_pcconsumptionbound - v.cbabsn_pcconsumptionbound_neighbourhood)
+            v.cbaux1_pcconsumptionbound_auxiliary1 = 2*(p.cbabs_pcconsumptionbound - v.cbabsn_pcconsumptionbound_neighbourhood)
             v.cbaux2_pcconsumptionbound_auxiliary2 = 4 / v.cbaux1_pcconsumptionbound_auxiliary1
         end
 
@@ -119,8 +117,8 @@
 
                     end
                 else
-                    if v.cons_percap_consumption[t,r] < v.cbabs_pcconsumptionbound
-                        v.cons_percap_consumption[t,r] = v.cbabs_pcconsumptionbound
+                    if v.cons_percap_consumption[t,r] < p.cbabs_pcconsumptionbound
+                        v.cons_percap_consumption[t,r] = p.cbabs_pcconsumptionbound
 
                         # recalculate all variables accordingly
                         v.cons_consumption[t, r] = v.cons_percap_consumption[t,r] * p.pop_population[t,r]
