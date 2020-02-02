@@ -6,7 +6,6 @@ include("utils/mctools.jl")
 function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
                 ge_maximum::Union{Float64, Nothing} = nothing,
                 ge_mode::Union{Float64, Nothing} = nothing,
-                ge_use_empirical::Union{Float64, Nothing} = nothing,
                 civvalue_multiplier::Union{Float64, Nothing} = 1.)
     mcs = @defsim begin
 
@@ -90,7 +89,7 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
         # GDP
         isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
         ge_growtheffects = TriangularDist(ge_minimum, ge_maximum, ge_mode)
-        ge_use_empiricaldistribution = Normal(ge_use_empirical, 0.) # Gaussian with zero variance and mean one
+        ge_seed_empiricaldistribution = Uniform(0, 10^10)
 
         # MarketDamages
         iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
@@ -325,7 +324,7 @@ end
                       cbabs::Union{Float64, Nothing} = nothing,
                       eqwbound::Union{Float64, Nothing} = nothing)
 
-     # Setup the marginal model
+     # Setup the marginal model and modify key parameters if they are specified
      m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
      if use_convergence != nothing
          update_param!(m, :use_convergence, use_convergence)
@@ -350,7 +349,7 @@ end
      end
 
      # Setup MC simulation
-     mcs = getsim(ge_minimum, ge_maximum, ge_mode, ge_use_empirical, civvalue_multiplier)
+     mcs = getsim(ge_minimum, ge_maximum, ge_mode, civvalue_multiplier)
      set_models!(mcs, [mm.base, mm.marginal])
      generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 

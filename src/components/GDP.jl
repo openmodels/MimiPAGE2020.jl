@@ -40,7 +40,8 @@
     cons_percap_consumption_noconvergence = Variable(index=[time, region], unit="\$/person")
     # switch to overwrite the growth effects parameter with empirical distribution
     ge_empirical_distribution = Parameter(index=[draw], unit="none")
-    ge_use_empiricaldistribution = Parameter(unit = "none", default = 1.)
+    ge_use_empiricaldistribution = Parameter(unit = "none", default = 0.)
+    ge_seed_empiricaldistribution = Parameter(unit = "none", default = 1.)
 
     function init(p, v, d)
 
@@ -77,7 +78,11 @@
 
             # if the switch is set to one, overwrite the growth effects parameter with an empirical distribution, using the seed parameter
             if p.ge_use_empiricaldistribution == 1.
+                Random.seed!(trunc(Int, p.ge_seed_empiricaldistribution))
                 p.ge_growtheffects = p.ge_empirical_distribution[Random.rand(1:10^6)]
+            elseif p.ge_use_empiricaldistribution == 2. # set negative rho values to zero if switch set to two
+                Random.seed!(trunc(Int, p.ge_seed_empiricaldistribution))
+                p.ge_growtheffects = max(p.ge_empirical_distribution[Random.rand(1:10^6)], 0)
             end
         end
 
