@@ -1,6 +1,10 @@
-setwd("~/research/iamup/persistence")
+# setwd("~/research/mimi-page/mimi-page-2020.jl/preproc/ar-model")
 
-df.co2 <- read.csv("co2conc.csv")
+df.co2.hist <- read.csv("co2conc.csv")
+df.co2.obs <- read.table("co2_annmean_gl.txt")
+names(df.co2.obs) <- c('year', 'mean', 'unc')
+df.co2 <- data.frame(year=c(df.co2.hist$year[df.co2.hist$year < min(df.co2.obs$year)], df.co2.obs$year), co2=c(df.co2.hist$rcp45[df.co2.hist$year < min(df.co2.obs$year)], df.co2.obs$mean), co2.unc=c(seq(10, 1, length.out=sum(df.co2.hist$year < min(df.co2.obs$year))), df.co2.obs$unc))
+
 df.temp <- as.data.frame(t(as.matrix(read.csv("region-temps.csv", header=F))))
 colnames(df.temp) <- c('eu', 'rus+', 'usa', 'chi+', 'ind+', 'afr', 'lat', 'oth')
 df.temp$year <- 1850:2018
@@ -8,8 +12,9 @@ df.temp$year <- 1850:2018
 library(dplyr)
 library(MASS)
 
-df <- df.temp %>% left_join(df.co2, by=c('year'='years'))
-df$co2.delay <- c(NA, df$rcp45[-nrow(df)])
+df <- df.temp %>% left_join(df.co2)
+df$co2.delay <- c(NA, df$co2[-nrow(df)])
+df$co2.unc.delay <- c(NA, df$co2.unc[-nrow(df)])
 for (region in names(df)[1:8])
     df[, paste0(region, ".delay")] <- c(NA, df[-nrow(df), region])
 
