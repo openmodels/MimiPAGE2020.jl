@@ -79,15 +79,7 @@ function getsim()
         ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
 
         # Climate Variability Parameters
-        gvarsd_globalvariabilitystandarddeviation = Normal(0.11294, 0.021644) # ranges from https://github.com/jkikstra/climvar
-        rvarsd_regionalvariabilitystandarddeviation["EU"] = Normal(0.35251, 0.019147)
-        rvarsd_regionalvariabilitystandarddeviation["USA"] = Normal(0.39171, 0.030440)
-        rvarsd_regionalvariabilitystandarddeviation["OECD"] = Normal(0.35272, 0.042962)
-        rvarsd_regionalvariabilitystandarddeviation["USSR"] = Normal(0.39679, 0.030228)
-        rvarsd_regionalvariabilitystandarddeviation["China"] = Normal(0.26032, 0.059394)
-        rvarsd_regionalvariabilitystandarddeviation["SEAsia"] = Normal(0.20009, 0.039896)
-        rvarsd_regionalvariabilitystandarddeviation["Africa"] = Normal(0.18202, 0.050171)
-        rvarsd_regionalvariabilitystandarddeviation["LatAmerica"] = Normal(0.15618, 0.054156)
+        tvarseed_coefficientsrandomseed = Uniform(1, 10^10)
 
         # SeaLevelRise
         s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
