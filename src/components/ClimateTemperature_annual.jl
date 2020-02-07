@@ -1,7 +1,7 @@
 using CSV, Distributions
 
 # Load once and make global
-arests = CSV.read(joinpath(@__DIR__, "../../data/arestimates.csv"))
+arests = CSV.read(joinpath(@__DIR__, "../../data/other/arestimates.csv"))
 
 function calc_temp(p, v, d, tt, annual_year)
     # for every year, do the same calculations, but then with the new annual_year variables
@@ -32,7 +32,7 @@ function calc_temp(p, v, d, tt, annual_year)
     if yr == 1
         v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr] + g_variationtemp
     else
-        v.rt_g_globaltemperature_ann[yr] = p.tvarconst_g_globaltemperatureintercept + p.tvarar_g_globaltemperatureautoreg * v.rt_g_globaltemperature_ann[yr - 1] + p.tvargmst_g_globaltemperaturesmoothdep[r] * v.rt_g_globaltemperature_ann[yr] + g_variationtemp
+        v.rt_g_globaltemperature_ann[yr] = p.tvarconst_g_globaltemperatureintercept + p.tvarar_g_globaltemperatureautoreg * v.rt_g_globaltemperature_ann[yr - 1] + p.tvargmst_g_globaltemperaturesmoothdep * v.rt_g_globaltemperature_ann[yr] + g_variationtemp
     end
 
     # Setting regional temperature (uses globally shocked temperature)
@@ -162,14 +162,14 @@ end
         if p.tvarseed_coefficientsrandomseed != 0
             rng = MersenneTwister(trunc(Int, p.tvarseed_coefficientsrandomseed))
             tvarconst, tvarar, tvargmst = rand(rng, tvar_getmvnormal("global"))
-            climtemp[:tvarconst_g_globaltemperatureintercept] = tvarconst
-            climtemp[:tvarar_g_globaltemperatureautoreg] = tvarar
-            climtemp[:tvargmst_g_globaltemperaturesmoothdep] = tvargmst
+            p.tvarconst_g_globaltemperatureintercept = tvarconst
+            p.tvarar_g_globaltemperatureautoreg = tvarar
+            p.tvargmst_g_globaltemperaturesmoothdep = tvargmst
 
             tvarconst, tvarar, tvargmst, tvarerr = tvar_getregions(model, region -> rand(rng, tvar_getmvnormal(region)))
-            climtemp[:tvarconst_regionaltemperatureintercept] = tvarconst
-            climtemp[:tvarar_regionaltemperatureautoreg] = tvarar
-            climtemp[:tvargmst_regionaltemperatureglobaldep] = tvargmst
+            p.tvarconst_regionaltemperatureintercept = tvarconst
+            p.tvarar_regionaltemperatureautoreg = tvarar
+            p.tvargmst_regionaltemperatureglobaldep = tvargmst
         end
     end
 
@@ -268,7 +268,7 @@ function tvar_getmvnormal(region::String)
         end
     end
 
-    MvNormal(tvarcoeffs, tvarsigma)
+    MvNormal([tvarcoeffs...], tvarsigma)
 end     
 
 function tvar_getregions(model::Model, coeffproc::Function=tvar_getcoeffs)
@@ -300,7 +300,7 @@ function addclimatetemperature(model::Model, use_seaice::Bool)
     climtemp[:tvargmst_g_globaltemperaturesmoothdep] = tvargmst
     climtemp[:tvarerr_g_globaltemperatureerrorvariance] = tvar_geterror("global")
 
-    tvarconst, tvarar, tvargmst, tvarerr = tvar_getregions(model, gvar_getcoeffs)
+    tvarconst, tvarar, tvargmst, tvarerr = tvar_getregions(model, tvar_getcoeffs)
     climtemp[:tvarconst_regionaltemperatureintercept] = tvarconst
     climtemp[:tvarar_regionaltemperatureautoreg] = tvarar
     climtemp[:tvargmst_regionaltemperatureglobaldep] = tvargmst
