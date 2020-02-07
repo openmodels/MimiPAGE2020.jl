@@ -183,6 +183,9 @@ function addrcpsspscenario(model::Model, scenario::String)
     elseif scenario == "RCP8.5 & SSP5"
         rcpsspscenario[:rcp] = 85
         rcpsspscenario[:ssp] = 5
+    elseif scenario == "RCP8.5 & SSP2"
+        rcpsspscenario[:rcp] = 85
+        rcpsspscenario[:ssp] = 2
     else
         error("Unknown scenario")
     end
