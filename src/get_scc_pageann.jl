@@ -28,7 +28,12 @@ set_globalbools()
 for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
     model = "PAGE-ANN"
     # define model, default settings: getpage(NDCs scenario, permafrost, no sea-ice, no page09damages)
-    m = getpage(scenario, true, true)
+    feedbacks = true
+    if feedbacks
+        m = getpage(scenario, true, true)
+    else
+        m = getpage(scenario, false, false)
+    end
     # run model
     run(m)
 
