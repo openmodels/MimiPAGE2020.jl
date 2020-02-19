@@ -310,7 +310,7 @@ function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
 
- function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
+function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
                       eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
                       pulse_size::Union{Float64, Nothing} = 100000.,
                       scenario::String = "RCP4.5 & SSP2",

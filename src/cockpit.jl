@@ -78,7 +78,7 @@ mean(scc_highdistribution)
 ################################################################################
 
 # set the parameters
-dir_output = "C:/Users/nasha/Documents/GitHub/damage-regressions/data/mimi-page-output_Dec19/"
+dir_output = joinpath(@__DIR__, "../output")
 
 jj_gestring = "MEDIUM"
 jj_scen = "RCP4.5 & SSP2"

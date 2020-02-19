@@ -44,27 +44,39 @@
     rcons_per_cap_SLRRemainConsumption = Variable(index=[time, region], unit = "\$/person") #include?
     rgdp_per_cap_SLRRemainGDP = Variable(index=[time, region], unit = "\$/person")
 
-    # new parameters for convergence boundary system
-    use_convergence =                           Parameter(unit = "none", default = 1.)
-    cbabs_pcconsumptionbound =                  Parameter(unit = "\$/person", default = 740.65)
-    cbabsn_pcconsumptionbound_neighbourhood =   Parameter(unit = "\$/person")
-    cbaux1_pcconsumptionbound_auxiliary1 =      Parameter(unit = "none")
-    cbaux2_pcconsumptionbound_auxiliary2 =      Parameter(unit = "none")
-    cons_percap_consumption_noconvergence =     Parameter(index=[time, region], unit="\$/person")
+    ###############################################
+    # if version_growtheffects
+    ###############################################
+        # new parameters for convergence boundary system
+        use_convergence =                           Parameter(unit = "none", default = 1.)
+        cbabs_pcconsumptionbound =                  Parameter(unit = "\$/person", default = 740.65)
+        cbabsn_pcconsumptionbound_neighbourhood =   Parameter(unit = "\$/person")
+        cbaux1_pcconsumptionbound_auxiliary1 =      Parameter(unit = "none")
+        cbaux2_pcconsumptionbound_auxiliary2 =      Parameter(unit = "none")
+        cons_percap_consumption_noconvergence =     Parameter(index=[time, region], unit="\$/person")
+    # end
+    ###############################################
 
     function run_timestep(p, v, d, t)
 
         for r in d.region
             v.cons_percap_aftercosts[t, r] = p.cons_percap_consumption[t, r] - p.tct_per_cap_totalcostspercap[t, r] - p.act_percap_adaptationcosts[t, r]
-            # apply the boundary condition if consumption minus adaptation and mitigation costs drops below the threshold
-            if p.use_convergence == 1. && (v.cons_percap_aftercosts[t, r] < p.cbabsn_pcconsumptionbound_neighbourhood)
-                v.cons_percap_aftercosts[t, r] = p.cbabsn_pcconsumptionbound_neighbourhood - 0.5*p.cbaux1_pcconsumptionbound_auxiliary1 +
-                                    p.cbaux1_pcconsumptionbound_auxiliary1 * exp(p.cbaux2_pcconsumptionbound_auxiliary2*
-                                                                            (p.cons_percap_consumption_noconvergence[t,r] - p.tct_per_cap_totalcostspercap[t, r] - p.act_percap_adaptationcosts[t, r] - p.cbabsn_pcconsumptionbound_neighbourhood))/
-                                                                        (1 + exp(p.cbaux2_pcconsumptionbound_auxiliary2*
-                                                                                (p.cons_percap_consumption_noconvergence[t,r] - p.tct_per_cap_totalcostspercap[t, r] - p.act_percap_adaptationcosts[t, r] - p.cbabsn_pcconsumptionbound_neighbourhood)))
-            elseif p.use_convergence != 1. && (v.cons_percap_aftercosts[t, r] < p.cbabs_pcconsumptionbound)
-                v.cons_percap_aftercosts[t, r] = p.cbabs_pcconsumptionbound
+
+            if version_growtheffects
+                # apply the boundary condition if consumption minus adaptation and mitigation costs drops below the threshold
+                if p.use_convergence == 1. && (v.cons_percap_aftercosts[t, r] < p.cbabsn_pcconsumptionbound_neighbourhood)
+                    v.cons_percap_aftercosts[t, r] = p.cbabsn_pcconsumptionbound_neighbourhood - 0.5*p.cbaux1_pcconsumptionbound_auxiliary1 +
+                                        p.cbaux1_pcconsumptionbound_auxiliary1 * exp(p.cbaux2_pcconsumptionbound_auxiliary2*
+                                                                                (p.cons_percap_consumption_noconvergence[t,r] - p.tct_per_cap_totalcostspercap[t, r] - p.act_percap_adaptationcosts[t, r] - p.cbabsn_pcconsumptionbound_neighbourhood))/
+                                                                            (1 + exp(p.cbaux2_pcconsumptionbound_auxiliary2*
+                                                                                    (p.cons_percap_consumption_noconvergence[t,r] - p.tct_per_cap_totalcostspercap[t, r] - p.act_percap_adaptationcosts[t, r] - p.cbabsn_pcconsumptionbound_neighbourhood)))
+                elseif p.use_convergence != 1. && (v.cons_percap_aftercosts[t, r] < p.cbabs_pcconsumptionbound)
+                    v.cons_percap_aftercosts[t, r] = p.cbabs_pcconsumptionbound
+                end
+            else
+                if (v.cons_percap_aftercosts[t, r] < 0.01*p.cons_percap_consumption_0[1])
+                    v.cons_percap_aftercosts[t, r] = 0.01*p.cons_percap_consumption_0[1]
+                end
             end
 
             v.gdp_percap_aftercosts[t,r]=v.cons_percap_aftercosts[t, r]/(1 - p.save_savingsrate/100)

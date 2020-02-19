@@ -11,18 +11,22 @@ using Random
 using StatsBase
 using Statistics
 
+# set version boolean:
+global version_growtheffects = true
+
+
 include("main_model.jl")
+include("growth_mcs.jl")
 
 # define the model regions in the order that Mimi returns stuff
 myregions = ["EU", "USA", "Other OECD","Former USSR","China","Southeast Asia","Africa","Latin America"]
 myyears = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
 
 # define the output directory
-#dir_output = "E:/Paul SCC/"
-dir_output = "E:/Paul SCC/"
+dir_output = joinpath(@__DIR__, "../output/")
 
 # define number of Monte Carlo runs
-global numberofmontecarlo = 50000
+global numberofmontecarlo = 2
 
 # define the seed
 global masterseed = 22081994
