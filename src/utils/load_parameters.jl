@@ -63,6 +63,10 @@ function readpagedata(model::Union{Model, Nothing}, filepath::AbstractString)
         end
 
         return convert(Array{Float64}, data[1][:, 2:end])
+    elseif firstline == "# Index: draw"
+        data = readdlm(filepath, ',', header=true, comments=true)
+
+        return convert(Vector{Float64}, vec(data[1][:, 2]))
     else
         error("Unknown header in parameter file $filepath.")
     end
