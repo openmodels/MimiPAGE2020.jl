@@ -11,12 +11,8 @@ using Random
 using StatsBase
 using Statistics
 
-# set version boolean:
-global version_growtheffects = true
 
-
-include("main_model.jl")
-include("growth_mcs.jl")
+include("main_model_growth.jl")
 
 # define the model regions in the order that Mimi returns stuff
 myregions = ["EU", "USA", "Other OECD","Former USSR","China","Southeast Asia","Africa","Latin America"]
@@ -26,13 +22,15 @@ myyears = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
 dir_output = joinpath(@__DIR__, "../output/")
 
 # define number of Monte Carlo runs
-global numberofmontecarlo = 2
+samplesize = 50000
 
 # define the seed
-global masterseed = 22081994
+masterseed = 22081994
 
 # define the pulse size
-global scc_pulse_size = 75000.
+scc_pulse_size = 75000.
+
+# do_monte_carlo_runs(samplesize, joinpath(@__DIR__, "../output"))
 
 ################################################################################
 ###################### EXTRACT STATIC SCENARIO STUFF ###########################
@@ -314,10 +312,10 @@ df_sccMC_singleGE = DataFrame(damagePAGE09 = false, permafr = false, seaice = fa
                                   perc75 = -999., sd = -999., varcoeff = -999., perc05 = -999., perc95 = -999.,
                                   perc10 = -999., perc90 = -999.)
 for jj_page09damages in [false]
-    for jj_permafr in [true, false]
-        for jj_seaice in [true, false]
-            for jj_scen in ["RCP4.5 & SSP2"]
-                for jj_civvalue in [1., 10.0^20]
+  for jj_permafr in [true, false]
+      for jj_seaice in [true, false]
+          for jj_scen in ["RCP4.5 & SSP2"]
+              for jj_civvalue in [1., 10.0^20]
 #              for jj_gdploss in [1., 0.]
 
                     # jump undesired combinations
@@ -345,7 +343,7 @@ for jj_page09damages in [false]
 
                         # fix the seed and calculate the SCC using a triangular distribution collapsing to a single value and removing the civilization value bound
                         Random.seed!(masterseed)
-                        global scc_mcs_object = get_scc_mcs(numberofmontecarlo, 2020, dir_MCoutput,
+                        global scc_mcs_object = get_scc_mcs(samplesize, 2020, dir_MCoutput,
                                                                 scenario = jj_scen,
                                                                 pulse_size = scc_pulse_size,
                                                                 use_permafrost = jj_permafr,
