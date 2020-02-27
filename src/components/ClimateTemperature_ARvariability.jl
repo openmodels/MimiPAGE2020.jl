@@ -1,3 +1,8 @@
+using CSV, Distributions
+
+# Load once and make global
+arests = CSV.read(joinpath(@__DIR__, "../../data/other/arestimates.csv"))
+
 function calc_temp(p, v, d, tt, annual_year)
     # for every year, do the same calculations, but then with the new annual_year variables
     yr = annual_year - 2015 + 1 # + 1 because of 1-based indexing in Julia
@@ -18,27 +23,32 @@ function calc_temp(p, v, d, tt, annual_year)
     # Without surface albedo, just equal
     v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr]
 
+    # Adding variability to global temperature
+    if use_variability
+        g_variationtemp = rand(Normal(0.0, sqrt(v.tvarerr_g_globaltemperatureerrorvariance)))
+    else
+        g_variationtemp = 0
+    end
+    if yr == 1
+        v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr] + g_variationtemp
+    else
+        v.rt_g_globaltemperature_ann[yr] = v.tvarconst_g_globaltemperatureintercept + v.tvarar_g_globaltemperatureautoreg * v.rt_g_globaltemperature_ann[yr - 1] + v.tvargmst_g_globaltemperaturesmoothdep * v.rt_g_globaltemperature_ann[yr] + g_variationtemp
+    end
 
-    # Setting regional temperature
+    # Setting regional temperature (uses globally shocked temperature)
     for r in d.region
         if use_variability
-            r_variationtemp = rand(Normal(0.0, max(0., p.rvarsd_regionalvariabilitystandarddeviation[r]))) # NEW - with variation
+            r_variationtemp = rand(Normal(0.0, sqrt(v.tvarerr_regionaltemperatureerrorvariance[r]))) # NEW - with variation
             # r_variationtemp = r_variationtemp * p.var_multiplier # for sensitivity analysis for variability
         else
             r_variationtemp = 0 # NEW - no variation
         end
-        v.rtl_realizedtemperature_ann[yr, r] = v.rt_g_globaltemperature_ann[yr] * p.ampf_amplification[r] + r_variationtemp # NEW - add interannual variability
+        if yr == 1
+            v.rtl_realizedtemperature_ann[yr, r] = v.rt_g_globaltemperature_ann[yr] * p.ampf_amplification[r] + r_variationtemp
+        else
+            v.rtl_realizedtemperature_ann[yr, r] = v.tvarconst_regionaltemperatureintercept[r] + v.tvarar_regionaltemperatureautoreg[r] * v.rtl_realizedtemperature_ann[yr - 1, r] + v.tvargmst_regionaltemperatureglobaldep[r] * v.rt_g_globaltemperature_ann[yr] + r_variationtemp
+        end
     end
-
-
-    # Setting global temperature
-    if use_variability
-        g_variationtemp = rand(Normal(0.0, max(0., p.gvarsd_globalvariabilitystandarddeviation)))
-        # g_variationtemp = g_variationtemp * p.var_multiplier # for sensitivity analysis for variability
-    else
-        g_variationtemp = 0
-    end
-    v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr] + g_variationtemp
 
     # Land average temperature
     v.rtl_g_landtemperature_ann[yr] = sum(v.rtl_realizedtemperature_ann[yr, :]' .* p.area') / sum(p.area)
@@ -68,8 +78,16 @@ end
     rtl_g0_baselandtemp = Variable(unit="degreeC") #needed for feedback in CH4 and N2O cycles
 
     # variability parameters
-    gvarsd_globalvariabilitystandarddeviation = Parameter(unit="degreeC", default=0.11294)  # default from https://github.com/jkikstra/climvar
-    rvarsd_regionalvariabilitystandarddeviation = Parameter(index=[region], unit = "degreeC") # provided in data folder
+    tvarorder_arestimatesrows = Parameter(index=[region], unit="none")
+    tvarseed_coefficientsrandomseed = Parameter(unit="none")
+    tvarerr_g_globaltemperatureerrorvariance = Variable(unit="degreeC^2")
+    tvarconst_g_globaltemperatureintercept = Variable(unit="degreeC")
+    tvarar_g_globaltemperatureautoreg = Variable(unit="none")
+    tvargmst_g_globaltemperaturesmoothdep = Variable(unit="none")
+    tvarerr_regionaltemperatureerrorvariance = Variable(index=[region], unit="degreeC^2")
+    tvarconst_regionaltemperatureintercept = Variable(index=[region], unit="degreeC")
+    tvarar_regionaltemperatureautoreg = Variable(index=[region], unit="none")
+    tvargmst_regionaltemperatureglobaldep = Variable(index=[region], unit="none")
 
     # Rate of change of forcing
     fant_anthroforcing = Parameter(index=[time], unit="W/m2")
@@ -141,6 +159,30 @@ end
         end
         v.alb_saf_ecs = v.alb_fsaf_ecs / v.ecs_climatesensitivity
         v.alb_fsaf_t_switch = (p.alb_saf_quadr_mean_t2_coeff*(p.alb_t_switch^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(p.alb_t_switch^2)/2 + p.alb_saf_quadr_mean_t0_coeff*p.alb_t_switch) + (p.alb_saf_quadr_std*p.alb_t_switch) * p.alb_emulator_rand
+
+        tvarconst, tvarar, tvargmst = tvar_getcoeffs(findfirst(arests[!, :region] .== "global"))
+        v.tvarconst_g_globaltemperatureintercept = tvarconst
+        v.tvarar_g_globaltemperatureautoreg = tvarar
+        v.tvargmst_g_globaltemperaturesmoothdep = tvargmst
+        v.tvarerr_g_globaltemperatureerrorvariance = tvar_geterror(findfirst(arests[!, :region] .== "global"))
+
+        tvarconst, tvarar, tvargmst, tvarerr = tvar_getregions(p.tvarorder_arestimatesrows, tvar_getcoeffs)
+        v.tvarconst_regionaltemperatureintercept[:] = tvarconst
+        v.tvarar_regionaltemperatureautoreg[:] = tvarar
+        v.tvargmst_regionaltemperatureglobaldep[:] = tvargmst
+        v.tvarerr_regionaltemperatureerrorvariance[:] = tvarerr
+        if p.tvarseed_coefficientsrandomseed != 0
+            rng = MersenneTwister(trunc(Int, p.tvarseed_coefficientsrandomseed))
+            tvarconst, tvarar, tvargmst = rand(rng, tvar_getmvnormal(findfirst(arests[!, :region] .== "global")))
+            v.tvarconst_g_globaltemperatureintercept = tvarconst
+            v.tvarar_g_globaltemperatureautoreg = tvarar
+            v.tvargmst_g_globaltemperaturesmoothdep = tvargmst
+
+            tvarconst, tvarar, tvargmst, tvarerr = tvar_getregions(p.tvarorder_arestimatesrows, rr -> rand(rng, tvar_getmvnormal(rr)))
+            v.tvarconst_regionaltemperatureintercept[:] = tvarconst
+            v.tvarar_regionaltemperatureautoreg[:] = tvarar
+            v.tvargmst_regionaltemperatureglobaldep[:] = tvargmst
+        end
     end
 
     function run_timestep(p, v, d, tt)
@@ -215,10 +257,65 @@ end
     end
 end
 
+function tvar_getcoeffs(rr::Int64)
+    tvarconst = arests[rr, :intercept][1]
+    tvarar = arests[rr, :ar][1]
+    tvargmst = arests[rr, :gmst][1]
+
+    tvarconst, tvarar, tvargmst
+end
+
+function tvar_geterror(rr::Int64)
+    arests[rr, :varerror][1]
+end
+
+function tvar_getmvnormal(rr::Int64)
+    tvarcoeffs = tvar_getcoeffs(rr)
+
+    names = ["intercept", "ar", "gmst"]
+    tvarsigma = zeros(3, 3)
+    for ii in 1:3
+        for jj in 1:3
+            tvarsigma[ii, jj] = arests[rr, Symbol("var$(names[ii])*$(names[jj])")][1]
+        end
+    end
+
+    MvNormal([tvarcoeffs...], tvarsigma)
+end
+
+function tvar_getregions(regionorder::Vector{Float64}, coeffproc::Function=tvar_getcoeffs)
+    regionorder = convert(Vector{Int64}, regionorder)
+    tvar_getregions(regionorder, coeffproc)
+end
+
+function tvar_getregions(regionorder::Vector{Int64}, coeffproc::Function=tvar_getcoeffs)
+    regionorder = convert(Vector{Int64}, regionorder)
+    tvarconst = zeros(length(regionorder))
+    tvarar = zeros(length(regionorder))
+    tvargmst = zeros(length(regionorder))
+    tvarerr = zeros(length(regionorder))
+    for rr in 1:length(regionorder)
+        tvarconst[rr], tvarar[rr], tvargmst[rr] = coeffproc(regionorder[rr])
+        tvarerr[rr] = tvar_geterror(regionorder[rr])
+    end
+
+    tvarconst, tvarar, tvargmst, tvarerr
+end
+
 function addclimatetemperature(model::Model, use_seaice::Bool)
     climtemp = add_comp!(model, ClimateTemperature)
 
     climtemp[:use_seaice] = use_seaice
+
+    region_keys = Mimi.dim_keys(model.md, :region)
+    regionmapping = Dict{String, String}("EU" => "eu", "USA" => "usa", "OECD" => "oth", "Africa" => "afr", "China" => "chi+", "SEAsia" => "ind+", "LatAmerica" => "lat", "USSR" => "rus+")
+
+    tvarorder = zeros(Int64, length(region_keys))
+    for rr in 1:length(region_keys)
+        tvarorder[rr] = findfirst(arests[!, :region] .== regionmapping[region_keys[rr]])
+    end
+    climtemp[:tvarorder_arestimatesrows] = tvarorder
+    climtemp[:tvarseed_coefficientsrandomseed] = 0 # random draw not used
 
     return climtemp
 end
