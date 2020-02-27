@@ -31,7 +31,7 @@ function runpage()
     elseif isequal(version, "3") || isequal(version, "PAGE-ICE (annual)")
         include("runmodel_annual.jl")
     elseif isequal(version, "4") || isequal(version, "PAGE-ICE with Interannual Temperature Variability (annual)")
-        include("runmodel_variability")
+        include("runmodel_variability.jl")
     # elseif isequal(version, "5") || isequal(version, "PAGE-ICE with Interannual Temperature Variability with Autoregression (annual)")
     #     include("runmodel_ARvariability")
     else

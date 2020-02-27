@@ -1,12 +1,6 @@
 using Mimi
-using CSV
-using DataFrames
 
-# get main_model file
-include("main_model_annual.jl")
-include("mcs_annual.jl")
-include("compute_scc_annual.jl")
-
+# specify model settings
 function set_globalbools()
     global use_variability = true
 
@@ -25,20 +19,27 @@ end
 # set global values for technical configuration options
 set_globalbools()
 
+#run main_model file
+include("main_model_annual.jl")
+include("mcs_annual.jl")
+include("compute_scc_annual.jl")
+
+
 for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
     model = "PAGE-VAR"
     # define model, default settings: getpage(NDCs scenario, permafrost, no sea-ice, no page09damages)
-    feedbacks = true
-    if feedbacks
-        m = getpage(scenario, true, true)
-    else
-        m = getpage(scenario, false, false)
-    end
+    m = getpage(scenario, true, true)
     # run model
     run(m)
 
-    # get the social cost of carbon for the Monte Carlo simulations, for selected quantiles.
-    samplesize = 50000
+    # open up Explorer UI, for visual exploration of the variables
+    # explore(m)
+
+    samplesize = 5
+    # do general monte carlo simulation and save the output
+    do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output", scenario, model))
+
+    # get the social cost of carbon for the Monte Carlo simulations and save the output
     sccs = compute_scc_mcs(m, samplesize, year=2020)
     # store results in DataFrame
     df = DataFrame(Any[fill(model, samplesize), fill(scenario, samplesize), sccs], [:ModelName, :ScenarioName, :SCC])
