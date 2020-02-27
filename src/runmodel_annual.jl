@@ -37,7 +37,7 @@ for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & 
     # open up Explorer UI, for visual exploration of the variables
     # explore(m)
 
-    samplesize = 5
+    samplesize = 50000
     # do general monte carlo simulation and save the output
     do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output", scenario, model))
 
