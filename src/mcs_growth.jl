@@ -346,7 +346,7 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
     function mc_scc_calculation(sim_inst, trialnum::Int, ntimesteps::Int, ignore::Nothing)
         marginal = sim_inst.models[1]
 
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts_ann]
+        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
 
         scc_results[trialnum] = marg_damages
     end
