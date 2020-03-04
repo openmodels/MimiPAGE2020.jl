@@ -193,7 +193,7 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
 
                                     # calculate the stochastic mean SCC
                                     Random.seed!(masterseed)
-                                    global scc_mcs_object = get_scc_mcs(numberofmontecarlo, 2020, dir_MCoutput,
+                                    global scc_mcs_object = get_scc_mcs(samplesize, 2020, dir_MCoutput,
                                                                         scenario = jj_scen,
                                                                         pulse_size = jj_pulse,
                                                                         use_permafrost = jj_permafr,
