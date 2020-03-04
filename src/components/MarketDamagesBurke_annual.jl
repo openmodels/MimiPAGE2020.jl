@@ -138,7 +138,7 @@ end
     igdp_ImpactatActualGDPperCap_ann = Variable(index=[year, region])
 
     isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
-    isat_ImpactinclSaturationandAdaptation_ann = Variable(index=[year, region], unit = "\$")
+    isat_ImpactinclSaturationandAdaptation_ann = Variable(index=[year, region])
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
     isat_per_cap_ImpactperCapinclSaturationandAdaptation_sum = Variable(unit = "\$/person") # for analysis
     isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann = Variable(index=[year, region], unit = "\$/person")
