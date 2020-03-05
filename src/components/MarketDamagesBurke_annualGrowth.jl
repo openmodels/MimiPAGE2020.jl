@@ -81,13 +81,6 @@ function calc_marketdamagesburke(p, v, d, t, annual_year, r)
             (v.igdp_ImpactatActualGDPperCap_ann[yr,r]-
             p.isatg_impactfxnsaturation)))
     end
-    println("Burke")
-    println(annual_year)
-    println(v.isat_ImpactinclSaturationandAdaptation_ann[yr,1])
-    if isnan(v.isat_ImpactinclSaturationandAdaptation_ann[yr,1])
-        println(annual_year)
-        error("nan in marketdamages")
-    end
 
     v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r] = (v.isat_ImpactinclSaturationandAdaptation_ann[yr,r]/100)*p.rgdp_per_cap_SLRRemainGDP_ann[yr,r]
     v.rcons_per_cap_MarketRemainConsumption_ann[yr,r] = p.rcons_per_cap_SLRRemainConsumption_ann[yr,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r]

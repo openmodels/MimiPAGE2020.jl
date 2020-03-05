@@ -107,22 +107,6 @@ function calc_gdp(p, v, d, t, annual_year)
                     v.cbreg_regionsatbound_ann[yr,r] = 1.
                 end
             end
-            # println(v.grw_gdpgrowthrate_ann[yr,1])
-            # println(v.grwnet_realizedgdpgrowth_ann[yr,1])
-            # println(v.gdp_ann[yr,1])
-
-
-            ################
-            # ISSUE:
-            # Damages up until 2020
-            #       are tried to be used for until 2030..
-            ################            
-
-            println("GDP")
-            println(annual_year)
-            println(p.isat_ImpactinclSaturationandAdaptation_ann[yr,1])
-            if isnan(p.isat_ImpactinclSaturationandAdaptation_ann[yr,1])
-                error("nan found")
             end
         end
 
