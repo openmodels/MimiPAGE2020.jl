@@ -61,8 +61,8 @@ function calc_gdp(p, v, d, t, annual_year)
             v.cons_consumption_ann[yr, r] = v.gdp_ann[yr, r] * (1 - p.save_savingsrate / 100)
             v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_ann[yr, r]
 
-        else
-            v.grwnet_realizedgdpgrowth_ann[yr,r] = v.grw_gdpgrowthrate_ann[yr,r] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation_ann[yr-1,r]
+        elseif isequal(gettime(t), 2030)
+            v.grwnet_realizedgdpgrowth_ann[yr,r] = v.grw_gdpgrowthrate_ann[yr,r] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation_ann[6,r]
             v.gdp_ann[yr, r] = v.gdp_ann[yr-1, r] * (1 + (v.grwnet_realizedgdpgrowth_ann[yr,r]/100))^(p.y_year_ann[yr] - p.y_year_ann[yr-1])
             v.gdp_leveleffect_ann[yr,r] = v.gdp_leveleffect_ann[yr-1, r] *  (1 + (v.grw_gdpgrowthrate_ann[yr,r]/100))^(p.y_year_ann[yr] - p.y_year_ann[yr-1])
 
@@ -107,6 +107,54 @@ function calc_gdp(p, v, d, t, annual_year)
                     v.cbreg_regionsatbound_ann[yr,r] = 1.
                 end
             end
+
+
+        else
+            lag = gettime(t) - gettime(t-1)
+            v.grwnet_realizedgdpgrowth_ann[yr,r] = v.grw_gdpgrowthrate_ann[yr,r] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation_ann[yr-lag,r]
+            v.gdp_ann[yr, r] = v.gdp_ann[yr-1, r] * (1 + (v.grwnet_realizedgdpgrowth_ann[yr,r]/100))^(p.y_year_ann[yr] - p.y_year_ann[yr-1])
+            v.gdp_leveleffect_ann[yr,r] = v.gdp_leveleffect_ann[yr-1, r] *  (1 + (v.grw_gdpgrowthrate_ann[yr,r]/100))^(p.y_year_ann[yr] - p.y_year_ann[yr-1])
+
+            v.cons_consumption_ann[yr, r] = v.gdp_ann[yr, r] * (1 - p.save_savingsrate / 100)
+            v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_ann[yr, r]
+
+            # let boundary take effect if pc consumption is in the neighbourhood of the boundary
+            if p.use_convergence == 1.
+                if v.cons_percap_consumption_ann[yr,r] >= v.cbabsn_pcconsumptionbound_neighbourhood
+                    v.cbreg_regionsatbound_ann[yr,r] = 0.
+                    v.cons_consumption_noconvergence_ann[yr,r] = v.cons_consumption_ann[yr,r]
+                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r]/v.pop_population_ann[yr,r]
+                else
+                    # calculate the consumption level if there was no convergence system
+                    v.cons_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr-1, r] * (1 + (v.grwnet_realizedgdpgrowth_ann[yr,r]/100))^(p.y_year_ann[yr] - p.y_year_ann[yr-1])
+                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r]/v.pop_population_ann[yr,r]
+
+                    # send the pc cconsumption on a logistic path convergenging against the bound
+                    v.cons_percap_consumption_ann[yr,r] = v.cbabsn_pcconsumptionbound_neighbourhood - 0.5*v.cbaux1_pcconsumptionbound_auxiliary1 +
+                                        v.cbaux1_pcconsumptionbound_auxiliary1 * exp(v.cbaux2_pcconsumptionbound_auxiliary2*
+                                                                                (v.cons_percap_consumption_noconvergence_ann[yr,r] - v.cbabsn_pcconsumptionbound_neighbourhood))/
+                                                                            (1 + exp(v.cbaux2_pcconsumptionbound_auxiliary2*
+                                                                                    (v.cons_percap_consumption_noconvergence_ann[yr,r] - v.cbabsn_pcconsumptionbound_neighbourhood)))
+
+                # recalculate all variables accordingly
+                v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_ann[yr,r]
+                v.gdp_ann[yr, r] = v.cons_consumption_ann[yr, r] / (1 - p.save_savingsrate / 100)
+                v.grwnet_realizedgdpgrowth_ann[yr,r] = 100 * ((v.gdp_ann[yr, r] / v.gdp_ann[yr-1, r])^(1/(p.y_year_ann[yr] - p.y_year_ann[yr-1])) - 1)
+
+                v.cbreg_regionsatbound_ann[yr,r] = 1.
+
+                end
+            else
+                if v.cons_percap_consumption_ann[yr,r] < p.cbabs_pcconsumptionbound
+                    v.cons_percap_consumption_ann[yr,r] = p.cbabs_pcconsumptionbound
+
+                    # recalculate all variables accordingly
+                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_ann[yr,r]
+                    v.gdp_ann[yr, r] = v.cons_consumption_ann[yr, r] / (1 - p.save_savingsrate / 100)
+                    v.grwnet_realizedgdpgrowth_ann[yr,r] = 100 * ((v.gdp_ann[yr, r] / v.gdp_ann[yr-1, r])^(1/(p.y_year_ann[yr] - p.y_year_ann[yr-1])) - 1)
+
+                    v.cbreg_regionsatbound_ann[yr,r] = 1.
+                end
             end
         end
 
