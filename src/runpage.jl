@@ -18,6 +18,8 @@ function runpage()
     - 3 PAGE-ICE (annual)
     - 4 PAGE-ICE with independent Interannual Temperature Variability (annual)
     - 5 PAGE-ICE with autoregressive Interannual Temperature Variability (annual)
+    - 6 PAGE-ICE with Growth Effects (annual)
+    - 7 PAGE-ICE with Growth Effects and autoregressive Interannual Temperature Variability (annual)
 
     Input number:
     "
@@ -35,6 +37,10 @@ function runpage()
         include("runmodel_variability.jl")
     elseif isequal(version, "5") || isequal(version, "PAGE-ICE with Interannual Temperature Variability with Autoregression (annual)")
         include("runmodel_ARvariability.jl")
+    elseif isequal(version, "6") || isequal(version, "PAGE-ICE with Growth Effects (annual)")
+        include("runmodel_annualGrowth.jl")
+    elseif isequal(version, "7") || isequal(version, "PAGE-ICE with Growth Effects and autoregressive Interannual Temperature Variability (annual)")
+        include("runmodel_annualGrowth_ARvariability.jl")
     else
         println("WARNING: No valid model input provided. Please provide a valid model choice")
         runpage()
