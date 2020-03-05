@@ -440,8 +440,6 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
 
     # Setup the marginal model and modify key parameters if they are specified
     m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
-    run(m)
-    explore(m)
     if use_convergence != nothing
          update_param!(m, :use_convergence, use_convergence)
     end
