@@ -68,7 +68,7 @@ function calc_equityweighting(p, v, d, t, annual_year)
         v.yp_yearsperiod_ann[yr] = 1 # every timestep is 1 year long.
 
         if is_first(t)
-            v.dfc_consumptiondiscountrate[1, r] = (1 + v.dr_discountrate[1, r] / 100)^(-v.yp_yearsperiod[1])
+            v.dfc_consumptiondiscountrate_ann[yr, r] = (1 + v.dr_discountrate_ann[yr, r] / 100)^(-v.yp_yearsperiod_ann[yr])
         else
             v.dfc_consumptiondiscountrate_ann[yr, r] = v.dfc_consumptiondiscountrate_ann[yr - 1, r] * (1 + v.dr_discountrate_ann[yr, r] / 100)^(-v.yp_yearsperiod_ann[yr])
         end
@@ -136,7 +136,6 @@ function calc_equityweighting(p, v, d, t, annual_year)
 
         v.excdampv_excessdamagespresvalue_ann[yr, r] = v.excdam_excessdamages_ann[yr, r] *  v.dfc_consumptiondiscountrate_ann[yr, r]
 
-
         v.addt_equityweightedimpact_discountedaggregated_ann[yr, r] = v.widt_equityweightedimpact_discounted_ann[yr, r]
         v.aact_equityweightedadaptation_discountedaggregated_ann[yr, r] = v.wacdt_partiallyweighted_discounted_ann[yr, r]
 
@@ -156,7 +155,6 @@ function calc_equityweighting(p, v, d, t, annual_year)
     # Total effect of climate change
     v.te_totaleffect_ann = min(v.td_totaldiscountedimpacts_ann + v.tpc_totalaggregatedcosts_ann + v.tac_totaladaptationcosts_ann, p.civvalue_civilizationvalue)
     v.te_totaleffect_ann_yr[yr] = v.te_totaleffect_ann # for saving as a timeseries for possible post-analysis
-
 end
 
 @defcomp EquityWeighting begin
