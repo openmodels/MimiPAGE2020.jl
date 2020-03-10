@@ -1,8 +1,3 @@
-# TODO: connect all annual variables coming from GDP to all other components, and then annualise those components as well! .................
-# TODO: annualise more components??
-# TODO: ugh.....
-# TODO: ### --> check if also annual variable of this
-
 using Mimi
 
 export getpage
@@ -11,7 +6,7 @@ include("utils/load_parameters.jl")
 include("utils/mctools.jl")
 
 include("mcs_annualGrowth.jl")                          ## done - based on mcs_ARvariability.jl + added lines (GDP, civvalue, save command) + added functions (compute_scc_mcs & get_scc_mcs) from mcs_growth.jl
-include("compute_scc_annualGrowth.jl")                  ## nothing done yet - based on compute_scc_growth.jl, 4 variables changed to *_ann
+include("compute_scc_annualGrowth.jl")                  ## based on compute_scc_growth.jl, changed 4 variables to their annual versions
 
 include("components/RCPSSPScenario.jl")
 include("components/CO2emissions.jl")
@@ -213,62 +208,62 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :TotalAbatementCosts => :tc_totalcosts_linear, :AbatementCostsLin => :tc_totalcost)
     connect_param!(m, :TotalAbatementCosts => :pop_population, :Population => :pop_population)
 
-    connect_param!(m, :AdaptiveCostsEconomic => :gdp, :GDP => :gdp)                                                                ### working on this now
-    connect_param!(m, :AdaptiveCostsEconomic => :gdp_ann, :GDP => :gdp_ann)                                                                ### working on this now
-    connect_param!(m, :AdaptiveCostsNonEconomic => :gdp, :GDP => :gdp)                                                                ### working on this now
-    connect_param!(m, :AdaptiveCostsNonEconomic => :gdp_ann, :GDP => :gdp_ann)                                                                ### working on this now
-    connect_param!(m, :AdaptiveCostsSeaLevel => :gdp, :GDP => :gdp)                                                                ### working on this now
-    connect_param!(m, :AdaptiveCostsSeaLevel => :gdp_ann, :GDP => :gdp_ann)                                                                ### working on this now
+    connect_param!(m, :AdaptiveCostsEconomic => :gdp, :GDP => :gdp)
+    connect_param!(m, :AdaptiveCostsEconomic => :gdp_ann, :GDP => :gdp_ann)
+    connect_param!(m, :AdaptiveCostsNonEconomic => :gdp, :GDP => :gdp)
+    connect_param!(m, :AdaptiveCostsNonEconomic => :gdp_ann, :GDP => :gdp_ann)
+    connect_param!(m, :AdaptiveCostsSeaLevel => :gdp, :GDP => :gdp)
+    connect_param!(m, :AdaptiveCostsSeaLevel => :gdp_ann, :GDP => :gdp_ann)
 
-    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_economic, :AdaptiveCostsEconomic => :ac_adaptivecosts)                                                                ###
-    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_economic_ann, :AdaptiveCostsEconomic => :ac_adaptivecosts_ann)    ### from adaptivecosts, placeholder for now
-    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_noneconomic, :AdaptiveCostsNonEconomic => :ac_adaptivecosts)                                                                ###
-    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_noneconomic_ann, :AdaptiveCostsNonEconomic => :ac_adaptivecosts_ann)    ### from adaptivecosts, placeholder for now
-    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_sealevelrise, :AdaptiveCostsSeaLevel => :ac_adaptivecosts)                                                                ###
-    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_sealevelrise_ann, :AdaptiveCostsSeaLevel => :ac_adaptivecosts_ann)    ### from adaptivecosts, placeholder for now
-    connect_param!(m, :TotalAdaptationCosts => :pop_population, :Population => :pop_population)                                                                ###
-    connect_param!(m, :TotalAdaptationCosts => :pop_population_ann, :GDP => :pop_population_ann)                                                                ###
+    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_economic, :AdaptiveCostsEconomic => :ac_adaptivecosts)
+    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_economic_ann, :AdaptiveCostsEconomic => :ac_adaptivecosts_ann)
+    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_noneconomic, :AdaptiveCostsNonEconomic => :ac_adaptivecosts)
+    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_noneconomic_ann, :AdaptiveCostsNonEconomic => :ac_adaptivecosts_ann)
+    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_sealevelrise, :AdaptiveCostsSeaLevel => :ac_adaptivecosts)
+    connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_sealevelrise_ann, :AdaptiveCostsSeaLevel => :ac_adaptivecosts_ann)
+    connect_param!(m, :TotalAdaptationCosts => :pop_population, :Population => :pop_population)
+    connect_param!(m, :TotalAdaptationCosts => :pop_population_ann, :GDP => :pop_population_ann)
 
     connect_param!(m, :SLRDamages => :s_sealevel, :SeaLevelRise => :s_sealevel)
-    connect_param!(m, :SLRDamages => :cons_percap_consumption, :GDP => :cons_percap_consumption)                                                                ###
-    connect_param!(m, :SLRDamages => :cons_percap_consumption_ann, :GDP => :cons_percap_consumption_ann)                                                                ###
-    connect_param!(m, :SLRDamages => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)                                                                ###
+    connect_param!(m, :SLRDamages => :cons_percap_consumption, :GDP => :cons_percap_consumption)
+    connect_param!(m, :SLRDamages => :cons_percap_consumption_ann, :GDP => :cons_percap_consumption_ann)
+    connect_param!(m, :SLRDamages => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :SLRDamages => :tct_per_cap_totalcostspercap, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)
-    connect_param!(m, :SLRDamages => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)                                                                ###
-    connect_param!(m, :SLRDamages => :act_percap_adaptationcosts_ann, :TotalAdaptationCosts => :act_percap_adaptationcosts_ann)   ### from TotalAdaptationCosts, placeholder for now
+    connect_param!(m, :SLRDamages => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
+    connect_param!(m, :SLRDamages => :act_percap_adaptationcosts_ann, :TotalAdaptationCosts => :act_percap_adaptationcosts_ann)
     connect_param!(m, :SLRDamages => :atl_adjustedtolerablelevelofsealevelrise, :AdaptiveCostsSeaLevel => :atl_adjustedtolerablelevel, ignoreunits=true)
-    connect_param!(m, :SLRDamages => :atl_adjustedtolerablelevelofsealevelrise_ann, :AdaptiveCostsSeaLevel => :atl_adjustedtolerablelevel_ann, ignoreunits=true)    ### from adaptivecosts, placeholder for now
+    connect_param!(m, :SLRDamages => :atl_adjustedtolerablelevelofsealevelrise_ann, :AdaptiveCostsSeaLevel => :atl_adjustedtolerablelevel_ann, ignoreunits=true)
     connect_param!(m, :SLRDamages => :imp_actualreductionSLR, :AdaptiveCostsSeaLevel => :imp_adaptedimpacts)
-    connect_param!(m, :SLRDamages => :imp_actualreductionSLR_ann, :AdaptiveCostsSeaLevel => :imp_adaptedimpacts_ann)    ### from adaptivecosts, placeholder for now
-    connect_param!(m, :SLRDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)                                                                ###
+    connect_param!(m, :SLRDamages => :imp_actualreductionSLR_ann, :AdaptiveCostsSeaLevel => :imp_adaptedimpacts_ann)
+    connect_param!(m, :SLRDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
-        connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence, :GDP => :cons_percap_consumption_noconvergence)                                                                ###
-        connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence_ann, :GDP => :cons_percap_consumption_noconvergence_ann)                                                                ###
-        connect_param!(m, :SLRDamages => :cbabsn_pcconsumptionbound_neighbourhood, :GDP => :cbabsn_pcconsumptionbound_neighbourhood)                                                                ###
-        connect_param!(m, :SLRDamages => :cbaux1_pcconsumptionbound_auxiliary1, :GDP => :cbaux1_pcconsumptionbound_auxiliary1)                                                                ###
-        connect_param!(m, :SLRDamages => :cbaux2_pcconsumptionbound_auxiliary2, :GDP => :cbaux2_pcconsumptionbound_auxiliary2)                                                                ###
+        connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence, :GDP => :cons_percap_consumption_noconvergence)
+        connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence_ann, :GDP => :cons_percap_consumption_noconvergence_ann)
+        connect_param!(m, :SLRDamages => :cbabsn_pcconsumptionbound_neighbourhood, :GDP => :cbabsn_pcconsumptionbound_neighbourhood)
+        connect_param!(m, :SLRDamages => :cbaux1_pcconsumptionbound_auxiliary1, :GDP => :cbaux1_pcconsumptionbound_auxiliary1)
+        connect_param!(m, :SLRDamages => :cbaux2_pcconsumptionbound_auxiliary2, :GDP => :cbaux2_pcconsumptionbound_auxiliary2)
     ###############################################
 
     connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
     connect_param!(m, :MarketDamages => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
-    connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)                                                                ###
-    connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)                                                                ###
-    connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)                                                                ###
-    connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)                                                                ###
+    connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
+    connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)
+    connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
+    connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)
     connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits=true) # not required for Burke damages
-    connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel_ann, ignoreunits=true)    ### from adaptivecosts, placeholder for now
+    connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel_ann, ignoreunits=true)
     connect_param!(m, :MarketDamages => :imp_actualreduction, :AdaptiveCostsEconomic => :imp_adaptedimpacts) # not required for Burke damages
-    connect_param!(m, :MarketDamages => :imp_actualreduction_ann, :AdaptiveCostsEconomic => :imp_adaptedimpacts_ann)    ### from adaptivecosts, placeholder for now
+    connect_param!(m, :MarketDamages => :imp_actualreduction_ann, :AdaptiveCostsEconomic => :imp_adaptedimpacts_ann)
     connect_param!(m, :MarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
     connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
     connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
-    connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)                                                                ###
-    connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)                                                                ###
-    connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)                                                                ###
-    connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)                                                                ###
+    connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
+    connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)
+    connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
+    connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)
     connect_param!(m, :MarketDamagesBurke => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :MarketDamagesBurke => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
@@ -286,10 +281,10 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption_ann)
     end
     connect_param!(m, :NonMarketDamages =>:atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic =>:atl_adjustedtolerablelevel, ignoreunits=true)
-    connect_param!(m, :NonMarketDamages =>:atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsNonEconomic =>:atl_adjustedtolerablelevel_ann, ignoreunits=true)    ### from adaptivecosts, placeholder for now
+    connect_param!(m, :NonMarketDamages =>:atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsNonEconomic =>:atl_adjustedtolerablelevel_ann, ignoreunits=true)
     connect_param!(m, :NonMarketDamages => :imp_actualreduction, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts)
-    connect_param!(m, :NonMarketDamages => :imp_actualreduction_ann, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts_ann)    ### from adaptivecosts, placeholder for now
-    connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)                                                                ###
+    connect_param!(m, :NonMarketDamages => :imp_actualreduction_ann, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts_ann)
+    connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :NonMarketDamages => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
@@ -300,22 +295,22 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP_ann, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP_ann)
     connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption)
     connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption_ann, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption_ann)
-    connect_param!(m, :Discontinuity => :isatg_saturationmodification, :GDP => :isatg_impactfxnsaturation)                                                                ###
+    connect_param!(m, :Discontinuity => :isatg_saturationmodification, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :Discontinuity => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
     connect_param!(m, :EquityWeighting => :pop_population, :Population => :pop_population)
-    connect_param!(m, :EquityWeighting => :pop_population_ann, :GDP => :pop_population_ann)                                                                ###
+    connect_param!(m, :EquityWeighting => :pop_population_ann, :GDP => :pop_population_ann)
     connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)
-    connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total_ann, :SLRDamages => :tct_per_cap_totalcostspercap_ann)                                                                ###
+    connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total_ann, :SLRDamages => :tct_per_cap_totalcostspercap_ann)
     connect_param!(m, :EquityWeighting => :act_adaptationcosts_total, :TotalAdaptationCosts => :act_adaptationcosts_total)
-    connect_param!(m, :EquityWeighting => :act_adaptationcosts_total_ann, :TotalAdaptationCosts => :act_adaptationcosts_total_ann)   ### from TotalAdaptationCosts, placeholder for now
+    connect_param!(m, :EquityWeighting => :act_adaptationcosts_total_ann, :TotalAdaptationCosts => :act_adaptationcosts_total_ann)
     connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
-    connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts_ann, :TotalAdaptationCosts => :act_percap_adaptationcosts_ann)   ### from TotalAdaptationCosts, placeholder for now
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)                                                                ###
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption_ann, :GDP => :cons_percap_consumption_ann)                                                                ###
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)                                                                ###
-    connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)                                                                ###
-    connect_param!(m, :EquityWeighting => :cons_percap_aftercosts_ann, :SLRDamages => :cons_percap_aftercosts_ann)                                                                ###
+    connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts_ann, :TotalAdaptationCosts => :act_percap_adaptationcosts_ann)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption_ann, :GDP => :cons_percap_consumption_ann)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
+    connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
+    connect_param!(m, :EquityWeighting => :cons_percap_aftercosts_ann, :SLRDamages => :cons_percap_aftercosts_ann)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis_ann, :Discontinuity => :rcons_per_cap_DiscRemainConsumption_ann)
     connect_param!(m, :EquityWeighting => :yagg_periodspan, :GDP => :yagg_periodspan)
