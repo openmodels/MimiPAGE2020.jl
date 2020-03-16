@@ -311,7 +311,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     te_ann      = load_RV("EquityWeighting_te_totaleffect_ann", "te_totaleffect_ann"; output_path = output_path)
 
     #time index
-    c_co2concentration = load_RV("co2cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
+    c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
     ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path = output_path)
     rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
     rt_g_ann    = load_RV("ClimateTemperature_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path = output_path)

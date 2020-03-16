@@ -56,7 +56,7 @@ df_sccMC_singleGE = DataFrame(damagePAGE09 = false, permafr = false, seaice = fa
 for jj_page09damages in [false]
   for jj_permafr in [true, false]
       for jj_seaice in [true, false]
-          for jj_scen in ["RCP4.5 & SSP2"]
+          for jj_scen in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
               for jj_civvalue in [1., 10.0^20]
 #              for jj_gdploss in [1., 0.]
 
