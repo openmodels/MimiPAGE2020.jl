@@ -18,5 +18,6 @@ m = getpage()
 run(m)
 compute_scc_mcs(m, samplesize; year=scc_year)
 
-scenario = "RCP4.5 & SSP2"
-do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output"))
+for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
+    do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output", scenario))
+end
