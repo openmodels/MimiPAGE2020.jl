@@ -26,7 +26,7 @@ include("compute_scc_annual.jl")
 
 
 for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
-    model = "PAGE-VAR"
+    model = "PAGE-arVAR"
     # define model, default settings: getpage(NDCs scenario, permafrost, no sea-ice, no page09damages)
     m = getpage(scenario, true, true)
     # run model
