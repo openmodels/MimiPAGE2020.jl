@@ -32,7 +32,8 @@ function calc_temp(p, v, d, tt, annual_year)
     if yr == 1
         v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr] + g_variationtemp
     else
-        v.rt_g_globaltemperature_ann[yr] = v.tvarconst_g_globaltemperatureintercept + v.tvarar_g_globaltemperatureautoreg * v.rt_g_globaltemperature_ann[yr - 1] + v.tvargmst_g_globaltemperaturesmoothdep * v.rt_g_globaltemperature_ann[yr] + g_variationtemp
+        ptdiff = v.pt_g_preliminarygmst_ann[yr] - v.pt_g_preliminarygmst_ann[yr - 1]
+        v.rt_g_globaltemperature_ann[yr] = v.tvarconst_g_globaltemperatureintercept + v.tvarar_g_globaltemperatureautoreg * (ptdiff + v.rt_g_globaltemperature_ann[yr - 1]) + v.tvargmst_g_globaltemperaturesmoothdep * v.rt_g_globaltemperature_ann[yr] + g_variationtemp
     end
 
     # Setting regional temperature (uses globally shocked temperature)
@@ -46,7 +47,8 @@ function calc_temp(p, v, d, tt, annual_year)
         if yr == 1
             v.rtl_realizedtemperature_ann[yr, r] = v.rt_g_globaltemperature_ann[yr] * p.ampf_amplification[r] + r_variationtemp
         else
-            v.rtl_realizedtemperature_ann[yr, r] = v.tvarconst_regionaltemperatureintercept[r] + v.tvarar_regionaltemperatureautoreg[r] * v.rtl_realizedtemperature_ann[yr - 1, r] + v.tvargmst_regionaltemperatureglobaldep[r] * v.rt_g_globaltemperature_ann[yr] + r_variationtemp
+	    # Determine correction to conform in expectation to ampf * T_g
+            v.rtl_realizedtemperature_ann[yr, r] = (p.ampf_amplification[r] / (v.tvarar_regionaltemperatureautoreg[r] + v.tvargmst_regionaltemperatureglobaldep[r])) * (v.tvarconst_regionaltemperatureintercept[r] + v.tvarar_regionaltemperatureautoreg[r] * (p.ampf_amplification[r] * ptdiff + v.rtl_realizedtemperature_ann[yr - 1, r]) + v.tvargmst_regionaltemperatureglobaldep[r] * v.rt_g_globaltemperature_ann[yr]) + r_variationtemp
         end
     end
 
