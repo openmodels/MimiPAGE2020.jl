@@ -24,7 +24,7 @@ function runpage()
     Input number:
     "
 
-    version = Input(options)
+    version = "6" #Input(options)
 
 
     if isequal(version, "1") || isequal(version, "PAGE-ICE (10 timestep)")
