@@ -383,7 +383,7 @@ end
 #     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 
 #     # Run it!
-#     run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+#     run(mcs, m, samplesize; results_output_dir=output_path, post_trial_func=my_scc_calculation)
 
 #     scc_results
 # end

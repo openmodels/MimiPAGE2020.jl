@@ -30,13 +30,19 @@ for (region in names(df)[1:8])
     df[, paste0(region, ".delay")] <- c(NA, df[-nrow(df), region])
 
 results <- data.frame()
+allmods <- list()
+globmod <- NULL
 for (region in c(names(df)[1:8], 'global')) {
     ##mod.ar <- lm(as.formula(paste0("`", region, "` ~ `", region, ".delay` + co2.delay")), data=df)
     ##mod.ar <- lm(as.formula(paste0("`", region, "` ~ `", region, ".delay` + smooth.delay")), data=df)
-    if (region == 'global')
+    if (region == 'global') {
         mod.ar <- lm(gmst ~ gmst.delay + smooth, data=df)
-    else
-        mod.ar <- lm(as.formula(paste0("`", region, "` ~ `", region, ".delay` + gmst")), data=df)
+        globmod <- mod.ar
+    } else {
+        df$my.delay <- df[, paste0(region, '.delay')]
+        mod.ar <- lm(as.formula(paste0("`", region, "` ~ my.delay + gmst")), data=df)
+        allmods[[region]] <- mod.ar
+    }
 
     errsigma <- summary(mod.ar)$sigma
     coeffs <- mod.ar$coefficients
@@ -57,3 +63,8 @@ for (region in c(names(df)[1:8], 'global')) {
 }
 
 write.csv(results, "arestimates.csv", row.names=F)
+
+library(stargazer)
+
+stargazer(globmod)
+stargazer(allmods)

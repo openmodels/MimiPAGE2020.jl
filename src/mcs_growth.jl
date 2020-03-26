@@ -311,12 +311,8 @@ end
 #     set_models!(mcs, [m])
 #     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "trialdata.csv"))
 #     #
-#     # # Run it!
-#     # run_sim(mcs, output_dir=output_path)
-#
-#
 #     # Run
-#     res = run_sim(mcs; output_dir = output_path)
+#     res = run(mcs, m, samplesize; results_output_dir = output_path)
 #
 #     # reformat outputs for testing and analysis
 #     reformat_RV_outputs(samplesize, output_path=output_path)
@@ -411,7 +407,7 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
     generate_trials!(mcs_inst, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 
     # Run it!
-    run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+    run(mcs, m, samplesize; results_output_dir=output_path, post_trial_func=my_scc_calculation)
 
     scc_results
 end
