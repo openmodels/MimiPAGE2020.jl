@@ -21,13 +21,13 @@ myyears = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
 dir_output = joinpath(@__DIR__, "../output/")
 
 # define number of Monte Carlo runs
-samplesize = 50000
+samplesize = sample
 
 # define the seed
 masterseed = 22081994
 
 # define the pulse size
-scc_pulse_size = 75000.
+scc_pulse_size = ps
 
 ################################################################################
 ################### MC MODEL RUNS    ###########################################

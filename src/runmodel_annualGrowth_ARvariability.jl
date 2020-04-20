@@ -35,13 +35,13 @@ include("main_model_annualGrowth.jl")
 dir_output = joinpath(@__DIR__, "../output/")
 
 # define number of Monte Carlo runs
-samplesize = 50000
+samplesize = sample
 
 # define the seed
 masterseed = 22081994
 
 # define the pulse size
-scc_pulse_size = 75000.
+scc_pulse_size = ps
 
 ################################################################################
 ################### MC MODEL RUNS    ###########################################
