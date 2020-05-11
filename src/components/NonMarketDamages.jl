@@ -85,12 +85,16 @@ end
 # Still need this function in order to set the parameters than depend on
 # readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
-function addnonmarketdamages(model::Model)
+function addnonmarketdamages(model::Model, use_page09weights::Bool=false)
     nonmarketdamagescomp = add_comp!(model, NonMarketDamages)
     nonmarketdamagescomp[:impmax_maxtempriseforadaptpolicyNM] = readpagedata(model, "data/impmax_noneconomic.csv")
 
     # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-    nonmarketdamagescomp[:wincf_weightsfactor_nonmarket] = readpagedata(model, "data/wincf_weightsfactor_nonmarket.csv")
+    if use_page09weights
+        nonmarketdamagescomp[:wincf_weightsfactor_nonmarket] = readpagedata(model, "data/wincf_weightsfactor_sea.csv")
+    else
+        nonmarketdamagescomp[:wincf_weightsfactor_nonmarket] = readpagedata(model, "data/wincf_weightsfactor_nonmarket.csv")
+    end
 
     return nonmarketdamagescomp
 end

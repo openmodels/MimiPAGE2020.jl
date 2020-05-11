@@ -1,0 +1,1170 @@
+period
+period <- gmstdf$year[which.min(abs(gmstdf$gmst[gmstdf$rcp == 'rcp85'] - temp))]
+period
+subdf <- subset(df, rcp == 'rcp85' & year == period)
+nrow(subdf)
+library(ggplot2)#
+#
+temp0 <- 0.83#
+temp0.ocean <- .0068#
+ecs0 = 3.6813#
+#
+## Temp#
+#
+xl1 <- 1 / 7.34#
+xl2 <- ecs0 / 3.1#
+xl3 <- .73#
+xl4 <- .00346 / 5#
+#
+## SAF#
+#
+baseyear.fsaf = 0.340705392393271#
+ecs.avg.saf = 0.349590471493953#
+SAF_mean_quad_segment2 = -0.00195847734350797#
+SAF_mean_quad_segment1 = -0.00638719168756076#
+SAF_mean_quad_segment0 = 0.363696354946893#
+SAF_std_quad_segment = 0.109096642865273#
+forceslope = 5.5#
+nonlinearity = 0
+gmst <- seq(1, 10, length.out=100)#
+curve <- SAF_mean_quad_segment2*(gmst^3)/3+SAF_mean_quad_segment1*gmst^2/2+SAF_mean_quad_segment0*gmst)+SAF_std_quad_segment*gmst*nonlinearity
+curve <- (SAF_mean_quad_segment2*(gmst^3)/3+SAF_mean_quad_segment1*gmst^2/2+SAF_mean_quad_segment0*gmst)+SAF_std_quad_segment*gmst*nonlinearity
+ggplot(data.frame(gmst, curve), aes(gmst, curve)) +#
+    geom_line()
+curve <- (SAF_mean_quad_segment2*(gmst^3)/3+SAF_mean_quad_segment1*gmst^2/2+SAF_mean_quad_segment0*gmst)#+SAF_std_quad_segment*gmst*nonlinearity#
+#
+ggplot(data.frame(gmst, curve), aes(gmst, curve)) +#
+    geom_line()
+gmst <- seq(0, 10, length.out=100)#
+curve <- (SAF_mean_quad_segment2*(gmst^3)/3+SAF_mean_quad_segment1*gmst^2/2+SAF_mean_quad_segment0*gmst)+SAF_std_quad_segment*gmst*nonlinearity#
+#
+ggplot(data.frame(gmst, curve), aes(gmst, curve)) +#
+    geom_line()
+ggplot(data.frame(gmst, curve / gmst), aes(gmst, curve)) +#
+    geom_line()
+ggplot(data.frame(gmst, curve=curve / gmst), aes(gmst, curve)) +#
+    geom_line()
+ggplot(data.frame(gmst, curve=curve / gmst), aes(gmst, curve)) +#
+    geom_line() + theme_bw() + ylim(0, .5)
+curve <- (SAF_mean_quad_segment2*(gmst^3)+SAF_mean_quad_segment1*gmst^2+SAF_mean_quad_segment0*gmst)+SAF_std_quad_segment*gmst*nonlinearity#
+#
+ggplot(data.frame(gmst, curve=curve / gmst), aes(gmst, curve)) +#
+    geom_line() + theme_bw() + ylim(0, .5)
+curve <- (SAF_mean_quad_segment2*(gmst^3)/3+SAF_mean_quad_segment1*gmst^2/2+SAF_mean_quad_segment0*gmst)+SAF_std_quad_segment*gmst*nonlinearity#
+#
+ggplot(data.frame(gmst, curve=curve), aes(gmst, curve)) +#
+    geom_line() + theme_bw() + ylim(0, .5)
+ggplot(data.frame(gmst, curve=curve), aes(gmst, curve)) +#
+    geom_line() + theme_bw()
+library(ggplot2)#
+#
+temp0 <- 0.83#
+temp0.ocean <- .0068#
+ecs0 = 3.6813#
+#
+## Temp#
+#
+xl1 <- 1 / 7.34#
+xl2 <- ecs0 / 3.1#
+xl3 <- .73#
+xl4 <- .00346 / 5#
+#
+## SAF#
+#
+baseyear.fsaf = 0.340705392393271#
+ecs.avg.saf = 0.349590471493953#
+SAF_mean_quad_segment2 = -0.00195847734350797#
+SAF_mean_quad_segment1 = -0.00638719168756076#
+SAF_mean_quad_segment0 = 0.363696354946893#
+SAF_std_quad_segment = 0.109096642865273#
+forceslope = 5.5#
+nonlinearity = 0#
+#
+calc.temp.step <- function(ecs, forcing, TT.atmos.tm1, TT.ocean.tm1) {#
+    TT.atmos <- TT.atmos.tm1+(ecs / ecs0)*xl1*(forcing-xl2*TT.atmos.tm1-xl3*(TT.atmos.tm1-TT.ocean.tm1))#
+    TT.ocean <- TT.ocean.tm1+xl4*(TT.atmos.tm1-TT.ocean.tm1)#
+    c(TT.atmos, TT.ocean)#
+}#
+#
+calc.saf <- function(TT.before, TT.after) {#
+    APPROXSAF <- ((SAF_mean_quad_segment2*(TT.before^3)/3+SAF_mean_quad_segment1*TT.before^2/2+SAF_mean_quad_segment0*TT.before)+SAF_std_quad_segment*TT.before*nonlinearity-baseyear.fsaf)/(TT.before-temp0)#
+#
+    ADJSAF <- APPROXSAF-ecs.avg.saf#
+    ADJFSAF <- (SAF_mean_quad_segment2*(TT.after^3)/3+SAF_mean_quad_segment1*TT.after^2/2+SAF_mean_quad_segment0*TT.after)+SAF_std_quad_segment*TT.after*nonlinearity-APPROXSAF*TT.after#
+#
+    ECS <- ecs0/(1-ecs0*ADJSAF/(log(2)*forceslope))#
+#
+    return(c(ADJFSAF, ECS, APPROXSAF, ADJSAF))#
+}#
+#
+df <- data.frame(gmst=c(), ecs=c(), fsaf=c(), approxsaf=c(), adjsaf=c())#
+for (gmst in seq(1, 10, length.out=100)) {#
+    vals <- calc.saf(gmst, gmst)#
+    df <- rbind(df, data.frame(gmst, ecs=vals[2], fsaf=vals[1], approxsaf=vals[3], adjsaf=vals[4]))#
+}
+head(df)
+df$cumfsaf <- (SAF_mean_quad_segment2*(df$gmst^3)/3+SAF_mean_quad_segment1*df$gmst^2/2+SAF_mean_quad_segment0*df$gmst)+SAF_std_quad_segment*df$gmst*nonlinearity
+library(ggplot2)#
+#
+df2 <- data.frame(gmst=rep(df$gmst, 4), value=c(df$cumfsaf, df$approxsaf, df$ecs, df$fsaf), label=rep(c('SAF (W/m^2)', 'SAF (W/m2/C)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))#
+#
+ggplot(df2, aes(gmst, value)) +#
+    facet_grid(label ~ ., scales="free_y") +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/T)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL)
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=1) +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/T)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/T)', 'SAF (W/m2/T)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df2 <- data.frame(gmst=rep(df$gmst, 4), value=c(df$cumfsaf, df$approxsaf, df$ecs, df$fsaf), label=rep(c('SAF (W/m^2)', 'SAF (W/m2/C)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))#
+#
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=2) +#
+    geom_line() + geom_hline(data=data.frame(value=c(NA, ecs.avg.saf, ecs0, NA), label=c('SAF (W/m^2)', 'SAF (W/m2/T)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/T)', 'SAF (W/m2/T)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df2 <- data.frame(gmst=rep(df$gmst, 4), value=c(df$cumfsaf, df$approxsaf, df$ecs, df$fsaf), label=rep(c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))#
+#
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=2) +#
+    geom_line() + geom_hline(data=data.frame(value=c(NA, ecs.avg.saf, ecs0, NA), label=c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/K)', 'SAF (W/m2/K)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df2$label <- as.factor(df2$label, c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'))
+df2 <- data.frame(gmst=rep(df$gmst, 4), value=c(df$cumfsaf, df$approxsaf, df$ecs, df$fsaf), label=rep(c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))#
+df2$label <- as.factor(df2$label, levels=c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'))
+df2 <- data.frame(gmst=rep(df$gmst, 4), value=c(df$cumfsaf, df$approxsaf, df$ecs, df$fsaf), label=rep(c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))#
+df2$label <- factor(df2$label, levels=c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'))
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=2) +#
+    geom_line() + geom_hline(data=data.frame(value=c(NA, ecs.avg.saf, ecs0, NA), label=c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/K)', 'SAF (W/m2/K)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+calc.saf <- function(TT.before, TT.after) {#
+    APPROXSAF <- ((SAF_mean_quad_segment2*(TT.before^3)/3+SAF_mean_quad_segment1*TT.before^2/2+SAF_mean_quad_segment0*TT.before)+SAF_std_quad_segment*TT.before*nonlinearity-baseyear.fsaf)/(TT.before-temp0)#
+#
+    ADJSAF <- APPROXSAF-ecs.avg.saf#
+    REALFSAF <- (SAF_mean_quad_segment2*(TT.after^3)/3+SAF_mean_quad_segment1*TT.after^2/2+SAF_mean_quad_segment0*TT.after)+SAF_std_quad_segment*TT.after*nonlinearity#
+    ADJFSAF <- REALFSAF - APPROXSAF*TT.after # may not need this#
+#
+    ECS <- ecs0/(1-ecs0*ADJSAF/(log(2)*forceslope))#
+#
+    ## FSAF at actual T (W/m^2)#
+    ## (ALB_SAF_QUADR_MEAN_T2_COEFF*(rt_g^3)/3 + ALB_SAF_QUADR_MEAN_T1_COEFF*(rt_g^2)/2 + ALB_SAF_QUADR_MEAN_T0_COEFF*rt_g) + (ALB_SAF_QUADR_STD*rt_g) * ALB_EMULATOR_RAND#
+    return(c(ADJFSAF, ECS, APPROXSAF, ADJSAF, REALFSAF))#
+}
+df <- data.frame(gmst=c(), ecs=c(), fsaf=c(), approxsaf=c(), adjsaf=c(), realfsaf=c())#
+for (gmst in seq(1, 10, length.out=100)) {#
+    vals <- calc.saf(gmst, gmst)#
+    df <- rbind(df, data.frame(gmst, ecs=vals[2], fsaf=vals[1], approxsaf=vals[3], adjsaf=vals[4], realfsaf=vals[5]))#
+}
+df$cumfsaf <- (SAF_mean_quad_segment2*(df$gmst^3)/3+SAF_mean_quad_segment1*df$gmst^2/2+SAF_mean_quad_segment0*df$gmst)+SAF_std_quad_segment*df$gmst*nonlinearity
+df <- data.frame(gmst=c(), ecs=c(), adjfsaf=c(), approxsaf=c(), adjsaf=c(), realfsaf=c())#
+for (gmst in seq(1, 10, length.out=100)) {#
+    vals <- calc.saf(gmst, gmst)#
+    df <- rbind(df, data.frame(gmst, ecs=vals[2], adjfsaf=vals[1], approxsaf=vals[3], adjsaf=vals[4], realfsaf=vals[5]))#
+}
+head9df
+head(df)
+df$cumfsaf <- (SAF_mean_quad_segment2*(df$gmst^3)/3+SAF_mean_quad_segment1*df$gmst^2/2+SAF_mean_quad_segment0*df$gmst)+SAF_std_quad_segment*df$gmst*nonlinearity#
+#
+library(ggplot2)#
+#
+df2 <- data.frame(gmst=rep(df$gmst, 3), value=c(df$approxsaf, df$ecs, df$realfsaf), label=rep('SAF (W/m2/C)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))
+df2 <- data.frame(gmst=rep(df$gmst, 3), value=c(df$approxsaf, df$ecs, df$realfsaf), label=rep('SAF (W/m2/C)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df))
+df2 <- data.frame(gmst=rep(df$gmst, 3), value=c(df$approxsaf, df$ecs, df$realfsaf), label=rep(c('SAF (W/m2/C)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=1) +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/T)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/T)', 'SAF (W/m2/T)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df2 <- data.frame(gmst=rep(df$gmst, 4), value=c(df$cumfsaf, df$approxsaf, df$ecs, df$realfsaf), label=rep(c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))#
+df2$label <- factor(df2$label, levels=c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'))#
+#
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=2) +#
+    geom_line() + geom_hline(data=data.frame(value=c(NA, ecs.avg.saf, ecs0, NA), label=c('SAF (W/m^2)', 'SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/K)', 'SAF (W/m2/K)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df$saf <- (SAF_mean_quad_segment2*(df$gmst^2)+SAF_mean_quad_segment1*df$gmst+SAF_mean_quad_segment0)#
+df$cumfsaf <- (SAF_mean_quad_segment2*(df$gmst^3)/3+SAF_mean_quad_segment1*df$gmst^2/2+SAF_mean_quad_segment0*df$gmst)+SAF_std_quad_segment*df$gmst*nonlinearity
+df2 <- data.frame(gmst=rep(df$gmst, 3), value=c(df$saf, df$ecs, df$realfsaf), label=rep(c('SAF (W/m2/C)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=1) +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/T)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/T)', 'SAF (W/m2/T)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df2 <- data.frame(gmst=rep(df$gmst, 3), value=c(df$saf, df$ecs, df$realfsaf), label=rep(c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'), each=nrow(df)))#
+#
+## ggplot(df2, aes(gmst, value)) +#
+##     facet_grid(label ~ ., scales="free_y") +#
+##     geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+##     theme_bw() + xlab("Change in GMST (C)") + ylab(NULL)#
+#
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=1) +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/K)', 'SAF (W/m2/K)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df.plus <- data.frame(gmst=seq(0, 10, length.out=100))#
+df.plus$saf <- (SAF_mean_quad_segment2*(df.plus$gmst^2)+SAF_mean_quad_segment1*df.plus$gmst+SAF_mean_quad_segment0)#
+df.plus$cumfsaf <- (SAF_mean_quad_segment2*(df.plus$gmst^3)/3+SAF_mean_quad_segment1*df.plus$gmst^2/2+SAF_mean_quad_segment0*df.plus$gmst)+SAF_std_quad_segment*df.plus$gmst*nonlinearity
+df2 <- data.frame(gmst=c(rep(df.plus$gmst, 2), df$gmst), value=c(df.plus$saf, df.plus$realfsaf, df$ecs), label=c(rep(c('SAF (W/m2/K)', 'Adjusted ECS (C)'), each=nrow(df.plus)), rep('SAF forcing (W/m2)', each=nrow(df))))
+df2 <- data.frame(gmst=c(rep(df.plus$gmst, 2), df$gmst), value=c(df.plus$saf, df.plus$realfsaf, df$ecs))
+df2 <- data.frame(gmst=c(rep(df.plus$gmst, 2), df$gmst), value=c(df.plus$saf, df.plus$cumfsaf, df$ecs), label=c(rep(c('SAF (W/m2/K)', 'Adjusted ECS (C)'), each=nrow(df.plus)), rep('SAF forcing (W/m2)', each=nrow(df))))
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=1) +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/K)', 'SAF (W/m2/K)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df2$label <- factor(df2$label, c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'))
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=1) +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/K)', 'SAF (W/m2/K)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df2 <- data.frame(gmst=c(rep(df.plus$gmst, 2), df$gmst), value=c(df.plus$saf, df.plus$cumfsaf, df$ecs), label=c(rep(c('SAF (W/m2/K)', 'SAF forcing (W/m2)'), each=nrow(df.plus)), rep('Adjusted ECS (C)', each=nrow(df))))#
+df2$label <- factor(df2$label, c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)'))
+ggplot(df2, aes(gmst, value)) +#
+    facet_wrap(label ~ ., scales="free_y", ncol=1) +#
+    geom_line() + geom_hline(data=data.frame(value=c(ecs.avg.saf, ecs0, NA), label=c('SAF (W/m2/K)', 'Adjusted ECS (C)', 'SAF forcing (W/m2)')), aes(yintercept=value)) +#
+    geom_label(data=data.frame(gmst=c(9, 6, 9, 6, 6), value=c(3.6, 3.45, .32, .275, .15), label=c('Adjusted ECS (C)', 'Adjusted ECS (C)', 'SAF (W/m2/K)', 'SAF (W/m2/K)', 'SAF forcing (W/m2)'), text=c('Constant', 'Variable', 'Constant', 'Variable', NA)), aes(label=text)) +#
+    theme_bw() + xlab("Change in GMST (C)") + ylab(NULL) +#
+    scale_x_continuous(expand=c(0, 0))
+df.plus
+##setwd("~/research/missrisks")#
+#
+do.bornnows <- F#
+generation <- F#
+diagnostics <- F#
+#
+library(dplyr)#
+source("mortality/calc.yod.R", chdir=T)#
+#
+## Construct average GMST#
+gmstdf <- data.frame()#
+for (rcp in c('rcp45', 'rcp85')) {#
+    temps <- matrix(NA, 2099 - 1981 + 1, 0)#
+    path <- file.path("~/Dropbox/NextGen IAMs/Mortality/data/gmt_anom/gmt_anom", rcp)#
+    for (filename in list.files(path, ".*csv")) {#
+        if (length(grep("pattern", filename)) > 0)#
+            next#
+        gcmdf <- read.csv(file.path(path, filename))#
+        temps <- cbind(temps, gcmdf$global_tas)#
+    }#
+#
+    for (year1 in c(1980, 2000, 2020, 2040, 2060, 2080)) {#
+        gmstdf <- rbind(gmstdf, data.frame(year=paste0(year1, '-', year1+19), rcp, gmst=mean(temps[(year1 - 1980):(year1 - 1980 + 19),])))#
+    }#
+}#
+#
+paths <- list("young"="~/Dropbox/NextGen IAMs/Mortality/data/young-aggregated",#
+              "young.costs"="~/Dropbox/NextGen IAMs/Mortality/data/young-costs-aggregated",#
+              "older"="~/Dropbox/NextGen IAMs/Mortality/data/older-aggregated",#
+              "older.costs"="~/Dropbox/NextGen IAMs/Mortality/data/older-costs-aggregated",#
+              "oldest"="~/Dropbox/NextGen IAMs/Mortality/data/oldest-aggregated",#
+              "oldest.costs"="~/Dropbox/NextGen IAMs/Mortality/data/oldest-costs-aggregated",#
+              "tas"="~/Dropbox/NextGen IAMs/Mortality/data/covariates/tas-aggregated",#
+              "loggdppc"="~/Dropbox/NextGen IAMs/Mortality/data/covariates/loggdppc-aggregated")#
+#
+df <- data.frame()#
+for (filename in list.files(paths[[names(paths)[1]]])) {#
+    scenarios <- strsplit(gsub(".csv", "", filename), '-')[[1]]#
+    scendf <- NULL#
+    for (variable in names(paths)) {#
+        subdf <- read.csv(file.path(paths[[variable]], filename))#
+        names(subdf) <- c('region', 'year', variable, paste0(variable, '.sd'))#
+        if (is.null(scendf))#
+            scendf <- subdf#
+        else#
+            scendf <- scendf %>% left_join(subdf)#
+    }#
+#
+    df <- rbind(df, cbind(rcp=scenarios[1], ssp=scenarios[2], scendf))#
+}#
+#
+df <- df %>% left_join(gmstdf)
+head(df)
+plot(density(df$oldest))
+plot(density(df$oldest, na.rm=T))
+plot(density(df$oldest, na.rm=T), xlim=c(-1e-5, 1e-5))
+plot(density(df$oldest, na.rm=T), xlim=c(-1e-3, 1e-3))
+plot(density(df$oldest[df$year == '2060-2079'], na.rm=T), xlim=c(-1e-3, 1e-3))
+df[df$region == 'USA' & df$year == '2060-2079',]
+library(raster)
+?raster
+pops <- raster("~/data/Landscan2011/RasterGISbinary/lspop2011.flt")
+pops
+?raster
+pops2 <- aggregate(pops, fact=10, fun=sum)
+pops2
+?write.raster
+?raster
+writeRaster(pops2, "pop2011.grd")
+library(party)
+df = data.frame(aa=c(1, 2, NA), bb=(3, NA, NA), yy=c(T, F, T))
+df = data.frame(aa=c(1, 2, NA), bb=c(3, NA, NA), yy=c(T, F, T))
+ctree(yy ~ aa + bb)
+ctree(yy ~ aa + bb, data=df)
+plot(ctree(yy ~ aa + bb, data=df))
+11 / (.25 * 1200)
+33 / (.25 * 1200)
+33 / (.125 * 1200)
+## Always SCC-CO2 in 2020, in $2015#
+#
+## Initial PAGE09 results ($2009 -> $2015):#
+df1 <- data.frame(model='PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(14, 33, 62, 121, 347, 386, 136, 24, 53, 97, 186, 540, 407, 189) * 1.2255)#
+#
+## AR PAGE09 results ($2013 -> $2015):#
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Default PAGE-ICE results#
+df4 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df5 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))#
+#
+df <- rbind(df1, df2, df3, df4, df5)#
+#
+library(ggplot2)#
+#
+ggplot(df) +#
+    facet_grid(scenario ~ .) +#
+    geom_barplot(data=subset(df, stat='mean'), aes(model, value))
+## Always SCC-CO2 in 2020, in $2015#
+#
+## Initial PAGE09 results ($2009 -> $2015):#
+df1 <- data.frame(model='PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(14, 33, 62, 121, 347, 386, 136, 24, 53, 97, 186, 540, 407, 189) * 1.2255)#
+#
+## AR PAGE09 results ($2013 -> $2015):#
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Default PAGE-ICE results#
+df4 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df5 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))
+df <- rbind(df1, df2, df3, df4, df5)#
+#
+library(ggplot2)#
+#
+ggplot(df) +#
+    facet_grid(scenario ~ .) +#
+    geom_barplot(data=subset(df, stat='mean'), aes(model, value))
+?geom_bar
+ggplot(df) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(data=subset(df, stat='mean'), aes(model, value), stat='identity')
+subset(df, stat='mean')
+ggplot(df) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(model, value), stat='identity')
+## Always SCC-CO2 in 2020, in $2015#
+#
+## Initial PAGE09 results ($2009 -> $2015):#
+df1 <- data.frame(model='PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=0, label="PAGE09",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(14, 33, 62, 121, 347, 386, 136, 24, 53, 97, 186, 540, 407, 189) * 1.2255)#
+#
+## AR PAGE09 results ($2013 -> $2015):#
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=1, label="AR5 Climate",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=2, label="New Sensitivities",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Building up to PAGE-ICE#
+df4 <- data.frame(model='Partial PAGE-ICE', scenario='RCP4.5 & SSP2',#
+                  sequence=3:4, label=c("Reduced Discontinuity", "2300 Horizon")#
+                  stat='mean',#
+                  value=c(191, 230))#
+#
+## Default PAGE-ICE results#
+df5 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=3, label="Arctic feedbacks",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df6 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))#
+#
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+#
+library(ggplot2)#
+#
+ggplot(df) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(model, value), stat='identity')
+## Always SCC-CO2 in 2020, in $2015#
+#
+## Initial PAGE09 results ($2009 -> $2015):#
+df1 <- data.frame(model='PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=1, label="PAGE09",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(14, 33, 62, 121, 347, 386, 136, 24, 53, 97, 186, 540, 407, 189) * 1.2255)#
+#
+## AR PAGE09 results ($2013 -> $2015):#
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=2, label="AR5 Climate",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=3, label="New Sensitivities",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Building up to PAGE-ICE#
+df4 <- data.frame(model='Partial PAGE-ICE', scenario='RCP4.5 & SSP2',#
+                  sequence=4:5, label=c("Reduced Discontinuity", "2300 Horizon"),#
+                  stat='mean',#
+                  value=c(191, 230))#
+#
+## Default PAGE-ICE results#
+df5 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=6, label="Arctic Feedbacks",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df6 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=7, label="Burke Damages",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))
+df <- rbind(df1, df2, df3, df4, df5, df6)
+df$label <- factor(df$label, levels=df$label[df$sequence])
+df$label[df$sequence]
+df$label[df$sequence][!duplicated(df$label[df$sequence])]
+df
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+#
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)][df$sequence])
+v
+df$label[!duplicated(df$label)][df$sequence]
+df$label[!duplicated(df$label)]
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+#
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])
+library(ggplot2)#
+#
+ggplot(df) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(model, value), stat='identity')
+ggplot(df) +#
+    facet_grid(scenario ~ .) + coord_flip() +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(model, value), stat='identity')
+ggplot(df) +#
+    facet_grid(scenario ~ .) + coord_flip() +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(label, value), stat='identity')
+ggplot(df) +#
+    facet_grid(scenario ~ .) + #coord_flip() +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(label, value), stat='identity')
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=2, label="AR5\nClimate",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=3, label="New Sensitivities",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Building up to PAGE-ICE#
+df4 <- data.frame(model='Partial PAGE-ICE', scenario='RCP4.5 & SSP2',#
+                  sequence=4:5, label=c("Reduced Discontinuity", "2300 Horizon"),#
+                  stat='mean',#
+                  value=c(191, 230))#
+#
+## Default PAGE-ICE results#
+df5 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=6, label="Arctic Feedbacks",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df6 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=7, label="Burke Damages",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))#
+#
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+#
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])#
+#
+library(ggplot2)#
+#
+ggplot(df) +#
+    facet_grid(scenario ~ .) + #coord_flip() +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(label, value), stat='identity')
+## Always SCC-CO2 in 2020, in $2015#
+#
+## Initial PAGE09 results ($2009 -> $2015):#
+df1 <- data.frame(model='PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=1, label="PAGE09",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(14, 33, 62, 121, 347, 386, 136, 24, 53, 97, 186, 540, 407, 189) * 1.2255)#
+#
+## AR PAGE09 results ($2013 -> $2015):#
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=2, label="AR5\nClimate",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=3, label="New\nSensitivities",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Building up to PAGE-ICE#
+df4 <- data.frame(model='Partial PAGE-ICE', scenario='RCP4.5 & SSP2',#
+                  sequence=4:5, label=c("Reduced\nDiscontinuity", "2300\nHorizon"),#
+                  stat='mean',#
+                  value=c(191, 230))#
+#
+## Default PAGE-ICE results#
+df5 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=6, label="Arctic\nFeedbacks",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df6 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=7, label="Burke\nDamages",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))#
+#
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+#
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])#
+#
+library(ggplot2)#
+#
+ggplot(df) +#
+    facet_grid(scenario ~ .) + #coord_flip() +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(label, value), stat='identity')
+ggplot(df) +#
+    facet_grid(scenario ~ .) + #coord_flip() +#
+    geom_bar(data=subset(df, stat == 'mean'), aes(label, value), stat='identity') +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+head(df)
+?reshape
+?cast
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+dcast(df, ... ~ stat)
+library(reshape)
+library(reshape2)
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+dcast(df, ... ~ stat)
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])
+df
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+df <- dcast(df, ... ~ stat)#
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])
+df
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) + #coord_flip() +#
+    geom_bar(stat='identity') +#
+    geom_errorbar(#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+)
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) + #coord_flip() +#
+    geom_bar(stat='identity') +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(stat='identity') + geom_errorbar(aes(ymin=q5, ymax=q95)) +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(stat='identity') + geom_errorbar(aes(ymin=q25, ymax=q75)) +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(stat='identity') + geom_errorbar(aes(ymin=q25, ymax=q75), width=.5) +#
+    geom_pointrange(aes(y=q50, ymin=q5, ymax=q95)) +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+## Always SCC-CO2 in 2020, in $2015#
+#
+library(reshape2)#
+#
+## Initial PAGE09 results ($2009 -> $2015):#
+df1 <- data.frame(model='PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=1, label="PAGE09",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(14, 33, 62, 121, 347, 386, 136, 24, 53, 97, 186, 540, 407, 189) * 1.2255)#
+#
+## AR PAGE09 results ($2013 -> $2015):#
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=2, label="AR5\nClimate",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=3, label="New\nSensitivity",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Building up to PAGE-ICE#
+df4 <- data.frame(model='Partial PAGE-ICE', scenario='RCP4.5 & SSP2',#
+                  sequence=4:5, label=c("Reduced\nDiscontinuity", "2300\nHorizon"),#
+                  stat='mean',#
+                  value=c(191, 230))#
+#
+## Default PAGE-ICE results#
+df5 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=6, label="Arctic\nFeedbacks",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df6 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=7, label="Burke\nDamages",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))#
+#
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+df <- dcast(df, ... ~ stat)#
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])#
+#
+library(ggplot2)#
+#
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(stat='identity') + geom_errorbar(aes(ymin=q25, ymax=q75), width=.5) +#
+    geom_pointrange(aes(y=q50, ymin=q5, ymax=q95)) +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(stat='identity') + geom_errorbar(aes(ymin=q25, ymax=q75), width=.5) +#
+    geom_errorbar(aes(ymin=q50, ymax=q50), width=1) +#
+    geom_errorbar(aes(ymin=q5, ymax=q95), width=.1) +#
+    ##geom_pointrange(aes(y=q50, ymin=q5, ymax=q95)) +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+total <- 307#
+rands <- runif(5, 8)
+total <- 307#
+rands <- matrix(runif(5*8), 5, 8)
+rands
+for (ii in 1:8)#
+    rands[ii,] / sum(rands[ii,])
+rands <- matrix(runif(5*8), 5, 8)#
+#
+for (ii in 1:8)#
+    rands[,ii] / sum(rands[,ii])
+rands
+rands <- matrix(runif(5*8), 5, 8)#
+#
+for (ii in 1:8)#
+    rands[,ii] <- rands[,ii] / sum(rands[,ii])
+rands
+rands <- matrix(runif(5*8), 5, 8)#
+#
+colSums(rands)
+rands <- matrix(runif(5*8), 5, 8)#
+widths <- colSums(rands) / sum(colSums(rands))
+?rect
+rands[ii, rr]
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr], col=ii)#
+        y0 <- y0 + rands[ii, rr]#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+?plot.new
+plot(c(0, 1), c(0, 307))
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr], col=ii)#
+        y0 <- y0 + rands[ii, rr]#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+totalarea <- 0#
+for (rr in 1:8) {#
+    for (ii in 1:5)#
+        totalarea <- totalarea + widths[rr] * rands[ii, rr]#
+}
+totalarea
+plot(c(0, 1), c(0, 307))#
+#
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr] * total / totalarea, col=ii)#
+        y0 <- y0 + rands[ii, rr]#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+plot(c(0, 1), c(0, 307))#
+#
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr] * total / totalarea, col=ii)#
+        y0 <- y0 + rands[ii, rr] * total / totalarea#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+plot(c(0, 1), c(0, 307), ylim=c(0, 500))#
+#
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr] * total / totalarea, col=ii)#
+        y0 <- y0 + rands[ii, rr] * total / totalarea#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+plot(c(0, 1), c(0, total), ylim=c(0, 500))#
+rect(0, 0, 1, total, col='white')
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr] * total / totalarea, col=ii)#
+        y0 <- y0 + rands[ii, rr] * total / totalarea#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+total <- 307#
+rands <- matrix(runif(5*8), 5, 8)#
+widths <- runif(8)#
+widths <- widths / sum(widths)#
+#
+totalarea <- 0#
+for (rr in 1:8) {#
+    for (ii in 1:5)#
+        totalarea <- totalarea + widths[rr] * rands[ii, rr]#
+}#
+#
+plot(c(0, 1), c(0, total), ylim=c(0, 500))#
+rect(0, 0, 1, total, col='white')#
+#
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr] * total / totalarea, col=ii)#
+        y0 <- y0 + rands[ii, rr] * total / totalarea#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+plot(c(0, 1), c(0, total), ylim=c(0, 500), xlab="PAGE09", ylab="SCC-CO2 in 2020 ($2015)")#
+rect(0, 0, 1, total, col='white')#
+#
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr] * total / totalarea, col=ii)#
+        y0 <- y0 + rands[ii, rr] * total / totalarea#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+plot(c(0, 1), c(0, total), ylim=c(0, 500), xlab="PAGE-ICE", ylab="SCC-CO2 in 2020 ($2015)")#
+rect(0, 0, 1, total, col='white')#
+#
+w0 <- 0#
+for (rr in 1:8) {#
+    y0 <- 0#
+    for (ii in 1:5) {#
+        rect(w0, y0, w0 + widths[rr], y0 + rands[ii, rr] * total / totalarea, col=ii)#
+        y0 <- y0 + rands[ii, rr] * total / totalarea#
+    }#
+    w0 <- w0 + widths[rr]#
+}
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(stat='identity') + geom_errorbar(aes(ymin=q25, ymax=q75), width=.5) +#
+    geom_errorbar(aes(ymin=q50, ymax=q50), width=1) +#
+    geom_errorbar(aes(ymin=q5, ymax=q95), width=.1) +#
+    ##geom_pointrange(aes(y=q50, ymin=q5, ymax=q95)) +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+## Always SCC-CO2 in 2020, in $2015#
+#
+library(reshape2)#
+#
+## Initial PAGE09 results ($2009 -> $2015):#
+df1 <- data.frame(model='PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=1, label="PAGE09",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(14, 33, 62, 121, 347, 386, 136, 24, 53, 97, 186, 540, 407, 189) * 1.2255)#
+#
+## AR PAGE09 results ($2013 -> $2015):#
+df2 <- data.frame(model='AR PAGE09', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=7),#
+                  sequence=2, label="AR5\nClimate",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean'), 2),#
+                  value=c(16, 46, NA, 161, 433, 184, 140, 27, 71, 131, 242, 613, 224, 201) * 1.0149)#
+#
+## PAGE-ICE results with PAGE09 arctic impacts and discontinuity#
+df3 <- data.frame(model='PAGE-ICE results with PAGE09 arctic impacts and discontinuity', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=3, label="New\nSensitivity",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(30.378, 71.252, 122.304, 208.498, 515.230, 401.210, 204.860, 202.775, 206.949, 38.188, 87.169, 152.532, 266.353, 688.511, NA, 252.774, 250.506, 255.042))#
+#
+## Building up to PAGE-ICE#
+df4 <- data.frame(model='Partial PAGE-ICE', scenario='RCP4.5 & SSP2',#
+                  sequence=4:5, label=c("Reduced\nDiscontinuity", "2300\nHorizon"),#
+                  stat='mean',#
+                  value=c(191, 230))#
+#
+## Default PAGE-ICE results#
+df5 <- data.frame(model='Default PAGE-ICE results', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=6, label="Arctic\nFeedbacks",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(37.031, 89.742, 161.868, 299.439, 847.020, NA, 261.739, 260.053, 263.424, 42.992, 101.930, 181.870, 326.430, 809.929, NA, 267.835, 266.399, 269.272))#
+#
+## PAGE-ICE results with simulation of Burke impacts#
+df6 <- data.frame(model='PAGE-ICE results with simulation of Burke impacts', scenario=rep(c('RCP4.5 & SSP2', 'RCP8.5 & SSP5'), each=9),#
+                  sequence=7, label="Burke\nDamages",#
+                  stat=rep(c('q5', 'q25', 'q50', 'q75', 'q95', 'sd', 'mean', 'meanq5', 'meanq95'), 2),#
+                  value=c(53.903, 129.330, 217.337, 361.739, 886.998, NA, 306.914, 305.267, 308.560, 56.802, 123.377, 197.469, 311.269, 682.786, NA, 259.448, 258.241, 260.655))#
+#
+df <- rbind(df1, df2, df3, df4, df5, df6)#
+df <- dcast(df, ... ~ stat)#
+df$label <- factor(df$label, levels=df$label[!duplicated(df$label)])
+df
+library(ggplot2)#
+#
+ggplot(df, aes(label, mean)) +#
+    facet_grid(scenario ~ .) +#
+    geom_bar(stat='identity') + geom_errorbar(aes(ymin=q25, ymax=q75), width=.5) +#
+    geom_errorbar(aes(ymin=q50, ymax=q50), width=1) +#
+    geom_errorbar(aes(ymin=q5, ymax=q95), width=.1) +#
+    ##geom_pointrange(aes(y=q50, ymin=q5, ymax=q95)) +#
+    xlab(NULL) + ylab("SCC-CO2 in 2020 ($2015)") + theme_bw()
+pdf1
+df = read.csv("~/research/tippt/hazard-changes.csv")
+df
+t(df)
+write.csv(t(df), "hazard-changes-transpose.csv", row.names=F)
+getwd()
+write.csv(t(df), "~/research/tippt/hazard-changes-transpose.csv", row.names=F)
+df
+c('tot', 1:9)
+?data
+data()
+data(Nile)
+ls()
+head(Nile)
+density(Nile)
+plot(density(Nile))
+data()
+data(Seatbelts)
+head(Seatbelts)
+plot(density(Seatbelts))
+? USArrests
+data(USArrests)
+head(USArrests)
+plot(density(USArrests$Murder))
+plot(density(USArrests$Assault))
+plot(density(USArrests$UrbanPop))
+data(airquality)
+head(airquality)
+plot(density(airquality$Ozone))
+plot(density(airquality$Ozone, na.rm=T))
+plot(density(airquality$Wint, na.rm=T))
+plot(density(airquality$Wind, na.rm=T))
+plot(density(airquality$Solar.R, na.rm=T))
+data(fdeaths)
+head(UKLungDeaths)
+data(UKLungDeaths)
+head(UKLungDeaths)
+head(fdeaths)
+plot(density(fdeaths))
+data(presidents)
+plot(density(presidents))
+head(presidents)
+plot(density(presidents, na.rm=T))
+data(treering)
+head(treering)
+plot(density(treering))
+exp(.5 * 1)
+mean(exp(rnorm(1000000)))
+mean(exp(rnorm(1000000, 0, 2)))
+exp(.5 * 4)
+mean(exp(rnorm(1000000, 0, .7)))
+exp(.5 * .7^2)
+exp(.5 * (.1750078507480245^2))
+exp(.5 * .1750078507480245)
+setwd("~/research/mimi-page/mimi-page-2020.jl/preproc/ar-model")#
+#
+df.co2.hist <- read.csv("co2conc.csv")#
+df.co2.obs <- read.table("co2_annmean_gl.txt")#
+names(df.co2.obs) <- c('year', 'mean', 'unc')#
+df.co2 <- data.frame(year=c(df.co2.hist$year[df.co2.hist$year < min(df.co2.obs$year)], df.co2.obs$year), co2=c(df.co2.hist$rcp45[df.co2.hist$year < min(df.co2.obs$year)], df.co2.obs$mean), co2.unc=c(seq(10, 1, length.out=sum(df.co2.hist$year < min(df.co2.obs$year))), df.co2.obs$unc))#
+#
+df.temp <- as.data.frame(t(as.matrix(read.csv("region-temps.csv", header=F))))#
+colnames(df.temp) <- c('eu', 'rus+', 'usa', 'chi+', 'ind+', 'afr', 'lat', 'oth')#
+df.temp$year <- 1850:2018#
+#
+ampf <- c(1.27, 1.65, 1.34, 1.17, 1.01, 1.21, 1.04, 1.22)#
+## RT = GMST * AMPF: use mean of multiple observations#
+df.temp$gmst <- NA#
+for (ii in 1:nrow(df.temp))#
+    df.temp$gmst[ii] <- mean(as.numeric(df.temp[ii, -9:-10]) / ampf)#
+## Smooth it#
+mod.gmst <- loess(gmst ~ year, data=df.temp)#
+df.temp$smooth <- predict(mod.gmst)#
+#
+library(dplyr)#
+library(MASS)#
+#
+df <- df.temp %>% left_join(df.co2)#
+df$co2.delay <- c(NA, df$co2[-nrow(df)])#
+df$co2.unc.delay <- c(NA, df$co2.unc[-nrow(df)])#
+df$gmst.delay <- c(NA, df$gmst[-nrow(df)])#
+df$smooth.delay <- c(NA, df$smooth[-nrow(df)])#
+for (region in names(df)[1:8])#
+    df[, paste0(region, ".delay")] <- c(NA, df[-nrow(df), region])
+setwd("~/research/iamup/mimi-page-2020.jl/preproc/ar-model")#
+#
+df.co2.hist <- read.csv("co2conc.csv")#
+df.co2.obs <- read.table("co2_annmean_gl.txt")#
+names(df.co2.obs) <- c('year', 'mean', 'unc')#
+df.co2 <- data.frame(year=c(df.co2.hist$year[df.co2.hist$year < min(df.co2.obs$year)], df.co2.obs$year), co2=c(df.co2.hist$rcp45[df.co2.hist$year < min(df.co2.obs$year)], df.co2.obs$mean), co2.unc=c(seq(10, 1, length.out=sum(df.co2.hist$year < min(df.co2.obs$year))), df.co2.obs$unc))#
+#
+df.temp <- as.data.frame(t(as.matrix(read.csv("region-temps.csv", header=F))))#
+colnames(df.temp) <- c('eu', 'rus+', 'usa', 'chi+', 'ind+', 'afr', 'lat', 'oth')#
+df.temp$year <- 1850:2018#
+#
+ampf <- c(1.27, 1.65, 1.34, 1.17, 1.01, 1.21, 1.04, 1.22)#
+## RT = GMST * AMPF: use mean of multiple observations#
+df.temp$gmst <- NA#
+for (ii in 1:nrow(df.temp))#
+    df.temp$gmst[ii] <- mean(as.numeric(df.temp[ii, -9:-10]) / ampf)#
+## Smooth it#
+mod.gmst <- loess(gmst ~ year, data=df.temp)#
+df.temp$smooth <- predict(mod.gmst)#
+#
+library(dplyr)#
+library(MASS)#
+#
+df <- df.temp %>% left_join(df.co2)#
+df$co2.delay <- c(NA, df$co2[-nrow(df)])#
+df$co2.unc.delay <- c(NA, df$co2.unc[-nrow(df)])#
+df$gmst.delay <- c(NA, df$gmst[-nrow(df)])#
+df$smooth.delay <- c(NA, df$smooth[-nrow(df)])#
+for (region in names(df)[1:8])#
+    df[, paste0(region, ".delay")] <- c(NA, df[-nrow(df), region])
+head(df)
+mod.var.co2 <- lm(gmst ~ co2)#
+mod.var.smooth <- lm(gmst ~ smooth)#
+mod.ar.co2 <- lm(gmst ~ gmst.delay + co2)#
+mod.ar.smooth <- lm(gmst ~ gmst.delay + smooth)
+mod.var.yr <- lm(gmst ~ year, data=df)#
+mod.var.co2 <- lm(gmst ~ co2, data=df)#
+mod.var.smooth <- lm(gmst ~ smooth, data=df)#
+mod.ar.co2 <- lm(gmst ~ gmst.delay + co2, data=df)#
+mod.ar.smooth <- lm(gmst ~ gmst.delay + smooth, data=df)
+library(stargazer)#
+stargazer(list(mod.var.yr, mod.var.co2, mod.var.smooth, mod.ar.co2, mod.ar.smooth))
+head(df)
+mod.ar.smooth
+summary)mod.ar.smooth)
+summary(mod.ar.smooth)
+head(df)
+names(mod.ar.smooth)
+sd(mod.ar.smooth$residuals)
+summary(mod.ar.smooth)
+names(summary(mod.ar.smooth))
+names(summary(mod.ar.smooth))$sigma
+summary(mod.ar.smooth)$sigma
+head(df)
+projs <- data.frame()#
+for (mc in 1:10) {#
+    gmsts <- df$gmst[1]#
+    seres <- summary(mod.ar.smooth)$sigma#
+    for (ii in 2:nrow(df))#
+        gmsts <- c(gmsts, predict(mod.ar.smooth, data.frame(gmst.delay=gmsts[ii-1], smooth=df$smooth[ii])) + rnorm(1, 0, seres))#
+#
+    projs <- rbind(projs, data.frame(mc, year=df$year, gmst=gmsts))#
+}
+library(ggplot2)#
+#
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(aes(group=mc), alpha=.5) + geom_line(data=df, aes(y=smooth))
+projs$group <- "Others"#
+projs$group[projs$mc == 1] <- "One"#
+#
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(aes(group=mc, colour=group), alpha=.5) + geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True"))
+projs <- data.frame()#
+for (mc in 1:10) {#
+    gmsts <- df$gmst[1]#
+    seres <- summary(mod.ar.smooth)$sigma#
+    for (ii in 2:nrow(df))#
+        gmsts <- c(gmsts, predict(mod.ar.smooth, data.frame(gmst.delay=gmsts[ii-1], smooth=df$smooth[ii])) + rnorm(1, 0, seres))#
+#
+    projs <- rbind(projs, data.frame(mc, year=df$year, gmst=gmsts))#
+}
+ggplot(aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Others"), alpha=.5) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True"))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Others"), alpha=.5) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True"))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Others"), alpha=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True"))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), alpha=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST"))#
+    #scale_colour_manual(name=NULL, breaks=c('One', 'Others', 'True'), values=c('#1b9e77',
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), alpha=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#d9d9d9', '#7570b3'))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), alpha=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#d9d9d9', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), alpha=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#00000', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), alpha=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#000000', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), alpha=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#000000', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations")) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#0000009a', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations")) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#9a9a9a', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), width=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#9a9a9a', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
+?geom_line
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), size=.1) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#9a9a9a', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), size=.2) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth)) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#9a9a9a', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), size=.2) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth, colour="Loess of GMST")) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('One simulation', 'Other simulations', 'True GMST'), values=c('#1b9e77', '#9a9a9a', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), size=.2) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth, colour="Loess of GMST")) +#
+    geom_line(data=df, aes(colour="True GMST"))
+ggplot(projs, aes(year, gmst)) +#
+    geom_line(data=subset(projs, mc != 1), aes(group=mc, colour="Other simulations"), size=.2) +#
+    geom_line(data=subset(projs, mc == 1), aes(group=mc, colour="One simulation")) +#
+    geom_line(data=df, aes(y=smooth, colour="Loess of GMST")) +#
+    geom_line(data=df, aes(colour="True GMST")) +#
+    scale_colour_manual(name=NULL, breaks=c('Loess of GMST', 'One simulation', 'Other simulations', 'True GMST'), values=c('#000000', '#1b9e77', '#9a9a9a', '#7570b3')) +#
+theme_bw() + scale_x_continuous(expand=c(0, 0)) + ylab("Change in GMST from pre-industrial") + xlab(NULL)
