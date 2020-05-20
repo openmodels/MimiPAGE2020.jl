@@ -38,7 +38,7 @@ You only have to run this (whichever method you choose) once on your machine.
 
 Mimi-PAGE also requires the Distributions, DataFrames, CSVFiles, Query, and Missings packages.
 
-For more information about the Mimi component framework, you can refer to the [Mimi](https://github.com/anthofflab/Mimi.jl) Github repository, which has a documentation and links to various models that are based on Mimi.
+For more information about the Mimi component framework, you can refer to the [Mimi](https://www.mimiframework.org/) site, which has a documentation and links to various models that are based on Mimi.
 
 ## Installing Mimi-PAGE
 
@@ -55,11 +55,14 @@ outgoing variables. Results can be viewed by running `m[:ComponentName, :Variabl
 for the desired component and variable. You may also explore the results graphically
 by running `explore(m)` to view all variables and parameters, or `explore(m, :VariableName)`
 for just one. For more details on the graphical interface of Mimi look to the
-documentation in the Mimi [User Guide](`http://anthofflab.berkeley.edu/Mimi.jl/stable/userguide/#Plotting-and-the-Explorer-UI-1`).
+documentation in the
+Mimi
+[User Guide](https://www.mimiframework.org/Mimi.jl/stable/userguide/) under
+Plotting and the Explorer UI.
 
 To run the stochastic version of Mimi-PAGE, which uses parameter
 distributions, see the `mcs.jl` file in the src folder and the documentation for
-Mimi Monte Carlo support [here](https://github.com/anthofflab/Mimi.jl/blob/master/docs/src/internals/montecarlo.md). The simplest version of the stochastic can be implemented as follows:
+Mimi Monte Carlo support [here](https://github.com/mimiframework/Mimi.jl/blob/master/docs/src/internals/montecarlo.md). The simplest version of the stochastic can be implemented as follows:
 ```julia
 julia> do_monte_carlo_runs(1000) #1000 runs
 ```
@@ -71,4 +74,4 @@ desired. For more information, see the [Technical Guide](technicaluserguide.md).
 
 To troubleshoot individual components, you can refer to the `test` directory, which has separate files that check each component.
 
-For specific questions, you can send an email to [David Anthoff](http://www.david-anthoff.com/) (<anthoff@berkeley.edu>).
+For specific questions, you can send an email to [James Rising](http://existencia.org/pro) (<j.a.rising@lse.ac.uk>).
