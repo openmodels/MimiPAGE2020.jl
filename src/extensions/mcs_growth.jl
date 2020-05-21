@@ -2,7 +2,7 @@ using Distributions
 using DataFrames
 using Mimi
 
-include("utils/mctools.jl")
+include("../utils/mctools.jl")
 
 function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
                 ge_maximum::Union{Float64, Nothing} = nothing,
@@ -409,7 +409,3 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
     scc_results
 end
 
-# include("mcs.jl")
-# do_monte_carlo_runs(100)
-# include("compute_scc.jl")
-# get_scc_mcs(100, 2020)

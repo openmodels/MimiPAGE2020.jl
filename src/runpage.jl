@@ -1,9 +1,3 @@
-#########################
-# options to choose from:
-###
-# - "PAGE-ICE"
-# - "PAGE-ICE with Growth Effects"
-#########################
 function Input(texttodisplay)
     # function that allows for user input in the CLI
     println(texttodisplay)
@@ -26,21 +20,20 @@ function runpage()
 
     version = Input(options)
 
-
     if isequal(version, "1") || isequal(version, "PAGE-ICE (10 timestep)")
         include("runmodel.jl")
     elseif isequal(version, "2") || isequal(version, "PAGE-ICE with Growth Effects (10 timestep)")
-        include("runmodel_growth.jl")
+        include("extensions/runmodel_growth.jl")
     elseif isequal(version, "3") || isequal(version, "PAGE-ICE (annual)")
-        include("runmodel_annual.jl")
+        include("extensions/runmodel_annual.jl")
     elseif isequal(version, "4") || isequal(version, "PAGE-ICE with independent Interannual Temperature Variability (annual)")
-        include("runmodel_variability.jl")
+        include("extensions/runmodel_variability.jl")
     elseif isequal(version, "5") || isequal(version, "PAGE-ICE with Interannual Temperature Variability with Autoregression (annual)")
-        include("runmodel_ARvariability.jl")
+        include("extensions/runmodel_ARvariability.jl")
     elseif isequal(version, "6") || isequal(version, "PAGE-ICE with Growth Effects (annual)")
-        include("runmodel_annualGrowth.jl")
+        include("extensions/runmodel_annualGrowth.jl")
     elseif isequal(version, "7") || isequal(version, "PAGE-ICE with Growth Effects and autoregressive Interannual Temperature Variability (annual)")
-        include("runmodel_annualGrowth_ARvariability.jl")
+        include("extensions/runmodel_annualGrowth_ARvariability.jl")
     else
         println("WARNING: No valid model input provided. Please provide a valid model choice")
         runpage()

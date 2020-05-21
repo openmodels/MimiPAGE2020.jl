@@ -13,6 +13,9 @@ include("main_model.jl")
 include("mcs.jl")
 include("compute_scc.jl")
 
+if !@isdefined samplesize
+    samplesize = 50000
+end
 
 for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
     model = "PAGE-ICE"
@@ -24,7 +27,6 @@ for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & 
     # open up Explorer UI, for visual exploration of the variables
     # explore(m)
 
-    samplesize = 50000
     # do general monte carlo simulation and save the output
     do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output", scenario, model))
 

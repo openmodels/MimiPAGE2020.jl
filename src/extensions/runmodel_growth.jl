@@ -18,10 +18,12 @@ myregions = ["EU", "USA", "Other OECD","Former USSR","China","Southeast Asia","A
 myyears = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
 
 # define the output directory
-dir_output = joinpath(@__DIR__, "../output/")
+dir_output = joinpath(@__DIR__, "../../output/")
 
 # define number of Monte Carlo runs
-samplesize = 50000
+if !@isdefined samplesize
+    samplesize = 50000
+end
 
 # define the seed
 masterseed = 22081994

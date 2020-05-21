@@ -32,10 +32,12 @@ set_globalbools()
 include("main_model_annualGrowth.jl")
 
 # define the output directory
-dir_output = joinpath(@__DIR__, "../output/")
+dir_output = joinpath(@__DIR__, "../../output/")
 
 # define number of Monte Carlo runs
-samplesize = 50000
+if !@isdefined samplesize
+    samplesize = 50000
+end
 
 # define the seed
 masterseed = 22081994
