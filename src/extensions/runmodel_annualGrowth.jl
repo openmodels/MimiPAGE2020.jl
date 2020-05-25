@@ -83,13 +83,13 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
                                                  " convergence", jj_convergence, "pulse_", jj_pulse))
 
                                     # define the output for the Monte Carlo files
-                                    dir_MCoutput = string(dir_output, "montecarlo_distrGE/ge", jj_gestring,
+                                    dir_MCoutput = string(dir_output, "mc_diGE/ge", jj_gestring,
                                                                     "_scen", jj_scen,
-                                                                    "_per", jj_permafr,
-                                                                    "_sea", jj_seaice,
-                                                                    "_conv", jj_convergence, "_boun", jj_cbabs, "_eqw", jj_eqwshare,
-                                                                    "_civ", jj_civvalue,
-                                                                    "_pul", jj_pulse,
+                                                                    "_pf", jj_permafr,
+                                                                    "_se", jj_seaice,
+                                                                    "_co", jj_convergence, "_bd", jj_cbabs, "_eq", jj_eqwshare,
+                                                                    "_ci", jj_civvalue,
+                                                                    "_p", jj_pulse,
                                                                      "/")
 
                                     # calculate the stochastic mean SCC
