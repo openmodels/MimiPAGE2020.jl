@@ -276,7 +276,7 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
 end
 
 #Reformat the RV results into the format used for testing
-function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../output"))
+function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../../output"))
 
     #create vectors to hold results of Monte Carlo runs
     td=zeros(samplesize);
@@ -379,7 +379,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
 
 end
 
-function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../output"))
+function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../../output"))
     # get simulation
     mcs = getsim()
 
@@ -424,7 +424,7 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
     return scc_results
 end
 
-function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
+function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../../output");
                       eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
                       pulse_size::Union{Float64, Nothing} = 75000.,
                       scenario::String = "RCP4.5 & SSP2",
@@ -470,4 +470,3 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
 
     scc_results
 end
-

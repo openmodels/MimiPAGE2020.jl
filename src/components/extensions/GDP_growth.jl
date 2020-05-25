@@ -28,7 +28,7 @@
     ###############################################
     # parameters and variables for growth effects
     gdp_leveleffect   = Variable(index=[time, region], unit="\$M")
-    isat_ImpactinclSaturationandAdaptation = Parameter(index=[time,region])
+    isat_ImpactinclSaturationandAdaptation = Parameter(index=[time,region], unit = "\$")
     lgdp_gdploss =  Variable(index=[time, region], unit="\$M")
     ge_growtheffects = Parameter(unit = "none", default =  0.)
     grwnet_realizedgdpgrowth = Variable(index=[time, region], unit = "%/year")
