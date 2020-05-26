@@ -2,9 +2,12 @@ using Distributions
 using DataFrames
 using CSV
 
-include("utils/mctools.jl")
+include("../utils/mctools.jl")
 
-function getsim()
+function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
+                ge_maximum::Union{Float64, Nothing} = nothing,
+                ge_mode::Union{Float64, Nothing} = nothing,
+                civvalue_multiplier::Union{Float64, Nothing} = 1.)
     mcs = @defsim begin
 
         ############################################################################
@@ -89,6 +92,8 @@ function getsim()
 
         # GDP
         isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
+        ge_growtheffects = TriangularDist(ge_minimum, ge_maximum, ge_mode)
+        ge_seed_empiricaldistribution = Uniform(0, 10^10)
 
         # MarketDamages
         iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
@@ -132,7 +137,9 @@ function getsim()
         distau_discontinuityexponent = TriangularDist(10, 30, 20)
 
         # EquityWeighting
-        civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
+        civvalue_civilizationvalue = TriangularDist(1e10*civvalue_multiplier,
+                                                    1e11*civvalue_multiplier,
+                                                    5e10*civvalue_multiplier)
         ptp_timepreference = TriangularDist(0.1,2,1)
         emuc_utilityconvexity = TriangularDist(0.5,2,1)
 
@@ -249,14 +256,27 @@ function getsim()
              NonMarketDamages.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP_ann,
-             Discontinuity.isat_per_cap_DiscImpactperCapinclSaturation_ann)
+             Discontinuity.isat_per_cap_DiscImpactperCapinclSaturation_ann,
+             GDP.ge_growtheffects,
+             GDP.ge_use_empiricaldistribution,
+             GDP.gdp,
+             GDP.gdp_ann,
+             GDP.cbreg_regionsatbound,
+             GDP.cbreg_regionsatbound_ann,
+             EquityWeighting.lgdp_gdploss,
+             EquityWeighting.lgdp_gdploss_ann,
+             EquityWeighting.grwnet_realizedgdpgrowth,
+             EquityWeighting.grwnet_realizedgdpgrowth_ann,
+             EquityWeighting.excdampv_excessdamagespresvalue,
+             EquityWeighting.excdampv_excessdamagespresvalue_ann
+             )
 
     end #de
     return mcs
 end
 
 #Reformat the RV results into the format used for testing
-function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../output"))
+function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../../output"))
 
     #create vectors to hold results of Monte Carlo runs
     td=zeros(samplesize);
@@ -286,6 +306,22 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     te_totaleffect_ann_yr=zeros(samplesize);
     td_totaldiscountedimpacts_ann_yr=zeros(samplesize);
 
+    ge_growtheffects=zeros(samplesize);
+    ge_use_empiricaldistribution=zeros(samplesize);
+    gdp=zeros(samplesize);
+    gdp_ann=zeros(samplesize);
+    cbreg_regionsatbound=zeros(samplesize);
+    cbreg_regionsatbound_ann=zeros(samplesize);
+    lgdp_gdploss=zeros(samplesize);
+    lgdp_gdploss_ann=zeros(samplesize);
+    grwnet_realizedgdpgrowth=zeros(samplesize);
+    grwnet_realizedgdpgrowth_ann=zeros(samplesize);
+    excdampv_excessdamagespresvalue=zeros(samplesize);
+    excdampv_excessdamagespresvalue_ann=zeros(samplesize);
+
+
+    EquityWeighting.excdampv_excessdamagespresvalue
+
     #load raw data
     #no filter
     td      = load_RV("EquityWeighting_td_totaldiscountedimpacts", "td_totaldiscountedimpacts"; output_path = output_path)
@@ -296,9 +332,10 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     tac_ann     = load_RV("EquityWeighting_tac_totaladaptationcosts_ann", "tac_totaladaptationcosts_ann"; output_path = output_path)
     te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path = output_path)
     te_ann      = load_RV("EquityWeighting_te_totaleffect_ann", "te_totaleffect_ann"; output_path = output_path)
-
+    ge_growtheffects      = load_RV("GDP_ge_growtheffects", "ge_growtheffects"; output_path = output_path)
+    ge_use_empiricaldistribution = load_RV("GDP_ge_use_empiricaldistribution", "ge_use_empiricaldistribution"; output_path = output_path)
     #time index
-    c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
+    c_co2concentration = load_RV("co2cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
     ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path = output_path)
     rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
     rt_g_ann    = load_RV("ClimateTemperature_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path = output_path)
@@ -318,21 +355,31 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path) # redundant?
     rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path) # redundant?
     rimpactpercap_disc_ann         = load_RV("Discontinuity_isat_per_cap_DiscImpactperCapinclSaturation_ann", "isat_per_cap_DiscImpactperCapinclSaturation_ann"; output_path = output_path)
+    gdp         = load_RV("GDP_gdp", "gdp"; output_path = output_path)
+    gdp_ann     = load_RV("GDP_gdp_ann", "gdp_ann"; output_path = output_path)
+    cbreg_regionsatbound    = load_RV("GDP_cbreg_regionsatbound", "cbreg_regionsatbound"; output_path = output_path)
+    cbreg_regionsatbound_ann    = load_RV("GDP_cbreg_regionsatbound_ann", "cbreg_regionsatbound_ann"; output_path = output_path)
+    lgdp_gdploss    = load_RV("EquityWeighting_lgdp_gdploss", "lgdp_gdploss"; output_path = output_path)
+    lgdp_gdploss_ann    = load_RV("EquityWeighting_lgdp_gdploss_ann", "lgdp_gdploss_ann"; output_path = output_path)
+    grwnet_realizedgdpgrowth    = load_RV("EquityWeighting_grwnet_realizedgdpgrowth", "grwnet_realizedgdpgrowth"; output_path = output_path)
+    grwnet_realizedgdpgrowth_ann    = load_RV("EquityWeighting_grwnet_realizedgdpgrowth_ann", "grwnet_realizedgdpgrowth_ann"; output_path = output_path)
+    excdampv_excessdamagespresvalue    = load_RV("EquityWeighting_excdampv_excessdamagespresvalue", "excdampv_excessdamagespresvalue"; output_path = output_path)
+    excdampv_excessdamagespresvalue_ann    = load_RV("EquityWeighting_excdampv_excessdamagespresvalue_ann", "excdampv_excessdamagespresvalue_ann"; output_path = output_path)
 
     #resave aggregate data
-    df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
+    df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc, ge_growtheffects=ge_growtheffects, ge_use_empiricaldistribution=ge_use_empiricaldistribution)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_aggregate_global.csv"),df)
     #resave annual data
     df=DataFrame(rt_g_ann=rt_g_ann, te_ann_yr=te_ann_yr, td_ann_yr=td_ann_yr)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"),df)
     #resave annual and regional data
-    # df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann)
-    df = DataFrame(rimpactpercap_market_ann=rimpactpercap_market_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rimpactpercap_disc_ann=rimpactpercap_disc_ann)
+    # df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann, gdp=gdp, gdp_ann=gdp_ann, cbreg_regionsatbound=cbreg_regionsatbound, cbreg_regionsatbound_ann=cbreg_regionsatbound_ann, lgdp_gdploss=lgdp_gdploss, lgdp_gdploss_ann=lgdp_gdploss_ann, grwnet_realizedgdpgrowth=grwnet_realizedgdpgrowth, grwnet_realizedgdpgrowth_ann=grwnet_realizedgdpgrowth_ann, excdampv_excessdamagespresvalue=excdampv_excessdamagespresvalue, excdampv_excessdamagespresvalue_ann=excdampv_excessdamagespresvalue_ann)
+    df = DataFrame(rimpactpercap_market_ann=rimpactpercap_market_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rimpactpercap_disc_ann=rimpactpercap_disc_ann, gdp=gdp, gdp_ann=gdp_ann, cbreg_regionsatbound=cbreg_regionsatbound, cbreg_regionsatbound_ann=cbreg_regionsatbound_ann, lgdp_gdploss=lgdp_gdploss, lgdp_gdploss_ann=lgdp_gdploss_ann, grwnet_realizedgdpgrowth=grwnet_realizedgdpgrowth, grwnet_realizedgdpgrowth_ann=grwnet_realizedgdpgrowth_ann, excdampv_excessdamagespresvalue=excdampv_excessdamagespresvalue, excdampv_excessdamagespresvalue_ann=excdampv_excessdamagespresvalue_ann)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_regional.csv"),df)
 
 end
 
-function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../output"))
+function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../../output"))
     # get simulation
     mcs = getsim()
 
@@ -347,33 +394,79 @@ function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2"
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
 
-# function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
-#                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-#                      pulse_size::Union{Float64, Nothing} = 100000.)
-#     # Setup the marginal model
-#     m = getpage()
-#     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
 
-#     # Setup SCC calculation and place for results
-#     scc_results = zeros(samplesize)
 
-#     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
-#         base, marginal = mcs.models
-#         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
-#     end
 
-#     # Setup MC simulation
-#     mcs = getsim()
-#     set_models!(mcs, [mm.base, mm.marginal])
-#     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
+function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 75000.)#, varseed::Union{Int, Nothing} = nothing)
+    # Setup of location of final results
+    scc_results = zeros(samplesize)
 
-#     # Run it!
-#     run(mcs, m, samplesize; results_output_dir=output_path, post_trial_func=my_scc_calculation)
+    function mc_scc_calculation(sim_inst, trialnum::Int, ntimesteps::Int, ignore::Nothing)
+        marginal = sim_inst.models[1]
 
-#     scc_results
-# end
+        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts_ann]
 
-# include("mcs.jl")
-# do_monte_carlo_runs(100)
-# include("compute_scc.jl")
-# get_scc_mcs(100, 2020)
+        scc_results[trialnum] = marg_damages
+    end
+
+    # get simulation
+    mcs = getsim()
+
+    # Setup models
+    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+
+    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)#, varseed=varseed)   # Returns a marginal model that has already been run
+
+    # Run
+    res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
+
+    return scc_results
+end
+
+function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../../output");
+                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
+                      pulse_size::Union{Float64, Nothing} = 75000.,
+                      scenario::String = "RCP4.5 & SSP2",
+                      use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false,
+                      ge_minimum::Union{Float64, Nothing} = nothing,
+                      ge_maximum::Union{Float64, Nothing} = nothing,
+                      ge_mode::Union{Float64, Nothing} = nothing,
+                      ge_use_empirical::Union{Float64, Nothing} = nothing,
+                      civvalue_multiplier::Union{Float64, Nothing} = 1.,
+                      use_convergence::Union{Float64, Nothing} = nothing,
+                      cbabs::Union{Float64, Nothing} = nothing,
+                      eqwbound::Union{Float64, Nothing} = nothing)
+
+    # Setup the marginal model and modify key parameters if they are specified
+    m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
+    if use_convergence != nothing
+         update_param!(m, :use_convergence, use_convergence)
+    end
+    if ge_use_empirical != nothing
+        update_param!(m, :ge_use_empiricaldistribution, ge_use_empirical)
+    end
+    if cbabs != nothing
+        update_param!(m, :cbabs_pcconsumptionbound, cbabs)
+    end
+    if eqwbound != nothing
+        update_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
+    end
+    mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
+
+    # Setup SCC calculation and place for results
+    scc_results = zeros(samplesize)
+
+    function my_scc_calculation(mcs, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
+        base, marginal = mcs.models
+        scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts_ann] - base[:EquityWeighting, :td_totaldiscountedimpacts_ann]) / pulse_size
+    end
+
+    # Setup MC simulation
+    mcs_def = getsim(ge_minimum, ge_maximum, ge_mode, civvalue_multiplier)
+    mcs_inst = run(mcs_def, [mm.base, mm.marginal], samplesize; results_output_dir=output_path, post_trial_func=my_scc_calculation)
+    set_models!(mcs_inst, [mm.base, mm.marginal])
+    generate_trials!(mcs_inst, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
+
+    scc_results
+end

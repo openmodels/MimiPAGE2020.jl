@@ -13,7 +13,7 @@ using Statistics
 
 # specify model settings
 function set_globalbools()
-    global use_variability = true
+    global use_variability = false
 
     # set random seed to have similar variability development in the base and the marginal model.
     # set variability seed.
@@ -32,10 +32,12 @@ set_globalbools()
 include("main_model_annualGrowth.jl")
 
 # define the output directory
-dir_output = joinpath(@__DIR__, "../output/")
+dir_output = joinpath(@__DIR__, "../../output/")
 
 # define number of Monte Carlo runs
-samplesize = 50000
+if !@isdefined samplesize
+    samplesize = 50000
+end
 
 # define the seed
 masterseed = 22081994
@@ -81,13 +83,13 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
                                                  " convergence", jj_convergence, "pulse_", jj_pulse))
 
                                     # define the output for the Monte Carlo files
-                                    dir_MCoutput = string(dir_output, "montecarlo_distrGE/ge", jj_gestring,
+                                    dir_MCoutput = string(dir_output, "mc_diGE/ge", jj_gestring,
                                                                     "_scen", jj_scen,
-                                                                    "_per", jj_permafr,
-                                                                    "_sea", jj_seaice,
-                                                                    "_conv", jj_convergence, "_boun", jj_cbabs, "_eqw", jj_eqwshare,
-                                                                    "_civ", jj_civvalue,
-                                                                    "_pul", jj_pulse,
+                                                                    "_pf", jj_permafr,
+                                                                    "_se", jj_seaice,
+                                                                    "_co", jj_convergence, "_bd", jj_cbabs, "_eq", jj_eqwshare,
+                                                                    "_ci", jj_civvalue,
+                                                                    "_p", jj_pulse,
                                                                      "/")
 
                                     # calculate the stochastic mean SCC
@@ -114,6 +116,8 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
                                                             "_civ", jj_civvalue,
                                                             "_pul", jj_pulse,  ".csv"),
                                                             scc_mcs_object, ",")
+
+                                    println(scc_mcs_object)
 
                                     # push the results into the data frame
                                     push!(df_sccMC, [jj_permafr, jj_seaice, jj_gestring,  jj_scen,

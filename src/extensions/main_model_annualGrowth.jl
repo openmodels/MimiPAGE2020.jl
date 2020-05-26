@@ -2,45 +2,45 @@ using Mimi
 
 export getpage
 
-include("utils/load_parameters.jl")
-include("utils/mctools.jl")
+include("../utils/load_parameters.jl")
+include("../utils/mctools.jl")
 
 include("mcs_annualGrowth.jl")                          ## done - based on mcs_ARvariability.jl + added lines (GDP, civvalue, save command) + added functions (compute_scc_mcs & get_scc_mcs) from mcs_growth.jl
 include("compute_scc_annualGrowth.jl")                  ## based on compute_scc_growth.jl, changed 4 variables to their annual versions
 
-include("components/RCPSSPScenario.jl")
-include("components/CO2emissions.jl")
-include("components/CO2cycle.jl")
-include("components/CO2forcing.jl")
-include("components/CH4emissions.jl")
-include("components/CH4cycle.jl")
-include("components/CH4forcing.jl")
-include("components/N2Oemissions.jl")
-include("components/N2Ocycle.jl")
-include("components/N2Oforcing.jl")
-include("components/LGemissions.jl")
-include("components/LGcycle.jl")
-include("components/LGforcing.jl")
-include("components/SulphateForcing.jl")
-include("components/TotalForcing.jl")
-include("components/ClimateTemperature_ARvariability.jl")       # runs default with AR variability!
-include("components/SeaLevelRise.jl")
-include("components/GDP_annualGrowth.jl")                   # annualised, based on the PAGE-Growth file
-include("components/SLRDamages_annualGrowth.jl")            # annualised, based on the PAGE-Growth file
-include("components/MarketDamages_annualGrowth.jl")         # annualised, based on the PAGE-ANN file
-include("components/MarketDamagesBurke_annualGrowth.jl")    # annualised, based on the PAGE-ANN file
-include("components/NonMarketDamages_annualGrowth.jl")      # annualised, based on the PAGE-ANN file
-include("components/Discontinuity_annual.jl")                           ## stays same as normal annual damages!
-include("components/AdaptationCosts_annualGrowth.jl")       # annualised, based on the PAGE-ICE file
-include("components/AbatementCostParameters.jl")
-include("components/AbatementCosts.jl")
-include("components/TotalAbatementCosts.jl")
-include("components/TotalAdaptationCosts_annualGrowth.jl")  # annualised, based on the PAGE-ICE file
-include("components/Population.jl")
-include("components/EquityWeighting_annualGrowth.jl")       # annualised, based on the PAGE-Growth file
-include("components/PermafrostSiBCASA.jl")
-include("components/PermafrostJULES.jl")
-include("components/PermafrostTotal.jl")
+include("../components/RCPSSPScenario.jl")
+include("../components/CO2emissions.jl")
+include("../components/CO2cycle.jl")
+include("../components/CO2forcing.jl")
+include("../components/CH4emissions.jl")
+include("../components/CH4cycle.jl")
+include("../components/CH4forcing.jl")
+include("../components/N2Oemissions.jl")
+include("../components/N2Ocycle.jl")
+include("../components/N2Oforcing.jl")
+include("../components/LGemissions.jl")
+include("../components/LGcycle.jl")
+include("../components/LGforcing.jl")
+include("../components/SulphateForcing.jl")
+include("../components/TotalForcing.jl")
+include("../components/extensions/ClimateTemperature_ARvariability.jl")       # runs default with AR variability!
+include("../components/SeaLevelRise.jl")
+include("../components/extensions/GDP_annualGrowth.jl")                   # annualised, based on the PAGE-Growth file
+include("../components/extensions/SLRDamages_annualGrowth.jl")            # annualised, based on the PAGE-Growth file
+include("../components/extensions/MarketDamages_annualGrowth.jl")         # annualised, based on the PAGE-ANN file
+include("../components/extensions/MarketDamagesBurke_annualGrowth.jl")    # annualised, based on the PAGE-ANN file
+include("../components/extensions/NonMarketDamages_annualGrowth.jl")      # annualised, based on the PAGE-ANN file
+include("../components/extensions/Discontinuity_annual.jl")                           ## stays same as normal annual damages!
+include("../components/extensions/AdaptationCosts_annualGrowth.jl")       # annualised, based on the PAGE-ICE file
+include("../components/AbatementCostParameters.jl")
+include("../components/AbatementCosts.jl")
+include("../components/TotalAbatementCosts.jl")
+include("../components/extensions/TotalAdaptationCosts_annualGrowth.jl")  # annualised, based on the PAGE-ICE file
+include("../components/Population.jl")
+include("../components/extensions/EquityWeighting_annualGrowth.jl")       # annualised, based on the PAGE-Growth file
+include("../components/PermafrostSiBCASA.jl")
+include("../components/PermafrostJULES.jl")
+include("../components/PermafrostTotal.jl")
 
 function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
 

@@ -18,10 +18,12 @@ myregions = ["EU", "USA", "Other OECD","Former USSR","China","Southeast Asia","A
 myyears = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
 
 # define the output directory
-dir_output = joinpath(@__DIR__, "../output/")
+dir_output = joinpath(@__DIR__, "../../output/")
 
 # define number of Monte Carlo runs
-samplesize = 50000
+if !@isdefined samplesize
+    samplesize = 50000
+end
 
 # define the seed
 masterseed = 22081994
@@ -182,13 +184,13 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
                                                  " convergence", jj_convergence, "pulse_", jj_pulse))
 
                                     # define the output for the Monte Carlo files
-                                    dir_MCoutput = string(dir_output, "montecarlo_distrGE/ge", jj_gestring,
+                                    dir_MCoutput = string(dir_output, "mc_diGE/ge", jj_gestring,
                                                                     "_scen", jj_scen,
-                                                                    "_per", jj_permafr,
-                                                                    "_sea", jj_seaice,
-                                                                    "_conv", jj_convergence, "_boun", jj_cbabs, "_eqw", jj_eqwshare,
-                                                                    "_civ", jj_civvalue,
-                                                                    "_pul", jj_pulse,
+                                                                    "_pf", jj_permafr,
+                                                                    "_se", jj_seaice,
+                                                                    "_co", jj_convergence, "_bd", jj_cbabs, "_eq", jj_eqwshare,
+                                                                    "_ci", jj_civvalue,
+                                                                    "_p", jj_pulse,
                                                                      "/")
 
                                     # calculate the stochastic mean SCC

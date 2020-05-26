@@ -31,8 +31,8 @@
     iref_ImpactatReferenceGDPperCap=Variable(index=[time, region])
     igdp_ImpactatActualGDPperCap=Variable(index=[time, region])
 
-    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region])
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region])
+    isat_ImpactinclSaturationandAdaptation= Variable(index=[time,region], unit = "\$")
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit = "\$/person")
 
 
     function run_timestep(p, v, d, t)

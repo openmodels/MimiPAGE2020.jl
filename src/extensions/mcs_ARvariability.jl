@@ -2,7 +2,7 @@ using Distributions
 using DataFrames
 using CSV
 
-include("utils/mctools.jl")
+include("../utils/mctools.jl")
 
 function getsim()
     mcs = @defsim begin
@@ -79,15 +79,7 @@ function getsim()
         ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
 
         # Climate Variability Parameters
-        gvarsd_globalvariabilitystandarddeviation = Normal(0.11294, 0.021644) # ranges from https://github.com/jkikstra/climvar
-        rvarsd_regionalvariabilitystandarddeviation["EU"] = Normal(0.35251, 0.019147)
-        rvarsd_regionalvariabilitystandarddeviation["USA"] = Normal(0.39171, 0.030440)
-        rvarsd_regionalvariabilitystandarddeviation["OECD"] = Normal(0.35272, 0.042962)
-        rvarsd_regionalvariabilitystandarddeviation["USSR"] = Normal(0.39679, 0.030228)
-        rvarsd_regionalvariabilitystandarddeviation["China"] = Normal(0.26032, 0.059394)
-        rvarsd_regionalvariabilitystandarddeviation["SEAsia"] = Normal(0.20009, 0.039896)
-        rvarsd_regionalvariabilitystandarddeviation["Africa"] = Normal(0.18202, 0.050171)
-        rvarsd_regionalvariabilitystandarddeviation["LatAmerica"] = Normal(0.15618, 0.054156)
+        tvarseed_coefficientsrandomseed = Uniform(1, 10^10)
 
         # SeaLevelRise
         s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
@@ -257,10 +249,7 @@ function getsim()
              NonMarketDamages.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP_ann,
-             Discontinuity.isat_per_cap_DiscImpactperCapinclSaturation_ann,
-             EquityWeighting.cons_percap_consumption_ann,
-             EquityWeighting.pop_population_ann,
-             )
+             Discontinuity.isat_per_cap_DiscImpactperCapinclSaturation_ann)
 
     end #de
     return mcs
@@ -296,8 +285,6 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rimpactpercap_disc_ann=zeros(samplesize);
     te_totaleffect_ann_yr=zeros(samplesize);
     td_totaldiscountedimpacts_ann_yr=zeros(samplesize);
-    gdp=zeros(samplesize)
-    pop=zeros(samplesize)
 
     #load raw data
     #no filter
@@ -331,9 +318,6 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path) # redundant?
     rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path) # redundant?
     rimpactpercap_disc_ann         = load_RV("Discontinuity_isat_per_cap_DiscImpactperCapinclSaturation_ann", "isat_per_cap_DiscImpactperCapinclSaturation_ann"; output_path = output_path)
-    gdp = load_RV("EquityWeighting_cons_percap_consumption_ann", "cons_percap_consumption_ann"; output_path = output_path)
-    pop = load_RV("EquityWeighting_pop_population_ann", "pop_population_ann"; output_path = output_path)
-
 
     #resave aggregate data
     df=DataFrame(td=td,td_ann=td_ann,tpc=tpc,tpc_ann=tpc_ann,tac=tac,tac_ann=tac_ann,te=te,te_ann=te_ann,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
@@ -342,7 +326,8 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     df=DataFrame(rt_g_ann=rt_g_ann, te_ann_yr=te_ann_yr, td_ann_yr=td_ann_yr)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"),df)
     #resave annual and regional data
-    df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann, gdp=gdp, pop=pop)
+    # df=DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann)
+    df = DataFrame(rimpactpercap_market_ann=rimpactpercap_market_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rimpactpercap_disc_ann=rimpactpercap_disc_ann)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_regional.csv"),df)
 
 end
@@ -361,34 +346,3 @@ function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2"
     # reformat outputs for testing and analysis
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
-
-# function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
-#                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-#                      pulse_size::Union{Float64, Nothing} = 100000.)
-#     # Setup the marginal model
-#     m = getpage()
-#     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
-
-#     # Setup SCC calculation and place for results
-#     scc_results = zeros(samplesize)
-
-#     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
-#         base, marginal = mcs.models
-#         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
-#     end
-
-#     # Setup MC simulation
-#     mcs = getsim()
-#     set_models!(mcs, [mm.base, mm.marginal])
-#     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
-
-#     # Run it!
-#     run(mcs, m, samplesize; results_output_dir=output_path, post_trial_func=my_scc_calculation)
-
-#     scc_results
-# end
-
-# include("mcs.jl")
-# do_monte_carlo_runs(100)
-# include("compute_scc.jl")
-# get_scc_mcs(100, 2020)
