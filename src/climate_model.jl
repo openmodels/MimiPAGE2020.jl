@@ -1,3 +1,5 @@
+using Mimi
+
 include("utils/load_parameters.jl")
 include("components/RCPSSPScenario.jl")
 include("components/CO2emissions.jl")
