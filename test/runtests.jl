@@ -24,6 +24,7 @@ end
 
 @testset "mimi-page-2020" begin
 
+# include("test_extensions.jl") # NB will currently clean out the 'output' folder! - tests number of model extension output files for PAGE2020 update 
 include("test_climatemodel.jl")
 include("test_AbatementCosts.jl")
 include("test_AdaptationCosts.jl")
