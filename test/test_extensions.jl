@@ -1,10 +1,9 @@
 using Test
 
-# For this test to be run succesfully, the output folder needs to be empty.
-
 # Test that all models run
 outdir = joinpath(@__DIR__, "../output")
 samplesize = 10
+rm(outdir, recursive=true) # NB !!currently cleans out the 'output' folder!!
 
 include("../src/runmodel.jl")
 @test sum([length(files) for (root, dirs, files) in walkdir(outdir)]) == 60
