@@ -21,6 +21,13 @@ for testscen in 1:2
         end
     end
 
+    if updatetestdata
+        include("../src/utils/save_parameters.jl")
+        savepagedata(m, :Population, :pop_population, "test/validationdata/$valdir/pop_population.csv")
+        savepagedata(m, :TotalAdaptationCosts,:act_adaptationcosts_total, "test/validationdata/$valdir/act_adaptationcosts_tot.csv")
+        savepagedata(m, :SLRDamages,:rcons_per_cap_SLRRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_SLRRemainConsumption.csv")
+    end
+
     #climate component
     temp=m[:ClimateTemperature,:rt_g_globaltemperature]
     temp_compare=readpagedata(m,"test/validationdata/$valdir/rt_g_globaltemperature.csv")

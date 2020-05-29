@@ -18,6 +18,11 @@ for testscen in 1:2
 
     run(m)
 
+    if updatetestdata
+        include("../src/utils/save_parameters.jl")
+        savepagedata(m, :TotalAbatementCosts, :tct_per_cap_totalcostspercap, "test/validationdata/$valdir/tct_per_cap_totalcostspercap.csv")
+    end
+
     # Generated data
     abate_cost = m[:TotalAbatementCosts, :tct_totalcosts]
     abate_cost_per_cap = m[:TotalAbatementCosts, :tct_per_cap_totalcostspercap]
