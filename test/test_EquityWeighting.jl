@@ -35,7 +35,7 @@ for testscen in 1:2
     run(m)
 
     # Generated data
-    df = m[:EquityWeighting, :df_utilitydiscountrate]
+    df = m[:EquityWeighting, :df_utilitydiscountfactor]
     wtct_percap = m[:EquityWeighting, :wtct_percap_weightedcosts]
     pct_percap = m[:EquityWeighting, :pct_percap_partiallyweighted]
     dr = m[:EquityWeighting, :dr_discountrate]
@@ -51,7 +51,7 @@ for testscen in 1:2
     te = m[:EquityWeighting, :te_totaleffect]
 
     # Recorded data
-    df_compare = readpagedata(m, "test/validationdata/df_utilitydiscountrate.csv")
+    df_compare = readpagedata(m, "test/validationdata/df_utilitydiscountfactor.csv")
     wtct_percap_compare = readpagedata(m, "test/validationdata/$valdir/wtct_percap_weightedcosts.csv")
     pct_percap_compare = readpagedata(m, "test/validationdata/$valdir/pct_percap_partiallyweighted.csv")
     dr_compare = readpagedata(m, "test/validationdata/$valdir/dr_discountrate.csv")

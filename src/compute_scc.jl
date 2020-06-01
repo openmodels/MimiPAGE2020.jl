@@ -29,12 +29,28 @@ function getperiodlength(year)      # same calculations made for yagg_periodspan
     return (last_year - start_year) / 2
 end
 
-@defcomp PAGE_marginal_emissions begin
-    er_CO2emissionsgrowth = Variable(index=[time,region], unit = "%")
-    marginal_emissions_growth = Parameter(index=[time,region], unit = "%", default = zeros(10,8))
+"""Applies undiscounting factor to get the SCC."""
+function undiscount_scc(m::Model, year::Int)
+    df = m[:EquityWeighting, :df_utilitydiscountfactor]
+    consfocus0 = m[:GDP, :cons_percap_consumption_0][1]
+    consfocus = m[:GDP, :cons_percap_consumption][:, 1]
+    emuc = m[:EquityWeighting, :emuc_utilityconvexity]
+    sccii = getpageindexfromyear(year)
+
+    return df[sccii] * ((consfocus[sccii] / consfocus0)^-emuc)
+end
+
+@defcomp ExtraEmissions begin
+    e_globalCO2emissions = Parameter(index=[time],unit="Mtonne/year")
+    pulse_size = Parameter()
+    pulse_year = Parameter()
+    e_globalCO2emissions_adjusted = Variable(index=[time],unit="Mtonne/year")
+
     function run_timestep(p, v, d, t)
-        if is_first(t)
-            v.er_CO2emissionsgrowth[:, :] = p.marginal_emissions_growth[:, :]
+        if gettime(t) == p.pulse_year
+            v.e_globalCO2emissions_adjusted[t] = p.e_globalCO2emissions[t] + p.pulse_size / getperiodlength(p.pulse_year)
+        else
+            v.e_globalCO2emissions_adjusted[t] = p.e_globalCO2emissions[t]
         end
     end
 end
@@ -55,7 +71,7 @@ function compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
+    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
 
     return scc
 end
@@ -77,8 +93,8 @@ function compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = noth
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts]
-    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]
+    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
+    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] / undiscount_scc(mm.base, year)
 
     return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
 end
@@ -95,27 +111,14 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
 
     mm = create_marginal_model(m, pulse_size)
 
-    add_comp!(mm.marginal, PAGE_marginal_emissions, :marginal_emissions; before = :co2emissions)
-    connect_param!(mm.marginal, :co2emissions=>:er_CO2emissionsgrowth, :marginal_emissions=>:er_CO2emissionsgrowth)
-    connect_param!(mm.marginal, :AbatementCostsCO2=>:er_emissionsgrowth, :marginal_emissions=>:er_CO2emissionsgrowth)
+    add_comp!(mm.marginal, ExtraEmissions, :extra_emissions; after=:co2emissions)
+    connect_param!(mm.marginal, :extra_emissions => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
+    set_param!(mm.marginal, :extra_emissions, :pulse_size, pulse_size)
+    set_param!(mm.marginal, :extra_emissions, :pulse_year, year)
 
-    i = getpageindexfromyear(year)
+    connect_param!(mm.marginal, :CO2Cycle => :e_globalCO2emissions, :extra_emissions => :e_globalCO2emissions_adjusted)
 
-    # Base model
-    run(mm.base)
-    base_glob0_emissions = mm.base[:CO2Cycle, :e0_globalCO2emissions]
-    er_co2_a = mm.base[:co2emissions, :er_CO2emissionsgrowth][i, :]
-    e_co2_g = mm.base[:co2emissions, :e_globalCO2emissions]
-
-    # Calculate pulse
-    ER_SCC = 100 * -1 * pulse_size / (base_glob0_emissions * getperiodlength(year))
-    pulse = er_co2_a - ER_SCC * (er_co2_a/100) * (base_glob0_emissions / e_co2_g[i])
-    marginal_emissions_growth = copy(mm.base[:co2emissions, :er_CO2emissionsgrowth])
-    marginal_emissions_growth[i, :] = pulse
-
-    # Marginal emissions model
-    update_param!(mm.marginal, :marginal_emissions_growth, marginal_emissions_growth)
-    run(mm.marginal)
+    run(mm)
 
     return mm
 end
@@ -126,7 +129,7 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
 
     function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
         marginal = sim_inst.models[1]
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
+        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
         scc_results[trialnum] = marg_damages
     end
 
