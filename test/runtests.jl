@@ -3,6 +3,8 @@ using Mimi
 
 include("../src/main_model.jl")
 
+updatetestdata = false
+
 function page_model()
     m = Model()
 

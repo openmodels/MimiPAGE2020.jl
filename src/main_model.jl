@@ -1,4 +1,5 @@
 using Mimi
+using Random
 
 export getpage
 
@@ -42,7 +43,7 @@ include("components/PermafrostSiBCASA.jl")
 include("components/PermafrostJULES.jl")
 include("components/PermafrostTotal.jl")
 
-function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=false, use_page09damages::Bool=false)
+function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
 
     #add all the components
     scenario = addrcpsspscenario(m, scenario)
@@ -266,7 +267,7 @@ function initpage(m::Model)
     set_leftover_params!(m, p)
 end
 
-function getpage(scenario::String="NDCs", use_permafrost::Bool=true, use_seaice::Bool=false, use_page09damages::Bool=false)
+function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])

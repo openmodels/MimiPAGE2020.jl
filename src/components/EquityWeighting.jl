@@ -73,12 +73,14 @@
     # Final result: total effect of climate change
     te_totaleffect = Variable(unit="\$million")
 
+
     function run_timestep(p, v, d, tt)
         if is_first(tt)
             v.tpc_totalaggregatedcosts = 0
             v.addt_gt_equityweightedimpact_discountedglobal = 0
             v.tac_totaladaptationcosts = 0
             v.te_totaleffect = 0
+
         end
 
         v.df_utilitydiscountrate[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
@@ -103,9 +105,8 @@
 
             v.pct_partiallyweighted[tt, rr] = v.pct_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
             v.wact_partiallyweighted[tt, rr] = v.wact_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
-
-            # Discount rate calculations
             v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+
             if is_first(tt)
                 v.yp_yearsperiod[1] = p.y_year[1] - p.y_year_0
             else
@@ -131,7 +132,6 @@
 
             ## Equity weighted impacts (end of page 28, Hope 2009)
             v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
-
             v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]
 
             v.addt_equityweightedimpact_discountedaggregated[tt, rr] = v.widt_equityweightedimpact_discounted[tt, rr] * p.yagg_periodspan[tt]

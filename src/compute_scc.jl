@@ -47,7 +47,7 @@ If no model is provided, the default model from main_model.get_model() is used.
 Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
 If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
 """
-function compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)
+function compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 75000.)
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
@@ -69,7 +69,7 @@ If no model is provided, the default model from main_model.get_model() is used.
 Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
 If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
 """
-function compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)
+function compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 75000.)
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
@@ -89,7 +89,7 @@ Returns a Mimi MarginalModel where the provided m is the base model, and the mar
 If no Model m is provided, the default model from main_model.get_model() is used as the base model.
 Note that the returned MarginalModel has already been run.
 """
-function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing, pulse_size = 100000.)
+function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing, pulse_size = 75000.)
     year === nothing ? error("Must specify an emission year. Try `get_marginal_model(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot add marginal emissions in $year, year must be within the model's time index $page_years.") : nothing
 
@@ -118,29 +118,4 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
     run(mm.marginal)
 
     return mm
-end
-
-function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)
-    # Setup of location of final results
-    scc_results = zeros(samplesize)
-
-    function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
-        marginal = sim_inst.models[1]
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
-        scc_results[trialnum] = marg_damages
-    end
-
-    # get simulation
-    mcs = getsim()
-
-    # Setup models
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
-
-    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-
-    # Run
-    res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
-
-    scc_results
 end

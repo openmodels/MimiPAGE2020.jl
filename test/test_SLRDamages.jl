@@ -24,6 +24,11 @@ for testscen in 1:2
     ##running Model
     run(m)
 
+    if updatetestdata
+        include("../src/utils/save_parameters.jl")
+        savepagedata(m, :SLRDamages, :rcons_per_cap_SLRRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_SLRRemainConsumption.csv")
+    end
+
     cons_percap_aftercosts = m[:SLRDamages, :cons_percap_aftercosts]
     cons_percap_aftercosts_compare = readpagedata(m, "test/validationdata/$valdir/cons_percap_aftercosts.csv")
     @test ones(10, 8) ≈ cons_percap_aftercosts ./ cons_percap_aftercosts_compare rtol=.001

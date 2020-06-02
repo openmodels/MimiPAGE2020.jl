@@ -261,28 +261,29 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
     te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path = output_path)
 
     #time index
-    c_co2concentration = load_RV("co2cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
+    c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
     ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path = output_path)
     rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
     s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path = output_path)
 
     #region index
     rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
-    rgdppercap_market       = load_RV("MarketDamages_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
+    rgdppercap_market       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
     rgdppercap_nonmarket    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
-    rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
+    rgdppercap_disc         = load_RV("Discontinuity_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
 
     #resave data
     df=DataFrame(td=td,tpc=tpc,tac=tac,te=te,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
     save(joinpath(output_path, "mimipagemontecarlooutput.csv"),df)
 end
 
-function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__DIR__, "../output"))
+
+function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../output"))
     # get simulation
     mcs = getsim()
 
     # get a model
-    m = getpage()
+    m = getpage(scenario)
     run(m)
 
     # Run
@@ -292,33 +293,31 @@ function do_monte_carlo_runs(samplesize::Int, output_path::String = joinpath(@__
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
 
-# function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../output");
-#                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-#                      pulse_size::Union{Float64, Nothing} = 100000.)
-#     # Setup the marginal model
-#     m = getpage()
-#     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
 
-#     # Setup SCC calculation and place for results
-#     scc_results = zeros(samplesize)
 
-#     function my_scc_calculation(mcs::Simulation, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
-#         base, marginal = mcs.models
-#         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
-#     end
+function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 75000.)#, varseed::Union{Int, Nothing} = nothing)
+    # Setup of location of final results
+    scc_results = zeros(samplesize)
 
-#     # Setup MC simulation
-#     mcs = getsim()
-#     set_models!(mcs, [mm.base, mm.marginal])
-#     generate_trials!(mcs, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
+    function mc_scc_calculation(sim_inst, trialnum::Int, ntimesteps::Int, ignore::Nothing)
+        marginal = sim_inst.models[1]
 
-#     # Run it!
-#     run_sim(mcs, output_dir=output_path, post_trial_func=my_scc_calculation)
+        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
 
-#     scc_results
-# end
+        scc_results[trialnum] = marg_damages
+    end
 
-# include("mcs.jl")
-# do_monte_carlo_runs(100)
-# include("compute_scc.jl")
-# get_scc_mcs(100, 2020)
+    # get simulation
+    mcs = getsim()
+
+    # Setup models
+    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+
+    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)#, varseed=varseed)   # Returns a marginal model that has already been run
+
+    # Run
+    res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
+
+    return scc_results
+end
