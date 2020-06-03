@@ -23,7 +23,7 @@ mm[:ClimateTemperature, :rt_g_globaltemperature]
 
 # Test compute_scc_mm
 result = compute_scc_mm(year=2050)
-@test result.scc < scc1
+@test result.scc > scc1
 @test result.mm isa Mimi.MarginalModel
 
 end
