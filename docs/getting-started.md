@@ -54,7 +54,11 @@ returns a list of components and each of their incoming parameters and
 outgoing variables. Results can be viewed by running `m[:ComponentName, :VariableName]` 
 for the desired component and variable. You may also explore the results graphically
 by running `explore(m)` to view all variables and parameters, or `explore(m, :VariableName)`
-for just one.
+for just one. For more details on the graphical interface of Mimi look to the
+documentation in the
+Mimi
+[User Guide](https://www.mimiframework.org/Mimi.jl/stable/userguide/) under
+Plotting and the Explorer UI.
 
 For more details on the graphical interface of Mimi look to the
 documentation in the
