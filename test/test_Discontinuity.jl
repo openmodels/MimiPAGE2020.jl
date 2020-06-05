@@ -20,11 +20,6 @@ for testscen in 1:2
     ##running Model
     run(m)
 
-    if updatetestdata
-        include("../src/utils/save_parameters.jl")
-        savepagedata(m, :Discontinuity,:rcons_per_cap_DiscRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_DiscRemainConsumption.csv")
-    end
-
     @test !isnan(m[:Discontinuity, :irefeqdis_eqdiscimpact][8])
     @test !isnan(m[:Discontinuity, :igdpeqdis_eqdiscimpact][10,8])
     @test !isnan(m[:Discontinuity, :igdp_realizeddiscimpact][10,8])

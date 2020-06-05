@@ -21,11 +21,6 @@ for testscen in 1:2
 
     run(m)
 
-    if updatetestdata
-        include("../src/utils/save_parameters.jl")
-        savepagedata(m, :Population, :pop_population, "test/validationdata/$valdir/pop_population.csv")
-    end
-
     # Generated data
     pop = m[:Population, :pop_population]
 
