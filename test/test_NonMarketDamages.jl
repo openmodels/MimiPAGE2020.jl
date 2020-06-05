@@ -24,12 +24,6 @@ for testscen in 1:2
 
     run(m)
 
-    if updatetestdata
-        include("../src/utils/save_parameters.jl")
-        savepagedata(m, :NonMarketDamages, :rcons_per_cap_NonMarketRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_NonMarketRemainConsumption.csv")
-        savepagedata(m, :NonMarketDamages, :rgdp_per_cap_NonMarketRemainGDP, "test/validationdata/$valdir/rgdp_per_cap_NonMarketRemainGDP.csv")
-    end
-
     rcons_per_cap = m[:NonMarketDamages, :rcons_per_cap_NonMarketRemainConsumption]
     rcons_per_cap_compare = readpagedata(m, "test/validationdata/$valdir/rcons_per_cap_NonMarketRemainConsumption.csv")
     @test rcons_per_cap ≈ rcons_per_cap_compare rtol=1e-2

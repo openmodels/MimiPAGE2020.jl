@@ -17,12 +17,6 @@ for testscen in 1:2
 
     run(m)
 
-    if updatetestdata
-        include("../src/utils/save_parameters.jl")
-        savepagedata(m, :TotalAdaptationCosts, :act_adaptationcosts_total, "test/validationdata/$valdir/act_adaptationcosts_tot.csv")
-        savepagedata(m, :TotalAdaptationCosts, :act_percap_adaptationcosts, "test/validationdata/$valdir/act_percap_adaptationcosts.csv")
-    end
-
     # Generated data
     adapt_cost = m[:TotalAdaptationCosts, :act_adaptationcosts_total]
     adapt_cost_per_cap = m[:TotalAdaptationCosts, :act_percap_adaptationcosts]
