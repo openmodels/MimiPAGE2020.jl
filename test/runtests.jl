@@ -3,7 +3,7 @@ using Mimi
 
 include("../src/main_model.jl")
 
-updatetestdata = true
+updatetestdata = false
 
 function page_model()
     m = Model()
