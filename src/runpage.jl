@@ -36,7 +36,6 @@ function runpage()
         include("extensions/runmodel_annualGrowth_ARvariability.jl")
     else
         println("WARNING: No valid model input provided. Please provide a valid model choice")
-        runpage()
     end
 end
 

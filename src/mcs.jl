@@ -292,32 +292,3 @@ function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2"
     # reformat outputs for testing and analysis
     reformat_RV_outputs(samplesize, output_path=output_path)
 end
-
-
-
-function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 75000.)#, varseed::Union{Int, Nothing} = nothing)
-    # Setup of location of final results
-    scc_results = zeros(samplesize)
-
-    function mc_scc_calculation(sim_inst, trialnum::Int, ntimesteps::Int, ignore::Nothing)
-        marginal = sim_inst.models[1]
-
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts]
-
-        scc_results[trialnum] = marg_damages
-    end
-
-    # get simulation
-    mcs = getsim()
-
-    # Setup models
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
-
-    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)#, varseed=varseed)   # Returns a marginal model that has already been run
-
-    # Run
-    res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
-
-    return scc_results
-end

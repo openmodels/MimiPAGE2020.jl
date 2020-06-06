@@ -9,9 +9,9 @@ using Statistics
 
 
 # get main_model file
-include("main_model.jl")
-include("mcs.jl")
-include("compute_scc.jl")
+include("../../src/main_model.jl")
+include("../../src/mcs.jl")
+include("../../src/compute_scc.jl")
 
 if !@isdefined samplesize
     samplesize = 50000
@@ -35,6 +35,6 @@ for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & 
     # store results in DataFrame
     df = DataFrame(Any[fill(model, samplesize), fill(scenario, samplesize), sccs], [:ModelName, :ScenarioName, :SCC])
     # write out to csv
-    DIR = joinpath(@__DIR__, "..", "output")
+    DIR = joinpath(@__DIR__, "..", "..", "output")
     CSV.write(joinpath(DIR, string(model, "_", scenario, "_", "scc.csv")), df)
 end

@@ -42,7 +42,7 @@ For more information about the Mimi component framework, you can refer to the [M
 
 ## Installing PAGE-2020
 
-Clone or download the PAGE-2020 repository from the PAGE-2020 [Github website](https://github.com/openmodels/mimi-page-2020.jl).
+Clone or download the PAGE-2020 repository from the PAGE-2020 [Github website](https://github.com/openmodels/PAGE-2020).
 
 ## Using PAGE-2020
 

@@ -2,7 +2,7 @@ using Distributions
 using DataFrames
 using CSV
 
-include("../utils/mctools.jl")
+include("../../src/utils/mctools.jl")
 
 function getsim()
     mcs = @defsim begin
@@ -267,7 +267,7 @@ function getsim()
 end
 
 #Reformat the RV results into the format used for testing
-function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../output"))
+function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../../output"))
 
     #create vectors to hold results of Monte Carlo runs
     td=zeros(samplesize);
@@ -347,7 +347,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
 
 end
 
-function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../output"))
+function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../../output"))
     # get simulation
     mcs = getsim()
 
