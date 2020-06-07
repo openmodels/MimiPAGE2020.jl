@@ -44,12 +44,14 @@
     rcons_per_cap_SLRRemainConsumption = Variable(index=[time, region], unit = "\$/person") #include?
     rgdp_per_cap_SLRRemainGDP = Variable(index=[time, region], unit = "\$/person")
 
+
     function run_timestep(p, v, d, t)
 
         for r in d.region
             v.cons_percap_aftercosts[t, r] = p.cons_percap_consumption[t, r] - p.tct_per_cap_totalcostspercap[t, r] - p.act_percap_adaptationcosts[t, r]
+
             if (v.cons_percap_aftercosts[t, r] < 0.01*p.cons_percap_consumption_0[1])
-                v.cons_percap_aftercosts[t, r] = 0.01*p.cons_percap_consumption_0[1] # happens in some MC draws
+                v.cons_percap_aftercosts[t, r] = 0.01*p.cons_percap_consumption_0[1]
             end
 
             v.gdp_percap_aftercosts[t,r]=v.cons_percap_aftercosts[t, r]/(1 - p.save_savingsrate/100)

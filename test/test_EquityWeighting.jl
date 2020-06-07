@@ -34,8 +34,13 @@ for testscen in 1:2
 
     run(m)
 
+    if updatetestdata
+        println(m[:EquityWeighting, :addt_gt_equityweightedimpact_discountedglobal])
+        println(m[:EquityWeighting, :te_totaleffect])
+    end
+
     # Generated data
-    df = m[:EquityWeighting, :df_utilitydiscountrate]
+    df = m[:EquityWeighting, :df_utilitydiscountfactor]
     wtct_percap = m[:EquityWeighting, :wtct_percap_weightedcosts]
     pct_percap = m[:EquityWeighting, :pct_percap_partiallyweighted]
     dr = m[:EquityWeighting, :dr_discountrate]
@@ -51,7 +56,7 @@ for testscen in 1:2
     te = m[:EquityWeighting, :te_totaleffect]
 
     # Recorded data
-    df_compare = readpagedata(m, "test/validationdata/df_utilitydiscountrate.csv")
+    df_compare = readpagedata(m, "test/validationdata/df_utilitydiscountfactor.csv")
     wtct_percap_compare = readpagedata(m, "test/validationdata/$valdir/wtct_percap_weightedcosts.csv")
     pct_percap_compare = readpagedata(m, "test/validationdata/$valdir/pct_percap_partiallyweighted.csv")
     dr_compare = readpagedata(m, "test/validationdata/$valdir/dr_discountrate.csv")
@@ -63,8 +68,8 @@ for testscen in 1:2
 
     wit_compare = readpagedata(m, "test/validationdata/$valdir/wit_equityweightedimpact.csv")
     addt_compare = readpagedata(m, "test/validationdata/$valdir/addt_equityweightedimpact_discountedaggregated.csv")
-    addt_gt_compare = (scenario == "NDCs" ? 9.960706559386551e8 : 3.445096140740376e8)
-    te_compare = (scenario == "NDCs" ? 1.0320923880568126e9 : 5.0496576104580307e8)
+    addt_gt_compare = (scenario == "NDCs" ? 9.938302679477245e8 : 3.242546277441784e8)
+    te_compare = (scenario == "NDCs" ? 1.0295055580383469e9 : 4.8471657538027054e8)
 
     @test df ≈ df_compare rtol=1e-8
     @test wtct_percap ≈ wtct_percap_compare rtol=1e-7

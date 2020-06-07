@@ -87,7 +87,7 @@ end
 end
 
 """Construct a model with a uniform (global and all gases, but time-varying) tax."""
-function getuniformtaxmodel(scenario::String="NDCs")
+function getuniformtaxmodel(scenario::String="RCP4.5 & SSP2")
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])

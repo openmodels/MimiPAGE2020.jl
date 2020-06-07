@@ -33,7 +33,7 @@ for testscen in 1:2
     #validating - comparison spreadsheet has discontinuity occuring in 2200
     #keep running model until m[:Discontinuity,:occurdis_occurrencedummy] shows discontiuity occuring in 2200
     output=m[:Discontinuity,:rcons_per_cap_DiscRemainConsumption]
-    validation=readpagedata(m,"test/validationdata/$valdir/rcons_per_cap_DiscRemainConsumption.csv")
+    validation=readpagedata(m, "test/validationdata/$valdir/rcons_per_cap_DiscRemainConsumption.csv")
 
     @test output ≈ validation rtol=1e-2
 end

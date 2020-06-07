@@ -21,6 +21,40 @@ for testscen in 1:2
         end
     end
 
+    if updatetestdata
+        include("../src/utils/save_parameters.jl")
+        savepagedata(m, :Population, :pop_population, "test/validationdata/$valdir/pop_population.csv")
+        savepagedata(m, :GDP, :cons_percap_consumption, "test/validationdata/$valdir/cons_percap_consumption.csv")
+        savepagedata(m, :GDP, :gdp, "test/validationdata/$valdir/gdp.csv")
+        savepagedata(m, :Discontinuity,:rcons_per_cap_DiscRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_DiscRemainConsumption.csv")
+        savepagedata(m, :TotalAbatementCosts, :tct_per_cap_totalcostspercap, "test/validationdata/$valdir/tct_per_cap_totalcostspercap.csv")
+        savepagedata(m, :AdaptiveCostsEconomic, :ac_adaptivecosts, "test/validationdata/ac_adaptationcosts_economic.csv")
+        savepagedata(m, :AdaptiveCostsNonEconomic, :ac_adaptivecosts, "test/validationdata/ac_adaptationcosts_noneconomic.csv")
+        savepagedata(m, :AdaptiveCostsSeaLevel, :ac_adaptivecosts, "test/validationdata/$valdir/ac_adaptationcosts_sealevelrise.csv")
+        savepagedata(m, :TotalAdaptationCosts, :act_adaptationcosts_total, "test/validationdata/$valdir/act_adaptationcosts_tot.csv")
+        savepagedata(m, :TotalAdaptationCosts, :act_percap_adaptationcosts, "test/validationdata/$valdir/act_percap_adaptationcosts.csv")
+        savepagedata(m, :SLRDamages,:rcons_per_cap_SLRRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_SLRRemainConsumption.csv")
+        savepagedata(m, :SLRDamages, :cons_percap_aftercosts, "test/validationdata/$valdir/cons_percap_aftercosts.csv")
+        savepagedata(m, :MarketDamagesBurke, :rcons_per_cap_MarketRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_MarketRemainConsumption.csv")
+        savepagedata(m, :MarketDamagesBurke, :rgdp_per_cap_MarketRemainGDP, "test/validationdata/$valdir/rgdp_per_cap_MarketRemainGDP.csv")
+        savepagedata(m, :NonMarketDamages, :rcons_per_cap_NonMarketRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_NonMarketRemainConsumption.csv")
+        savepagedata(m, :NonMarketDamages, :rgdp_per_cap_NonMarketRemainGDP, "test/validationdata/$valdir/rgdp_per_cap_NonMarketRemainGDP.csv")
+        savepagedata(m, :SLRDamages, :rcons_per_cap_SLRRemainConsumption, "test/validationdata/$valdir/rcons_per_cap_SLRRemainConsumption.csv")
+        savepagedata(m, :SLRDamages, :rgdp_per_cap_SLRRemainGDP, "test/validationdata/$valdir/rgdp_per_cap_SLRRemainGDP.csv")
+        savepagedata(m, :SLRDamages, :igdp_ImpactatActualGDPperCapSLR, "test/validationdata/$valdir/igdp_ImpactatActualGDPperCap_sea.csv")
+        savepagedata(m, :SLRDamages, :isat_ImpactinclSaturationandAdaptationSLR, "test/validationdata/$valdir/isat_ImpactinclSaturationandAdaptation_SLRise.csv")
+        savepagedata(m, :EquityWeighting, :wtct_percap_weightedcosts, "test/validationdata/$valdir/wtct_percap_weightedcosts.csv")
+        savepagedata(m, :EquityWeighting, :pct_percap_partiallyweighted, "test/validationdata/$valdir/pct_percap_partiallyweighted.csv")
+        savepagedata(m, :EquityWeighting, :dr_discountrate, "test/validationdata/$valdir/dr_discountrate.csv")
+        savepagedata(m, :EquityWeighting, :dfc_consumptiondiscountrate, "test/validationdata/$valdir/dfc_consumptiondiscountrate.csv")
+        savepagedata(m, :EquityWeighting, :pct_partiallyweighted, "test/validationdata/$valdir/pct_partiallyweighted.csv")
+        savepagedata(m, :EquityWeighting, :pcdt_partiallyweighted_discounted, "test/validationdata/$valdir/pcdt_partiallyweighted_discounted.csv")
+        savepagedata(m, :EquityWeighting, :wacdt_partiallyweighted_discounted, "test/validationdata/$valdir/wacdt_partiallyweighted_discounted.csv")
+        savepagedata(m, :EquityWeighting, :aact_equityweightedadaptation_discountedaggregated, "test/validationdata/$valdir/aact_equityweightedadaptation_discountedaggregated.csv")
+        savepagedata(m, :EquityWeighting, :wit_equityweightedimpact, "test/validationdata/$valdir/wit_equityweightedimpact.csv")
+        savepagedata(m, :EquityWeighting, :addt_equityweightedimpact_discountedaggregated, "test/validationdata/$valdir/addt_equityweightedimpact_discountedaggregated.csv")
+    end
+
     #climate component
     temp=m[:ClimateTemperature,:rt_g_globaltemperature]
     temp_compare=readpagedata(m,"test/validationdata/$valdir/rt_g_globaltemperature.csv")

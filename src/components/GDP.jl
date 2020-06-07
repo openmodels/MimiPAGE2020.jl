@@ -1,6 +1,6 @@
 @defcomp GDP begin
-# GDP: Gross domestic product $M
-# GRW: GDP growth rate %/year
+    # GDP: Gross domestic product $M
+    # GRW: GDP growth rate %/year
     region            = Index()
 
     # Variables
@@ -52,11 +52,14 @@
             #eq.28 in Hope 2002
             if is_first(t)
                 v.gdp[t, r] = p.gdp_0[r] * (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year_0)
+
             else
                 v.gdp[t, r] = v.gdp[t-1, r] * (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
             end
+
             v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
             v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
+
         end
     end
 end

@@ -23,6 +23,7 @@ for testscen in 1:2
     set_leftover_params!(m, p)
 
     run(m)
+
     rcons_per_cap = m[:NonMarketDamages, :rcons_per_cap_NonMarketRemainConsumption]
     rcons_per_cap_compare = readpagedata(m, "test/validationdata/$valdir/rcons_per_cap_NonMarketRemainConsumption.csv")
     @test rcons_per_cap ≈ rcons_per_cap_compare rtol=1e-2
