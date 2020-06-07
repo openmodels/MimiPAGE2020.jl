@@ -16,6 +16,7 @@ script:
   - julia -e 'using Pkg; Pkg.add("Query")'
   - julia -e 'using Pkg; Pkg.add("Missings")'
   - julia -e 'using Pkg; Pkg.add("FileIO")'
+  - julia -e 'using Pkg; Pkg.add("StatsBase")'
   - julia --code-coverage=user test/runtests_clean.jl
 after_success:
   # push coverage results to Codecov
