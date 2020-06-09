@@ -28,7 +28,7 @@ for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & 
     # explore(m)
 
     # do general monte carlo simulation and save the output
-    do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../output", scenario, model))
+    do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../../output", scenario, model))
 
     # get the social cost of carbon for the Monte Carlo simulations and save the output
     sccs = compute_scc_mcs(m, samplesize, year=2020)
