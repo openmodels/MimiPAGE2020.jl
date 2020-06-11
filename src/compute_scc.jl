@@ -119,7 +119,6 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
     connect_param!(mm.marginal, :CO2Cycle => :e_globalCO2emissions, :extra_emissions => :e_globalCO2emissions_adjusted)
 
     run(mm)
-
     return mm
 end
 

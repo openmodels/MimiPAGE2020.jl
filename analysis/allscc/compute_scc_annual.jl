@@ -1,44 +1,7 @@
 using Mimi
 using Random
 
-page_years = [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300]
-page_year_0 = 2015
-
-function getpageindexfromyear(year)
-    i = findfirst(isequal(year), page_years)
-    if i == 0
-        error("Invalid PAGE year: $year.")
-    end
-    return i
-end
-
-function getperiodlength(year)      # same calculations made for yagg_periodspan in the model
-    i = getpageindexfromyear(year)
-
-    if year==page_years[1]
-        start_year = page_year_0
-    else
-        start_year = page_years[i - 1]
-    end
-
-    if year == page_years[end]
-        last_year = page_years[end]
-    else
-        last_year = page_years[i + 1]
-    end
-
-    return (last_year - start_year) / 2
-end
-
-@defcomp PAGE_marginal_emissions begin
-    er_CO2emissionsgrowth = Variable(index=[time,region], unit = "%")
-    marginal_emissions_growth = Parameter(index=[time,region], unit = "%", default = zeros(10,8))
-    function run_timestep(p, v, d, t)
-        if is_first(t)
-            v.er_CO2emissionsgrowth[:, :] = p.marginal_emissions_growth[:, :]
-        end
-    end
-end
+include("../../src/compute_scc.jl")
 
 """
 compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
@@ -56,7 +19,7 @@ function compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
+    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
 
     return scc
 end
@@ -79,8 +42,8 @@ function compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = noth
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
 
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann]
-    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated_ann]
+    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
+    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated_ann] / undiscount_scc(mm.base, year)
 
     return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
 end
@@ -97,38 +60,19 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = 
 
     mm = create_marginal_model(m, pulse_size)
 
-    add_comp!(mm.marginal, PAGE_marginal_emissions, :marginal_emissions; before = :co2emissions)
-    connect_param!(mm.marginal, :co2emissions=>:er_CO2emissionsgrowth, :marginal_emissions=>:er_CO2emissionsgrowth)
-    connect_param!(mm.marginal, :AbatementCostsCO2=>:er_emissionsgrowth, :marginal_emissions=>:er_CO2emissionsgrowth)
+    add_comp!(mm.marginal, ExtraEmissions, :extra_emissions; after=:co2emissions)
+    connect_param!(mm.marginal, :extra_emissions => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
+    set_param!(mm.marginal, :extra_emissions, :pulse_size, pulse_size)
+    set_param!(mm.marginal, :extra_emissions, :pulse_year, year)
 
-    i = getpageindexfromyear(year)
-
-    # set random seed to have similar variability development in the base and the marginal model.
-    if use_variability
-        Random.seed!(varseed);
-    end
-    # run base model
-    run(mm.base)
-    base_glob0_emissions = mm.base[:CO2Cycle, :e0_globalCO2emissions]
-    er_co2_a = mm.base[:co2emissions, :er_CO2emissionsgrowth][i, :]
-    e_co2_g = mm.base[:co2emissions, :e_globalCO2emissions]
-
-    # Calculate pulse
-    ER_SCC = 100 * -1 * pulse_size / (base_glob0_emissions * getperiodlength(year))
-    pulse = er_co2_a - ER_SCC * (er_co2_a/100) * (base_glob0_emissions / e_co2_g[i])
-    marginal_emissions_growth = copy(mm.base[:co2emissions, :er_CO2emissionsgrowth])
-    marginal_emissions_growth[i, :] = pulse
-
-    # Marginal emissions model
-    update_param!(mm.marginal, :marginal_emissions_growth, marginal_emissions_growth)
+    connect_param!(mm.marginal, :CO2Cycle => :e_globalCO2emissions, :extra_emissions => :e_globalCO2emissions_adjusted)
 
     # set random seed to have similar variability development in the base and the marginal model.
     if use_variability
         Random.seed!(varseed);
     end
-    # run marginal model
-    run(mm.marginal)
 
+    run(mm)
     return mm
 end
 
@@ -139,7 +83,7 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
     function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
         marginal = sim_inst.models[1]
 
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts_ann]
+        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
 
         scc_results[trialnum] = marg_damages
     end
