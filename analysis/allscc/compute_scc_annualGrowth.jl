@@ -2,6 +2,16 @@ using Mimi
 
 include("../../src/compute_scc.jl")
 
+"""Applies undiscounting factor to get the SCC."""
+function undiscount_scc(m::Model, year::Int)
+    df = m[:EquityWeighting, :df_utilitydiscountfactor_ann]
+    consfocus0 = m[:GDP, :cons_percap_consumption_0][1]
+    consfocus = m[:GDP, :cons_percap_consumption_ann][:, 1]
+    emuc = m[:EquityWeighting, :emuc_utilityconvexity]
+    sccii = getpageindexfromyear(year)
+
+    return df[sccii] * ((consfocus[sccii] / consfocus0)^-emuc)
+end
 """
 compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
 
