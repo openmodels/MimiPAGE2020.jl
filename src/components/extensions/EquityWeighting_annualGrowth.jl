@@ -30,10 +30,10 @@ function calc_equityweighting(p, v, d, t, annual_year)
     # setting the year for entry in lists.
     yr = annual_year - 2015 + 1 # + 1 because of 1-based indexing in Julia
 
-    v.df_utilitydiscountrate_ann[yr] = (1 + p.ptp_timepreference / 100)^(-(p.y_year_ann[yr] - p.y_year_0))
+    v.df_utilitydiscountfactor_ann[yr] = (1 + p.ptp_timepreference / 100)^(-(p.y_year_ann[yr] - p.y_year_0))
 
     if p.discfix_fixediscountrate != 0.
-        v.df_utilitydiscountrate_ann[yr] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year_ann[yr] - p.y_year_0))
+        v.df_utilitydiscountfactor_ann[yr] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year_ann[yr] - p.y_year_0))
     end
 
 
@@ -78,8 +78,8 @@ function calc_equityweighting(p, v, d, t, annual_year)
             v.pcdt_partiallyweighted_discounted_ann[yr, r] = v.pct_partiallyweighted_ann[yr, r] * v.dfc_consumptiondiscountrate_ann[yr, r]
             v.wacdt_partiallyweighted_discounted_ann[yr, r] = p.act_adaptationcosts_total_ann[yr, r] * v.dfc_consumptiondiscountrate_ann[yr, r]
         else
-            v.pcdt_partiallyweighted_discounted_ann[yr, r] = v.pct_partiallyweighted_ann[yr, r] * v.df_utilitydiscountrate_ann[yr]
-            v.wacdt_partiallyweighted_discounted_ann[yr, r] = v.wact_partiallyweighted_ann[yr, r] * v.df_utilitydiscountrate_ann[yr]
+            v.pcdt_partiallyweighted_discounted_ann[yr, r] = v.pct_partiallyweighted_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]
+            v.wacdt_partiallyweighted_discounted_ann[yr, r] = v.wact_partiallyweighted_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]
         end
 
         v.pcdat_partiallyweighted_discountedaggregated_ann[yr, r] = v.pcdt_partiallyweighted_discounted_ann[yr, r]
@@ -120,17 +120,17 @@ function calc_equityweighting(p, v, d, t, annual_year)
             v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.dfc_consumptiondiscountrate_ann[yr, r]
         elseif p.lossinc_includegdplosses == 0. && p.equity_proportion == 1.
                 v.wit_equityweightedimpact_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, r]^(1 - p.emuc_utilityconvexity)) * p.pop_population_ann[yr, r]
-                v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.df_utilitydiscountrate_ann[yr]
+                v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]
         elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 0.
                 v.wit_equityweightedimpact_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r]  - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_ann[yr, r] + p.lgdp_gdploss_ann[yr, r]
                 v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.dfc_consumptiondiscountrate_ann[yr, r]
         elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 1.
                 if v.excdam_excessdamages_ann[yr, r] == 0
                     v.wit_equityweightedimpact_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, r]^(1 - p.emuc_utilityconvexity)) * p.pop_population_ann[yr, r]
-                    v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.df_utilitydiscountrate_ann[yr]
+                    v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]
                 else
                     v.wit_equityweightedimpact_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - ((1 - v.eqwshare_shareofweighteddamages_ann[yr,r]) * p.cons_percap_aftercosts_ann[yr, r])^(1 - p.emuc_utilityconvexity)) * p.pop_population_ann[yr, r]
-                    v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.df_utilitydiscountrate_ann[yr]  + v.excdam_excessdamages_ann[yr, r] *  v.dfc_consumptiondiscountrate_ann[yr, r]
+                    v.widt_equityweightedimpact_discounted_ann[yr, r] = v.wit_equityweightedimpact_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]  + v.excdam_excessdamages_ann[yr, r] *  v.dfc_consumptiondiscountrate_ann[yr, r]
                 end
         end
 
@@ -220,8 +220,8 @@ end
     dfc_consumptiondiscountrate = Variable(index=[time, region], unit="1/year")
     dfc_consumptiondiscountrate_ann = Variable(index=[year, region], unit="1/year")
 
-    df_utilitydiscountrate = Variable(index=[time], unit="fraction")
-    df_utilitydiscountrate_ann = Variable(index=[year], unit="fraction")
+    df_utilitydiscountfactor = Variable(index=[time], unit="fraction")
+    df_utilitydiscountfactor_ann = Variable(index=[year], unit="fraction")
 
     # Discounted costs
     pcdt_partiallyweighted_discounted = Variable(index=[time, region], unit="\$million")
@@ -323,10 +323,10 @@ end
 
         end
 
-        v.df_utilitydiscountrate[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
+        v.df_utilitydiscountfactor[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
 
         if p.discfix_fixediscountrate != 0.
-            v.df_utilitydiscountrate[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
+            v.df_utilitydiscountfactor[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
         end
 
 
@@ -376,8 +376,8 @@ end
                 v.pcdt_partiallyweighted_discounted[tt, rr] = v.pct_partiallyweighted[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
                 v.wacdt_partiallyweighted_discounted[tt, rr] = p.act_adaptationcosts_total[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
             else
-                v.pcdt_partiallyweighted_discounted[tt, rr] = v.pct_partiallyweighted[tt, rr] * v.df_utilitydiscountrate[tt]
-                v.wacdt_partiallyweighted_discounted[tt, rr] = v.wact_partiallyweighted[tt, rr] * v.df_utilitydiscountrate[tt]
+                v.pcdt_partiallyweighted_discounted[tt, rr] = v.pct_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]
+                v.wacdt_partiallyweighted_discounted[tt, rr] = v.wact_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]
             end
 
             v.pcdat_partiallyweighted_discountedaggregated[tt, rr] = v.pcdt_partiallyweighted_discounted[tt, rr] * p.yagg_periodspan[tt]
@@ -418,17 +418,17 @@ end
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
             elseif p.lossinc_includegdplosses == 0. && p.equity_proportion == 1.
                     v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
-                    v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]
+                    v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountfactor[tt]
             elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 0.
                     v.wit_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr] + p.lgdp_gdploss[tt, rr]
                     v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
             elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 1.
                     if v.excdam_excessdamages[tt, rr] == 0
                         v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
-                        v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]
+                        v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountfactor[tt]
                     else
                         v.wit_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - ((1 - v.eqwshare_shareofweighteddamages[tt,rr]) * p.cons_percap_aftercosts[tt, rr])^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
-                        v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountrate[tt]  + v.excdam_excessdamages[tt, rr] *  v.dfc_consumptiondiscountrate[tt, rr]
+                        v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountfactor[tt]  + v.excdam_excessdamages[tt, rr] *  v.dfc_consumptiondiscountrate[tt, rr]
                     end
             end
 
