@@ -31,6 +31,7 @@ include("components/MarketDamages.jl")
 include("components/MarketDamagesBurke.jl")
 include("components/NonMarketDamages.jl")
 include("components/Discontinuity.jl")
+include("components/PAGE09Discontinuity.jl")
 include("components/AdaptationCosts.jl")
 include("components/SLRDamages.jl")
 include("components/AbatementCostParameters.jl")
@@ -43,8 +44,7 @@ include("components/PermafrostSiBCASA.jl")
 include("components/PermafrostJULES.jl")
 include("components/PermafrostTotal.jl")
 
-function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
-
+function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false)
     #add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
@@ -93,10 +93,14 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     # Impacts
     slrdamages = addslrdamages(m)
-    marketdamages = addmarketdamages(m)
+    marketdamages = addmarketdamages(m, use_page09weights)
     marketdamagesburke = addmarketdamagesburke(m)
-    nonmarketdamages = addnonmarketdamages(m)
-    add_comp!(m, Discontinuity)
+    nonmarketdamages = addnonmarketdamages(m, use_page09weights)
+    if page09_discontinuity
+        add_comp!(m, PAGE09Discontinuity, :Discontinuity)
+    else
+        add_comp!(m, Discontinuity)
+    end
 
     #Equity weighting and Total Costs
     equityweighting = add_comp!(m, EquityWeighting)
@@ -267,12 +271,12 @@ function initpage(m::Model)
     set_leftover_params!(m, p)
 end
 
-function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
+function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false)
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
-    buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages)
+    buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages; use_page09weights=use_page09weights, page09_discontinuity=page09_discontinuity)
 
     # next: add vector and panel example
     initpage(m)

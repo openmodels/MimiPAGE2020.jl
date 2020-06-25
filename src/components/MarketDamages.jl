@@ -19,7 +19,7 @@
     W_MarketImpactsatCalibrationTemp =Parameter(unit="%GDP", default=0.6)
     ipow_MarketIncomeFxnExponent =Parameter(default=-0.13333333333333333)
     iben_MarketInitialBenefit=Parameter(default=.1333333333333)
-    tcal_CalibrationTemp = Parameter(default=3.)
+    tcal_CalibrationTemp = Parameter(unit="degreeC", default=3.)
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
 
     #impact variables
@@ -82,12 +82,16 @@ end
 # readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
 
-function addmarketdamages(model::Model)
+function addmarketdamages(model::Model, use_page09weights::Bool=false)
     marketdamagescomp = add_comp!(model, MarketDamages)
     marketdamagescomp[:impmax_maxtempriseforadaptpolicyM] = readpagedata(model, "data/impmax_economic.csv")
 
     # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-    marketdamagescomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
+    if use_page09weights
+        marketdamagescomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_sea.csv")
+    else
+        marketdamagescomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
+    end
 
     return marketdamagescomp
 end

@@ -70,6 +70,13 @@
     aact_equityweightedadaptation_discountedaggregated = Variable(index=[time, region], unit="\$million")
     tac_totaladaptationcosts = Variable(unit="\$million")
 
+    # SCC comparison variables
+    addt_gt_equityweightedimpact_discountedglobal_2200 = Variable(unit="\$million")
+    tac_totaladaptationcosts_2200 = Variable(unit="\$million")
+    td_totaldiscountedimpacts_2200 = Variable(unit="\$million")
+    tdac_totalimpactandadaptation = Variable(unit="\$million")
+    tdac_totalimpactandadaptation_2200 = Variable(unit="\$million")
+
     # Final result: total effect of climate change
     te_totaleffect = Variable(unit="\$million")
 
@@ -78,7 +85,9 @@
         if is_first(tt)
             v.tpc_totalaggregatedcosts = 0
             v.addt_gt_equityweightedimpact_discountedglobal = 0
+            v.addt_gt_equityweightedimpact_discountedglobal_2200 = 0
             v.tac_totaladaptationcosts = 0
+            v.tac_totaladaptationcosts_2200 = 0
             v.te_totaleffect = 0
 
         end
@@ -147,6 +156,17 @@
         v.tac_totaladaptationcosts = v.tac_totaladaptationcosts + sum(v.aact_equityweightedadaptation_discountedaggregated[tt, :])
 
         v.td_totaldiscountedimpacts = min(v.addt_gt_equityweightedimpact_discountedglobal, p.civvalue_civilizationvalue)
+
+        # Sums only to 2200
+        if gettime(tt) <= 2200
+            v.addt_gt_equityweightedimpact_discountedglobal_2200 = v.addt_gt_equityweightedimpact_discountedglobal_2200 + sum(v.addt_equityweightedimpact_discountedaggregated[tt, :])
+            v.tac_totaladaptationcosts_2200 = v.tac_totaladaptationcosts_2200 + sum(v.aact_equityweightedadaptation_discountedaggregated[tt, :])
+            v.td_totaldiscountedimpacts_2200 = min(v.addt_gt_equityweightedimpact_discountedglobal_2200, p.civvalue_civilizationvalue)
+        end
+
+        # New results for SCC comparison
+        v.tdac_totalimpactandadaptation = min(v.td_totaldiscountedimpacts + v.tac_totaladaptationcosts, p.civvalue_civilizationvalue)
+        v.tdac_totalimpactandadaptation_2200 = min(v.td_totaldiscountedimpacts_2200 + v.tac_totaladaptationcosts_2200, p.civvalue_civilizationvalue)
 
         # Total effect of climate change
         v.te_totaleffect = min(v.td_totaldiscountedimpacts + v.tpc_totalaggregatedcosts + v.tac_totaladaptationcosts, p.civvalue_civilizationvalue)
