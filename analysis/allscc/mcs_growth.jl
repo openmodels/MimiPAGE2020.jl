@@ -355,7 +355,8 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
                       civvalue_multiplier::Union{Float64, Nothing} = 1.,
                       use_convergence::Union{Float64, Nothing} = nothing,
                       cbabs::Union{Float64, Nothing} = nothing,
-                      eqwbound::Union{Float64, Nothing} = nothing)
+                      eqwbound::Union{Float64, Nothing} = nothing,
+                      geadrate::Union{Float64, Nothing} = nothing)
 
     # Setup the marginal model and modify key parameters if they are specified
     m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
@@ -371,6 +372,10 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
     if eqwbound != nothing
         update_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
     end
+    if geadrate != nothing
+        update_param!(m, :geadrate_growtheffects_adaptationrate, geadrate)
+    end
+
     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
 
     # Setup SCC calculation and place for results
