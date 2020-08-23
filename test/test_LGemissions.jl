@@ -12,13 +12,13 @@ for testscen in 1:2
     lgemit = add_comp!(m, LGemissions)
 
     lgemit[:er_LGemissionsgrowth] = rcpsspscenario[:er_LGemissionsgrowth]
-    set_param!(m, :LGemissions, :e0_baselineLGemissions, readpagedata(m,"data/e0_baselineLGemissions.csv"))
+    set_param!(m, :LGemissions, :e0_baselineLGemissions, readpagedata(m, "data/e0_baselineLGemissions.csv"))
 
     # run Model
     run(m)
 
-    emissions= m[:LGemissions,  :e_globalLGemissions]
-    emissions_compare=readpagedata(m, "test/validationdata/$valdir/e_globalLGemissions.csv")
+    emissions = m[:LGemissions,  :e_globalLGemissions]
+    emissions_compare = readpagedata(m, "test/validationdata/$valdir/e_globalLGemissions.csv")
 
-    @test emissions ≈ emissions_compare rtol=1e-3
+    @test emissions ≈ emissions_compare rtol = 1e-3
 end

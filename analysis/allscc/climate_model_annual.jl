@@ -19,13 +19,13 @@ include("../../src/components/extensions/PermafrostSiBCASA_annual.jl")
 include("../../src/components/extensions/PermafrostJULES_annual.jl")
 include("../../src/components/extensions/PermafrostTotal_annual.jl")
 
-function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true)
+function climatemodel(scenario::String, use_permafrost::Bool = true, use_seaice::Bool = true)
     m = Model()
     set_dimension!(m, :year, collect(2015:2300))
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
-    #add all the components
+    # add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
     if use_permafrost
@@ -33,7 +33,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
         permafrost_jules = add_comp!(m, PermafrostJULES)
         permafrost = add_comp!(m, PermafrostTotal)
     end
-    co2emit = add_comp!(m,co2emissions)
+    co2emit = add_comp!(m, co2emissions)
     co2cycle = addco2cycle(m, use_permafrost)
     add_comp!(m, co2forcing)
     ch4emit = add_comp!(m, ch4emissions)
@@ -48,7 +48,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     sulfemit = add_comp!(m, SulphateForcing)
     totalforcing = add_comp!(m, TotalForcing)
 
-    #connect parameters together
+    # connect parameters together
     set_param!(m, :ClimateTemperature, :y_year_ann, collect(2015:2300))
     set_param!(m, :ClimateTemperature, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
     set_param!(m, :ClimateTemperature, :y_year_0, 2015.)

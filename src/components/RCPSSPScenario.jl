@@ -10,26 +10,26 @@
     rcp::Int64 = Parameter() # like rcp26
     ssp::Int64 = Parameter() # like ssp1
 
-    y_year = Parameter(index=[time], unit="year")
-    weight_scenarios = Parameter(unit="%") # from -100% to 100%, only used for sspw, rcpw
+    y_year = Parameter(index = [time], unit = "year")
+    weight_scenarios = Parameter(unit = "%") # from -100% to 100%, only used for sspw, rcpw
 
-    extra_abate_rate = Parameter(unit="%/year") # only used for rcp26extra
-    extra_abate_start = Parameter(unit="year")
-    extra_abate_end = Parameter(unit="year")
+    extra_abate_rate = Parameter(unit = "%/year") # only used for rcp26extra
+    extra_abate_start = Parameter(unit = "year")
+    extra_abate_end = Parameter(unit = "year")
 
     # RCP scenario values
-    er_CO2emissionsgrowth = Variable(index=[time,region], unit="%")
-    er_CH4emissionsgrowth = Variable(index=[time,region], unit="%")
-    er_N2Oemissionsgrowth = Variable(index=[time,region], unit="%")
-    er_LGemissionsgrowth = Variable(index=[time,region], unit="%")
-    pse_sulphatevsbase = Variable(index=[time, region], unit="%")
-    exf_excessforcing = Variable(index=[time], unit="W/m2")
+    er_CO2emissionsgrowth = Variable(index = [time,region], unit = "%")
+    er_CH4emissionsgrowth = Variable(index = [time,region], unit = "%")
+    er_N2Oemissionsgrowth = Variable(index = [time,region], unit = "%")
+    er_LGemissionsgrowth = Variable(index = [time,region], unit = "%")
+    pse_sulphatevsbase = Variable(index = [time, region], unit = "%")
+    exf_excessforcing = Variable(index = [time], unit = "W/m2")
 
-    extra_abate_compound = Variable(index=[time])
+    extra_abate_compound = Variable(index = [time])
 
     # SSP scenario values
-    popgrw_populationgrowth = Variable(index=[time, region], unit="%/year") # From p.32 of Hope 2009
-    grw_gdpgrowthrate = Variable(index=[time, region], unit="%/year") #From p.32 of Hope 2009
+    popgrw_populationgrowth = Variable(index = [time, region], unit = "%/year") # From p.32 of Hope 2009
+    grw_gdpgrowthrate = Variable(index = [time, region], unit = "%/year") # From p.32 of Hope 2009
 
 
     function init(p, v, d)
@@ -99,7 +99,7 @@
             if is_first(t)
                 duration = 5
             else
-                duration = p.y_year[t] - p.y_year[t-1]
+                duration = p.y_year[t] - p.y_year[t - 1]
             end
 
             extra_abate_period = ifelse(p.y_year[t] <= p.extra_abate_start || p.y_year[t] > p.extra_abate_end, 1.,
@@ -107,7 +107,7 @@
             if is_first(t)
                 v.extra_abate_compound[t] = extra_abate_period
             else
-                v.extra_abate_compound[t] = extra_abate_period * v.extra_abate_compound[t-1]
+                v.extra_abate_compound[t] = extra_abate_period * v.extra_abate_compound[t - 1]
             end
 
             er_rcp26_CO2emissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_co2.csv")
@@ -128,9 +128,9 @@
 end
 
 function weighted_scenario(lowscen, medscen, highscen, weight)
-    lowscen * .25 * (1 - weight/100)^2 +
-        medscen * .5 * (1 - (weight/100)^2) +
-        highscen * .25 * (1 + weight/100)^2
+    lowscen * .25 * (1 - weight / 100)^2 +
+        medscen * .5 * (1 - (weight / 100)^2) +
+        highscen * .25 * (1 + weight / 100)^2
 end
 
 function addrcpsspscenario(model::Model, scenario::String)

@@ -42,10 +42,10 @@ df_sccMC_singleGE = DataFrame(damagePAGE09 = false, permafr = false, seaice = fa
                                   perc75 = -999., sd = -999., varcoeff = -999., perc05 = -999., perc95 = -999.,
                                   perc10 = -999., perc90 = -999.)
 for jj_page09damages in [false]
-  for jj_permafr in [true, false]
-      for jj_seaice in [true, false]
-          for jj_scen in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
-              for jj_civvalue in [1., 10.0^20]
+    for jj_permafr in [true, false]
+        for jj_seaice in [true, false]
+            for jj_scen in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
+                for jj_civvalue in [1., 10.0^20]
 #              for jj_gdploss in [1., 0.]
 
                     # jump undesired combinations
@@ -101,7 +101,7 @@ for jj_page09damages in [false]
                                                       StatsBase.percentile(scc_mcs_object[:, 1], 90)])
 
                       # clean out the MCS objects
-                      scc_mcs_object = nothing
+                        scc_mcs_object = nothing
                     end
                 end
             end
@@ -133,10 +133,10 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
                     for jj_cbabs in [740.65, 740.65 / 2, 740.65 * 2]
                         for jj_eqwshare in [0.99, 0.95, 0.999]
                             for jj_convergence in [1., 0.]
-                                for jj_pulse in [scc_pulse_size, scc_pulse_size/1000., scc_pulse_size/10., scc_pulse_size*10.]
+                                for jj_pulse in [scc_pulse_size, scc_pulse_size / 1000., scc_pulse_size / 10., scc_pulse_size * 10.]
 
                                     # jump undesired or infeasible combinations
-                                    if  jj_scen != "RCP4.5 & SSP2" && (jj_gestring != "EMPIRICAL" || jj_permafr != true ||
+                                    if jj_scen != "RCP4.5 & SSP2" && (jj_gestring != "EMPIRICAL" || jj_permafr != true ||
                                                                         jj_seaice != true || jj_civvalue != 1. || jj_cbabs != 740.65 ||
                                                                         jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
                                         continue

@@ -11,10 +11,10 @@ for testscen in 1:2
     scenario = addrcpsspscenario(m, scenario)
     totalforcing = add_comp!(m, TotalForcing)
 
-    totalforcing[:f_CO2forcing] = readpagedata(m,"test/validationdata/$valdir/f_co2forcing.csv")
-    totalforcing[:f_CH4forcing] = readpagedata(m,"test/validationdata/$valdir/f_ch4forcing.csv")
-    totalforcing[:f_N2Oforcing] = readpagedata(m,"test/validationdata/$valdir/f_n2oforcing.csv")
-    totalforcing[:f_lineargasforcing] = readpagedata(m,"test/validationdata/$valdir/f_LGforcing.csv")
+    totalforcing[:f_CO2forcing] = readpagedata(m, "test/validationdata/$valdir/f_co2forcing.csv")
+    totalforcing[:f_CH4forcing] = readpagedata(m, "test/validationdata/$valdir/f_ch4forcing.csv")
+    totalforcing[:f_N2Oforcing] = readpagedata(m, "test/validationdata/$valdir/f_n2oforcing.csv")
+    totalforcing[:f_lineargasforcing] = readpagedata(m, "test/validationdata/$valdir/f_LGforcing.csv")
     totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
     totalforcing[:fs_sulfateforcing] = readpagedata(m, "test/validationdata/$valdir/fs_sulfateforcing.csv")
 
@@ -25,8 +25,8 @@ for testscen in 1:2
 
     run(m)
 
-    forcing=m[:TotalForcing, :ft_totalforcing]
-    forcing_compare=readpagedata(m,"test/validationdata/$valdir/ft_totalforcing.csv")
+    forcing = m[:TotalForcing, :ft_totalforcing]
+    forcing_compare = readpagedata(m, "test/validationdata/$valdir/ft_totalforcing.csv")
 
-    @test forcing ≈ forcing_compare rtol=1e-3
+    @test forcing ≈ forcing_compare rtol = 1e-3
 end

@@ -4,10 +4,10 @@ using Mimi
 
 include("../../src/utils/mctools.jl")
 
-function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
-                ge_maximum::Union{Float64, Nothing} = nothing,
-                ge_mode::Union{Float64, Nothing} = nothing,
-                civvalue_multiplier::Union{Float64, Nothing} = 1.)
+function getsim(ge_minimum::Union{Float64,Nothing} = nothing,
+                ge_maximum::Union{Float64,Nothing} = nothing,
+                ge_mode::Union{Float64,Nothing} = nothing,
+                civvalue_multiplier::Union{Float64,Nothing} = 1.)
 
     mcs = @defsim begin
 
@@ -15,9 +15,9 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
         # Define random variables (RVs)
         ############################################################################
 
-        #The folllowing RVs are in more than one component.  For clarity they are
-        #set here as opposed to below within the blocks of RVs separated by component
-        #so that they are not set more than once.
+        # The folllowing RVs are in more than one component.  For clarity they are
+        # set here as opposed to below within the blocks of RVs separated by component
+        # so that they are not set more than once.
 
         save_savingsrate = TriangularDist(10, 20, 15) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages. GDP, SLRDamages
         tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.) # components: MarketDamages, NonMarketDamages, SLRDamages, Discountinuity
@@ -30,24 +30,24 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
         wincf_weightsfactor_sea["Africa"] = TriangularDist(.4, .8, .6)
         wincf_weightsfactor_sea["LatAmerica"] = TriangularDist(.4, .8, .6)
 
-        automult_autonomouschange = TriangularDist(0.5, 0.8, 0.65)  #components: AdaptationCosts, AbatementCosts
+        automult_autonomouschange = TriangularDist(0.5, 0.8, 0.65)  # components: AdaptationCosts, AbatementCosts
 
-        #The following RVs are divided into blocks by component
+        # The following RVs are divided into blocks by component
 
         # CO2cycle
         air_CO2fractioninatm = TriangularDist(57, 67, 62)
         res_CO2atmlifetime = TriangularDist(50, 100, 70)
-        #ccf_CO2feedback = TriangularDist(0, 0, 0) # only usable if lb <> ub
+        # ccf_CO2feedback = TriangularDist(0, 0, 0) # only usable if lb <> ub
         ccfmax_maxCO2feedback = TriangularDist(10, 30, 20)
-        stay_fractionCO2emissionsinatm = TriangularDist(0.25,0.35,0.3)
-        ce_0_basecumCO2emissions=TriangularDist(1830000, 2240000, 2040000)
-        a1_percentco2oceanlong=TriangularDist( 4.3,	41.6, 23.0)
-        a2_percentco2oceanshort=TriangularDist(23.1, 30.1, 26.6)
-        a3_percentco2land=TriangularDist(11.4, 42.5, 27.0)
-        t1_timeco2oceanlong=TriangularDist(248.9, 376.2, 312.5)
-        t2_timeco2oceanshort=TriangularDist(25.9, 43.9, 34.9)
-        t3_timeco2land=TriangularDist(2.8, 5.7, 4.3)
-        rt_g0_baseglobaltemp=TriangularDist(0.903, 0.989, 0.946)
+        stay_fractionCO2emissionsinatm = TriangularDist(0.25, 0.35, 0.3)
+        ce_0_basecumCO2emissions = TriangularDist(1830000, 2240000, 2040000)
+        a1_percentco2oceanlong = TriangularDist(4.3,	41.6, 23.0)
+        a2_percentco2oceanshort = TriangularDist(23.1, 30.1, 26.6)
+        a3_percentco2land = TriangularDist(11.4, 42.5, 27.0)
+        t1_timeco2oceanlong = TriangularDist(248.9, 376.2, 312.5)
+        t2_timeco2oceanshort = TriangularDist(25.9, 43.9, 34.9)
+        t3_timeco2land = TriangularDist(2.8, 5.7, 4.3)
+        rt_g0_baseglobaltemp = TriangularDist(0.903, 0.989, 0.946)
 
         # SiBCASA Permafrost
         perm_sib_af = TriangularDist(1.42609149897258, 2.32504747848815, 1.87556948873036)
@@ -121,7 +121,7 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
 
         # SLRDamages
         scal_calibrationSLR = TriangularDist(0.45, 0.55, .5)
-        #iben_SLRInitialBenefit = TriangularDist(0, 0, 0) # only usable if lb <> ub
+        # iben_SLRInitialBenefit = TriangularDist(0, 0, 0) # only usable if lb <> ub
         W_SatCalibrationSLR = TriangularDist(.5, 1.5, 1)
         pow_SLRImpactFxnExponent = TriangularDist(.5, 1, .7)
         ipow_SLRIncomeFxnExponent = TriangularDist(-.4, -.2, -.3)
@@ -135,77 +135,77 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
         distau_discontinuityexponent = TriangularDist(10, 30, 20)
 
         # EquityWeighting
-        civvalue_civilizationvalue = TriangularDist(1e10*civvalue_multiplier,
-                                                    1e11*civvalue_multiplier,
-                                                    5e10*civvalue_multiplier)
-        ptp_timepreference = TriangularDist(0.1,2,1)
-        emuc_utilityconvexity = TriangularDist(0.5,2,1)
+        civvalue_civilizationvalue = TriangularDist(1e10 * civvalue_multiplier,
+                                                    1e11 * civvalue_multiplier,
+                                                    5e10 * civvalue_multiplier)
+        ptp_timepreference = TriangularDist(0.1, 2, 1)
+        emuc_utilityconvexity = TriangularDist(0.5, 2, 1)
 
         # AbatementCosts
-        AbatementCostParametersCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,6.0,-22)
-        AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67,6.0,-30)
-        AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20,6.0,-7.0)
-        AbatementCostParametersLin_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50,50,0)
+        AbatementCostParametersCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50, 6.0, -22)
+        AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67, 6.0, -30)
+        AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20, 6.0, -7.0)
+        AbatementCostParametersLin_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50, 50, 0)
 
-        AbatementCostParametersCO2_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,40,20)
-        AbatementCostParametersCH4_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,20,10)
-        AbatementCostParametersN2O_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,20,10)
-        AbatementCostParametersLin_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0,20,10)
+        AbatementCostParametersCO2_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 40, 20)
+        AbatementCostParametersCH4_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
+        AbatementCostParametersN2O_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
+        AbatementCostParametersLin_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
 
-        AbatementCostParametersCO2_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400,-100,-200)
-        AbatementCostParametersCH4_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-8000,-1000,-4000)
-        AbatementCostParametersN2O_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-15000,0,-7000)
-        AbatementCostParametersLin_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400,-100,-200)
+        AbatementCostParametersCO2_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400, -100, -200)
+        AbatementCostParametersCH4_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-8000, -1000, -4000)
+        AbatementCostParametersN2O_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-15000, 0, -7000)
+        AbatementCostParametersLin_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400, -100, -200)
 
-        AbatementCostParametersCO2_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60,80,70)
-        AbatementCostParametersCH4_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35,70,50)
-        AbatementCostParametersN2O_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35,70,50)
-        AbatementCostParametersLin_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60,80,70)
+        AbatementCostParametersCO2_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60, 80, 70)
+        AbatementCostParametersCH4_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35, 70, 50)
+        AbatementCostParametersN2O_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35, 70, 50)
+        AbatementCostParametersLin_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60, 80, 70)
 
-        AbatementCostParametersCO2_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100,700,400)
-        AbatementCostParametersCH4_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(3000,10000,6000)
-        AbatementCostParametersN2O_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(2000,60000,20000)
-        AbatementCostParametersLin_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100,600,300)
+        AbatementCostParametersCO2_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100, 700, 400)
+        AbatementCostParametersCH4_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(3000, 10000, 6000)
+        AbatementCostParametersN2O_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(2000, 60000, 20000)
+        AbatementCostParametersLin_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100, 600, 300)
 
-        AbatementCostParametersCO2_ies_InitialExperienceStockofCutbacks = TriangularDist(100000,200000,150000)
-        AbatementCostParametersCH4_ies_InitialExperienceStockofCutbacks = TriangularDist(1500,2500,2000)
-        AbatementCostParametersN2O_ies_InitialExperienceStockofCutbacks = TriangularDist(30,80,50)
-        AbatementCostParametersLin_ies_InitialExperienceStockofCutbacks = TriangularDist(1500,2500,2000)
+        AbatementCostParametersCO2_ies_InitialExperienceStockofCutbacks = TriangularDist(100000, 200000, 150000)
+        AbatementCostParametersCH4_ies_InitialExperienceStockofCutbacks = TriangularDist(1500, 2500, 2000)
+        AbatementCostParametersN2O_ies_InitialExperienceStockofCutbacks = TriangularDist(30, 80, 50)
+        AbatementCostParametersLin_ies_InitialExperienceStockofCutbacks = TriangularDist(1500, 2500, 2000)
 
-        #the following variables need to be set, but set the same in all 4 abatement cost components
-        #note that for these regional variables, the first region is the focus region (EU), which is set in the preceding code, and so is always one for these variables
+        # the following variables need to be set, but set the same in all 4 abatement cost components
+        # note that for these regional variables, the first region is the focus region (EU), which is set in the preceding code, and so is always one for these variables
 
-        emitf_uncertaintyinBAUemissfactor["USA"] = TriangularDist(0.8,1.2,1.0)
-        emitf_uncertaintyinBAUemissfactor["OECD"] = TriangularDist(0.8,1.2,1.0)
-        emitf_uncertaintyinBAUemissfactor["USSR"] = TriangularDist(0.65,1.35,1.0)
-        emitf_uncertaintyinBAUemissfactor["China"] = TriangularDist(0.5,1.5,1.0)
-        emitf_uncertaintyinBAUemissfactor["SEAsia"] = TriangularDist(0.5,1.5,1.0)
-        emitf_uncertaintyinBAUemissfactor["Africa"] = TriangularDist(0.5,1.5,1.0)
-        emitf_uncertaintyinBAUemissfactor["LatAmerica"] = TriangularDist(0.5,1.5,1.0)
+        emitf_uncertaintyinBAUemissfactor["USA"] = TriangularDist(0.8, 1.2, 1.0)
+        emitf_uncertaintyinBAUemissfactor["OECD"] = TriangularDist(0.8, 1.2, 1.0)
+        emitf_uncertaintyinBAUemissfactor["USSR"] = TriangularDist(0.65, 1.35, 1.0)
+        emitf_uncertaintyinBAUemissfactor["China"] = TriangularDist(0.5, 1.5, 1.0)
+        emitf_uncertaintyinBAUemissfactor["SEAsia"] = TriangularDist(0.5, 1.5, 1.0)
+        emitf_uncertaintyinBAUemissfactor["Africa"] = TriangularDist(0.5, 1.5, 1.0)
+        emitf_uncertaintyinBAUemissfactor["LatAmerica"] = TriangularDist(0.5, 1.5, 1.0)
 
-        q0f_negativecostpercentagefactor["USA"] = TriangularDist(0.75,1.5,1.0)
-        q0f_negativecostpercentagefactor["OECD"] = TriangularDist(0.75,1.25,1.0)
-        q0f_negativecostpercentagefactor["USSR"] = TriangularDist(0.4,1.0,0.7)
-        q0f_negativecostpercentagefactor["China"] = TriangularDist(0.4,1.0,0.7)
-        q0f_negativecostpercentagefactor["SEAsia"] = TriangularDist(0.4,1.0,0.7)
-        q0f_negativecostpercentagefactor["Africa"] = TriangularDist(0.4,1.0,0.7)
-        q0f_negativecostpercentagefactor["LatAmerica"] = TriangularDist(0.4,1.0,0.7)
+        q0f_negativecostpercentagefactor["USA"] = TriangularDist(0.75, 1.5, 1.0)
+        q0f_negativecostpercentagefactor["OECD"] = TriangularDist(0.75, 1.25, 1.0)
+        q0f_negativecostpercentagefactor["USSR"] = TriangularDist(0.4, 1.0, 0.7)
+        q0f_negativecostpercentagefactor["China"] = TriangularDist(0.4, 1.0, 0.7)
+        q0f_negativecostpercentagefactor["SEAsia"] = TriangularDist(0.4, 1.0, 0.7)
+        q0f_negativecostpercentagefactor["Africa"] = TriangularDist(0.4, 1.0, 0.7)
+        q0f_negativecostpercentagefactor["LatAmerica"] = TriangularDist(0.4, 1.0, 0.7)
 
-        cmaxf_maxcostfactor["USA"] = TriangularDist(0.8,1.2,1.0)
-        cmaxf_maxcostfactor["OECD"] = TriangularDist(1.0,1.5,1.2)
-        cmaxf_maxcostfactor["USSR"] = TriangularDist(0.4,1.0,0.7)
-        cmaxf_maxcostfactor["China"] = TriangularDist(0.8,1.2,1.0)
-        cmaxf_maxcostfactor["SEAsia"] = TriangularDist(1,1.5,1.2)
-        cmaxf_maxcostfactor["Africa"] = TriangularDist(1,1.5,1.2)
-        cmaxf_maxcostfactor["LatAmerica"] = TriangularDist(0.4,1.0,0.7)
+        cmaxf_maxcostfactor["USA"] = TriangularDist(0.8, 1.2, 1.0)
+        cmaxf_maxcostfactor["OECD"] = TriangularDist(1.0, 1.5, 1.2)
+        cmaxf_maxcostfactor["USSR"] = TriangularDist(0.4, 1.0, 0.7)
+        cmaxf_maxcostfactor["China"] = TriangularDist(0.8, 1.2, 1.0)
+        cmaxf_maxcostfactor["SEAsia"] = TriangularDist(1, 1.5, 1.2)
+        cmaxf_maxcostfactor["Africa"] = TriangularDist(1, 1.5, 1.2)
+        cmaxf_maxcostfactor["LatAmerica"] = TriangularDist(0.4, 1.0, 0.7)
 
-        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3,1.2,0.7)
-        qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1,1.5,1.3)
-        c0mult_mostnegativecostinfinalyear = TriangularDist(0.5,1.2,0.8)
-        curve_below_curvatureofMACcurvebelowzerocost = TriangularDist(0.25,0.8,0.45)
-        curve_above_curvatureofMACcurveabovezerocost = TriangularDist(0.1,0.7,0.4)
-        cross_experiencecrossoverratio = TriangularDist(0.1,0.3,0.2)
-        learn_learningrate = TriangularDist(0.05,0.35,0.2)
+        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3, 1.2, 0.7)
+        qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1, 1.5, 1.3)
+        c0mult_mostnegativecostinfinalyear = TriangularDist(0.5, 1.2, 0.8)
+        curve_below_curvatureofMACcurvebelowzerocost = TriangularDist(0.25, 0.8, 0.45)
+        curve_above_curvatureofMACcurveabovezerocost = TriangularDist(0.1, 0.7, 0.4)
+        cross_experiencecrossoverratio = TriangularDist(0.1, 0.3, 0.2)
+        learn_learningrate = TriangularDist(0.05, 0.35, 0.2)
 
         # AdaptationCosts
         AdaptiveCostsSeaLevel_cp_costplateau_eu = TriangularDist(0.01, 0.04, 0.02)
@@ -252,49 +252,49 @@ function getsim(ge_minimum::Union{Float64, Nothing} = nothing,
              GDP.ge_use_empiricaldistribution
              )
 
-    end #de
+    end # de
     return mcs
 end
 
-#Reformat the RV results into the format used for testing
+# Reformat the RV results into the format used for testing
 function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../../output"))
 
-    #create vectors to hold results of Monte Carlo runs
-    td=zeros(samplesize);
-    tpc=zeros(samplesize);
-    tac=zeros(samplesize);
-    te=zeros(samplesize);
-    ft=zeros(samplesize);
-    rt_g=zeros(samplesize);
-    s=zeros(samplesize);
-    c_co2concentration=zeros(samplesize);
-    rgdppercap_slr=zeros(samplesize);
-    rgdppercap_market=zeros(samplesize);
-    rgdppercap_nonmarket=zeros(samplesize);
-    rgdppercap_disc=zeros(samplesize);
+    # create vectors to hold results of Monte Carlo runs
+    td = zeros(samplesize);
+    tpc = zeros(samplesize);
+    tac = zeros(samplesize);
+    te = zeros(samplesize);
+    ft = zeros(samplesize);
+    rt_g = zeros(samplesize);
+    s = zeros(samplesize);
+    c_co2concentration = zeros(samplesize);
+    rgdppercap_slr = zeros(samplesize);
+    rgdppercap_market = zeros(samplesize);
+    rgdppercap_nonmarket = zeros(samplesize);
+    rgdppercap_disc = zeros(samplesize);
 
-    #load raw data
-    #no filter
+    # load raw data
+    # no filter
     td      = load_RV("EquityWeighting_td_totaldiscountedimpacts", "td_totaldiscountedimpacts"; output_path = output_path)
     tpc     = load_RV("EquityWeighting_tpc_totalaggregatedcosts", "tpc_totalaggregatedcosts"; output_path = output_path)
     tac     = load_RV("EquityWeighting_tac_totaladaptationcosts", "tac_totaladaptationcosts"; output_path = output_path)
     te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path = output_path)
 
-    #time index
+    # time index
     c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
     ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path = output_path)
     rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
     s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path = output_path)
 
-    #region index
+    # region index
     rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
     rgdppercap_market       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
-    rgdppercap_nonmarket    =load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
+    rgdppercap_nonmarket    = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
     rgdppercap_disc         = load_RV("Discontinuity_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
 
-    #resave data
-    df=DataFrame(td=td,tpc=tpc,tac=tac,te=te,c_co2concentration=c_co2concentration,ft=ft,rt_g=rt_g,sealevel=s,rgdppercap_slr=rgdppercap_slr,rgdppercap_market=rgdppercap_market,rgdppercap_nonmarket=rgdppercap_nonmarket,rgdppercap_di=rgdppercap_disc)
-    save(joinpath(output_path, "mimipagemontecarlooutput.csv"),df)
+    # resave data
+    df = DataFrame(td = td, tpc = tpc, tac = tac, te = te, c_co2concentration = c_co2concentration, ft = ft, rt_g = rt_g, sealevel = s, rgdppercap_slr = rgdppercap_slr, rgdppercap_market = rgdppercap_market, rgdppercap_nonmarket = rgdppercap_nonmarket, rgdppercap_di = rgdppercap_disc)
+    save(joinpath(output_path, "mimipagemontecarlooutput.csv"), df)
 end
 
 
@@ -311,12 +311,12 @@ function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2"
     res = run(mcs, m, samplesize; trials_output_filename = joinpath(output_path, "trialdata.csv"), results_output_dir = output_path)
 
     # reformat outputs for testing and analysis
-    reformat_RV_outputs(samplesize, output_path=output_path)
+    reformat_RV_outputs(samplesize, output_path = output_path)
 end
 
 
 
-function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 75000.)#, varseed::Union{Int, Nothing} = nothing)
+function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing} = nothing, eta::Union{Float64,Nothing} = nothing, prtp::Union{Float64,Nothing} = nothing, pulse_size = 75000.)# , varseed::Union{Int, Nothing} = nothing)
     # Setup of location of final results
     scc_results = zeros(samplesize)
 
@@ -335,32 +335,32 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int, Nothing} = 
     eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
     prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
 
-    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)#, varseed=varseed)   # Returns a marginal model that has already been run
+    mm = get_marginal_model(m, year = year, pulse_size = pulse_size)# , varseed=varseed)   # Returns a marginal model that has already been run
 
     # Run
-    res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
+    res = run(mcs, mm, samplesize; post_trial_func = mc_scc_calculation)
 
     return scc_results
 end
 
 function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(@__DIR__, "../../output");
-                      eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing,
-                      pulse_size::Union{Float64, Nothing} = 75000.,
+                      eta::Union{Float64,Nothing} = nothing, prtp::Union{Float64,Nothing} = nothing,
+                      pulse_size::Union{Float64,Nothing} = 75000.,
                       scenario::String = "RCP4.5 & SSP2",
-                      use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false,
-                      ge_minimum::Union{Float64, Nothing} = nothing,
-                      ge_maximum::Union{Float64, Nothing} = nothing,
-                      ge_mode::Union{Float64, Nothing} = nothing,
-                      ge_use_empirical::Union{Float64, Nothing} = nothing,
-                      civvalue_multiplier::Union{Float64, Nothing} = 1.,
-                      use_convergence::Union{Float64, Nothing} = nothing,
-                      cbabs::Union{Float64, Nothing} = nothing,
-                      eqwbound::Union{Float64, Nothing} = nothing)
+                      use_permafrost::Bool = true, use_seaice::Bool = true, use_page09damages::Bool = false,
+                      ge_minimum::Union{Float64,Nothing} = nothing,
+                      ge_maximum::Union{Float64,Nothing} = nothing,
+                      ge_mode::Union{Float64,Nothing} = nothing,
+                      ge_use_empirical::Union{Float64,Nothing} = nothing,
+                      civvalue_multiplier::Union{Float64,Nothing} = 1.,
+                      use_convergence::Union{Float64,Nothing} = nothing,
+                      cbabs::Union{Float64,Nothing} = nothing,
+                      eqwbound::Union{Float64,Nothing} = nothing)
 
     # Setup the marginal model and modify key parameters if they are specified
     m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
     if use_convergence != nothing
-         update_param!(m, :use_convergence, use_convergence)
+        update_param!(m, :use_convergence, use_convergence)
     end
     if ge_use_empirical != nothing
         update_param!(m, :ge_use_empiricaldistribution, ge_use_empirical)
@@ -371,19 +371,19 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
     if eqwbound != nothing
         update_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
     end
-    mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
+    mm = compute_scc_mm(m, year = year, eta = eta, prtp = prtp, pulse_size = pulse_size)[:mm]
 
     # Setup SCC calculation and place for results
     scc_results = zeros(samplesize)
 
-    function my_scc_calculation(mcs, trialnum::Int, ntimesteps::Int, tup::Union{Tuple, Nothing})
+    function my_scc_calculation(mcs, trialnum::Int, ntimesteps::Int, tup::Union{Tuple,Nothing})
         base, marginal = mcs.models
         scc_results[trialnum] = (marginal[:EquityWeighting, :td_totaldiscountedimpacts] - base[:EquityWeighting, :td_totaldiscountedimpacts]) / pulse_size
     end
 
     # Setup MC simulation
     mcs_def = getsim(ge_minimum, ge_maximum, ge_mode, civvalue_multiplier)
-    mcs_inst = run(mcs_def, [mm.base, mm.marginal], samplesize; results_output_dir=output_path, post_trial_func=my_scc_calculation)
+    mcs_inst = run(mcs_def, [mm.base, mm.marginal], samplesize; results_output_dir = output_path, post_trial_func = my_scc_calculation)
     set_models!(mcs_inst, [mm.base, mm.marginal])
     generate_trials!(mcs_inst, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 

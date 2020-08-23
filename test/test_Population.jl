@@ -27,5 +27,5 @@ for testscen in 1:2
     # Recorded data
     pop_compare = readpagedata(m, "test/validationdata/$valdir/pop_population.csv")
 
-    @test pop ≈ pop_compare rtol=1e-3
+    @test pop ≈ pop_compare rtol = 1e-3
 end
