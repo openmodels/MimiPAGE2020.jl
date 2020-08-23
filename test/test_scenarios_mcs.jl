@@ -3,11 +3,11 @@ using Test
 using CSV
 
 include("../src/mcs.jl")
-df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header=false)
-rfrow0 = findfirst(x -> !ismissing(x) && x == "RF in 2100", df[!, 1])
-gmstrow0 = findfirst(x -> !ismissing(x) && x == "Temp. in 2100", df[!, 1])
-slrrow0 = findfirst(x -> !ismissing(x) && x == "SLR in 2100", df[!, 1])
-terow0 = findfirst(x -> !ismissing(x) && x == "Total effect NPV", df[!, 1])
+df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header = false)
+rfrow0 = findfirst(x->!ismissing(x) && x == "RF in 2100", df[!, 1])
+gmstrow0 = findfirst(x->!ismissing(x) && x == "Temp. in 2100", df[!, 1])
+slrrow0 = findfirst(x->!ismissing(x) && x == "SLR in 2100", df[!, 1])
+terow0 = findfirst(x->!ismissing(x) && x == "Total effect NPV", df[!, 1])
 
 mcs = getsim()
 
@@ -54,7 +54,7 @@ for testscen in 2:size(df)[2]
 
     # Run for MC
     output_path = joinpath(@__DIR__, "../output")
-    res = run(mcs, m, 1000; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)
+    res = run(mcs, m, 1000; trials_output_filename = joinpath(output_path, "trialdata.csv"), results_output_dir = output_path)
 
     ## This isn't quite the right comparison
     # forcing = m[:TotalForcing, :ft_totalforcing][6]
@@ -70,14 +70,14 @@ for testscen in 2:size(df)[2]
     for (quant, drow, rtolmult) in [(0.05, 1, 100), (.25, 2, 60), (.5, 3, 30), (.75, 4, 60), (.95, 5, 100)]
         rt_g = quantile(allrt_g, quant)
         rt_g_compare = parse(Float64, df[gmstrow0 + drow, testscen])
-        @test rt_g ≈ rt_g_compare rtol=1e-2*rtolmult
+        @test rt_g ≈ rt_g_compare rtol = 1e-2 * rtolmult
 
         slr = quantile(allslr, quant)
         slr_compare = parse(Float64, df[slrrow0 + drow, testscen])
-        @test slr ≈ slr_compare rtol=1e-2*rtolmult
+        @test slr ≈ slr_compare rtol = 1e-2 * rtolmult
 
         te = quantile(allte, quant)
         te_compare = parse(Float64, df[terow0 + drow, testscen])
-        @test te ≈ te_compare rtol=1e4*rtolmult
+        @test te ≈ te_compare rtol = 1e4 * rtolmult
     end
 end

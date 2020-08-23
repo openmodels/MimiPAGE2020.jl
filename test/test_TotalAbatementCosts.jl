@@ -26,7 +26,7 @@ for testscen in 1:2
     cost_compare = readpagedata(m, "test/validationdata/$valdir/tct_totalcosts.csv")
     cost_cap_compare = readpagedata(m, "test/validationdata/$valdir/tct_per_cap_totalcostspercap.csv")
 
-    @test abate_cost ≈ cost_compare rtol=1e-4
-    @test abate_cost_per_cap ≈ cost_cap_compare rtol=1e-7
+    @test abate_cost ≈ cost_compare rtol = 1e-4
+    @test abate_cost_per_cap ≈ cost_cap_compare rtol = 1e-7
 end
 

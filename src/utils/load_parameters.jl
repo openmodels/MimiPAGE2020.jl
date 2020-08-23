@@ -1,7 +1,7 @@
 using DelimitedFiles
 
 function checkregionorder(model::Model, regions, file)
-    regionaliases = Dict{AbstractString, Vector{AbstractString}}("EU" => [],
+    regionaliases = Dict{AbstractString,Vector{AbstractString}}("EU" => [],
                                                                  "USA" => ["US"],
                                                                  "OECD" => ["OT"],
                                                                  "Africa" => ["AF"],
@@ -26,7 +26,7 @@ function checktimeorder(model::Model, times, file)
     end
 end
 
-function readpagedata(model::Union{Model, Nothing}, filepath::AbstractString)
+function readpagedata(model::Union{Model,Nothing}, filepath::AbstractString)
     # Handle relative paths
     if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
         filepath = joinpath(@__DIR__, "..", "..", filepath)
@@ -36,16 +36,16 @@ function readpagedata(model::Union{Model, Nothing}, filepath::AbstractString)
 
     firstline = chomp(content[1])
     if firstline == "# Index: region"
-        data = readdlm(filepath, ',', header=true, comments=true)
+        data = readdlm(filepath, ',', header = true, comments = true)
 
         if model != nothing
             # Check that regions are in the right order
             checkregionorder(model, data[1][:, 1], basename(filepath))
         end
 
-        return convert(Vector{Float64},vec(data[1][:, 2]))
+        return convert(Vector{Float64}, vec(data[1][:, 2]))
     elseif firstline == "# Index: time"
-        data = readdlm(filepath, ',', header=true, comments=true)
+        data = readdlm(filepath, ',', header = true, comments = true)
 
         if model != nothing
             # Check that the times are in the right order
@@ -54,7 +54,7 @@ function readpagedata(model::Union{Model, Nothing}, filepath::AbstractString)
 
         return convert(Vector{Float64}, vec(data[1][:, 2]))
     elseif firstline == "# Index: time, region"
-        data = readdlm(filepath, ',', header=true, comments = true)
+        data = readdlm(filepath, ',', header = true, comments = true)
 
         if model != nothing
             # Check that both dimension match
@@ -64,7 +64,7 @@ function readpagedata(model::Union{Model, Nothing}, filepath::AbstractString)
 
         return convert(Array{Float64}, data[1][:, 2:end])
     elseif firstline == "# Index: draw"
-        data = readdlm(filepath, ',', header=true, comments=true)
+        data = readdlm(filepath, ',', header = true, comments = true)
 
         return convert(Vector{Float64}, vec(data[1][:, 2]))
     else
@@ -73,10 +73,10 @@ function readpagedata(model::Union{Model, Nothing}, filepath::AbstractString)
 end
 
 function load_parameters(model::Model)
-    parameters = Dict{Any, Any}()
+    parameters = Dict{Any,Any}()
 
     parameter_directory = joinpath(dirname(@__FILE__), "..", "..", "data")
-    for file in filter(q->splitext(q)[2]==".csv", readdir(parameter_directory))
+    for file in filter(q->splitext(q)[2] == ".csv", readdir(parameter_directory))
         parametername = splitext(file)[1]
         filepath = joinpath(parameter_directory, file)
 

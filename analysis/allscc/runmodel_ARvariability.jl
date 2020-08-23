@@ -19,7 +19,7 @@ end
 # set global values for technical configuration options
 set_globalbools()
 
-#run main_model file
+# run main_model file
 include("main_model_ARvariability.jl")
 include("mcs_ARvariability.jl")
 include("compute_scc_annual.jl")
@@ -42,7 +42,7 @@ for scenario in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & 
     do_monte_carlo_runs(samplesize, scenario, joinpath(@__DIR__, "../../output", scenario, model))
 
     # get the social cost of carbon for the Monte Carlo simulations and save the output
-    sccs = compute_scc_mcs(m, samplesize, year=2020)
+    sccs = compute_scc_mcs(m, samplesize, year = 2020)
     # store results in DataFrame
     df = DataFrame(Any[fill(model, samplesize), fill(scenario, samplesize), sccs], [:ModelName, :ScenarioName, :SCC])
     # write out to csv

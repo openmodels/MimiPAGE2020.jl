@@ -26,6 +26,7 @@ include("components/SulphateForcing.jl")
 include("components/TotalForcing.jl")
 include("components/ClimateTemperature.jl")
 include("components/SeaLevelRise.jl")
+include("components/PAGE09SeaLevelRise.jl")
 include("components/GDP.jl")
 include("components/MarketDamages.jl")
 include("components/MarketDamagesBurke.jl")
@@ -44,8 +45,8 @@ include("components/PermafrostSiBCASA.jl")
 include("components/PermafrostJULES.jl")
 include("components/PermafrostTotal.jl")
 
-function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false)
-    #add all the components
+function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_seaice::Bool = true, use_page09damages::Bool = false; use_page09weights::Bool = false, page09_discontinuity::Bool = false, page09_sealevelrise::Bool = false)
+    # add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
     if use_permafrost
@@ -67,13 +68,17 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     add_comp!(m, LGforcing)
     sulfemit = add_comp!(m, SulphateForcing)
     totalforcing = add_comp!(m, TotalForcing)
-    add_comp!(m, SeaLevelRise)
+    if page09_sealevelrise
+        add_comp!(m, PAGE09SeaLevelRise, :SeaLevelRise)
+    else
+        add_comp!(m, SeaLevelRise)
+    end
 
-    #Socio-Economics
+    # Socio-Economics
     population = addpopulation(m)
     gdp = add_comp!(m, GDP)
 
-    #Abatement Costs
+    # Abatement Costs
     abatementcostparameters_CO2 = addabatementcostparameters(m, :CO2)
     abatementcostparameters_CH4 = addabatementcostparameters(m, :CH4)
     abatementcostparameters_N2O = addabatementcostparameters(m, :N2O)
@@ -85,7 +90,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     abatementcosts_Lin = addabatementcosts(m, :Lin)
     add_comp!(m, TotalAbatementCosts)
 
-    #Adaptation Costs
+    # Adaptation Costs
     adaptationcosts_sealevel = addadaptationcosts_sealevel(m)
     adaptationcosts_economic = addadaptationcosts_economic(m)
     adaptationcosts_noneconomic = addadaptationcosts_noneconomic(m)
@@ -102,10 +107,10 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         add_comp!(m, Discontinuity)
     end
 
-    #Equity weighting and Total Costs
+    # Equity weighting and Total Costs
     equityweighting = add_comp!(m, EquityWeighting)
 
-    #connect parameters together
+    # connect parameters together
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
 
     if use_permafrost
@@ -215,14 +220,14 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :SLRDamages => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :SLRDamages => :tct_per_cap_totalcostspercap, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)
     connect_param!(m, :SLRDamages => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
-    connect_param!(m, :SLRDamages => :atl_adjustedtolerablelevelofsealevelrise, :AdaptiveCostsSeaLevel => :atl_adjustedtolerablelevel, ignoreunits=true)
+    connect_param!(m, :SLRDamages => :atl_adjustedtolerablelevelofsealevelrise, :AdaptiveCostsSeaLevel => :atl_adjustedtolerablelevel, ignoreunits = true)
     connect_param!(m, :SLRDamages => :imp_actualreductionSLR, :AdaptiveCostsSeaLevel => :imp_adaptedimpacts)
     connect_param!(m, :SLRDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
     connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
     connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
     connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
-    connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits=true) # not required for Burke damages
+    connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits = true) # not required for Burke damages
     connect_param!(m, :MarketDamages => :imp_actualreduction, :AdaptiveCostsEconomic => :imp_adaptedimpacts) # not required for Burke damages
     connect_param!(m, :MarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
@@ -239,7 +244,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP)
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption)
     end
-    connect_param!(m, :NonMarketDamages =>:atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic =>:atl_adjustedtolerablelevel, ignoreunits=true)
+    connect_param!(m, :NonMarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic => :atl_adjustedtolerablelevel, ignoreunits = true)
     connect_param!(m, :NonMarketDamages => :imp_actualreduction, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts)
     connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
@@ -271,12 +276,12 @@ function initpage(m::Model)
     set_leftover_params!(m, p)
 end
 
-function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false)
+function getpage(scenario::String = "RCP4.5 & SSP2", use_permafrost::Bool = true, use_seaice::Bool = true, use_page09damages::Bool = false; use_page09weights::Bool = false, page09_discontinuity::Bool = false, page09_sealevelrise::Bool = false)
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
-    buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages; use_page09weights=use_page09weights, page09_discontinuity=page09_discontinuity)
+    buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages; use_page09weights = use_page09weights, page09_discontinuity = page09_discontinuity, page09_sealevelrise = page09_sealevelrise)
 
     # next: add vector and panel example
     initpage(m)

@@ -22,11 +22,11 @@ for testscen in 1:2
     rtl = m[:ClimateTemperature, :rtl_realizedtemperature]
     rtl_compare = readpagedata(m, "test/validationdata/$valdir/rtl_realizedtemperature.csv")
 
-    @test rtl ≈ rtl_compare rtol=1e-3
+    @test rtl ≈ rtl_compare rtol = 1e-3
 
     rto = m[:ClimateTemperature, :rto_g_oceantemperature]
     rto_compare = readpagedata(m, "test/validationdata/$valdir/rto_g_oceantemperature.csv")
 
-    @test rto ≈ rto_compare rtol=1e-3
+    @test rto ≈ rto_compare rtol = 1e-3
 end
 

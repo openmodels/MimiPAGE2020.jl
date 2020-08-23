@@ -30,8 +30,8 @@ function load_RV(filename::String, RVname::String;
     df = DataFrame(load(joinpath(output_path, "$filename.csv")))
     cols = names(df)
 
-    #apply filters if necessary, currently the function supports a time filter
-    #of a single time value and a region filter of a single region
+    # apply filters if necessary, currently the function supports a time filter
+    # of a single time value and a region filter of a single region
     if in(:time, cols)
 
         if in(:region, cols)
@@ -39,18 +39,18 @@ function load_RV(filename::String, RVname::String;
                 @where i.time == time_filter
                 @where i.region == region_filter
                 @select i
-                end) |> DataFrame
+            end) |> DataFrame
 
         else
             filtered_df = df |> @query(i, begin
                 @where i.time == time_filter
                 @select i
-                end) |> DataFrame
+            end) |> DataFrame
         end
 
         return filtered_df[!, Symbol(RVname)]
 
-    #no filters applied
+    # no filters applied
     else
         return df[!, Symbol(RVname)]
     end

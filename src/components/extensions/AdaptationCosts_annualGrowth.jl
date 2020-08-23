@@ -3,26 +3,26 @@ function calc_adaptationcosts(p, v, d, tt, annual_year)
     yr = annual_year - 2015 + 1 # + 1 because of 1-based indexing in Julia
 
     # Hope (2009), p. 21, equation -5
-    auto_autonomouschangepercent = (1 - p.automult_autonomouschange^(1/(p.y_year_lssp - p.y_year_0)))*100 # % per year
-    v.autofac_autonomouschangefraction_ann[yr] = (1 - auto_autonomouschangepercent/100)^(p.y_year_ann[yr] - p.y_year_0) # Varies by year
+    auto_autonomouschangepercent = (1 - p.automult_autonomouschange^(1 / (p.y_year_lssp - p.y_year_0))) * 100 # % per year
+    v.autofac_autonomouschangefraction_ann[yr] = (1 - auto_autonomouschangepercent / 100)^(p.y_year_ann[yr] - p.y_year_0) # Varies by year
 
     for rr in d.region
-        #calculate adjusted tolerable level and max impact based on adaptation policy
+        # calculate adjusted tolerable level and max impact based on adaptation policy
         if (p.y_year_ann[yr] - p.pstart_startdateofadaptpolicy[rr]) < 0
-            v.atl_adjustedtolerablelevel_ann[yr,rr]= 0
-        elseif ((p.y_year_ann[yr]-p.pstart_startdateofadaptpolicy[rr])/p.pyears_yearstilfulleffect[rr])<1.
-            v.atl_adjustedtolerablelevel_ann[yr,rr]=
-                ((p.y_year_ann[yr]-p.pstart_startdateofadaptpolicy[rr])/p.pyears_yearstilfulleffect[rr]) *
+            v.atl_adjustedtolerablelevel_ann[yr,rr] = 0
+        elseif ((p.y_year_ann[yr] - p.pstart_startdateofadaptpolicy[rr]) / p.pyears_yearstilfulleffect[rr]) < 1.
+            v.atl_adjustedtolerablelevel_ann[yr,rr] =
+                ((p.y_year_ann[yr] - p.pstart_startdateofadaptpolicy[rr]) / p.pyears_yearstilfulleffect[rr]) *
                 p.plateau_increaseintolerableplateaufromadaptation[rr]
         else
             v.atl_adjustedtolerablelevel_ann[yr,rr] = p.plateau_increaseintolerableplateaufromadaptation[rr]
         end
 
-        if (p.y_year_ann[yr]- p.istart_startdate[rr]) < 0
+        if (p.y_year_ann[yr] - p.istart_startdate[rr]) < 0
             v.imp_adaptedimpacts_ann[yr,rr] = 0
-        elseif ((p.y_year_ann[yr]-p.istart_startdate[rr])/p.iyears_yearstilfulleffect[rr]) < 1
+        elseif ((p.y_year_ann[yr] - p.istart_startdate[rr]) / p.iyears_yearstilfulleffect[rr]) < 1
             v.imp_adaptedimpacts_ann[yr,rr] =
-                (p.y_year_ann[yr]-p.istart_startdate[rr])/p.iyears_yearstilfulleffect[rr]*
+                (p.y_year_ann[yr] - p.istart_startdate[rr]) / p.iyears_yearstilfulleffect[rr] *
                 p.impred_eventualpercentreduction[rr]
         else
             v.imp_adaptedimpacts_ann[yr,rr] = p.impred_eventualpercentreduction[rr]
@@ -45,66 +45,66 @@ end
     region = Index()
     year = Index()
 
-    y_year_0 = Parameter(unit="year")
-    y_year_lssp = Parameter(unit="year", default=2100.)
-    y_year = Parameter(index=[time], unit="year")
-    y_year_ann = Parameter(index=[year], unit="year")
-    gdp = Parameter(index=[time, region], unit="\$M")
-    gdp_ann = Parameter(index=[year, region], unit="\$M")
-    cf_costregional = Parameter(index=[region], unit="none") # first value should be 1.
+    y_year_0 = Parameter(unit = "year")
+    y_year_lssp = Parameter(unit = "year", default = 2100.)
+    y_year = Parameter(index = [time], unit = "year")
+    y_year_ann = Parameter(index = [year], unit = "year")
+    gdp = Parameter(index = [time, region], unit = "\$M")
+    gdp_ann = Parameter(index = [year, region], unit = "\$M")
+    cf_costregional = Parameter(index = [region], unit = "none") # first value should be 1.
 
-    automult_autonomouschange = Parameter(unit="none")
-    impmax_maximumadaptivecapacity = Parameter(index=[region], unit="driver")
-    #tolerability parameters
-    plateau_increaseintolerableplateaufromadaptation = Parameter(index=[region], unit="driver")
-    pstart_startdateofadaptpolicy = Parameter(index=[region], unit="year")
-    pyears_yearstilfulleffect = Parameter(index=[region], unit="year")
-    impred_eventualpercentreduction = Parameter(index=[region], unit= "%")
-    istart_startdate = Parameter(index=[region], unit = "year")
-    iyears_yearstilfulleffect = Parameter(index=[region], unit= "year")
+    automult_autonomouschange = Parameter(unit = "none")
+    impmax_maximumadaptivecapacity = Parameter(index = [region], unit = "driver")
+    # tolerability parameters
+    plateau_increaseintolerableplateaufromadaptation = Parameter(index = [region], unit = "driver")
+    pstart_startdateofadaptpolicy = Parameter(index = [region], unit = "year")
+    pyears_yearstilfulleffect = Parameter(index = [region], unit = "year")
+    impred_eventualpercentreduction = Parameter(index = [region], unit = "%")
+    istart_startdate = Parameter(index = [region], unit = "year")
+    iyears_yearstilfulleffect = Parameter(index = [region], unit = "year")
 
-    cp_costplateau_eu = Parameter(unit="%GDP/driver")
-    ci_costimpact_eu = Parameter(unit="%GDP/%driver")
+    cp_costplateau_eu = Parameter(unit = "%GDP/driver")
+    ci_costimpact_eu = Parameter(unit = "%GDP/%driver")
 
-    atl_adjustedtolerablelevel = Variable(index=[time, region]) # Unit depends on instance (degreeC or m)
-    atl_adjustedtolerablelevel_ann = Variable(index=[year, region])
-    imp_adaptedimpacts = Variable(index=[time, region], unit="%")
-    imp_adaptedimpacts_ann = Variable(index=[year, region], unit="%")
+    atl_adjustedtolerablelevel = Variable(index = [time, region]) # Unit depends on instance (degreeC or m)
+    atl_adjustedtolerablelevel_ann = Variable(index = [year, region])
+    imp_adaptedimpacts = Variable(index = [time, region], unit = "%")
+    imp_adaptedimpacts_ann = Variable(index = [year, region], unit = "%")
 
     # Mostly for debugging
-    autofac_autonomouschangefraction = Variable(index=[time], unit="none")
-    autofac_autonomouschangefraction_ann = Variable(index=[year], unit="none")
-    acp_adaptivecostplateau = Variable(index=[time, region], unit="\$million")
-    acp_adaptivecostplateau_ann = Variable(index=[year, region], unit="\$million")
-    aci_adaptivecostimpact = Variable(index=[time, region], unit="\$million")
-    aci_adaptivecostimpact_ann = Variable(index=[year, region], unit="\$million")
+    autofac_autonomouschangefraction = Variable(index = [time], unit = "none")
+    autofac_autonomouschangefraction_ann = Variable(index = [year], unit = "none")
+    acp_adaptivecostplateau = Variable(index = [time, region], unit = "\$million")
+    acp_adaptivecostplateau_ann = Variable(index = [year, region], unit = "\$million")
+    aci_adaptivecostimpact = Variable(index = [time, region], unit = "\$million")
+    aci_adaptivecostimpact_ann = Variable(index = [year, region], unit = "\$million")
 
-    ac_adaptivecosts = Variable(index=[time, region], unit="\$million")
-    ac_adaptivecosts_ann = Variable(index=[year, region], unit="\$million")
+    ac_adaptivecosts = Variable(index = [time, region], unit = "\$million")
+    ac_adaptivecosts_ann = Variable(index = [year, region], unit = "\$million")
 
     function run_timestep(p, v, d, tt)
 
         # Hope (2009), p. 21, equation -5
-        auto_autonomouschangepercent = (1 - p.automult_autonomouschange^(1/(p.y_year_lssp - p.y_year_0)))*100 # % per year
-        v.autofac_autonomouschangefraction[tt] = (1 - auto_autonomouschangepercent/100)^(p.y_year[tt] - p.y_year_0) # Varies by year
+        auto_autonomouschangepercent = (1 - p.automult_autonomouschange^(1 / (p.y_year_lssp - p.y_year_0))) * 100 # % per year
+        v.autofac_autonomouschangefraction[tt] = (1 - auto_autonomouschangepercent / 100)^(p.y_year[tt] - p.y_year_0) # Varies by year
 
         for rr in d.region
-            #calculate adjusted tolerable level and max impact based on adaptation policy
+            # calculate adjusted tolerable level and max impact based on adaptation policy
             if (p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) < 0
-                v.atl_adjustedtolerablelevel[tt,rr]= 0
-            elseif ((p.y_year[tt]-p.pstart_startdateofadaptpolicy[rr])/p.pyears_yearstilfulleffect[rr])<1.
-                v.atl_adjustedtolerablelevel[tt,rr]=
-                    ((p.y_year[tt]-p.pstart_startdateofadaptpolicy[rr])/p.pyears_yearstilfulleffect[rr]) *
+                v.atl_adjustedtolerablelevel[tt,rr] = 0
+            elseif ((p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) / p.pyears_yearstilfulleffect[rr]) < 1.
+                v.atl_adjustedtolerablelevel[tt,rr] =
+                    ((p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) / p.pyears_yearstilfulleffect[rr]) *
                     p.plateau_increaseintolerableplateaufromadaptation[rr]
             else
                 v.atl_adjustedtolerablelevel[tt,rr] = p.plateau_increaseintolerableplateaufromadaptation[rr]
             end
 
-            if (p.y_year[tt]- p.istart_startdate[rr]) < 0
+            if (p.y_year[tt] - p.istart_startdate[rr]) < 0
                 v.imp_adaptedimpacts[tt,rr] = 0
-            elseif ((p.y_year[tt]-p.istart_startdate[rr])/p.iyears_yearstilfulleffect[rr]) < 1
+            elseif ((p.y_year[tt] - p.istart_startdate[rr]) / p.iyears_yearstilfulleffect[rr]) < 1
                 v.imp_adaptedimpacts[tt,rr] =
-                    (p.y_year[tt]-p.istart_startdate[rr])/p.iyears_yearstilfulleffect[rr]*
+                    (p.y_year[tt] - p.istart_startdate[rr]) / p.iyears_yearstilfulleffect[rr] *
                     p.impred_eventualpercentreduction[rr]
             else
                 v.imp_adaptedimpacts[tt,rr] = p.impred_eventualpercentreduction[rr]
@@ -128,8 +128,8 @@ end
                 calc_adaptationcosts(p, v, d, tt, annual_year)
             end
         else
-            for annual_year = (gettime(tt-1)+1):(gettime(tt))
-                 calc_adaptationcosts(p, v, d, tt, annual_year)
+            for annual_year = (gettime(tt - 1) + 1):(gettime(tt))
+                calc_adaptationcosts(p, v, d, tt, annual_year)
             end
         end
     end
