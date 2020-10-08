@@ -1,6 +1,8 @@
 using Mimi
 using Random
 
+import Random
+
 export getpage
 
 include("utils/load_parameters.jl")
@@ -40,6 +42,7 @@ include("components/AbatementCosts.jl")
 include("components/TotalAbatementCosts.jl")
 include("components/TotalAdaptationCosts.jl")
 include("components/Population.jl")
+include("components/TotalCosts.jl")
 include("components/EquityWeighting.jl")
 include("components/PermafrostSiBCASA.jl")
 include("components/PermafrostJULES.jl")
@@ -79,22 +82,36 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
     gdp = add_comp!(m, GDP)
 
     # Abatement Costs
-    abatementcostparameters_CO2 = addabatementcostparameters(m, :CO2)
-    abatementcostparameters_CH4 = addabatementcostparameters(m, :CH4)
-    abatementcostparameters_N2O = addabatementcostparameters(m, :N2O)
-    abatementcostparameters_Lin = addabatementcostparameters(m, :Lin)
+    addabatementcostparameters(m, :CO2)
+    addabatementcostparameters(m, :CH4)
+    addabatementcostparameters(m, :N2O)
+    addabatementcostparameters(m, :Lin)
 
-    abatementcosts_CO2 = addabatementcosts(m, :CO2)
-    abatementcosts_CH4 = addabatementcosts(m, :CH4)
-    abatementcosts_N2O = addabatementcosts(m, :N2O)
-    abatementcosts_Lin = addabatementcosts(m, :Lin)
+    set_param!(m, :q0propmult_cutbacksatnegativecostinfinalyear, 0.8833333333333333)
+    set_param!(m, :qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear, 1.1166666666666666)
+    set_param!(m, :c0mult_mostnegativecostinfinalyear, 0.9333333333333334)
+    set_param!(m, :curve_below_curvatureofMACcurvebelowzerocost, .5)
+    set_param!(m, :curve_above_curvatureofMACcurveabovezerocost, .4)
+    set_param!(m, :cross_experiencecrossoverratio, .2)
+    set_param!(m, :learn_learningrate, .2)
+    set_param!(m, :automult_autonomoustechchange, .65)
+    set_param!(m, :equity_prop_equityweightsproportion, 1)
+    set_param!(m, :y_year_0, 2015)
+
+    addabatementcosts(m, :CO2)
+    addabatementcosts(m, :CH4)
+    addabatementcosts(m, :N2O)
+    addabatementcosts(m, :Lin)
     add_comp!(m, TotalAbatementCosts)
 
     # Adaptation Costs
     adaptationcosts_sealevel = addadaptationcosts_sealevel(m)
     adaptationcosts_economic = addadaptationcosts_economic(m)
     adaptationcosts_noneconomic = addadaptationcosts_noneconomic(m)
+
     add_comp!(m, TotalAdaptationCosts)
+    set_param!(m, :automult_autonomouschange, 0.65)
+
 
     # Impacts
     slrdamages = addslrdamages(m)
@@ -106,6 +123,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
     else
         add_comp!(m, Discontinuity)
     end
+
+    # Total costs component
+    add_comp!(m, TotalCosts)
 
     # Equity weighting and Total Costs
     equityweighting = add_comp!(m, EquityWeighting)
@@ -253,6 +273,15 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
     connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption)
     connect_param!(m, :Discontinuity => :isatg_saturationmodification, :GDP => :isatg_impactfxnsaturation)
+
+    connect_param!(m, :TotalCosts => :population, :Population => :pop_population)
+    connect_param!(m, :TotalCosts => :period_length, :GDP => :yagg_periodspan)
+    connect_param!(m, :TotalCosts => :abatement_costs_percap_peryear, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)
+    connect_param!(m, :TotalCosts => :adaptation_costs_percap_peryear, :TotalAdaptationCosts => :act_percap_adaptationcosts)
+    connect_param!(m, :TotalCosts => :slr_damages_percap_peryear, :SLRDamages => :isat_per_cap_SLRImpactperCapinclSaturationandAdaptation)
+    connect_param!(m, :TotalCosts => :market_damages_percap_peryear, :MarketDamages => :isat_per_cap_ImpactperCapinclSaturationandAdaptation)
+    connect_param!(m, :TotalCosts => :non_market_damages_percap_peryear, :NonMarketDamages => :isat_per_cap_ImpactperCapinclSaturationandAdaptation)
+    connect_param!(m, :TotalCosts => :discontinuity_damages_percap_peryear, :Discontinuity => :isat_per_cap_DiscImpactperCapinclSaturation)
 
     connect_param!(m, :EquityWeighting => :pop_population, :Population => :pop_population)
     connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)

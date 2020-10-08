@@ -8,7 +8,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/RCPSSPScenario.jl")
     include("../src/components/EquityWeighting.jl")
 
@@ -50,7 +50,7 @@ for testscen in 1:2
     wacdt = m[:EquityWeighting, :wacdt_partiallyweighted_discounted]
     aact = m[:EquityWeighting, :aact_equityweightedadaptation_discountedaggregated]
 
-    wit = m[:EquityWeighting, :wit_equityweightedimpact]
+    wit = m[:EquityWeighting, :wit_partiallyweighted]
     addt = m[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated]
     addt_gt = m[:EquityWeighting, :addt_gt_equityweightedimpact_discountedglobal]
     te = m[:EquityWeighting, :te_totaleffect]
@@ -66,7 +66,7 @@ for testscen in 1:2
     wacdt_compare = readpagedata(m, "test/validationdata/$valdir/wacdt_partiallyweighted_discounted.csv")
     aact_compare = readpagedata(m, "test/validationdata/$valdir/aact_equityweightedadaptation_discountedaggregated.csv")
 
-    wit_compare = readpagedata(m, "test/validationdata/$valdir/wit_equityweightedimpact.csv")
+    wit_compare = readpagedata(m, "test/validationdata/$valdir/wit_partiallyweighted.csv")
     addt_compare = readpagedata(m, "test/validationdata/$valdir/addt_equityweightedimpact_discountedaggregated.csv")
     addt_gt_compare = (scenario == "NDCs" ? 9.938302679477245e8 : 3.242546277441784e8)
     te_compare = (scenario == "NDCs" ? 1.0295055580383469e9 : 4.8471657538027054e8)

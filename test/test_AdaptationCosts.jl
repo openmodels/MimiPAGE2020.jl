@@ -6,23 +6,18 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/AdaptationCosts.jl")
 
     adaptationcosts_noneconomic = addadaptationcosts_noneconomic(m)
-    adaptationcosts_noneconomic[:y_year_0] = 2015.
-    adaptationcosts_noneconomic[:y_year] = Mimi.dim_keys(m.md, :time)
-    adaptationcosts_noneconomic[:gdp] = readpagedata(m, "test/validationdata/$valdir/gdp.csv")
 
     adaptationcosts_economic = addadaptationcosts_economic(m)
-    adaptationcosts_economic[:y_year_0] = 2015.
-    adaptationcosts_economic[:y_year] = Mimi.dim_keys(m.md, :time)
-    adaptationcosts_economic[:gdp] = readpagedata(m, "test/validationdata/$valdir/gdp.csv")
 
     adaptationcosts_sealevel = addadaptationcosts_sealevel(m)
-    adaptationcosts_sealevel[:y_year_0] = 2015.
-    adaptationcosts_sealevel[:y_year] = Mimi.dim_keys(m.md, :time)
-    adaptationcosts_sealevel[:gdp] = readpagedata(m, "test/validationdata/$valdir/gdp.csv")
+
+    set_param!(m, :y_year_0, 2015)
+    set_param!(m, :y_year, Mimi.dim_keys(m.md, :time))
+    set_param!(m, :gdp, readpagedata(m, "test/validationdata/$valdir/gdp.csv"))
 
     p = load_parameters(m)
     set_leftover_params!(m, p)

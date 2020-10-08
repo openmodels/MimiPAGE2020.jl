@@ -1,12 +1,13 @@
 using Test
 
+m = test_page_model()
 include("../src/components/CO2cycle.jl")
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     addco2cycle(m, use_permafrost)
 
     set_param!(m, :CO2Cycle, :e_globalCO2emissions, readpagedata(m, "test/validationdata/$valdir/e_globalCO2emissions.csv"))

@@ -74,7 +74,6 @@ end
 
 function addadaptationcosts_sealevel(model::Model)
     adaptationcosts = add_comp!(model, AdaptationCosts, :AdaptiveCostsSeaLevel)
-    adaptationcosts[:automult_autonomouschange] = 0.65
 
     # Sea Level-specific parameters
     setdistinctparameter(model, :AdaptiveCostsSeaLevel, :impmax_maximumadaptivecapacity, readpagedata(model, "data/impmax_sealevel.csv"))
@@ -92,7 +91,6 @@ end
 
 function addadaptationcosts_economic(model::Model)
     adaptationcosts = add_comp!(model, AdaptationCosts, :AdaptiveCostsEconomic)
-    adaptationcosts[:automult_autonomouschange] = 0.65
 
     # Economic-specific parameters
     setdistinctparameter(model, :AdaptiveCostsEconomic, :impmax_maximumadaptivecapacity, readpagedata(model, "data/impmax_economic.csv"))
@@ -110,7 +108,6 @@ end
 
 function addadaptationcosts_noneconomic(model::Model)
     adaptationcosts = add_comp!(model, AdaptationCosts, :AdaptiveCostsNonEconomic)
-    adaptationcosts[:automult_autonomouschange] = 0.65
 
     # Non-economic-specific parameters
     setdistinctparameter(model, :AdaptiveCostsNonEconomic, :impmax_maximumadaptivecapacity, readpagedata(model, "data/impmax_noneconomic.csv"))
