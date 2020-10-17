@@ -7,8 +7,8 @@
 @defcomp RCPSSPScenario begin
     region = Index()
 
-    rcp::Int64 = Parameter() # like rcp26
-    ssp::Int64 = Parameter() # like ssp1
+    rcp = Parameter{Int64}() # like rcp26
+    ssp = Parameter{Int64}() # like ssp1
 
     y_year = Parameter(index = [time], unit = "year")
     weight_scenarios = Parameter(unit = "%") # from -100% to 100%, only used for sspw, rcpw
