@@ -6,7 +6,7 @@
     y_year_0 = Parameter(unit = "year")
     y_year = Parameter(index = [time], unit = "year")
     area_e_eartharea = Parameter(unit = "km2", default = 5.1e8)
-    use_seaice::Bool = Parameter()
+    use_seaice = Parameter{Bool}()
 
     # Initial temperature outputs
     rt_g0_baseglobaltemp = Parameter(unit = "degreeC", default = 0.9461666666666667) # needed for feedback in CO2 cycle component
