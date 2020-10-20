@@ -15,7 +15,6 @@ function test_page_model()
 end
 
 function get_scenario(ii)
-    Mimi.reset_compdefs()
     if ii == 1
         return "ndcs", "NDCs", true, false
     end
