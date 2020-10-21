@@ -50,8 +50,6 @@ function climatemodel(scenario::String, use_permafrost::Bool = true, use_seaice:
     totalforcing = add_comp!(m, TotalForcing)
 
     # connect parameters together
-    set_param!(m, :ClimateTemperature, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
-    set_param!(m, :ClimateTemperature, :y_year_0, 2015.)
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
 
     if use_permafrost
@@ -66,8 +64,6 @@ function climatemodel(scenario::String, use_permafrost::Bool = true, use_seaice:
     end
 
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
-    co2cycle[:y_year] = [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.]
-    co2cycle[:y_year_0] = 2015.
     co2cycle[:e_globalCO2emissions] = co2emit[:e_globalCO2emissions]
     co2cycle[:rt_g_globaltemperature] = climtemp[:rt_g_globaltemperature]
     if use_permafrost
@@ -77,8 +73,6 @@ function climatemodel(scenario::String, use_permafrost::Bool = true, use_seaice:
     connect_param!(m, :co2forcing => :c_CO2concentration, :CO2Cycle => :c_CO2concentration)
 
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
-    ch4cycle[:y_year] = [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.]
-    ch4cycle[:y_year_0] = 2015.
     ch4cycle[:e_globalCH4emissions] = ch4emit[:e_globalCH4emissions]
     ch4cycle[:rtl_g0_baselandtemp] = climtemp[:rtl_g0_baselandtemp]
     ch4cycle[:rtl_g_landtemperature] = climtemp[:rtl_g_landtemperature]
@@ -90,8 +84,6 @@ function climatemodel(scenario::String, use_permafrost::Bool = true, use_seaice:
     connect_param!(m, :ch4forcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
     n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
-    set_param!(m, :n2ocycle, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
-    set_param!(m, :n2ocycle, :y_year_0, 2015.)
     connect_param!(m, :n2ocycle => :e_globalN2Oemissions, :n2oemissions => :e_globalN2Oemissions)
     connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
     connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
@@ -100,8 +92,6 @@ function climatemodel(scenario::String, use_permafrost::Bool = true, use_seaice:
     connect_param!(m, :n2oforcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
     lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
-    set_param!(m, :LGcycle, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
-    set_param!(m, :LGcycle, :y_year_0, 2015.)
     connect_param!(m, :LGcycle => :e_globalLGemissions, :LGemissions => :e_globalLGemissions)
     connect_param!(m, :LGcycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
     connect_param!(m, :LGcycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
