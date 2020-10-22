@@ -117,12 +117,12 @@
             pse_rcp26_sulphatevsbase = readpagedata(nothing, "data/rcps/rcp26_sulph.csv")
             exf_rcp26_excessforcing = readpagedata(nothing, "data/rcps/rcp26_excess.csv")
 
-            v.er_CO2emissionsgrowth[t.t, :] = (er_rcp26_CO2emissionsgrowth[t.t, :] - er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]) * v.extra_abate_compound[t] .+ er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]
-            v.er_CH4emissionsgrowth[t.t, :] = er_rcp26_CH4emissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.er_N2Oemissionsgrowth[t.t, :] = er_rcp26_N2Oemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.er_LGemissionsgrowth[t.t, :] = er_rcp26_LGemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.pse_sulphatevsbase[t.t, :] = pse_rcp26_sulphatevsbase[t.t, :] * v.extra_abate_compound[t]
-            v.exf_excessforcing[t.t, :] = exf_rcp26_excessforcing[t.t, :] * v.extra_abate_compound[t]
+            v.er_CO2emissionsgrowth[t, :] = (er_rcp26_CO2emissionsgrowth[t.t, :] - er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]) * v.extra_abate_compound[t] .+ er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]
+            v.er_CH4emissionsgrowth[t, :] = er_rcp26_CH4emissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+            v.er_N2Oemissionsgrowth[t, :] = er_rcp26_N2Oemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+            v.er_LGemissionsgrowth[t, :] = er_rcp26_LGemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+            v.pse_sulphatevsbase[t, :] = pse_rcp26_sulphatevsbase[t.t, :] * v.extra_abate_compound[t]
+            v.exf_excessforcing[t, :] = exf_rcp26_excessforcing[t.t, :] * v.extra_abate_compound[t]
         end
     end
 end
