@@ -383,8 +383,8 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
 
     # Setup MC simulation
     mcs_def = getsim(ge_minimum, ge_maximum, ge_mode, civvalue_multiplier)
-    mcs_inst = run(mcs_def, [mm.base, mm.marginal], samplesize; results_output_dir = output_path, post_trial_func = my_scc_calculation)
-    set_models!(mcs_inst, [mm.base, mm.marginal])
+    mcs_inst = run(mcs_def, [mm.base, mm.modified], samplesize; results_output_dir = output_path, post_trial_func = my_scc_calculation)
+    set_models!(mcs_inst, [mm.base, mm.modified])
     generate_trials!(mcs_inst, samplesize, filename = joinpath(output_path, "scc_trials.csv"))
 
     scc_results

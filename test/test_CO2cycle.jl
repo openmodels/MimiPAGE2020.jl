@@ -1,6 +1,5 @@
 using Test
 
-m = test_page_model()
 include("../src/components/CO2cycle.jl")
 
 for testscen in 1:2
