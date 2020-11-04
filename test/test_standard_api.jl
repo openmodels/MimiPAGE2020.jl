@@ -13,7 +13,7 @@ scc2 = compute_scc(year = 2020, eta = 0., prtp = 0.03)
 
 # Test with a modified model
 m = get_model()
-update_param!(m, :tcr_transientresponse, 3)
+set_param!(m, :tcr_transientresponse, 3)
 scc3 = compute_scc(m, year = 2020)
 @test scc3 > scc1
 
@@ -34,7 +34,7 @@ sccs2 = compute_scc(year=2020, n=10, seed=350)
 sccs3 = compute_scc(year=2020, n=10, seed=351)
 @test sccs3 != sccs1
 
-sccs4 = MimiPAGE2009.compute_scc(year=2020, prtp=0.02, eta=1.5, n=10, seed=350)
+sccs4 = compute_scc(year=2020, prtp=0.02, eta=1.5, n=10, seed=350)
 @test sccs4 != sccs1    # test that the user specified discounting scheme overrides the default random variable values
 
 #Test equity weighting options

@@ -67,8 +67,8 @@ end
         trials_output_filename::Union{String, Nothing} = nothing,
         seed::Union{Int, Nothing} = nothing)
 
-Computes the social cost of CO2 for an emissions pulse in `year` for the provided MimiPAGE2009 model `m`.
-If no model is provided, the default model from MimiPAGE2009.get_model() is used.
+Computes the social cost of CO2 for an emissions pulse in `year` for the provided the model `m`.
+If no model is provided, the default model from get_model() is used.
 Units of the returned value are \$ per metric tonne of CO2.
 
 The discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity
@@ -138,11 +138,11 @@ function compute_scc(
         simdef = getsim()   # get the default simulation, need to remove :emuc_utilityconvexity and :ptp_timepreference RVs if user specified values for these
         eta !== nothing ? _remove_RV!(simdef, :emuc_utilityconvexity) : nothing
         prtp !== nothing ? _remove_RV!(simdef, :ptp_timepreference) : nothing
-       
+
         seed !== nothing ? Random.seed!(seed) : nothing
         Mimi.set_payload!(simdef, (Vector{Float64}(undef, n), year))  # pass the year and a vector for storing SCC values to the `run` function
         si = run(simdef, mm, n, trials_output_filename = trials_output_filename, post_trial_func = _scc_post_trial_func)
-        scc = Mimi.payload(si)[1]   # collect the values computed during the post-trial function        
+        scc = Mimi.payload(si)[1]   # collect the values computed during the post-trial function
     end
 
     return scc
@@ -155,15 +155,15 @@ function _scc_post_trial_func(si::SimulationInstance, trial::Int, ntimesteps::In
     scc_array[trial] = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
 end
 
-# Helper function for removing a random variable by its parameter name in the model. 
-#   Their random variable names have been appended with a unique number by Mimi, 
+# Helper function for removing a random variable by its parameter name in the model.
+#   Their random variable names have been appended with a unique number by Mimi,
 #   so need to look them up this way to find the RV name in the simulation definition
 #   in order to use the Mimi.delete_RV! function.
 #   If it is an array variable, it will be represented by multiple RVs; this deletes them all.
 function _remove_RV!(simdef, _name)
     all_rv_names = collect(keys(simdef.rvdict))
     rv_names = all_rv_names[findall(startswith(String(_name)), map(String, all_rv_names))]
-    [Mimi.delete_RV!(simdef, rv_name) for rv_name in rv_names]  
+    [Mimi.delete_RV!(simdef, rv_name) for rv_name in rv_names]
 end
 
 
@@ -215,12 +215,12 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int,Nothing} = n
 
     mm = create_marginal_model(m, pulse_size)
 
-    add_comp!(mm.marginal, ExtraEmissions, :extra_emissions; after = :co2emissions)
-    connect_param!(mm.marginal, :extra_emissions => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
-    set_param!(mm.marginal, :extra_emissions, :pulse_size, pulse_size)
-    set_param!(mm.marginal, :extra_emissions, :pulse_year, year)
+    add_comp!(mm.modified, ExtraEmissions, :extra_emissions; after = :co2emissions)
+    connect_param!(mm.modified, :extra_emissions => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
+    set_param!(mm.modified, :extra_emissions, :pulse_size, pulse_size)
+    set_param!(mm.modified, :extra_emissions, :pulse_year, year)
 
-    connect_param!(mm.marginal, :CO2Cycle => :e_globalCO2emissions, :extra_emissions => :e_globalCO2emissions_adjusted)
+    connect_param!(mm.modified, :CO2Cycle => :e_globalCO2emissions, :extra_emissions => :e_globalCO2emissions_adjusted)
 
     run(mm)
     return mm

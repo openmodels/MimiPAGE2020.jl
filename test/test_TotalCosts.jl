@@ -1,7 +1,6 @@
-using MimiPAGE2009 
 using Test
 
-m = MimiPAGE2009.get_model()
+m = get_model()
 run(m)
 
 # Test the values from this new components compared to the total cost calculation originally suggested by Fran

@@ -84,6 +84,7 @@ end
 
 function addmarketdamages(model::Model, use_page09weights::Bool = false)
     marketdamagescomp = add_comp!(model, MarketDamages)
+    marketdamagescomp[:impmax_maxtempriseforadaptpolicyM] = readpagedata(model, "data/impmax_economic.csv")
 
     # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
     if use_page09weights

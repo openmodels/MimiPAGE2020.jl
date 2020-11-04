@@ -2,6 +2,8 @@ using Mimi
 using Test
 using CSV
 
+import Mimi.has_parameter
+
 include("../src/mcs.jl")
 df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header = false)
 rfrow0 = findfirst(x->!ismissing(x) && x == "RF in 2100", df[!, 1])
