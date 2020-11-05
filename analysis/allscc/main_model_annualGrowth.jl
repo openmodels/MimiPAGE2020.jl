@@ -78,6 +78,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
     abatementcostparameters_N2O = addabatementcostparameters(m, :N2O)
     abatementcostparameters_Lin = addabatementcostparameters(m, :Lin)
 
+    set_param!(m, :automult_autonomoustechchange, .65)
+
     abatementcosts_CO2 = addabatementcosts(m, :CO2)
     abatementcosts_CH4 = addabatementcosts(m, :CH4)
     abatementcosts_N2O = addabatementcosts(m, :N2O)

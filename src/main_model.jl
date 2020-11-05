@@ -94,9 +94,10 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
     set_param!(m, :curve_above_curvatureofMACcurveabovezerocost, .4)
     set_param!(m, :cross_experiencecrossoverratio, .2)
     set_param!(m, :learn_learningrate, .2)
-    set_param!(m, :automult_autonomoustechchange, .65)
     set_param!(m, :equity_prop_equityweightsproportion, 1)
     set_param!(m, :y_year_0, 2015)
+
+    set_param!(m, :automult_autonomoustechchange, .65)
 
     addabatementcosts(m, :CO2)
     addabatementcosts(m, :CH4)
@@ -110,8 +111,6 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
     adaptationcosts_noneconomic = addadaptationcosts_noneconomic(m)
 
     add_comp!(m, TotalAdaptationCosts)
-    set_param!(m, :automult_autonomouschange, 0.65)
-
 
     # Impacts
     slrdamages = addslrdamages(m)

@@ -25,7 +25,7 @@ function getsim()
         wincf_weightsfactor_sea["Africa"] = TriangularDist(.4, .8, .6)
         wincf_weightsfactor_sea["LatAmerica"] = TriangularDist(.4, .8, .6)
 
-        automult_autonomouschange = TriangularDist(0.5, 0.8, 0.65)  # components: AdaptationCosts, AbatementCosts
+        automult_autonomoustechchange = TriangularDist(0.5, 0.8, 0.65)  # components: AdaptationCosts, AbatementCosts
 
         # The following RVs are divided into blocks by component
 

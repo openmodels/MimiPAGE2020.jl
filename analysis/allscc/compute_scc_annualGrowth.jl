@@ -2,7 +2,9 @@ using Mimi
 
 include("../../src/compute_scc.jl")
 
-"""Applies undiscounting factor to get the SCC."""
+"""
+Applies undiscounting factor to get the SCC, discounted to the emissions year instead of the base year.
+"""
 function undiscount_scc(m::Model, year::Int)
     df = m[:EquityWeighting, :df_utilitydiscountfactor_ann]
     consfocus0 = m[:GDP, :cons_percap_consumption_0][1]

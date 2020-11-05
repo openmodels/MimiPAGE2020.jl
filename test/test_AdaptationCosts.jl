@@ -24,7 +24,7 @@ for testscen in 1:2
 
     run(m)
 
-    autofac = m[:AdaptiveCostsEconomic, :autofac_autonomouschangefraction]
+    autofac = m[:AdaptiveCostsEconomic, :autofac_autonomoustechchangefraction]
     atl_economic = m[:AdaptiveCostsEconomic, :atl_adjustedtolerablelevel]
     imp_economic = m[:AdaptiveCostsEconomic, :imp_adaptedimpacts]
     acp_economic = m[:AdaptiveCostsEconomic, :acp_adaptivecostplateau]
