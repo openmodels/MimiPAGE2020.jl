@@ -67,7 +67,7 @@ end
     year = Index()
 
     # Basic parameters
-    area = Parameter(index = [region], unit = "km2")
+    area = Parameter(index = [region], unit = "km^2")
     y_year_0 = Parameter(unit = "year")
     y_year = Parameter(index = [time], unit = "year")
     y_year_ann = Parameter(index = [year], unit = "year")
@@ -193,7 +193,7 @@ end
             fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
             rate_fant = 0 # inferred from spreadsheet
             deltat = p.y_year[tt] - p.y_year_0
-        elseif tt == TimestepIndex(2)
+        elseif is_timestep(tt, 2)
             fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
             rate_fant = (p.fant_anthroforcing[tt - 1] - fant0) / (p.y_year[tt - 1] - p.y_year_0)
             deltat = p.y_year[tt] - p.y_year[tt - 1]
