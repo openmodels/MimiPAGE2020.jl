@@ -4,6 +4,14 @@ using CSV
 
 include("../../src/utils/mctools.jl")
 
+function setorup_param!(m::Model, param::Symbol, value)
+    try
+        set_param!(m, param, value)
+    catch e
+        update_param!(m, param, value)
+    end
+end
+
 function getsim(ge_minimum::Union{Float64,Nothing} = nothing,
                 ge_maximum::Union{Float64,Nothing} = nothing,
                 ge_mode::Union{Float64,Nothing} = nothing,
@@ -413,8 +421,8 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing} = n
     mcs = getsim()
 
     # Setup models
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+    eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year = year, pulse_size = pulse_size)# , varseed=varseed)   # Returns a marginal model that has already been run
 
@@ -441,16 +449,16 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String = joinpath(
     # Setup the marginal model and modify key parameters if they are specified
     m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
     if use_convergence != nothing
-        update_param!(m, :use_convergence, use_convergence)
+        setorup_param!(m, :use_convergence, use_convergence)
     end
     if ge_use_empirical != nothing
-        update_param!(m, :ge_use_empiricaldistribution, ge_use_empirical)
+        setorup_param!(m, :ge_use_empiricaldistribution, ge_use_empirical)
     end
     if cbabs != nothing
-        update_param!(m, :cbabs_pcconsumptionbound, cbabs)
+        setorup_param!(m, :cbabs_pcconsumptionbound, cbabs)
     end
     if eqwbound != nothing
-        update_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
+        setorup_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
     end
     mm = compute_scc_mm(m, year = year, eta = eta, prtp = prtp, pulse_size = pulse_size)[:mm]
 

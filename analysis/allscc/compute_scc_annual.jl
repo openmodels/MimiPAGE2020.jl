@@ -3,6 +3,14 @@ using Random
 
 include("../../src/compute_scc.jl")
 
+function setorup_param!(m::Model, param::Symbol, value)
+    try
+        set_param!(m, param, value)
+    catch e
+        update_param!(m, param, value)
+    end
+end
+
 """
 Applies undiscounting factor to get the SCC, discounted to the emissions year instead of the base year.
 """
@@ -28,8 +36,8 @@ function compute_scc(m::Model = get_model(); year::Union{Int,Nothing} = nothing,
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+    eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year = year, pulse_size = pulse_size)   # Returns a marginal model that has already been run
     scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
@@ -50,8 +58,8 @@ function compute_scc_mm(m::Model = get_model(); year::Union{Int,Nothing} = nothi
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+    eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year = year, pulse_size = pulse_size)   # Returns a marginal model that has already been run
 
@@ -105,8 +113,8 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing} = n
     mcs = getsim()
 
     # Setup models
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+    eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year = year, pulse_size = pulse_size)# , varseed=varseed)   # Returns a marginal model that has already been run
 
