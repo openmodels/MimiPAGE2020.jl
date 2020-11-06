@@ -72,7 +72,7 @@ end
     W_MarketImpactsatCalibrationTemp = Parameter(unit = "%GDP", default = 0.6)
     ipow_MarketIncomeFxnExponent = Parameter(default = -0.13333333333333333)
     iben_MarketInitialBenefit = Parameter(default = .1333333333333)
-    tcal_CalibrationTemp = Parameter(default = 3.)
+    tcal_CalibrationTemp = Parameter(unit = "degreeC", default = 3.)
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
 
     # impact variables

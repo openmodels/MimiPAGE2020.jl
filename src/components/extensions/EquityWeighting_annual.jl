@@ -332,7 +332,7 @@ end
             # Discount rate calculations
             v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
             if is_first(tt)
-                v.yp_yearsperiod[TimestepIndex(1)] = p.y_year[1] - p.y_year_0
+                v.yp_yearsperiod[TimestepIndex(1)] = p.y_year[TimestepIndex(1)] - p.y_year_0
             else
                 v.yp_yearsperiod[tt] = p.y_year[tt] - p.y_year[tt - 1]
             end

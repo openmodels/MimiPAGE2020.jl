@@ -277,12 +277,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
 end
 
 function initpage(m::Model)
-    set_param!(m, :ClimateTemperature, :y_year_ann, collect(2015:2300))
-    set_param!(m, :MarketDamages, :y_year_ann, collect(2015:2300))
-    set_param!(m, :MarketDamagesBurke, :y_year_ann, collect(2015:2300))
-    set_param!(m, :NonMarketDamages, :y_year_ann, collect(2015:2300))
-    set_param!(m, :Discontinuity, :y_year_ann, collect(2015:2300))
-    set_param!(m, :EquityWeighting, :y_year_ann, collect(2015:2300))
+    setorup_param!(m, :y_year_ann, collect(2015:2300))
     p = load_parameters(m)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
