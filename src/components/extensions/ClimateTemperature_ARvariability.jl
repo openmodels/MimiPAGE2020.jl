@@ -285,6 +285,10 @@ function tvar_getmvnormal(rr::Int64)
     MvNormal([tvarcoeffs...], tvarsigma)
 end
 
+function tvar_getregions(regionorder::Vector{Union{Missing, Float64}}, coeffproc::Function = tvar_getcoeffs)
+    tvar_getregions(convert(Vector{Float64}, regionorder), coeffproc)
+end
+
 function tvar_getregions(regionorder::Vector{Float64}, coeffproc::Function = tvar_getcoeffs)
     regionorder = convert(Vector{Int64}, regionorder)
     tvar_getregions(regionorder, coeffproc)

@@ -79,7 +79,7 @@ function getsim()
         ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
 
         # Climate Variability Parameters
-        tvarseed_coefficientsrandomseed = Uniform(1, 10^10)
+        ClimateTemperature_tvarseed_coefficientsrandomseed = Uniform(1, 10^10)
 
         # SeaLevelRise
         s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
