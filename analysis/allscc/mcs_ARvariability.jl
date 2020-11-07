@@ -26,7 +26,7 @@ function getsim()
         wincf_weightsfactor_sea["Africa"] = TriangularDist(.4, .8, .6)
         wincf_weightsfactor_sea["LatAmerica"] = TriangularDist(.4, .8, .6)
 
-        automult_autonomouschange = TriangularDist(0.5, 0.8, 0.65)  # components: AdaptationCosts, AbatementCosts
+        automult_autonomoustechchange = TriangularDist(0.5, 0.8, 0.65)  # components: AdaptationCosts, AbatementCosts
 
         # The following RVs are divided into blocks by component
 
@@ -79,7 +79,7 @@ function getsim()
         ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
 
         # Climate Variability Parameters
-        tvarseed_coefficientsrandomseed = Uniform(1, 10^10)
+        ClimateTemperature_tvarseed_coefficientsrandomseed = Uniform(1, 10^10)
 
         # SeaLevelRise
         s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
@@ -100,14 +100,14 @@ function getsim()
         impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
         impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
 
-        rtl_abs_0_realizedabstemperature["EU"] = TriangularDist(6.76231496767033, 13.482086163781, 10.1222005657257)
-        rtl_abs_0_realizedabstemperature["USA"] = TriangularDist(9.54210085883826, 17.3151395362191, 13.4286201975287)
-        rtl_abs_0_realizedabstemperature["OECD"] = TriangularDist(9.07596053028087, 15.0507477943984, 12.0633541623396)
-        rtl_abs_0_realizedabstemperature["USSR"] = TriangularDist(3.01320548016903, 11.2132204366259, 7.11321295839747)
-        rtl_abs_0_realizedabstemperature["China"] = TriangularDist(12.2330402806912, 17.7928749427573, 15.0129576117242)
-        rtl_abs_0_realizedabstemperature["SEAsia"] = TriangularDist(23.3863348263352, 26.5136231383473, 24.9499789823412)
-        rtl_abs_0_realizedabstemperature["Africa"] = TriangularDist(20.1866940491107, 23.5978086497453, 21.892251349428)
-        rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["EU"] = TriangularDist(6.76231496767033, 13.482086163781, 10.1222005657257)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USA"] = TriangularDist(9.54210085883826, 17.3151395362191, 13.4286201975287)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["OECD"] = TriangularDist(9.07596053028087, 15.0507477943984, 12.0633541623396)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USSR"] = TriangularDist(3.01320548016903, 11.2132204366259, 7.11321295839747)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["China"] = TriangularDist(12.2330402806912, 17.7928749427573, 15.0129576117242)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["SEAsia"] = TriangularDist(23.3863348263352, 26.5136231383473, 24.9499789823412)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["Africa"] = TriangularDist(20.1866940491107, 23.5978086497453, 21.892251349428)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
 
         # NonMarketDamages
         tcal_CalibrationTemp = TriangularDist(2.5, 3.5, 3.)

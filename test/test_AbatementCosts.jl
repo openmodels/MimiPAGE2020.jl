@@ -9,7 +9,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     scenario = addrcpsspscenario(m, scenario)
 
     for gas in [:CO2, :CH4, :N2O, :Lin]

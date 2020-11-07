@@ -1,7 +1,5 @@
 using Mimi
 
-use_permafrost = true
-
 @defcomp CO2Cycle begin
     # Permafrost outputs
     permte0_permafrostemissions0 = Parameter(unit = "Mtonne")

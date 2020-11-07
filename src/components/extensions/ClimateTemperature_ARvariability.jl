@@ -67,12 +67,12 @@ end
     year = Index()
 
     # Basic parameters
-    area = Parameter(index = [region], unit = "km2")
+    area = Parameter(index = [region], unit = "km^2")
     y_year_0 = Parameter(unit = "year")
     y_year = Parameter(index = [time], unit = "year")
     y_year_ann = Parameter(index = [year], unit = "year")
     area_e_eartharea = Parameter(unit = "km2", default = 5.1e8)
-    use_seaice::Bool = Parameter()
+    use_seaice = Parameter{Bool}()
 
     # Initial temperature outputs
     rt_g0_baseglobaltemp = Parameter(unit = "degreeC", default = 0.9461666666666667) # needed for feedback in CO2 cycle component
@@ -193,7 +193,7 @@ end
             fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
             rate_fant = 0 # inferred from spreadsheet
             deltat = p.y_year[tt] - p.y_year_0
-        elseif is_timestep(tt, 2)
+        elseif tt == TimestepIndex(2)
             fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
             rate_fant = (p.fant_anthroforcing[tt - 1] - fant0) / (p.y_year[tt - 1] - p.y_year_0)
             deltat = p.y_year[tt] - p.y_year[tt - 1]
@@ -283,6 +283,10 @@ function tvar_getmvnormal(rr::Int64)
     end
 
     MvNormal([tvarcoeffs...], tvarsigma)
+end
+
+function tvar_getregions(regionorder::Vector{Union{Missing, Float64}}, coeffproc::Function = tvar_getcoeffs)
+    tvar_getregions(convert(Vector{Float64}, regionorder), coeffproc)
 end
 
 function tvar_getregions(regionorder::Vector{Float64}, coeffproc::Function = tvar_getcoeffs)

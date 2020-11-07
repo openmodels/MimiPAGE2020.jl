@@ -15,7 +15,7 @@
     rgdp_per_cap_SLRRemainGDP = Parameter(index = [time, region], unit = "\$/person")
 
     save_savingsrate = Parameter(unit = "%", default = 15.)
-    wincf_weightsfactor_market = Parameter(index = [region], unit = "")
+    wincf_weightsfactor_market = Parameter(index = [region], unit = "unitless")
     W_MarketImpactsatCalibrationTemp = Parameter(unit = "%GDP", default = 0.6)
     ipow_MarketIncomeFxnExponent = Parameter(default = -0.13333333333333333)
     iben_MarketInitialBenefit = Parameter(default = .1333333333333)
@@ -31,7 +31,7 @@
     impmax_maxtempriseforadaptpolicyM = Parameter(index = [region], unit = "degreeC")
 
     isat_ImpactinclSaturationandAdaptation = Variable(index = [time,region])
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index = [time,region])
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index = [time,region], unit="\$/person")
     pow_MarketImpactExponent = Parameter(unit = "", default = 2.1666666666666665)
 
     function run_timestep(p, v, d, t)

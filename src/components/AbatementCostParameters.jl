@@ -27,7 +27,7 @@
     qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit = "none", default = 1.1166666666666666)
     c0mult_mostnegativecostinfinalyear = Parameter(unit = "none", default = 0.9333333333333334)
     curve_below_curvatureofMACcurvebelowzerocost = Parameter(unit = "none", default = .5)
-    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit = "none", default = 0.39999999999999997)
+    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit = "none", default = 0.4)
     cross_experiencecrossoverratio = Parameter(unit = "none", default = .2)
     learn_learningrate = Parameter(unit = "none", default = .2)
     automult_autonomoustechchange = Parameter(unit = "none", default = .65)
@@ -114,8 +114,6 @@ end
 function addabatementcostparameters(model::Model, class::Symbol, policy::String = "policy-a")
     componentname = Symbol("AbatementCostParameters$class")
     abatementcostscomp = add_comp!(model, AbatementCostParameters, componentname)
-
-    abatementcostscomp[:y_year_0] = 2015.
 
     if class == :CO2
         setdistinctparameter(model, componentname, :emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear, -22.0)

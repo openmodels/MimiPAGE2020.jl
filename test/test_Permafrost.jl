@@ -8,7 +8,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
 
     permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
     permafrost_jules = add_comp!(m, PermafrostJULES)
@@ -22,7 +22,7 @@ for testscen in 1:2
     permafrost_total[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
 
     set_param!(m, :PermafrostSiBCASA, :rt_g, readpagedata(m, "test/validationdata/$valdir/rt_g_globaltemperature.csv"))
-    set_param!(m, :PermafrostJULES, :rt_g, readpagedata(m, "test/validationdata/$valdir/rt_g_globaltemperature.csv"))
+    connect_param!(m, :PermafrostJULES, :rt_g, :rt_g)
 
     p = load_parameters(m)
     p["y_year_0"] = 2015.

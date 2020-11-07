@@ -2,6 +2,14 @@ using Mimi
 
 include("../../src/compute_scc.jl")
 
+function setorup_param!(m::Model, param::Symbol, value)
+    try
+        set_param!(m, param, value)
+    catch e
+        update_param!(m, param, value)
+    end
+end
+
 """
 compute_scc(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing)
 
@@ -14,8 +22,8 @@ function compute_scc(m::Model = get_model(); year::Union{Int,Nothing} = nothing,
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+    eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year = year, pulse_size = pulse_size)   # Returns a marginal model that has already been run
     scc = mm[:EquityWeighting_growth, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
@@ -36,8 +44,8 @@ function compute_scc_mm(m::Model = get_model(); year::Union{Int,Nothing} = nothi
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+    eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year = year, pulse_size = pulse_size)   # Returns a marginal model that has already been run
     scc = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
@@ -58,12 +66,12 @@ function get_marginal_model(m::Model = get_model(); year::Union{Int,Nothing} = n
 
     mm = create_marginal_model(m, pulse_size)
 
-    add_comp!(mm.marginal, ExtraEmissions, :extra_emissions; after = :co2emissions)
-    connect_param!(mm.marginal, :extra_emissions => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
-    set_param!(mm.marginal, :extra_emissions, :pulse_size, pulse_size)
-    set_param!(mm.marginal, :extra_emissions, :pulse_year, year)
+    add_comp!(mm.modified, ExtraEmissions, :extra_emissions; after = :co2emissions)
+    connect_param!(mm.modified, :extra_emissions => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
+    set_param!(mm.modified, :extra_emissions, :pulse_size, pulse_size)
+    set_param!(mm.modified, :extra_emissions, :pulse_year, year)
 
-    connect_param!(mm.marginal, :CO2Cycle => :e_globalCO2emissions, :extra_emissions => :e_globalCO2emissions_adjusted)
+    connect_param!(mm.modified, :CO2Cycle => :e_globalCO2emissions, :extra_emissions => :e_globalCO2emissions_adjusted)
 
     run(mm)
     return mm
@@ -83,8 +91,8 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing} = n
     mcs = getsim()
 
     # Setup models
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
+    eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
+    prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year = year, pulse_size = pulse_size)   # Returns a marginal model that has already been run
 

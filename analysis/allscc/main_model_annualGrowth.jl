@@ -78,6 +78,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
     abatementcostparameters_N2O = addabatementcostparameters(m, :N2O)
     abatementcostparameters_Lin = addabatementcostparameters(m, :Lin)
 
+    set_param!(m, :automult_autonomoustechchange, .65)
+
     abatementcosts_CO2 = addabatementcosts(m, :CO2)
     abatementcosts_CH4 = addabatementcosts(m, :CH4)
     abatementcosts_N2O = addabatementcosts(m, :N2O)
@@ -329,17 +331,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool = true, use_
 end
 
 function initpage(m::Model)
-    set_param!(m, :ClimateTemperature, :y_year_ann, collect(2015:2300))
-    set_param!(m, :GDP, :y_year_ann, collect(2015:2300))
-    set_param!(m, :AdaptiveCostsEconomic, :y_year_ann, collect(2015:2300))
-    set_param!(m, :AdaptiveCostsNonEconomic, :y_year_ann, collect(2015:2300))
-    set_param!(m, :AdaptiveCostsSeaLevel, :y_year_ann, collect(2015:2300))
-    set_param!(m, :SLRDamages, :y_year_ann, collect(2015:2300))
-    set_param!(m, :MarketDamages, :y_year_ann, collect(2015:2300))
-    set_param!(m, :MarketDamagesBurke, :y_year_ann, collect(2015:2300))
-    set_param!(m, :NonMarketDamages, :y_year_ann, collect(2015:2300))
-    set_param!(m, :Discontinuity, :y_year_ann, collect(2015:2300))
-    set_param!(m, :EquityWeighting, :y_year_ann, collect(2015:2300))
+    setorup_param!(m, :y_year_ann, collect(2015:2300))
     p = load_parameters(m)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
