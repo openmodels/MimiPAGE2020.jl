@@ -4,24 +4,24 @@
     region            = Index()
 
     # Variables
-    gdp               = Variable(index = [time, region], unit = "\$M")
-    cons_consumption  = Variable(index = [time, region], unit = "\$million")
-    cons_percap_consumption = Variable(index = [time, region], unit = "\$/person")
-    cons_percap_consumption_0 = Variable(index = [region], unit = "\$/person")
-    yagg_periodspan = Variable(index = [time], unit = "year")
+    gdp               = Variable(index=[time, region], unit="\$M")
+    cons_consumption  = Variable(index=[time, region], unit="\$million")
+    cons_percap_consumption = Variable(index=[time, region], unit="\$/person")
+    cons_percap_consumption_0 = Variable(index=[region], unit="\$/person")
+    yagg_periodspan = Variable(index=[time], unit="year")
 
     # Parameters
-    y_year_0          = Parameter(unit = "year")
-    y_year            = Parameter(index = [time], unit = "year")
-    grw_gdpgrowthrate = Parameter(index = [time, region], unit = "%/year") # From p.32 of Hope 2009
-    gdp_0             = Parameter(index = [region], unit = "\$M") # GDP in y_year_0
-    save_savingsrate  = Parameter(unit = "%", default = 15.00) # pp33 PAGE09 documentation, "savings rate".
-    pop0_initpopulation = Parameter(index = [region], unit = "million person")
-    pop_population    = Parameter(index = [time,region], unit = "million person")
+    y_year_0          = Parameter(unit="year")
+    y_year            = Parameter(index=[time], unit="year")
+    grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year") # From p.32 of Hope 2009
+    gdp_0             = Parameter(index=[region], unit="\$M") # GDP in y_year_0
+    save_savingsrate  = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
+    pop0_initpopulation = Parameter(index=[region], unit="million person")
+    pop_population    = Parameter(index=[time,region], unit="million person")
 
     # Saturation, used in impacts
-    isat0_initialimpactfxnsaturation = Parameter(unit = "unitless", default = 20.0) # pp34 PAGE09 documentation
-    isatg_impactfxnsaturation = Variable(unit = "unitless")
+    isat0_initialimpactfxnsaturation = Parameter(unit="unitless", default=20.0) # pp34 PAGE09 documentation
+    isatg_impactfxnsaturation = Variable(unit="unitless")
 
     function init(p, v, d)
 

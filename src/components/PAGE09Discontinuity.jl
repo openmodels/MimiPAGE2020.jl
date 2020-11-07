@@ -3,37 +3,37 @@ using Mimi
 @defcomp PAGE09Discontinuity begin
 
     region = Index()
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_0 = Parameter(unit = "year")
+    y_year = Parameter(index=[time], unit="year")
+    y_year_0 = Parameter(unit="year")
 
-    rand_discontinuity = Parameter(unit = "unitless", default = .5)
+    rand_discontinuity = Parameter(unit="unitless", default=.5)
 
-    irefeqdis_eqdiscimpact = Variable(index = [region], unit = "%")
-    wincf_weightsfactor = Parameter(index = [region], unit = "unitless", default = [1, 0.8, 0.8, 0.4, 0.8, 0.8, 0.6, 0.6])
-    wdis_gdplostdisc = Parameter(unit = "%", default = 15.)
+    irefeqdis_eqdiscimpact = Variable(index=[region], unit="%")
+    wincf_weightsfactor = Parameter(index=[region], unit="unitless", default=[1, 0.8, 0.8, 0.4, 0.8, 0.8, 0.6, 0.6])
+    wdis_gdplostdisc = Parameter(unit="%", default=15.)
 
-    igdpeqdis_eqdiscimpact = Variable(index = [time,region], unit = "%")
-    rgdp_per_cap_NonMarketRemainGDP = Parameter(index = [time,region], unit = "\$/person")
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 27934.244777382406)
-    ipow_incomeexponent = Parameter(unit = "unitless", default = -0.13333333333333333)
+    igdpeqdis_eqdiscimpact = Variable(index=[time,region], unit="%")
+    rgdp_per_cap_NonMarketRemainGDP = Parameter(index=[time,region], unit="\$/person")
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=27934.244777382406)
+    ipow_incomeexponent = Parameter(unit="unitless", default=-0.13333333333333333)
 
-    igdp_realizeddiscimpact = Variable(index = [time,region], unit = "%")
-    occurdis_occurrencedummy = Variable(index = [time], unit = "unitless")
-    expfdis_discdecay = Variable(index = [time], unit = "unitless")
+    igdp_realizeddiscimpact = Variable(index=[time,region], unit="%")
+    occurdis_occurrencedummy = Variable(index=[time], unit="unitless")
+    expfdis_discdecay = Variable(index=[time], unit="unitless")
 
-    distau_discontinuityexponent = Parameter(unit = "unitless", default = 90.)
+    distau_discontinuityexponent = Parameter(unit="unitless", default=90.)
 
-    idis_lossfromdisc = Variable(index = [time], unit = "degreeC")
-    tdis_tolerabilitydisc = Parameter(unit = "degreeC", default = 3.)
-    rt_g_globaltemperature = Parameter(index = [time], unit = "degreeC")
-    pdis_probability = Parameter(unit = "%/degreeC", default = 20.)
+    idis_lossfromdisc = Variable(index=[time], unit="degreeC")
+    tdis_tolerabilitydisc = Parameter(unit="degreeC", default=3.)
+    rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
+    pdis_probability = Parameter(unit="%/degreeC", default=20.)
 
-    isatg_saturationmodification = Parameter(unit = "unitless")
-    isat_satdiscimpact = Variable(index = [time,region], unit = "%")
+    isatg_saturationmodification = Parameter(unit="unitless")
+    isat_satdiscimpact = Variable(index=[time,region], unit="%")
 
-    isat_per_cap_DiscImpactperCapinclSaturation = Variable(index = [time,region], unit = "\$/person")
-    rcons_per_cap_DiscRemainConsumption = Variable(index = [time, region], unit = "\$/person")
-    rcons_per_cap_NonMarketRemainConsumption = Parameter(index = [time, region], unit = "\$/person")
+    isat_per_cap_DiscImpactperCapinclSaturation = Variable(index=[time,region], unit="\$/person")
+    rcons_per_cap_DiscRemainConsumption = Variable(index=[time, region], unit="\$/person")
+    rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, region], unit="\$/person")
 
     function run_timestep(p, v, d, t)
         wdis_gdplostdisc_2009 = quantile(TriangularDist(5, 25, 15), cdf(TriangularDist(1, 5, 3), p.wdis_gdplostdisc))

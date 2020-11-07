@@ -1,10 +1,10 @@
 @defcomp ch4emissions begin
     region = Index()
 
-    e_globalCH4emissions = Variable(index = [time], unit = "Mtonne/year")
-    e0_baselineCH4emissions = Parameter(index = [region], unit = "Mtonne/year")
-    e_regionalCH4emissions = Variable(index = [time,region], unit = "Mtonne/year")
-    er_CH4emissionsgrowth = Parameter(index = [time,region], unit = "%")
+    e_globalCH4emissions = Variable(index=[time], unit="Mtonne/year")
+    e0_baselineCH4emissions = Parameter(index=[region], unit="Mtonne/year")
+    e_regionalCH4emissions = Variable(index=[time,region], unit="Mtonne/year")
+    er_CH4emissionsgrowth = Parameter(index=[time,region], unit="%")
 
     function run_timestep(p, v, d, t)
 

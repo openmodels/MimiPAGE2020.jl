@@ -1,34 +1,34 @@
 @defcomp AdaptationCosts begin
     region = Index()
 
-    y_year_0 = Parameter(unit = "year")
-    y_year_lssp = Parameter(unit = "year", default = 2100.)
-    y_year = Parameter(index = [time], unit = "year")
-    gdp = Parameter(index = [time, region], unit = "\$M")
-    cf_costregional = Parameter(index = [region], unit = "none") # first value should be 1.
+    y_year_0 = Parameter(unit="year")
+    y_year_lssp = Parameter(unit="year", default=2100.)
+    y_year = Parameter(index=[time], unit="year")
+    gdp = Parameter(index=[time, region], unit="\$M")
+    cf_costregional = Parameter(index=[region], unit="none") # first value should be 1.
 
-    automult_autonomoustechchange = Parameter(unit = "none", default = .65)
-    impmax_maximumadaptivecapacity = Parameter(index = [region], unit = "driver")
+    automult_autonomoustechchange = Parameter(unit="none", default=.65)
+    impmax_maximumadaptivecapacity = Parameter(index=[region], unit="driver")
     # tolerability parameters
-    plateau_increaseintolerableplateaufromadaptation = Parameter(index = [region], unit = "driver")
-    pstart_startdateofadaptpolicy = Parameter(index = [region], unit = "year")
-    pyears_yearstilfulleffect = Parameter(index = [region], unit = "year")
-    impred_eventualpercentreduction = Parameter(index = [region], unit = "%")
-    istart_startdate = Parameter(index = [region], unit = "year")
-    iyears_yearstilfulleffect = Parameter(index = [region], unit = "year")
+    plateau_increaseintolerableplateaufromadaptation = Parameter(index=[region], unit="driver")
+    pstart_startdateofadaptpolicy = Parameter(index=[region], unit="year")
+    pyears_yearstilfulleffect = Parameter(index=[region], unit="year")
+    impred_eventualpercentreduction = Parameter(index=[region], unit="%")
+    istart_startdate = Parameter(index=[region], unit="year")
+    iyears_yearstilfulleffect = Parameter(index=[region], unit="year")
 
-    cp_costplateau_eu = Parameter(unit = "%GDP/driver")
-    ci_costimpact_eu = Parameter(unit = "%GDP/%driver")
+    cp_costplateau_eu = Parameter(unit="%GDP/driver")
+    ci_costimpact_eu = Parameter(unit="%GDP/%driver")
 
-    atl_adjustedtolerablelevel = Variable(index = [time, region]) # Unit depends on instance (degreeC or m)
-    imp_adaptedimpacts = Variable(index = [time, region], unit = "%")
+    atl_adjustedtolerablelevel = Variable(index=[time, region]) # Unit depends on instance (degreeC or m)
+    imp_adaptedimpacts = Variable(index=[time, region], unit="%")
 
     # Mostly for debugging
-    autofac_autonomoustechchangefraction = Variable(index = [time], unit = "none")
-    acp_adaptivecostplateau = Variable(index = [time, region], unit = "\$million")
-    aci_adaptivecostimpact = Variable(index = [time, region], unit = "\$million")
+    autofac_autonomoustechchangefraction = Variable(index=[time], unit="none")
+    acp_adaptivecostplateau = Variable(index=[time, region], unit="\$million")
+    aci_adaptivecostimpact = Variable(index=[time, region], unit="\$million")
 
-    ac_adaptivecosts = Variable(index = [time, region], unit = "\$million")
+    ac_adaptivecosts = Variable(index=[time, region], unit="\$million")
 
     function run_timestep(p, v, d, tt)
 

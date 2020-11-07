@@ -1,42 +1,42 @@
 @defcomp PermafrostSiBCASA begin
-    rt_g = Parameter(index = [time], unit = "degreeC")
-    y_year_0 = Parameter(unit = "year")
-    y_year = Parameter(index = [time], unit = "year")
+    rt_g = Parameter(index=[time], unit="degreeC")
+    y_year_0 = Parameter(unit="year")
+    y_year = Parameter(index=[time], unit="year")
 
-    perm_sib_af = Parameter(default = 1.8755694887303616) # Amplification factor for permafrost regions
-    perm_sib_sens_c_co2 = Parameter(default = 31939.74044307217) # Sensitivity for cumulative carbon emissions, CO2
-    perm_sib_lag_c_co2 = Parameter(default = 61.693785559934845) # Time lag for cumulative carbon emissions, CO2
-    perm_sib_pow_c_co2 = Parameter(default = 0.2589907164292725) # Nonlinear power for cumulative carbon emissions, CO2
-    perm_sib_sens_c_ch4 = Parameter(default = 2294.237641605309) # Sensitivity for cumulative carbon emissions, CH4
-    perm_sib_lag_c_ch4 = Parameter(default = 206.28841306311747) # Time lag for cumulative carbon emissions, CH4
-    perm_sib_pow_c_ch4 = Parameter(default = 0.2510548621108904) # Nonlinear power for cumulative carbon emissions, CH4
-    perm_sib_sens_slope_vs_t_co2 = Parameter(default = 1.3953528485263331)
-    perm_sib_limit_t = Parameter(default = 22.206606297204385)
-    perm_sib_lag_slope_vs_t_co2 = Parameter(default = 0.8292129951283947)
-    perm_sib_pow_slope_vs_t_co2 = Parameter(default = -0.03334709744835228)
-    perm_sib_limit_c = Parameter(default = 560000.0)
-    perm_sib_ce_c_co2_0 = Parameter(default = 3764.052934735)
-    perm_sib_ce_co2_0 = Parameter(default = 13801.527427361667)
-    perm_sib_sens_slope_vs_t_ch4 = Parameter(default = -0.061634027375886635)
-    perm_sib_lag_slope_vs_t_ch4 = Parameter(default = -2.5752200686097426)
-    perm_sib_pow_slope_vs_t_ch4 = Parameter(default = 1.3992129787187544)
-    perm_sib_pow_c_ch4 = Parameter(default = 0.2510548621108904)
-    perm_sib_ce_c_ch4_0 = Parameter(default = 175.56164558499998)
+    perm_sib_af = Parameter(default=1.8755694887303616) # Amplification factor for permafrost regions
+    perm_sib_sens_c_co2 = Parameter(default=31939.74044307217) # Sensitivity for cumulative carbon emissions, CO2
+    perm_sib_lag_c_co2 = Parameter(default=61.693785559934845) # Time lag for cumulative carbon emissions, CO2
+    perm_sib_pow_c_co2 = Parameter(default=0.2589907164292725) # Nonlinear power for cumulative carbon emissions, CO2
+    perm_sib_sens_c_ch4 = Parameter(default=2294.237641605309) # Sensitivity for cumulative carbon emissions, CH4
+    perm_sib_lag_c_ch4 = Parameter(default=206.28841306311747) # Time lag for cumulative carbon emissions, CH4
+    perm_sib_pow_c_ch4 = Parameter(default=0.2510548621108904) # Nonlinear power for cumulative carbon emissions, CH4
+    perm_sib_sens_slope_vs_t_co2 = Parameter(default=1.3953528485263331)
+    perm_sib_limit_t = Parameter(default=22.206606297204385)
+    perm_sib_lag_slope_vs_t_co2 = Parameter(default=0.8292129951283947)
+    perm_sib_pow_slope_vs_t_co2 = Parameter(default=-0.03334709744835228)
+    perm_sib_limit_c = Parameter(default=560000.0)
+    perm_sib_ce_c_co2_0 = Parameter(default=3764.052934735)
+    perm_sib_ce_co2_0 = Parameter(default=13801.527427361667)
+    perm_sib_sens_slope_vs_t_ch4 = Parameter(default=-0.061634027375886635)
+    perm_sib_lag_slope_vs_t_ch4 = Parameter(default=-2.5752200686097426)
+    perm_sib_pow_slope_vs_t_ch4 = Parameter(default=1.3992129787187544)
+    perm_sib_pow_c_ch4 = Parameter(default=0.2510548621108904)
+    perm_sib_ce_c_ch4_0 = Parameter(default=175.56164558499998)
 
-    perm_sib_temp = Variable(index = [time], unit = "degreeC")
-    perm_sib_sens_c_co2_correct = Variable(index = [time])
-    perm_sib_lag_c_co2_correct = Variable(index = [time])
-    perm_sib_pow_c_co2_correct = Variable(index = [time])
-    perm_sib_equilib_c_co2 = Variable(index = [time])
-    perm_sib_ce_c_co2 = Variable(index = [time], unit = "MtonneC")
-    perm_sib_ce_co2 = Variable(index = [time], unit = "Mtonne CO2")
-    perm_sib_e_co2 = Variable(index = [time], unit = "MtonCO2/yr")
-    perm_sib_sens_c_ch4_correct = Variable(index = [time])
-    perm_sib_lag_c_ch4_correct = Variable(index = [time])
-    perm_sib_pow_c_ch4_correct = Variable(index = [time])
-    perm_sib_equilib_c_ch4 = Variable(index = [time], unit = "Mtonne C")
-    perm_sib_ce_c_ch4 = Variable(index = [time], unit = "Mtonne C")
-    perm_sib_ce_ch4 = Variable(index = [time], unit = "Mtonne CH4")
+    perm_sib_temp = Variable(index=[time], unit="degreeC")
+    perm_sib_sens_c_co2_correct = Variable(index=[time])
+    perm_sib_lag_c_co2_correct = Variable(index=[time])
+    perm_sib_pow_c_co2_correct = Variable(index=[time])
+    perm_sib_equilib_c_co2 = Variable(index=[time])
+    perm_sib_ce_c_co2 = Variable(index=[time], unit="MtonneC")
+    perm_sib_ce_co2 = Variable(index=[time], unit="Mtonne CO2")
+    perm_sib_e_co2 = Variable(index=[time], unit="MtonCO2/yr")
+    perm_sib_sens_c_ch4_correct = Variable(index=[time])
+    perm_sib_lag_c_ch4_correct = Variable(index=[time])
+    perm_sib_pow_c_ch4_correct = Variable(index=[time])
+    perm_sib_equilib_c_ch4 = Variable(index=[time], unit="Mtonne C")
+    perm_sib_ce_c_ch4 = Variable(index=[time], unit="Mtonne C")
+    perm_sib_ce_ch4 = Variable(index=[time], unit="Mtonne CH4")
 
     function run_timestep(p, v, d, tt)
         if is_first(tt)

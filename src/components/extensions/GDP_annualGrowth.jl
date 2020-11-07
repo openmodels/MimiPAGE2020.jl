@@ -172,60 +172,60 @@ end
     year              = Index()
 
     # Variables
-    gdp               = Variable(index = [time, region], unit = "\$M")
-    gdp_ann               = Variable(index = [year, region], unit = "\$M")
-    cons_consumption  = Variable(index = [time, region], unit = "\$million")
-    cons_consumption_ann  = Variable(index = [year, region], unit = "\$million")
-    cons_percap_consumption = Variable(index = [time, region], unit = "\$/person")
-    cons_percap_consumption_ann = Variable(index = [year, region], unit = "\$/person")
-    cons_percap_consumption_0 = Variable(index = [region], unit = "\$/person")
-    yagg_periodspan = Variable(index = [time], unit = "year")
+    gdp               = Variable(index=[time, region], unit="\$M")
+    gdp_ann               = Variable(index=[year, region], unit="\$M")
+    cons_consumption  = Variable(index=[time, region], unit="\$million")
+    cons_consumption_ann  = Variable(index=[year, region], unit="\$million")
+    cons_percap_consumption = Variable(index=[time, region], unit="\$/person")
+    cons_percap_consumption_ann = Variable(index=[year, region], unit="\$/person")
+    cons_percap_consumption_0 = Variable(index=[region], unit="\$/person")
+    yagg_periodspan = Variable(index=[time], unit="year")
 
     # Parameters
-    y_year_0          = Parameter(unit = "year")
-    y_year            = Parameter(index = [time], unit = "year")
-    y_year_ann        = Parameter(index = [year], unit = "year")
-    grw_gdpgrowthrate = Parameter(index = [time, region], unit = "%/year") # From p.32 of Hope 2009
-    grw_gdpgrowthrate_ann = Variable(index = [year, region], unit = "%/year")                                   # interpolation
-    gdp_0             = Parameter(index = [region], unit = "\$M") # GDP in y_year_0
-    save_savingsrate  = Parameter(unit = "%", default = 15.00) # pp33 PAGE09 documentation, "savings rate".
-    pop0_initpopulation = Parameter(index = [region], unit = "million person")
-    pop_population    = Parameter(index = [time,region], unit = "million person")
-    pop_population_ann = Variable(index = [year, region], unit = "million person")                              # interpolation
+    y_year_0          = Parameter(unit="year")
+    y_year            = Parameter(index=[time], unit="year")
+    y_year_ann        = Parameter(index=[year], unit="year")
+    grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year") # From p.32 of Hope 2009
+    grw_gdpgrowthrate_ann = Variable(index=[year, region], unit="%/year")                                   # interpolation
+    gdp_0             = Parameter(index=[region], unit="\$M") # GDP in y_year_0
+    save_savingsrate  = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
+    pop0_initpopulation = Parameter(index=[region], unit="million person")
+    pop_population    = Parameter(index=[time,region], unit="million person")
+    pop_population_ann = Variable(index=[year, region], unit="million person")                              # interpolation
 
     # Saturation, used in impacts
-    isat0_initialimpactfxnsaturation = Parameter(unit = "unitless", default = 20.0) # pp34 PAGE09 documentation
-    isatg_impactfxnsaturation = Variable(unit = "unitless")
+    isat0_initialimpactfxnsaturation = Parameter(unit="unitless", default=20.0) # pp34 PAGE09 documentation
+    isatg_impactfxnsaturation = Variable(unit="unitless")
 
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
     # parameters and variables for growth effects
-    gdp_leveleffect   = Variable(index = [time, region], unit = "\$M")
-    gdp_leveleffect_ann   = Variable(index = [year, region], unit = "\$M")
-    isat_ImpactinclSaturationandAdaptation = Parameter(index = [time,region])
-    isat_ImpactinclSaturationandAdaptation_ann = Parameter(index = [year,region])                              # from MarketDamagesBurke (if default, otherwise MarketDamages)
-    lgdp_gdploss =  Variable(index = [time, region], unit = "\$M")
-    lgdp_gdploss_ann =  Variable(index = [year, region], unit = "\$M")
-    ge_growtheffects = Parameter(unit = "none", default =  0.)
-    grwnet_realizedgdpgrowth = Variable(index = [time, region], unit = "%/year")
-    grwnet_realizedgdpgrowth_ann = Variable(index = [year, region], unit = "%/year")
+    gdp_leveleffect   = Variable(index=[time, region], unit="\$M")
+    gdp_leveleffect_ann   = Variable(index=[year, region], unit="\$M")
+    isat_ImpactinclSaturationandAdaptation = Parameter(index=[time,region])
+    isat_ImpactinclSaturationandAdaptation_ann = Parameter(index=[year,region])                              # from MarketDamagesBurke (if default, otherwise MarketDamages)
+    lgdp_gdploss =  Variable(index=[time, region], unit="\$M")
+    lgdp_gdploss_ann =  Variable(index=[year, region], unit="\$M")
+    ge_growtheffects = Parameter(unit="none", default=0.)
+    grwnet_realizedgdpgrowth = Variable(index=[time, region], unit="%/year")
+    grwnet_realizedgdpgrowth_ann = Variable(index=[year, region], unit="%/year")
     # bound variables
-    use_convergence = Parameter(unit = "none", default = 1.)
-    cbabs_pcconsumptionbound = Parameter(unit = "\$/person", default = 740.65)
-    cbabsn_pcconsumptionbound_neighbourhood = Variable(unit = "\$/person")
-    cbaux1_pcconsumptionbound_auxiliary1 = Variable(unit = "none")
-    cbaux2_pcconsumptionbound_auxiliary2 = Variable(unit = "none")
-    cbreg_regionsatbound = Variable(index = [time, region], unit = "regions")
-    cbreg_regionsatbound_ann = Variable(index = [year, region], unit = "regions")
-    cons_consumption_noconvergence = Variable(index = [time, region], unit = "\$million")
-    cons_consumption_noconvergence_ann = Variable(index = [year, region], unit = "\$million")
-    cons_percap_consumption_noconvergence = Variable(index = [time, region], unit = "\$/person")
-    cons_percap_consumption_noconvergence_ann = Variable(index = [year, region], unit = "\$/person")
+    use_convergence = Parameter(unit="none", default=1.)
+    cbabs_pcconsumptionbound = Parameter(unit="\$/person", default=740.65)
+    cbabsn_pcconsumptionbound_neighbourhood = Variable(unit="\$/person")
+    cbaux1_pcconsumptionbound_auxiliary1 = Variable(unit="none")
+    cbaux2_pcconsumptionbound_auxiliary2 = Variable(unit="none")
+    cbreg_regionsatbound = Variable(index=[time, region], unit="regions")
+    cbreg_regionsatbound_ann = Variable(index=[year, region], unit="regions")
+    cons_consumption_noconvergence = Variable(index=[time, region], unit="\$million")
+    cons_consumption_noconvergence_ann = Variable(index=[year, region], unit="\$million")
+    cons_percap_consumption_noconvergence = Variable(index=[time, region], unit="\$/person")
+    cons_percap_consumption_noconvergence_ann = Variable(index=[year, region], unit="\$/person")
     # switch to overwrite the growth effects parameter with empirical distribution
-    ge_empirical_distribution = Parameter(index = [draw], unit = "none")
-    ge_use_empiricaldistribution = Parameter(unit = "none", default = 0.)
-    ge_seed_empiricaldistribution = Parameter(unit = "none", default = 1.)
+    ge_empirical_distribution = Parameter(index=[draw], unit="none")
+    ge_use_empiricaldistribution = Parameter(unit="none", default=0.)
+    ge_seed_empiricaldistribution = Parameter(unit="none", default=1.)
     ###############################################
 
     function init(p, v, d)

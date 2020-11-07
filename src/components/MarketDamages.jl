@@ -1,38 +1,38 @@
 @defcomp MarketDamages begin
     region = Index()
-    y_year = Parameter(index = [time], unit = "year")
+    y_year = Parameter(index=[time], unit="year")
 
     # incoming parameters from Climate
-    rtl_realizedtemperature = Parameter(index = [time, region], unit = "degreeC")
+    rtl_realizedtemperature = Parameter(index=[time, region], unit="degreeC")
 
     # tolerability variables
-    atl_adjustedtolerableleveloftemprise = Parameter(index = [time,region], unit = "degreeC")
-    imp_actualreduction = Parameter(index = [time, region], unit = "%")
-    i_regionalimpact = Variable(index = [time, region], unit = "degreeC")
+    atl_adjustedtolerableleveloftemprise = Parameter(index=[time,region], unit="degreeC")
+    imp_actualreduction = Parameter(index=[time, region], unit="%")
+    i_regionalimpact = Variable(index=[time, region], unit="degreeC")
 
     # impact Parameters
-    rcons_per_cap_SLRRemainConsumption = Parameter(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_SLRRemainGDP = Parameter(index = [time, region], unit = "\$/person")
+    rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, region], unit="\$/person")
+    rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit="\$/person")
 
-    save_savingsrate = Parameter(unit = "%", default = 15.)
-    wincf_weightsfactor_market = Parameter(index = [region], unit = "unitless")
-    W_MarketImpactsatCalibrationTemp = Parameter(unit = "%GDP", default = 0.6)
-    ipow_MarketIncomeFxnExponent = Parameter(default = -0.13333333333333333)
-    iben_MarketInitialBenefit = Parameter(default = .1333333333333)
-    tcal_CalibrationTemp = Parameter(unit = "degreeC", default = 3.)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
+    save_savingsrate = Parameter(unit="%", default=15.)
+    wincf_weightsfactor_market = Parameter(index=[region], unit="unitless")
+    W_MarketImpactsatCalibrationTemp = Parameter(unit="%GDP", default=0.6)
+    ipow_MarketIncomeFxnExponent = Parameter(default=-0.13333333333333333)
+    iben_MarketInitialBenefit = Parameter(default=.1333333333333)
+    tcal_CalibrationTemp = Parameter(unit="degreeC", default=3.)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
 
     # impact variables
-    isatg_impactfxnsaturation = Parameter(unit = "unitless")
-    rcons_per_cap_MarketRemainConsumption = Variable(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_MarketRemainGDP = Variable(index = [time, region], unit = "\$/person")
-    iref_ImpactatReferenceGDPperCap = Variable(index = [time, region])
-    igdp_ImpactatActualGDPperCap = Variable(index = [time, region])
-    impmax_maxtempriseforadaptpolicyM = Parameter(index = [region], unit = "degreeC")
+    isatg_impactfxnsaturation = Parameter(unit="unitless")
+    rcons_per_cap_MarketRemainConsumption = Variable(index=[time, region], unit="\$/person")
+    rgdp_per_cap_MarketRemainGDP = Variable(index=[time, region], unit="\$/person")
+    iref_ImpactatReferenceGDPperCap = Variable(index=[time, region])
+    igdp_ImpactatActualGDPperCap = Variable(index=[time, region])
+    impmax_maxtempriseforadaptpolicyM = Parameter(index=[region], unit="degreeC")
 
-    isat_ImpactinclSaturationandAdaptation = Variable(index = [time,region])
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index = [time,region], unit="\$/person")
-    pow_MarketImpactExponent = Parameter(unit = "", default = 2.1666666666666665)
+    isat_ImpactinclSaturationandAdaptation = Variable(index=[time,region])
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit="\$/person")
+    pow_MarketImpactExponent = Parameter(unit="", default=2.1666666666666665)
 
     function run_timestep(p, v, d, t)
 
@@ -82,7 +82,7 @@ end
 # readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
 
-function addmarketdamages(model::Model, use_page09weights::Bool = false)
+function addmarketdamages(model::Model, use_page09weights::Bool=false)
     marketdamagescomp = add_comp!(model, MarketDamages)
     marketdamagescomp[:impmax_maxtempriseforadaptpolicyM] = readpagedata(model, "data/impmax_economic.csv")
 

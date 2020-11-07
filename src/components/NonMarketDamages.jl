@@ -3,40 +3,40 @@
 @defcomp NonMarketDamages begin
     region = Index()
 
-    y_year = Parameter(index = [time], unit = "year")
+    y_year = Parameter(index=[time], unit="year")
 
     # incoming parameters from Climate
-    rtl_realizedtemperature = Parameter(index = [time, region], unit = "degreeC")
+    rtl_realizedtemperature = Parameter(index=[time, region], unit="degreeC")
 
     # tolerability parameters
-    impmax_maxtempriseforadaptpolicyNM = Parameter(index = [region], unit = "degreeC")
-    atl_adjustedtolerableleveloftemprise = Parameter(index = [time,region], unit = "degreeC")
-    imp_actualreduction = Parameter(index = [time, region], unit = "%")
+    impmax_maxtempriseforadaptpolicyNM = Parameter(index=[region], unit="degreeC")
+    atl_adjustedtolerableleveloftemprise = Parameter(index=[time,region], unit="degreeC")
+    imp_actualreduction = Parameter(index=[time, region], unit="%")
 
     # tolerability variables
-    i_regionalimpact = Variable(index = [time, region], unit = "degreeC")
+    i_regionalimpact = Variable(index=[time, region], unit="degreeC")
 
     # impact Parameters
-    rcons_per_cap_MarketRemainConsumption = Parameter(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_MarketRemainGDP = Parameter(index = [time, region], unit = "\$/person")
+    rcons_per_cap_MarketRemainConsumption = Parameter(index=[time, region], unit="\$/person")
+    rgdp_per_cap_MarketRemainGDP = Parameter(index=[time, region], unit="\$/person")
 
-    save_savingsrate = Parameter(unit = "%", default = 15.)
-    wincf_weightsfactor_nonmarket = Parameter(index = [region], unit = "")
-    w_NonImpactsatCalibrationTemp = Parameter(unit = "%GDP", default = 0.6333333333333333)
-    ipow_NonMarketIncomeFxnExponent = Parameter(unit = "unitless", default = 0.)
-    iben_NonMarketInitialBenefit = Parameter(unit = "%GDP/degreeC", default = 0.08333333333333333)
-    tcal_CalibrationTemp = Parameter(unit = "degreeC", default = 3.)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
-    pow_NonMarketExponent = Parameter(unit = "", default = 2.1666666666666665)
+    save_savingsrate = Parameter(unit="%", default=15.)
+    wincf_weightsfactor_nonmarket = Parameter(index=[region], unit="")
+    w_NonImpactsatCalibrationTemp = Parameter(unit="%GDP", default=0.6333333333333333)
+    ipow_NonMarketIncomeFxnExponent = Parameter(unit="unitless", default=0.)
+    iben_NonMarketInitialBenefit = Parameter(unit="%GDP/degreeC", default=0.08333333333333333)
+    tcal_CalibrationTemp = Parameter(unit="degreeC", default=3.)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
+    pow_NonMarketExponent = Parameter(unit="", default=2.1666666666666665)
 
     # impact variables
-    isatg_impactfxnsaturation = Parameter(unit = "unitless")
-    rcons_per_cap_NonMarketRemainConsumption = Variable(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_NonMarketRemainGDP = Variable(index = [time, region], unit = "\$/person")
-    iref_ImpactatReferenceGDPperCap = Variable(index = [time, region], unit = "%")
-    igdp_ImpactatActualGDPperCap = Variable(index = [time, region], unit = "%")
-    isat_ImpactinclSaturationandAdaptation = Variable(index = [time,region], unit = "\$")
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index = [time,region], unit = "\$/person")
+    isatg_impactfxnsaturation = Parameter(unit="unitless")
+    rcons_per_cap_NonMarketRemainConsumption = Variable(index=[time, region], unit="\$/person")
+    rgdp_per_cap_NonMarketRemainGDP = Variable(index=[time, region], unit="\$/person")
+    iref_ImpactatReferenceGDPperCap = Variable(index=[time, region], unit="%")
+    igdp_ImpactatActualGDPperCap = Variable(index=[time, region], unit="%")
+    isat_ImpactinclSaturationandAdaptation = Variable(index=[time,region], unit="\$")
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit="\$/person")
 
     function run_timestep(p, v, d, t)
 
@@ -85,7 +85,7 @@ end
 # Still need this function in order to set the parameters than depend on
 # readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
-function addnonmarketdamages(model::Model, use_page09weights::Bool = false)
+function addnonmarketdamages(model::Model, use_page09weights::Bool=false)
     nonmarketdamagescomp = add_comp!(model, NonMarketDamages)
     nonmarketdamagescomp[:impmax_maxtempriseforadaptpolicyNM] = readpagedata(model, "data/impmax_noneconomic.csv")
 

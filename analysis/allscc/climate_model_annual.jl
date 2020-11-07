@@ -19,7 +19,7 @@ include("../../src/components/extensions/PermafrostSiBCASA_annual.jl")
 include("../../src/components/extensions/PermafrostJULES_annual.jl")
 include("../../src/components/extensions/PermafrostTotal_annual.jl")
 
-function climatemodel(scenario::String, use_permafrost::Bool = true, use_seaice::Bool = true)
+function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true)
     m = Model()
     set_dimension!(m, :year, collect(2015:2300))
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])

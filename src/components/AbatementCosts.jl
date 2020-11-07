@@ -2,25 +2,25 @@
     region = Index()
 
    # From the AbatementCostParameters
-    zc_zerocostemissions = Parameter(index = [time, region], unit = "%")
-    q0_absolutecutbacksatnegativecost = Parameter(index = [time, region], unit = "Mtonne")
-    blo = Parameter(index = [time, region], unit = "per Mtonne")
-    alo = Parameter(index = [time, region], unit = "\$/tonne")
-    bhi = Parameter(index = [time, region], unit = "per Mtonne")
-    ahi = Parameter(index = [time, region], unit = "\$/tonne")
+    zc_zerocostemissions = Parameter(index=[time, region], unit="%")
+    q0_absolutecutbacksatnegativecost = Parameter(index=[time, region], unit="Mtonne")
+    blo = Parameter(index=[time, region], unit="per Mtonne")
+    alo = Parameter(index=[time, region], unit="\$/tonne")
+    bhi = Parameter(index=[time, region], unit="per Mtonne")
+    ahi = Parameter(index=[time, region], unit="\$/tonne")
 
     # Driver of abatement costs
-    e0_baselineemissions = Parameter(index = [region], unit = "Mtonne/year")
-    er_emissionsgrowth = Parameter(index = [time, region], unit = "%")
+    e0_baselineemissions = Parameter(index=[region], unit="Mtonne/year")
+    er_emissionsgrowth = Parameter(index=[time, region], unit="%")
 
     # Intermediate outputs
-    cb_reductionsfromzerocostemissions = Variable(index = [time, region], unit = "%")
-    cbe_absoluteemissionreductions = Variable(index = [time, region], unit = "Mtonne") # Goes to AbatementCostParameters
+    cb_reductionsfromzerocostemissions = Variable(index=[time, region], unit="%")
+    cbe_absoluteemissionreductions = Variable(index=[time, region], unit="Mtonne") # Goes to AbatementCostParameters
 
     # Main costs results
-    mc_marginalcost = Variable(index = [time, region], unit = "\$/tonne")
-    tcq0 = Variable(index = [time, region], unit = "\$million")
-    tc_totalcost = Variable(index = [time, region], unit = "\$million")
+    mc_marginalcost = Variable(index=[time, region], unit="\$/tonne")
+    tcq0 = Variable(index=[time, region], unit="\$million")
+    tc_totalcost = Variable(index=[time, region], unit="\$million")
 
     function run_timestep(p, v, d, t)
 

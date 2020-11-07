@@ -1,10 +1,10 @@
 @defcomp co2emissions begin
     region = Index()
 
-    e_globalCO2emissions = Variable(index = [time], unit = "Mtonne/year")
-    e0_baselineCO2emissions = Parameter(index = [region], unit = "Mtonne/year")
-    e_regionalCO2emissions = Variable(index = [time,region], unit = "Mtonne/year")
-    er_CO2emissionsgrowth = Parameter(index = [time,region], unit = "%")
+    e_globalCO2emissions = Variable(index=[time], unit="Mtonne/year")
+    e0_baselineCO2emissions = Parameter(index=[region], unit="Mtonne/year")
+    e_regionalCO2emissions = Variable(index=[time,region], unit="Mtonne/year")
+    er_CO2emissionsgrowth = Parameter(index=[time,region], unit="%")
 
     function run_timestep(p, v, d, t)
 

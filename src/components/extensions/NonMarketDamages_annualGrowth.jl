@@ -45,57 +45,57 @@ end
     region = Index()
     year = Index()
 
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_ann = Parameter(index = [year], unit = "year")
-    yagg_periodspan = Parameter(index = [time], unit = "year") # for in-component summation
+    y_year = Parameter(index=[time], unit="year")
+    y_year_ann = Parameter(index=[year], unit="year")
+    yagg_periodspan = Parameter(index=[time], unit="year") # for in-component summation
 
     # incoming parameters from Climate
-    rtl_realizedtemperature = Parameter(index = [time, region], unit = "degreeC")
-    rtl_realizedtemperature_ann = Parameter(index = [year, region], unit = "degreeC")
+    rtl_realizedtemperature = Parameter(index=[time, region], unit="degreeC")
+    rtl_realizedtemperature_ann = Parameter(index=[year, region], unit="degreeC")
 
     # tolerability parameters
-    impmax_maxtempriseforadaptpolicyNM = Parameter(index = [region], unit = "degreeC")
-    atl_adjustedtolerableleveloftemprise = Parameter(index = [time,region], unit = "degreeC")
-    atl_adjustedtolerableleveloftemprise_ann = Parameter(index = [year,region], unit = "degreeC")
-    imp_actualreduction = Parameter(index = [time, region], unit = "%")
-    imp_actualreduction_ann = Parameter(index = [year, region], unit = "%")
+    impmax_maxtempriseforadaptpolicyNM = Parameter(index=[region], unit="degreeC")
+    atl_adjustedtolerableleveloftemprise = Parameter(index=[time,region], unit="degreeC")
+    atl_adjustedtolerableleveloftemprise_ann = Parameter(index=[year,region], unit="degreeC")
+    imp_actualreduction = Parameter(index=[time, region], unit="%")
+    imp_actualreduction_ann = Parameter(index=[year, region], unit="%")
 
     # tolerability variables
-    i_regionalimpact = Variable(index = [time, region], unit = "degreeC")
-    i_regionalimpact_ann = Variable(index = [year, region], unit = "degreeC")
+    i_regionalimpact = Variable(index=[time, region], unit="degreeC")
+    i_regionalimpact_ann = Variable(index=[year, region], unit="degreeC")
 
     # impact Parameters
-    rcons_per_cap_MarketRemainConsumption = Parameter(index = [time, region], unit = "\$/person")
-    rcons_per_cap_MarketRemainConsumption_ann = Parameter(index = [year, region], unit = "\$/person")
-    rgdp_per_cap_MarketRemainGDP = Parameter(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_MarketRemainGDP_ann = Parameter(index = [year, region], unit = "\$/person")
+    rcons_per_cap_MarketRemainConsumption = Parameter(index=[time, region], unit="\$/person")
+    rcons_per_cap_MarketRemainConsumption_ann = Parameter(index=[year, region], unit="\$/person")
+    rgdp_per_cap_MarketRemainGDP = Parameter(index=[time, region], unit="\$/person")
+    rgdp_per_cap_MarketRemainGDP_ann = Parameter(index=[year, region], unit="\$/person")
 
-    save_savingsrate = Parameter(unit = "%", default = 15.)
-    wincf_weightsfactor_nonmarket = Parameter(index = [region], unit = "")
-    w_NonImpactsatCalibrationTemp = Parameter(unit = "%GDP", default = 0.6333333333333333)
-    ipow_NonMarketIncomeFxnExponent = Parameter(unit = "unitless", default = 0.)
-    iben_NonMarketInitialBenefit = Parameter(unit = "%GDP/degreeC", default = 0.08333333333333333)
-    tcal_CalibrationTemp = Parameter(unit = "degreeC", default = 3.)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
-    pow_NonMarketExponent = Parameter(unit = "", default = 2.1666666666666665)
+    save_savingsrate = Parameter(unit="%", default=15.)
+    wincf_weightsfactor_nonmarket = Parameter(index=[region], unit="")
+    w_NonImpactsatCalibrationTemp = Parameter(unit="%GDP", default=0.6333333333333333)
+    ipow_NonMarketIncomeFxnExponent = Parameter(unit="unitless", default=0.)
+    iben_NonMarketInitialBenefit = Parameter(unit="%GDP/degreeC", default=0.08333333333333333)
+    tcal_CalibrationTemp = Parameter(unit="degreeC", default=3.)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
+    pow_NonMarketExponent = Parameter(unit="", default=2.1666666666666665)
 
     # impact variables
-    isatg_impactfxnsaturation = Parameter(unit = "unitless")
-    rcons_per_cap_NonMarketRemainConsumption = Variable(index = [time, region], unit = "\$/person")
-    rcons_per_cap_NonMarketRemainConsumption_ann = Variable(index = [year, region], unit = "\$/person")
-    rgdp_per_cap_NonMarketRemainGDP = Variable(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_NonMarketRemainGDP_sum = Variable(unit = "\$/person") # for analysis
-    rgdp_per_cap_NonMarketRemainGDP_ann = Variable(index = [year, region], unit = "\$/person")
-    rgdp_per_cap_NonMarketRemainGDP_ann_sum = Variable(unit = "\$/person") # for analysis
-    iref_ImpactatReferenceGDPperCap = Variable(index = [time, region], unit = "%")
-    iref_ImpactatReferenceGDPperCap_ann = Variable(index = [year, region], unit = "%")
-    igdp_ImpactatActualGDPperCap = Variable(index = [time, region], unit = "%")
-    igdp_ImpactatActualGDPperCap_ann = Variable(index = [year, region], unit = "%")
-    isat_ImpactinclSaturationandAdaptation = Variable(index = [time,region], unit = "\$")
-    isat_ImpactinclSaturationandAdaptation_ann = Variable(index = [year, region], unit = "\$")
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index = [time,region], unit = "\$/person")
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann = Variable(index = [year, region], unit = "\$/person")
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann_sum_nonmarket = Variable(unit = "\$/person") # for analysis
+    isatg_impactfxnsaturation = Parameter(unit="unitless")
+    rcons_per_cap_NonMarketRemainConsumption = Variable(index=[time, region], unit="\$/person")
+    rcons_per_cap_NonMarketRemainConsumption_ann = Variable(index=[year, region], unit="\$/person")
+    rgdp_per_cap_NonMarketRemainGDP = Variable(index=[time, region], unit="\$/person")
+    rgdp_per_cap_NonMarketRemainGDP_sum = Variable(unit="\$/person") # for analysis
+    rgdp_per_cap_NonMarketRemainGDP_ann = Variable(index=[year, region], unit="\$/person")
+    rgdp_per_cap_NonMarketRemainGDP_ann_sum = Variable(unit="\$/person") # for analysis
+    iref_ImpactatReferenceGDPperCap = Variable(index=[time, region], unit="%")
+    iref_ImpactatReferenceGDPperCap_ann = Variable(index=[year, region], unit="%")
+    igdp_ImpactatActualGDPperCap = Variable(index=[time, region], unit="%")
+    igdp_ImpactatActualGDPperCap_ann = Variable(index=[year, region], unit="%")
+    isat_ImpactinclSaturationandAdaptation = Variable(index=[time,region], unit="\$")
+    isat_ImpactinclSaturationandAdaptation_ann = Variable(index=[year, region], unit="\$")
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit="\$/person")
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann = Variable(index=[year, region], unit="\$/person")
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann_sum_nonmarket = Variable(unit="\$/person") # for analysis
 
 
     function run_timestep(p, v, d, t)
