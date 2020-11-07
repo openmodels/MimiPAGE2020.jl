@@ -50,57 +50,57 @@ end
 
     region = Index()
     year = Index()
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_0 = Parameter(unit = "year")
-    y_year_ann = Parameter(index = [year], unit = "year")
-    yagg_periodspan = Parameter(index = [time], unit = "year") # for doing in-component aggregation
+    y_year = Parameter(index=[time], unit="year")
+    y_year_0 = Parameter(unit="year")
+    y_year_ann = Parameter(index=[year], unit="year")
+    yagg_periodspan = Parameter(index=[time], unit="year") # for doing in-component aggregation
 
-    rand_discontinuity = Parameter(unit = "unitless", default = .5)
+    rand_discontinuity = Parameter(unit="unitless", default=.5)
 
-    irefeqdis_eqdiscimpact = Variable(index = [region], unit = "%")
-    wincf_weightsfactor_sea = Parameter(index = [region], unit = "")
-    wdis_gdplostdisc = Parameter(unit = "%", default = 3.)
+    irefeqdis_eqdiscimpact = Variable(index=[region], unit="%")
+    wincf_weightsfactor_sea = Parameter(index=[region], unit="")
+    wdis_gdplostdisc = Parameter(unit="%", default=3.)
 
-    igdpeqdis_eqdiscimpact = Variable(index = [time,region], unit = "%")
-    igdpeqdis_eqdiscimpact_ann = Variable(index = [year,region], unit = "%")
-    rgdp_per_cap_NonMarketRemainGDP = Parameter(index = [time,region], unit = "\$/person")
-    rgdp_per_cap_NonMarketRemainGDP_ann = Parameter(index = [year,region], unit = "\$/person")
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
-    ipow_incomeexponent = Parameter(unit = "unitless", default = -0.13333333333333333)
+    igdpeqdis_eqdiscimpact = Variable(index=[time,region], unit="%")
+    igdpeqdis_eqdiscimpact_ann = Variable(index=[year,region], unit="%")
+    rgdp_per_cap_NonMarketRemainGDP = Parameter(index=[time,region], unit="\$/person")
+    rgdp_per_cap_NonMarketRemainGDP_ann = Parameter(index=[year,region], unit="\$/person")
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
+    ipow_incomeexponent = Parameter(unit="unitless", default=-0.13333333333333333)
 
-    igdp_realizeddiscimpact = Variable(index = [time,region], unit = "%")
-    igdp_realizeddiscimpact_ann = Variable(index = [year,region], unit = "%")
-    occurdis_occurrencedummy = Variable(index = [time], unit = "unitless")
-    occurdis_occurrencedummy_sum = Variable(unit = "unitless") # for analysis
-    occurdis_occurrencedummy_ann = Variable(index = [year], unit = "unitless")
-    occurdis_occurrencedummy_ann_sum = Variable(unit = "unitless") # for analysis
-    expfdis_discdecay = Variable(index = [time], unit = "unitless")
-    expfdis_discdecay_ann = Variable(index = [year], unit = "unitless")
+    igdp_realizeddiscimpact = Variable(index=[time,region], unit="%")
+    igdp_realizeddiscimpact_ann = Variable(index=[year,region], unit="%")
+    occurdis_occurrencedummy = Variable(index=[time], unit="unitless")
+    occurdis_occurrencedummy_sum = Variable(unit="unitless") # for analysis
+    occurdis_occurrencedummy_ann = Variable(index=[year], unit="unitless")
+    occurdis_occurrencedummy_ann_sum = Variable(unit="unitless") # for analysis
+    expfdis_discdecay = Variable(index=[time], unit="unitless")
+    expfdis_discdecay_ann = Variable(index=[year], unit="unitless")
 
 
-    distau_discontinuityexponent = Parameter(unit = "unitless", default = 20.)
+    distau_discontinuityexponent = Parameter(unit="unitless", default=20.)
 
-    idis_lossfromdisc = Variable(index = [time], unit = "degreeC")
-    idis_lossfromdisc_ann = Variable(index = [year], unit = "degreeC")
-    tdis_tolerabilitydisc = Parameter(unit = "degreeC", default = 1.5)
-    rt_g_globaltemperature = Parameter(index = [time], unit = "degreeC")
-    rt_g_globaltemperature_ann = Parameter(index = [year], unit = "degreeC")
-    pdis_probability = Parameter(unit = "%/degreeC", default = 20.)
+    idis_lossfromdisc = Variable(index=[time], unit="degreeC")
+    idis_lossfromdisc_ann = Variable(index=[year], unit="degreeC")
+    tdis_tolerabilitydisc = Parameter(unit="degreeC", default=1.5)
+    rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
+    rt_g_globaltemperature_ann = Parameter(index=[year], unit="degreeC")
+    pdis_probability = Parameter(unit="%/degreeC", default=20.)
 
-    isatg_saturationmodification = Parameter(unit = "unitless")
-    isat_satdiscimpact = Variable(index = [time,region], unit = "%")
-    isat_satdiscimpact_ann = Variable(index = [year,region], unit = "%")
+    isatg_saturationmodification = Parameter(unit="unitless")
+    isat_satdiscimpact = Variable(index=[time,region], unit="%")
+    isat_satdiscimpact_ann = Variable(index=[year,region], unit="%")
 
-    isat_per_cap_DiscImpactperCapinclSaturation = Variable(index = [time,region], unit = "\$/person")
-    isat_per_cap_DiscImpactperCapinclSaturation_sum = Variable(unit = "\$/person") # for analysis
-    isat_per_cap_DiscImpactperCapinclSaturation_ann = Variable(index = [year,region], unit = "\$/person")
-    isat_per_cap_DiscImpactperCapinclSaturation_ann_sum = Variable(unit = "\$/person") # for analysis
-    rcons_per_cap_DiscRemainConsumption = Variable(index = [time, region], unit = "\$/person")
-    rcons_per_cap_DiscRemainConsumption_sum =  Variable(unit = "\$/person") # for analysis
-    rcons_per_cap_DiscRemainConsumption_ann = Variable(index = [year, region], unit = "\$/person")
-    rcons_per_cap_DiscRemainConsumption_ann_sum = Variable(unit = "\$/person") # for analysis
-    rcons_per_cap_NonMarketRemainConsumption = Parameter(index = [time, region], unit = "\$/person")
-    rcons_per_cap_NonMarketRemainConsumption_ann = Parameter(index = [year, region], unit = "\$/person")
+    isat_per_cap_DiscImpactperCapinclSaturation = Variable(index=[time,region], unit="\$/person")
+    isat_per_cap_DiscImpactperCapinclSaturation_sum = Variable(unit="\$/person") # for analysis
+    isat_per_cap_DiscImpactperCapinclSaturation_ann = Variable(index=[year,region], unit="\$/person")
+    isat_per_cap_DiscImpactperCapinclSaturation_ann_sum = Variable(unit="\$/person") # for analysis
+    rcons_per_cap_DiscRemainConsumption = Variable(index=[time, region], unit="\$/person")
+    rcons_per_cap_DiscRemainConsumption_sum =  Variable(unit="\$/person") # for analysis
+    rcons_per_cap_DiscRemainConsumption_ann = Variable(index=[year, region], unit="\$/person")
+    rcons_per_cap_DiscRemainConsumption_ann_sum = Variable(unit="\$/person") # for analysis
+    rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, region], unit="\$/person")
+    rcons_per_cap_NonMarketRemainConsumption_ann = Parameter(index=[year, region], unit="\$/person")
 
 
     function run_timestep(p, v, d, t)

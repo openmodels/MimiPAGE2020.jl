@@ -1,21 +1,21 @@
 @defcomp TaxDrivenGrowth begin
     region = Index()
 
-    taxrate = Parameter(index = [time], unit = "\$/tonne")
+    taxrate = Parameter(index=[time], unit="\$/tonne")
 
     # From external files
-    e0_baselineemissions = Parameter(index = [region], unit = "Mtonne/year")
+    e0_baselineemissions = Parameter(index=[region], unit="Mtonne/year")
 
     # From the AbatementCostParameters
-    zc_zerocostemissions = Parameter(index = [time, region], unit = "%")
-    q0_absolutecutbacksatnegativecost = Parameter(index = [time, region], unit = "Mtonne")
-    blo = Parameter(index = [time, region], unit = "per Mtonne")
-    alo = Parameter(index = [time, region], unit = "\$/tonne")
-    bhi = Parameter(index = [time, region], unit = "per Mtonne")
-    ahi = Parameter(index = [time, region], unit = "\$/tonne")
+    zc_zerocostemissions = Parameter(index=[time, region], unit="%")
+    q0_absolutecutbacksatnegativecost = Parameter(index=[time, region], unit="Mtonne")
+    blo = Parameter(index=[time, region], unit="per Mtonne")
+    alo = Parameter(index=[time, region], unit="\$/tonne")
+    bhi = Parameter(index=[time, region], unit="per Mtonne")
+    ahi = Parameter(index=[time, region], unit="\$/tonne")
 
     # Outputs to AbatementCosts
-    er_emissionsgrowth = Variable(index = [time,region], unit = "%")
+    er_emissionsgrowth = Variable(index=[time,region], unit="%")
 
     function run_timestep(p, v, d, t)
 
@@ -52,7 +52,7 @@ end
 
 function addtaxdrivengrowth(model::Model, class::Symbol)
     componentname = Symbol("TaxDrivenGrowth$class")
-    add_comp!(model, TaxDrivenGrowth, componentname, after = Symbol("AbatementCostParameters$class"))
+    add_comp!(model, TaxDrivenGrowth, componentname, after=Symbol("AbatementCostParameters$class"))
 
     if class == :CO2
         setdistinctparameter(model, componentname, :e0_baselineemissions, readpagedata(model, "data/e0_baselineCO2emissions.csv"))
@@ -70,12 +70,12 @@ end
 @defcomp UniformTaxDrivenGrowth begin
     region = Index()
 
-    uniformtax = Parameter(index = [time], unit = "\$/tonne")
+    uniformtax = Parameter(index=[time], unit="\$/tonne")
 
-    taxrate_CO2 = Variable(index = [time], unit = "\$/tonne")
-    taxrate_CH4 = Variable(index = [time], unit = "\$/tonne")
-    taxrate_N2O = Variable(index = [time], unit = "\$/tonne")
-    taxrate_Lin = Variable(index = [time], unit = "\$/tonne")
+    taxrate_CO2 = Variable(index=[time], unit="\$/tonne")
+    taxrate_CH4 = Variable(index=[time], unit="\$/tonne")
+    taxrate_N2O = Variable(index=[time], unit="\$/tonne")
+    taxrate_Lin = Variable(index=[time], unit="\$/tonne")
 
     function run_timestep(p, v, d, t)
 
@@ -87,14 +87,14 @@ end
 end
 
 """Construct a model with a uniform (global and all gases, but time-varying) tax."""
-function getuniformtaxmodel(scenario::String = "RCP4.5 & SSP2")
+function getuniformtaxmodel(scenario::String="RCP4.5 & SSP2")
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
 
     buildpage(m, scenario)
 
-    add_comp!(m, UniformTaxDrivenGrowth, after = :GDP) # before all abatement costs parameters
+    add_comp!(m, UniformTaxDrivenGrowth, after=:GDP) # before all abatement costs parameters
     set_param!(m, :UniformTaxDrivenGrowth, :uniformtax, zeros(10))
 
     for class in [:CO2, :CH4, :N2O, :Lin]

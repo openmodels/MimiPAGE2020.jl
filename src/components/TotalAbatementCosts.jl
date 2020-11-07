@@ -3,14 +3,14 @@
 @defcomp TotalAbatementCosts begin
     region = Index()
 
-    tc_totalcosts_co2 = Parameter(index = [time, region], unit = "\$million")
-    tc_totalcosts_ch4 = Parameter(index = [time, region], unit = "\$million")
-    tc_totalcosts_n2o = Parameter(index = [time, region], unit = "\$million")
-    tc_totalcosts_linear = Parameter(index = [time, region], unit = "\$million")
-    pop_population = Parameter(index = [time, region], unit = "million person")
+    tc_totalcosts_co2 = Parameter(index=[time, region], unit="\$million")
+    tc_totalcosts_ch4 = Parameter(index=[time, region], unit="\$million")
+    tc_totalcosts_n2o = Parameter(index=[time, region], unit="\$million")
+    tc_totalcosts_linear = Parameter(index=[time, region], unit="\$million")
+    pop_population = Parameter(index=[time, region], unit="million person")
 
-    tct_totalcosts = Variable(index = [time,region], unit = "\$million")
-    tct_per_cap_totalcostspercap = Variable(index = [time,region], unit = "\$/person")
+    tct_totalcosts = Variable(index=[time,region], unit="\$million")
+    tct_per_cap_totalcostspercap = Variable(index=[time,region], unit="\$/person")
 
     function run_timestep(p, v, d, t)
 

@@ -1,10 +1,10 @@
 @defcomp n2oemissions begin
     region = Index()
 
-    e_globalN2Oemissions = Variable(index = [time], unit = "Mtonne/year")
-    e0_baselineN2Oemissions = Parameter(index = [region], unit = "Mtonne/year")
-    e_regionalN2Oemissions = Variable(index = [time,region], unit = "Mtonne/year")
-    er_N2Oemissionsgrowth = Parameter(index = [time,region], unit = "%")
+    e_globalN2Oemissions = Variable(index=[time], unit="Mtonne/year")
+    e0_baselineN2Oemissions = Parameter(index=[region], unit="Mtonne/year")
+    e_regionalN2Oemissions = Variable(index=[time,region], unit="Mtonne/year")
+    er_N2Oemissionsgrowth = Parameter(index=[time,region], unit="%")
 
     function run_timestep(p, v, d, t)
         # note that Hope (2009) states that Equations 1-12 for methane also apply to N2O

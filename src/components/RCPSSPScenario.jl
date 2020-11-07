@@ -10,26 +10,26 @@
     rcp = Parameter{Int64}() # like rcp26
     ssp = Parameter{Int64}() # like ssp1
 
-    y_year = Parameter(index = [time], unit = "year")
-    weight_scenarios = Parameter(unit = "%") # from -100% to 100%, only used for sspw, rcpw
+    y_year = Parameter(index=[time], unit="year")
+    weight_scenarios = Parameter(unit="%") # from -100% to 100%, only used for sspw, rcpw
 
-    extra_abate_rate = Parameter(unit = "%/year") # only used for rcp26extra
-    extra_abate_start = Parameter(unit = "year")
-    extra_abate_end = Parameter(unit = "year")
+    extra_abate_rate = Parameter(unit="%/year") # only used for rcp26extra
+    extra_abate_start = Parameter(unit="year")
+    extra_abate_end = Parameter(unit="year")
 
     # RCP scenario values
-    er_CO2emissionsgrowth = Variable(index = [time,region], unit = "%")
-    er_CH4emissionsgrowth = Variable(index = [time,region], unit = "%")
-    er_N2Oemissionsgrowth = Variable(index = [time,region], unit = "%")
-    er_LGemissionsgrowth = Variable(index = [time,region], unit = "%")
-    pse_sulphatevsbase = Variable(index = [time, region], unit = "%")
-    exf_excessforcing = Variable(index = [time], unit = "W/m2")
+    er_CO2emissionsgrowth = Variable(index=[time,region], unit="%")
+    er_CH4emissionsgrowth = Variable(index=[time,region], unit="%")
+    er_N2Oemissionsgrowth = Variable(index=[time,region], unit="%")
+    er_LGemissionsgrowth = Variable(index=[time,region], unit="%")
+    pse_sulphatevsbase = Variable(index=[time, region], unit="%")
+    exf_excessforcing = Variable(index=[time], unit="W/m2")
 
-    extra_abate_compound = Variable(index = [time])
+    extra_abate_compound = Variable(index=[time])
 
     # SSP scenario values
-    popgrw_populationgrowth = Variable(index = [time, region], unit = "%/year") # From p.32 of Hope 2009
-    grw_gdpgrowthrate = Variable(index = [time, region], unit = "%/year") # From p.32 of Hope 2009
+    popgrw_populationgrowth = Variable(index=[time, region], unit="%/year") # From p.32 of Hope 2009
+    grw_gdpgrowthrate = Variable(index=[time, region], unit="%/year") # From p.32 of Hope 2009
 
 
     function init(p, v, d)

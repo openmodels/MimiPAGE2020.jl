@@ -267,7 +267,7 @@ function getsim()
 end
 
 # Reformat the RV results into the format used for testing
-function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__DIR__, "../../output"))
+function reformat_RV_outputs(samplesize::Int; output_path::String=joinpath(@__DIR__, "../../output"))
 
     # create vectors to hold results of Monte Carlo runs
     td = zeros(samplesize);
@@ -301,53 +301,53 @@ function reformat_RV_outputs(samplesize::Int; output_path::String = joinpath(@__
 
     # load raw data
     # no filter
-    td      = load_RV("EquityWeighting_td_totaldiscountedimpacts", "td_totaldiscountedimpacts"; output_path = output_path)
-    td_ann      = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann", "td_totaldiscountedimpacts_ann"; output_path = output_path)
-    tpc     = load_RV("EquityWeighting_tpc_totalaggregatedcosts", "tpc_totalaggregatedcosts"; output_path = output_path)
-    tpc_ann     = load_RV("EquityWeighting_tpc_totalaggregatedcosts_ann", "tpc_totalaggregatedcosts_ann"; output_path = output_path)
-    tac     = load_RV("EquityWeighting_tac_totaladaptationcosts", "tac_totaladaptationcosts"; output_path = output_path)
-    tac_ann     = load_RV("EquityWeighting_tac_totaladaptationcosts_ann", "tac_totaladaptationcosts_ann"; output_path = output_path)
-    te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path = output_path)
-    te_ann      = load_RV("EquityWeighting_te_totaleffect_ann", "te_totaleffect_ann"; output_path = output_path)
+    td      = load_RV("EquityWeighting_td_totaldiscountedimpacts", "td_totaldiscountedimpacts"; output_path=output_path)
+    td_ann      = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann", "td_totaldiscountedimpacts_ann"; output_path=output_path)
+    tpc     = load_RV("EquityWeighting_tpc_totalaggregatedcosts", "tpc_totalaggregatedcosts"; output_path=output_path)
+    tpc_ann     = load_RV("EquityWeighting_tpc_totalaggregatedcosts_ann", "tpc_totalaggregatedcosts_ann"; output_path=output_path)
+    tac     = load_RV("EquityWeighting_tac_totaladaptationcosts", "tac_totaladaptationcosts"; output_path=output_path)
+    tac_ann     = load_RV("EquityWeighting_tac_totaladaptationcosts_ann", "tac_totaladaptationcosts_ann"; output_path=output_path)
+    te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path=output_path)
+    te_ann      = load_RV("EquityWeighting_te_totaleffect_ann", "te_totaleffect_ann"; output_path=output_path)
 
     # time index
-    c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path = output_path)
-    ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path = output_path)
-    rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path = output_path)
-    rt_g_ann    = load_RV("ClimateTemperature_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path = output_path)
-    s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path = output_path)
-    te_ann_yr      = load_RV("EquityWeighting_te_totaleffect_ann_yr", "te_totaleffect_ann_yr"; output_path = output_path)
-    td_ann_yr   = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann_yr", "td_totaldiscountedimpacts_ann_yr"; output_path = output_path)
+    c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path=output_path)
+    ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path=output_path)
+    rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path=output_path)
+    rt_g_ann    = load_RV("ClimateTemperature_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path=output_path)
+    s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path=output_path)
+    te_ann_yr      = load_RV("EquityWeighting_te_totaleffect_ann_yr", "te_totaleffect_ann_yr"; output_path=output_path)
+    td_ann_yr   = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann_yr", "td_totaldiscountedimpacts_ann_yr"; output_path=output_path)
 
     # region index
-    rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path = output_path)
-    rgdppercap_slr_ann          = load_RV("MarketDamagesBurke_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path = output_path) # note that the SLR module in itself is not annualised, Burke=default
-    rgdppercap_market       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path = output_path)
-    rgdppercap_market_ann       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path = output_path)
-    rimpactpercap_market_ann       = load_RV("MarketDamagesBurke_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path = output_path)
-    rgdppercap_nonmarket    = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path)
-    rgdppercap_nonmarket_ann    = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path)
-    rimpactpercap_nonmarket_ann    = load_RV("NonMarketDamages_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path = output_path)
-    rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path = output_path) # redundant?
-    rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path = output_path) # redundant?
-    rimpactpercap_disc_ann         = load_RV("Discontinuity_isat_per_cap_DiscImpactperCapinclSaturation_ann", "isat_per_cap_DiscImpactperCapinclSaturation_ann"; output_path = output_path)
-    gdp = load_RV("EquityWeighting_cons_percap_consumption_ann", "cons_percap_consumption_ann"; output_path = output_path)
-    pop = load_RV("EquityWeighting_pop_population_ann", "pop_population_ann"; output_path = output_path)
+    rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path=output_path)
+    rgdppercap_slr_ann          = load_RV("MarketDamagesBurke_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path=output_path) # note that the SLR module in itself is not annualised, Burke=default
+    rgdppercap_market       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path=output_path)
+    rgdppercap_market_ann       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path=output_path)
+    rimpactpercap_market_ann       = load_RV("MarketDamagesBurke_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path=output_path)
+    rgdppercap_nonmarket    = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path=output_path)
+    rgdppercap_nonmarket_ann    = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path=output_path)
+    rimpactpercap_nonmarket_ann    = load_RV("NonMarketDamages_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path=output_path)
+    rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path=output_path) # redundant?
+    rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path=output_path) # redundant?
+    rimpactpercap_disc_ann         = load_RV("Discontinuity_isat_per_cap_DiscImpactperCapinclSaturation_ann", "isat_per_cap_DiscImpactperCapinclSaturation_ann"; output_path=output_path)
+    gdp = load_RV("EquityWeighting_cons_percap_consumption_ann", "cons_percap_consumption_ann"; output_path=output_path)
+    pop = load_RV("EquityWeighting_pop_population_ann", "pop_population_ann"; output_path=output_path)
 
 
     # resave aggregate data
-    df = DataFrame(td = td, td_ann = td_ann, tpc = tpc, tpc_ann = tpc_ann, tac = tac, tac_ann = tac_ann, te = te, te_ann = te_ann, c_co2concentration = c_co2concentration, ft = ft, rt_g = rt_g, sealevel = s, rgdppercap_slr = rgdppercap_slr, rgdppercap_market = rgdppercap_market, rgdppercap_nonmarket = rgdppercap_nonmarket, rgdppercap_di = rgdppercap_disc)
+    df = DataFrame(td=td, td_ann=td_ann, tpc=tpc, tpc_ann=tpc_ann, tac=tac, tac_ann=tac_ann, te=te, te_ann=te_ann, c_co2concentration=c_co2concentration, ft=ft, rt_g=rt_g, sealevel=s, rgdppercap_slr=rgdppercap_slr, rgdppercap_market=rgdppercap_market, rgdppercap_nonmarket=rgdppercap_nonmarket, rgdppercap_di=rgdppercap_disc)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_aggregate_global.csv"), df)
     # resave annual data
-    df = DataFrame(rt_g_ann = rt_g_ann, te_ann_yr = te_ann_yr, td_ann_yr = td_ann_yr)
+    df = DataFrame(rt_g_ann=rt_g_ann, te_ann_yr=te_ann_yr, td_ann_yr=td_ann_yr)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_global.csv"), df)
     # resave annual and regional data
-    df = DataFrame(rgdppercap_slr_ann = rgdppercap_slr_ann, rgdppercap_market_ann = rgdppercap_market_ann, rimpactpercap_market_ann = rimpactpercap_market_ann, rgdppercap_nonmarket_ann = rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann = rimpactpercap_nonmarket_ann, rgdppercap_di_ann = rgdppercap_disc_ann, rgdppercap_disc_ann = rgdppercap_disc_ann, gdp = gdp, pop = pop)
+    df = DataFrame(rgdppercap_slr_ann=rgdppercap_slr_ann, rgdppercap_market_ann=rgdppercap_market_ann, rimpactpercap_market_ann=rimpactpercap_market_ann, rgdppercap_nonmarket_ann=rgdppercap_nonmarket_ann, rimpactpercap_nonmarket_ann=rimpactpercap_nonmarket_ann, rgdppercap_di_ann=rgdppercap_disc_ann, rgdppercap_disc_ann=rgdppercap_disc_ann, gdp=gdp, pop=pop)
     CSV.write(joinpath(output_path, "mimipagemontecarlooutput_annual_regional.csv"), df)
 
 end
 
-function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2", output_path::String = joinpath(@__DIR__, "../../output"))
+function do_monte_carlo_runs(samplesize::Int, scenario::String="RCP4.5 & SSP2", output_path::String=joinpath(@__DIR__, "../../output"))
     # get simulation
     mcs = getsim()
 
@@ -356,9 +356,9 @@ function do_monte_carlo_runs(samplesize::Int, scenario::String = "RCP4.5 & SSP2"
     run(m)
 
     # Run
-    res = run(mcs, m, samplesize; trials_output_filename = joinpath(output_path, "trialdata.csv"), results_output_dir = output_path)
+    res = run(mcs, m, samplesize; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)
 
     # reformat outputs for testing and analysis
-    reformat_RV_outputs(samplesize, output_path = output_path)
+    reformat_RV_outputs(samplesize, output_path=output_path)
 end
 

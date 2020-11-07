@@ -5,11 +5,11 @@ using CSV
 import Mimi.has_parameter
 
 include("../src/mcs.jl")
-df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header = false)
-rfrow0 = findfirst(x->!ismissing(x) && x == "RF in 2100", df[!, 1])
-gmstrow0 = findfirst(x->!ismissing(x) && x == "Temp. in 2100", df[!, 1])
-slrrow0 = findfirst(x->!ismissing(x) && x == "SLR in 2100", df[!, 1])
-terow0 = findfirst(x->!ismissing(x) && x == "Total effect NPV", df[!, 1])
+df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header=false)
+rfrow0 = findfirst(x -> !ismissing(x) && x == "RF in 2100", df[!, 1])
+gmstrow0 = findfirst(x -> !ismissing(x) && x == "Temp. in 2100", df[!, 1])
+slrrow0 = findfirst(x -> !ismissing(x) && x == "SLR in 2100", df[!, 1])
+terow0 = findfirst(x -> !ismissing(x) && x == "Total effect NPV", df[!, 1])
 
 mcs = getsim()
 
@@ -54,7 +54,7 @@ for testscen in 2:size(df)[2]
 
     # Run for MC
     output_path = joinpath(@__DIR__, "../output")
-    res = run(mcs, m, 1000; trials_output_filename = joinpath(output_path, "trialdata.csv"), results_output_dir = output_path)
+    res = run(mcs, m, 1000; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)
 
     ## This isn't quite the right comparison
     # forcing = m[:TotalForcing, :ft_totalforcing][6]

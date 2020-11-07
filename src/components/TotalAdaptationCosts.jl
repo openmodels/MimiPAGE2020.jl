@@ -3,13 +3,13 @@
 @defcomp TotalAdaptationCosts begin
     region = Index()
     # Total Adaptation Costs
-    pop_population = Parameter(index = [time, region], unit = "million person")
-    ac_adaptationcosts_economic = Parameter(index = [time, region], unit = "\$million")
-    ac_adaptationcosts_noneconomic = Parameter(index = [time, region], unit = "\$million")
-    ac_adaptationcosts_sealevelrise = Parameter(index = [time, region], unit = "\$million")
+    pop_population = Parameter(index=[time, region], unit="million person")
+    ac_adaptationcosts_economic = Parameter(index=[time, region], unit="\$million")
+    ac_adaptationcosts_noneconomic = Parameter(index=[time, region], unit="\$million")
+    ac_adaptationcosts_sealevelrise = Parameter(index=[time, region], unit="\$million")
 
-    act_adaptationcosts_total = Variable(index = [time, region], unit = "\$million")
-    act_percap_adaptationcosts = Variable(index = [time, region], unit = "\$/person")
+    act_adaptationcosts_total = Variable(index=[time, region], unit="\$million")
+    act_percap_adaptationcosts = Variable(index=[time, region], unit="\$/person")
 
     function run_timestep(p, v, d, t)
 

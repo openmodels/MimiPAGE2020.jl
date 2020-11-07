@@ -67,77 +67,77 @@ end
     year = Index()
 
     # Basic parameters
-    area = Parameter(index = [region], unit = "km^2")
-    y_year_0 = Parameter(unit = "year")
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_ann = Parameter(index = [year], unit = "year")
-    area_e_eartharea = Parameter(unit = "km2", default = 5.1e8)
+    area = Parameter(index=[region], unit="km^2")
+    y_year_0 = Parameter(unit="year")
+    y_year = Parameter(index=[time], unit="year")
+    y_year_ann = Parameter(index=[year], unit="year")
+    area_e_eartharea = Parameter(unit="km2", default=5.1e8)
     use_seaice = Parameter{Bool}()
 
     # Initial temperature outputs
-    rt_g0_baseglobaltemp = Parameter(unit = "degreeC", default = 0.9461666666666667) # needed for feedback in CO2 cycle component
-    rtl_0_baselandtemp = Variable(index = [region], unit = "degreeC")
-    rtl_g0_baselandtemp = Variable(unit = "degreeC") # needed for feedback in CH4 and N2O cycles
+    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component
+    rtl_0_baselandtemp = Variable(index=[region], unit="degreeC")
+    rtl_g0_baselandtemp = Variable(unit="degreeC") # needed for feedback in CH4 and N2O cycles
 
     # variability parameters
-    tvarorder_arestimatesrows = Parameter(index = [region], unit = "none")
-    tvarseed_coefficientsrandomseed = Parameter(unit = "none")
-    tvarerr_g_globaltemperatureerrorvariance = Variable(unit = "degreeC^2")
-    tvarconst_g_globaltemperatureintercept = Variable(unit = "degreeC")
-    tvarar_g_globaltemperatureautoreg = Variable(unit = "none")
-    tvargmst_g_globaltemperaturesmoothdep = Variable(unit = "none")
-    tvarerr_regionaltemperatureerrorvariance = Variable(index = [region], unit = "degreeC^2")
-    tvarconst_regionaltemperatureintercept = Variable(index = [region], unit = "degreeC")
-    tvarar_regionaltemperatureautoreg = Variable(index = [region], unit = "none")
-    tvargmst_regionaltemperatureglobaldep = Variable(index = [region], unit = "none")
+    tvarorder_arestimatesrows = Parameter(index=[region], unit="none")
+    tvarseed_coefficientsrandomseed = Parameter(unit="none")
+    tvarerr_g_globaltemperatureerrorvariance = Variable(unit="degreeC^2")
+    tvarconst_g_globaltemperatureintercept = Variable(unit="degreeC")
+    tvarar_g_globaltemperatureautoreg = Variable(unit="none")
+    tvargmst_g_globaltemperaturesmoothdep = Variable(unit="none")
+    tvarerr_regionaltemperatureerrorvariance = Variable(index=[region], unit="degreeC^2")
+    tvarconst_regionaltemperatureintercept = Variable(index=[region], unit="degreeC")
+    tvarar_regionaltemperatureautoreg = Variable(index=[region], unit="none")
+    tvargmst_regionaltemperatureglobaldep = Variable(index=[region], unit="none")
 
     # Rate of change of forcing
-    fant_anthroforcing = Parameter(index = [time], unit = "W/m2")
-    ft_0_totalforcing0 = Parameter(unit = "W/m2", default = 3.202)
-    fsd_g_0_directsulphate0 = Parameter(unit = "W/m2", default = -0.46666666666666673)
-    fsi_g_0_indirectsulphate0 = Parameter(unit = "W/m2", default = -0.17529148701061475)
+    fant_anthroforcing = Parameter(index=[time], unit="W/m2")
+    ft_0_totalforcing0 = Parameter(unit="W/m2", default=3.202)
+    fsd_g_0_directsulphate0 = Parameter(unit="W/m2", default=-0.46666666666666673)
+    fsi_g_0_indirectsulphate0 = Parameter(unit="W/m2", default=-0.17529148701061475)
 
     # Climate sensitivity calculations
-    tcr_transientresponse = Parameter(unit = "degreeC", default = 1.7666666666666668)
-    frt_warminghalflife = Parameter(unit = "year", default = 28.333333333333332)
+    tcr_transientresponse = Parameter(unit="degreeC", default=1.7666666666666668)
+    frt_warminghalflife = Parameter(unit="year", default=28.333333333333332)
 
-    ecs_climatesensitivity = Variable(unit = "degreeC")
+    ecs_climatesensitivity = Variable(unit="degreeC")
 
     # Unadjusted temperature calculations
-    fslope_CO2forcingslope = Parameter(unit = "W/m2", default = 5.5)
-    pt_g_preliminarygmst = Variable(index = [time], unit = "degreeC")
-    pt_g_preliminarygmst_ann = Variable(index = [year], unit = "degreeC")
+    fslope_CO2forcingslope = Parameter(unit="W/m2", default=5.5)
+    pt_g_preliminarygmst = Variable(index=[time], unit="degreeC")
+    pt_g_preliminarygmst_ann = Variable(index=[year], unit="degreeC")
 
     # Surface albedo parameters
-    alb_t_switch = Parameter(default = 10.0)
-    alb_saf_quadr_mean_t2_coeff = Parameter(default = -0.001955963673212411)
-    alb_saf_quadr_mean_t1_coeff = Parameter(default = -0.006407351323331157)
-    alb_saf_quadr_mean_t0_coeff = Parameter(default = 0.36372124028281877)
-    alb_saf_quadr_std = Parameter(default = 0.10908771841232413)
-    alb_saf_lin_mean = Parameter(default = 0.0636051293985324)
-    alb_saf_lin_std = Parameter(default = 0.02907749205894582)
-    alb_emulator_rand = Parameter(default = 0)
+    alb_t_switch = Parameter(default=10.0)
+    alb_saf_quadr_mean_t2_coeff = Parameter(default=-0.001955963673212411)
+    alb_saf_quadr_mean_t1_coeff = Parameter(default=-0.006407351323331157)
+    alb_saf_quadr_mean_t0_coeff = Parameter(default=0.36372124028281877)
+    alb_saf_quadr_std = Parameter(default=0.10908771841232413)
+    alb_saf_lin_mean = Parameter(default=0.0636051293985324)
+    alb_saf_lin_std = Parameter(default=0.02907749205894582)
+    alb_emulator_rand = Parameter(default=0)
 
     # Surface albedo internal variables
-    alb_fsaf_y0 = Variable(unit = "W/m2")
-    alb_saf_y0 = Variable(unit = "W/m2/degC")
-    alb_fsaf_ecs = Variable(unit = "W/m2")
-    alb_saf_ecs = Variable(unit = "W/m2/degC")
-    alb_fsaf_t_switch = Variable(unit = "W/m2")
+    alb_fsaf_y0 = Variable(unit="W/m2")
+    alb_saf_y0 = Variable(unit="W/m2/degC")
+    alb_fsaf_ecs = Variable(unit="W/m2")
+    alb_saf_ecs = Variable(unit="W/m2/degC")
+    alb_fsaf_t_switch = Variable(unit="W/m2")
 
     # Global outputs
-    rt_g_globaltemperature = Variable(index = [time], unit = "degreeC")
-    rt_g_globaltemperature_ann = Variable(index = [year], unit = "degreeC")
-    rto_g_oceantemperature = Variable(index = [time], unit = "degreeC")
-    rto_g_oceantemperature_ann = Variable(index = [year], unit = "degreeC")
-    rtl_g_landtemperature = Variable(index = [time], unit = "degreeC")
-    rtl_g_landtemperature_ann = Variable(index = [year], unit = "degreeC")
+    rt_g_globaltemperature = Variable(index=[time], unit="degreeC")
+    rt_g_globaltemperature_ann = Variable(index=[year], unit="degreeC")
+    rto_g_oceantemperature = Variable(index=[time], unit="degreeC")
+    rto_g_oceantemperature_ann = Variable(index=[year], unit="degreeC")
+    rtl_g_landtemperature = Variable(index=[time], unit="degreeC")
+    rtl_g_landtemperature_ann = Variable(index=[year], unit="degreeC")
 
     # Regional outputs
-    ampf_amplification = Parameter(index = [region])
+    ampf_amplification = Parameter(index=[region])
 
-    rtl_realizedtemperature = Variable(index = [time, region], unit = "degreeC")
-    rtl_realizedtemperature_ann = Variable(index = [year, region], unit = "degreeC")
+    rtl_realizedtemperature = Variable(index=[time, region], unit="degreeC")
+    rtl_realizedtemperature_ann = Variable(index=[year, region], unit="degreeC")
 
     function init(p, v, d)
         for rr in d.region
@@ -180,7 +180,7 @@ end
             v.tvarar_g_globaltemperatureautoreg = tvarar
             v.tvargmst_g_globaltemperaturesmoothdep = tvargmst
 
-            tvarconst, tvarar, tvargmst, tvarerr = tvar_getregions(p.tvarorder_arestimatesrows, rr->rand(rng, tvar_getmvnormal(rr)))
+            tvarconst, tvarar, tvargmst, tvarerr = tvar_getregions(p.tvarorder_arestimatesrows, rr -> rand(rng, tvar_getmvnormal(rr)))
             v.tvarconst_regionaltemperatureintercept[:] = tvarconst
             v.tvarar_regionaltemperatureautoreg[:] = tvarar
             v.tvargmst_regionaltemperatureglobaldep[:] = tvargmst
@@ -285,16 +285,16 @@ function tvar_getmvnormal(rr::Int64)
     MvNormal([tvarcoeffs...], tvarsigma)
 end
 
-function tvar_getregions(regionorder::Vector{Union{Missing, Float64}}, coeffproc::Function = tvar_getcoeffs)
+function tvar_getregions(regionorder::Vector{Union{Missing,Float64}}, coeffproc::Function=tvar_getcoeffs)
     tvar_getregions(convert(Vector{Float64}, regionorder), coeffproc)
 end
 
-function tvar_getregions(regionorder::Vector{Float64}, coeffproc::Function = tvar_getcoeffs)
+function tvar_getregions(regionorder::Vector{Float64}, coeffproc::Function=tvar_getcoeffs)
     regionorder = convert(Vector{Int64}, regionorder)
     tvar_getregions(regionorder, coeffproc)
 end
 
-function tvar_getregions(regionorder::Vector{Int64}, coeffproc::Function = tvar_getcoeffs)
+function tvar_getregions(regionorder::Vector{Int64}, coeffproc::Function=tvar_getcoeffs)
     regionorder = convert(Vector{Int64}, regionorder)
     tvarconst = zeros(length(regionorder))
     tvarar = zeros(length(regionorder))

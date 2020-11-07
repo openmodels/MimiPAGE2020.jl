@@ -2,101 +2,101 @@
     region = Index()
 
     # Basic information
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_0 = Parameter(unit = "year")
+    y_year = Parameter(index=[time], unit="year")
+    y_year_0 = Parameter(unit="year")
 
     # Impacts across all gases
-    pop_population = Parameter(index = [time, region], unit = "million person")
+    pop_population = Parameter(index=[time, region], unit="million person")
 
     # Total and Per-Capita Abatement and Adaptation Costs
-    tct_percap_totalcosts_total = Parameter(index = [time, region], unit = "\$/person")
-    act_adaptationcosts_total = Parameter(index = [time, region], unit = "\$million")
-    act_percap_adaptationcosts = Parameter(index = [time, region], unit = "\$/person")
+    tct_percap_totalcosts_total = Parameter(index=[time, region], unit="\$/person")
+    act_adaptationcosts_total = Parameter(index=[time, region], unit="\$million")
+    act_percap_adaptationcosts = Parameter(index=[time, region], unit="\$/person")
 
     # Consumption
-    cons_percap_consumption = Parameter(index = [time, region], unit = "\$/person") # Called "CONS_PER_CAP"
-    cons_percap_consumption_0 = Parameter(index = [region], unit = "\$/person")
-    cons_percap_aftercosts = Parameter(index = [time, region], unit = "\$/person")
+    cons_percap_consumption = Parameter(index=[time, region], unit="\$/person") # Called "CONS_PER_CAP"
+    cons_percap_consumption_0 = Parameter(index=[region], unit="\$/person")
+    cons_percap_aftercosts = Parameter(index=[time, region], unit="\$/person")
 
     # Calculation of weighted costs
-    emuc_utilityconvexity = Parameter(unit = "none", default = 1.1666666666666667)
+    emuc_utilityconvexity = Parameter(unit="none", default=1.1666666666666667)
 
-    wtct_percap_weightedcosts = Variable(index = [time, region], unit = "\$/person")
-    eact_percap_weightedadaptationcosts = Variable(index = [time, region], unit = "\$/person")
-    wact_percap_partiallyweighted = Variable(index = [time, region], unit = "\$/person")
-    wact_partiallyweighted = Variable(index = [time, region], unit = "\$million")
+    wtct_percap_weightedcosts = Variable(index=[time, region], unit="\$/person")
+    eact_percap_weightedadaptationcosts = Variable(index=[time, region], unit="\$/person")
+    wact_percap_partiallyweighted = Variable(index=[time, region], unit="\$/person")
+    wact_partiallyweighted = Variable(index=[time, region], unit="\$million")
 
     # Amount of equity weighting variable (0, (0, 1), or 1)
-    equity_proportion = Parameter(unit = "fraction", default = 1.0)
+    equity_proportion = Parameter(unit="fraction", default=1.0)
 
-    pct_percap_partiallyweighted = Variable(index = [time, region], unit = "\$/person")
-    pct_partiallyweighted = Variable(index = [time, region], unit = "\$million")
-    pct_g_partiallyweighted_global = Variable(index = [time], unit = "\$million")
+    pct_percap_partiallyweighted = Variable(index=[time, region], unit="\$/person")
+    pct_partiallyweighted = Variable(index=[time, region], unit="\$million")
+    pct_g_partiallyweighted_global = Variable(index=[time], unit="\$million")
 
     # Discount rates
-    ptp_timepreference = Parameter(unit = "%/year", default = 1.0333333333333334) # <0.1,1, 2>
-    grw_gdpgrowthrate = Parameter(index = [time, region], unit = "%/year")
-    popgrw_populationgrowth = Parameter(index = [time, region], unit = "%/year")
+    ptp_timepreference = Parameter(unit="%/year", default=1.0333333333333334) # <0.1,1, 2>
+    grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year")
+    popgrw_populationgrowth = Parameter(index=[time, region], unit="%/year")
 
-    dr_discountrate = Variable(index = [time, region], unit = "%/year")
-    yp_yearsperiod = Variable(index = [time], unit = "year") # defined differently from yagg
-    dfc_consumptiondiscountrate = Variable(index = [time, region], unit = "1/year")
+    dr_discountrate = Variable(index=[time, region], unit="%/year")
+    yp_yearsperiod = Variable(index=[time], unit="year") # defined differently from yagg
+    dfc_consumptiondiscountrate = Variable(index=[time, region], unit="1/year")
 
     df_utilitydiscountfactor = Variable(index=[time], unit="fraction")
 
     # Discounted costs
-    pcdt_partiallyweighted_discounted = Variable(index = [time, region], unit = "\$million")
-    pcdt_g_partiallyweighted_discountedglobal = Variable(index = [time], unit = "\$million")
+    pcdt_partiallyweighted_discounted = Variable(index=[time, region], unit="\$million")
+    pcdt_g_partiallyweighted_discountedglobal = Variable(index=[time], unit="\$million")
 
-    pcdat_partiallyweighted_discountedaggregated = Variable(index = [time, region], unit = "\$million")
-    tpc_totalaggregatedcosts = Variable(unit = "\$million")
+    pcdat_partiallyweighted_discountedaggregated = Variable(index=[time, region], unit="\$million")
+    tpc_totalaggregatedcosts = Variable(unit="\$million")
 
-    wacdt_partiallyweighted_discounted = Variable(index = [time, region], unit = "\$million")
+    wacdt_partiallyweighted_discounted = Variable(index=[time, region], unit="\$million")
 
     # Equity weighted impact totals
-    rcons_percap_dis = Parameter(index = [time, region], unit = "\$/person")
+    rcons_percap_dis = Parameter(index=[time, region], unit="\$/person")
 
     wit_partiallyweighted = Variable(index=[time, region], unit="\$million")
     widt_partiallyweighted_discounted = Variable(index=[time, region], unit="\$million")
 
-    yagg_periodspan = Parameter(index = [time], unit = "year")
+    yagg_periodspan = Parameter(index=[time], unit="year")
 
-    addt_equityweightedimpact_discountedaggregated = Variable(index = [time, region], unit = "\$million")
-    addt_gt_equityweightedimpact_discountedglobal = Variable(unit = "\$million")
+    addt_equityweightedimpact_discountedaggregated = Variable(index=[time, region], unit="\$million")
+    addt_gt_equityweightedimpact_discountedglobal = Variable(unit="\$million")
 
-    civvalue_civilizationvalue = Parameter(unit = "\$million", default = 6.1333333333333336e10) # Called "CIV_VALUE"
-    td_totaldiscountedimpacts = Variable(unit = "\$million")
+    civvalue_civilizationvalue = Parameter(unit="\$million", default=6.1333333333333336e10) # Called "CIV_VALUE"
+    td_totaldiscountedimpacts = Variable(unit="\$million")
 
-    aact_equityweightedadaptation_discountedaggregated = Variable(index = [time, region], unit = "\$million")
-    tac_totaladaptationcosts = Variable(unit = "\$million")
+    aact_equityweightedadaptation_discountedaggregated = Variable(index=[time, region], unit="\$million")
+    tac_totaladaptationcosts = Variable(unit="\$million")
 
     # Final result: total effect of climate change
-    te_totaleffect = Variable(unit = "\$million")
+    te_totaleffect = Variable(unit="\$million")
 
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
     # additional paramters and variables for growth effects and boundaries
-    grwnet_realizedgdpgrowth = Parameter(index = [time, region], unit = "%/year")
-    lgdp_gdploss =  Parameter(index = [time, region], unit = "\$M")
-    lossinc_includegdplosses = Parameter(unit = "none", default = 1.)
-    excdam_excessdamages = Variable(index = [time,region], unit = "\$million")
-    excdampv_excessdamagespresvalue = Variable(index = [time,region], unit = "\$million")
+    grwnet_realizedgdpgrowth = Parameter(index=[time, region], unit="%/year")
+    lgdp_gdploss =  Parameter(index=[time, region], unit="\$M")
+    lossinc_includegdplosses = Parameter(unit="none", default=1.)
+    excdam_excessdamages = Variable(index=[time,region], unit="\$million")
+    excdampv_excessdamagespresvalue = Variable(index=[time,region], unit="\$million")
 
     # convergence system for equity weighting threshold
-    use_convergence = Parameter(unit = "none", default = 1.)
-    eqwshare_shareofweighteddamages = Variable(index = [time,region], unit = "none")
-    eqwshare_shareofweighteddamages_noconvergence = Variable(index = [time,region], unit = "none")
-    eqwbound_maxshareofweighteddamages = Parameter(unit = "none", default = 0.99)
-    eqwboundn_maxshareofweighteddamages_neighbourhood = Parameter(unit = "none", default = 0.9)
-    eqwaux1_weighteddamages_auxiliary1 = Variable(unit = "none")
-    eqwaux2_weighteddamages_auxiliary2 = Variable(unit = "none")
+    use_convergence = Parameter(unit="none", default=1.)
+    eqwshare_shareofweighteddamages = Variable(index=[time,region], unit="none")
+    eqwshare_shareofweighteddamages_noconvergence = Variable(index=[time,region], unit="none")
+    eqwbound_maxshareofweighteddamages = Parameter(unit="none", default=0.99)
+    eqwboundn_maxshareofweighteddamages_neighbourhood = Parameter(unit="none", default=0.9)
+    eqwaux1_weighteddamages_auxiliary1 = Variable(unit="none")
+    eqwaux2_weighteddamages_auxiliary2 = Variable(unit="none")
 
-    currentdam_currentdamages = Variable(index = [time,region], unit = "\$million")
-    damshare_currentdamagesshare = Variable(index = [time,region], unit = "%GDP")
-    currentdampc_percapitacurrentdamages = Variable(index = [time,region], unit = "\$/person")
+    currentdam_currentdamages = Variable(index=[time,region], unit="\$million")
+    damshare_currentdamagesshare = Variable(index=[time,region], unit="%GDP")
+    currentdampc_percapitacurrentdamages = Variable(index=[time,region], unit="\$/person")
 
-    discfix_fixediscountrate = Parameter(unit = "none", default = 0.) # override the discount rates with something exogenous
+    discfix_fixediscountrate = Parameter(unit="none", default=0.) # override the discount rates with something exogenous
     ###############################################
 
     function run_timestep(p, v, d, tt)

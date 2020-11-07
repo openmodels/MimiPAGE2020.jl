@@ -1,14 +1,14 @@
 
 
 @defcomp n2oforcing begin
-    c_N2Oconcentration = Parameter(index = [time], unit = "ppbv")
-    c_CH4concentration = Parameter(index = [time], unit = "ppbv")
-    f0_N2Obaseforcing = Parameter(unit = "W/m2", default = 0.17)
-    fslope_N2Oforcingslope = Parameter(unit = "W/m2", default = 0.12)
-    c0_baseN2Oconc = Parameter(unit = "ppbv", default = 324.0)
-    c0_baseCH4conc = Parameter(unit = "ppbv", default = 1803.0)
-    f_N2Oforcing = Variable(index = [time], unit = "W/m2")
-    over_baseoverlap = Variable(unit = "W/m2")
+    c_N2Oconcentration = Parameter(index=[time], unit="ppbv")
+    c_CH4concentration = Parameter(index=[time], unit="ppbv")
+    f0_N2Obaseforcing = Parameter(unit="W/m2", default=0.17)
+    fslope_N2Oforcingslope = Parameter(unit="W/m2", default=0.12)
+    c0_baseN2Oconc = Parameter(unit="ppbv", default=324.0)
+    c0_baseCH4conc = Parameter(unit="ppbv", default=1803.0)
+    f_N2Oforcing = Variable(index=[time], unit="W/m2")
+    over_baseoverlap = Variable(unit="W/m2")
 
     function run_timestep(p, v, d, t)
 

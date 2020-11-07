@@ -3,13 +3,13 @@
     region = Index()
 
     # global emissions
-    e_globalLGemissions = Variable(index = [time], unit = "Mtonne/year")
+    e_globalLGemissions = Variable(index=[time], unit="Mtonne/year")
     # baseline emissions
-    e0_baselineLGemissions = Parameter(index = [region], unit = "Mtonne/year")
+    e0_baselineLGemissions = Parameter(index=[region], unit="Mtonne/year")
     # regional emissions
-    e_regionalLGemissions = Variable(index = [time,region], unit = "Mtonne/year")
+    e_regionalLGemissions = Variable(index=[time,region], unit="Mtonne/year")
     # growth rate by region
-    er_LGemissionsgrowth = Parameter(index = [time,region], unit = "%")
+    er_LGemissionsgrowth = Parameter(index=[time,region], unit="%")
 
     function run_timestep(p, v, d, t)
 

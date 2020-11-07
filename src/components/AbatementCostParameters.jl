@@ -1,64 +1,64 @@
 @defcomp AbatementCostParameters begin
 
     region = Index()
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_0 = Parameter(unit = "year", default = 2015.)
-    y_year_lssp = Parameter(unit = "year", default = 2100.)
+    y_year = Parameter(index=[time], unit="year")
+    y_year_0 = Parameter(unit="year", default=2015.)
+    y_year_lssp = Parameter(unit="year", default=2100.)
 
     # gas inputs
-    emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = Parameter(unit = "%")
-    q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = Parameter(unit = "% of BAU emissions")
-    c0init_MostNegativeCostCutbackinBaseYear = Parameter(unit = "\$/ton")
-    qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = Parameter(unit = "% of BAU emissions")
-    cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = Parameter(unit = "\$/ton")
-    ies_InitialExperienceStockofCutbacks = Parameter(unit = "Million ton")
-    e0_baselineemissions = Parameter(index = [region], unit = "Mtonne/year")
+    emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = Parameter(unit="%")
+    q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = Parameter(unit="% of BAU emissions")
+    c0init_MostNegativeCostCutbackinBaseYear = Parameter(unit="\$/ton")
+    qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = Parameter(unit="% of BAU emissions")
+    cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = Parameter(unit="\$/ton")
+    ies_InitialExperienceStockofCutbacks = Parameter(unit="Million ton")
+    e0_baselineemissions = Parameter(index=[region], unit="Mtonne/year")
 
     # regional inputs
-    emitf_uncertaintyinBAUemissfactor = Parameter(index = [region], unit = "none")
-    q0f_negativecostpercentagefactor = Parameter(index = [region], unit = "none")
-    cmaxf_maxcostfactor = Parameter(index = [region], unit = "none")
+    emitf_uncertaintyinBAUemissfactor = Parameter(index=[region], unit="none")
+    q0f_negativecostpercentagefactor = Parameter(index=[region], unit="none")
+    cmaxf_maxcostfactor = Parameter(index=[region], unit="none")
 
-    bau_businessasusualemissions = Parameter(index = [time, region], unit = "%")
-    yagg = Parameter(index = [time], unit = "year") # from equity weighting
+    bau_businessasusualemissions = Parameter(index=[time, region], unit="%")
+    yagg = Parameter(index=[time], unit="year") # from equity weighting
 
     # inputs with single, uncertain values
-    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit = "none", default = 0.8833333333333333)
-    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit = "none", default = 1.1166666666666666)
-    c0mult_mostnegativecostinfinalyear = Parameter(unit = "none", default = 0.9333333333333334)
-    curve_below_curvatureofMACcurvebelowzerocost = Parameter(unit = "none", default = .5)
-    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit = "none", default = 0.4)
-    cross_experiencecrossoverratio = Parameter(unit = "none", default = .2)
-    learn_learningrate = Parameter(unit = "none", default = .2)
-    automult_autonomoustechchange = Parameter(unit = "none", default = .65)
-    equity_prop_equityweightsproportion = Parameter(unit = "none", default = 1.)
+    q0propmult_cutbacksatnegativecostinfinalyear = Parameter(unit="none", default=0.8833333333333333)
+    qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = Parameter(unit="none", default=1.1166666666666666)
+    c0mult_mostnegativecostinfinalyear = Parameter(unit="none", default=0.9333333333333334)
+    curve_below_curvatureofMACcurvebelowzerocost = Parameter(unit="none", default=.5)
+    curve_above_curvatureofMACcurveabovezerocost = Parameter(unit="none", default=0.4)
+    cross_experiencecrossoverratio = Parameter(unit="none", default=.2)
+    learn_learningrate = Parameter(unit="none", default=.2)
+    automult_autonomoustechchange = Parameter(unit="none", default=.65)
+    equity_prop_equityweightsproportion = Parameter(unit="none", default=1.)
 
     # Inputs from other components
-    cbe_absoluteemissionreductions = Parameter(index = [time, region], unit = "Mtonne") # TODO: default here?
+    cbe_absoluteemissionreductions = Parameter(index=[time, region], unit="Mtonne") # TODO: default here?
 
     # Variables
-    emit_UncertaintyinBAUEmissFactor = Variable(index = [region], unit = "%")
-    q0propinit_CutbacksinNegativeCostinBaseYear = Variable(index = [region], unit = "% of BAU emissions")
-    cmaxinit_MaxCutbackCostinBaseYear = Variable(index = [region], unit = "\$/ton")
-    zc_zerocostemissions = Variable(index = [time, region], unit = "%")
-    cumcbe_cumulativereductionssincebaseyear = Variable(index = [time, region], unit = "Mtonne")
-    cumcbe_g_totalreductions = Variable(index = [time], unit = "Mtonne")
-    learnfac_learning = Variable(index = [time, region], unit = "none")
-    auto = Variable(unit = "% per year")
-    autofac = Variable(index = [time], unit = "% per year")
-    c0g = Variable(unit = "% per year")
-    c0 = Variable(index = [time], unit = "\$/ton")
-    qmaxminusq0propg = Variable(unit = "% per year")
-    qmaxminusq0prop = Variable(unit = "% of BAU emissions")
-    q0propg = Variable(unit = "% per year")
-    q0prop = Variable(index = [time, region], unit = "% of BAU emissions")
-    q0_absolutecutbacksatnegativecost = Variable(index = [time, region], unit = "Mtonne")
-    qmax_maxreferencereductions = Variable(index = [time, region], unit = "Mtonne")
-    cmax = Variable(index = [time,region], unit = "\$/tonne")
-    blo = Variable(index = [time, region], unit = "per Mtonne")
-    alo = Variable(index = [time, region], unit = "\$/tonne")
-    bhi = Variable(index = [time, region], unit = "per Mtonne")
-    ahi = Variable(index = [time, region], unit = "\$/tonne")
+    emit_UncertaintyinBAUEmissFactor = Variable(index=[region], unit="%")
+    q0propinit_CutbacksinNegativeCostinBaseYear = Variable(index=[region], unit="% of BAU emissions")
+    cmaxinit_MaxCutbackCostinBaseYear = Variable(index=[region], unit="\$/ton")
+    zc_zerocostemissions = Variable(index=[time, region], unit="%")
+    cumcbe_cumulativereductionssincebaseyear = Variable(index=[time, region], unit="Mtonne")
+    cumcbe_g_totalreductions = Variable(index=[time], unit="Mtonne")
+    learnfac_learning = Variable(index=[time, region], unit="none")
+    auto = Variable(unit="% per year")
+    autofac = Variable(index=[time], unit="% per year")
+    c0g = Variable(unit="% per year")
+    c0 = Variable(index=[time], unit="\$/ton")
+    qmaxminusq0propg = Variable(unit="% per year")
+    qmaxminusq0prop = Variable(unit="% of BAU emissions")
+    q0propg = Variable(unit="% per year")
+    q0prop = Variable(index=[time, region], unit="% of BAU emissions")
+    q0_absolutecutbacksatnegativecost = Variable(index=[time, region], unit="Mtonne")
+    qmax_maxreferencereductions = Variable(index=[time, region], unit="Mtonne")
+    cmax = Variable(index=[time,region], unit="\$/tonne")
+    blo = Variable(index=[time, region], unit="per Mtonne")
+    alo = Variable(index=[time, region], unit="\$/tonne")
+    bhi = Variable(index=[time, region], unit="per Mtonne")
+    ahi = Variable(index=[time, region], unit="\$/tonne")
 
     function run_timestep(p, v, d, t)
 
@@ -111,7 +111,7 @@
     end
 end
 
-function addabatementcostparameters(model::Model, class::Symbol, policy::String = "policy-a")
+function addabatementcostparameters(model::Model, class::Symbol, policy::String="policy-a")
     componentname = Symbol("AbatementCostParameters$class")
     abatementcostscomp = add_comp!(model, AbatementCostParameters, componentname)
 

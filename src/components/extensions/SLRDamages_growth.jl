@@ -1,57 +1,57 @@
 @defcomp SLRDamages begin
     region = Index()
 
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_0 = Parameter(unit = "year")
+    y_year = Parameter(index=[time], unit="year")
+    y_year_0 = Parameter(unit="year")
 
     # incoming parameters from SeaLevelRise
-    s_sealevel = Parameter(index = [time], unit = "m")
+    s_sealevel = Parameter(index=[time], unit="m")
     # incoming parameters to calculate consumption per capita after Costs
-    cons_percap_consumption = Parameter(index = [time, region], unit = "\$/person")
-    cons_percap_consumption_0 = Parameter(index = [region], unit = "\$/person")
-    tct_per_cap_totalcostspercap = Parameter(index = [time,region], unit = "\$/person")
-    act_percap_adaptationcosts = Parameter(index = [time, region], unit = "\$/person")
+    cons_percap_consumption = Parameter(index=[time, region], unit="\$/person")
+    cons_percap_consumption_0 = Parameter(index=[region], unit="\$/person")
+    tct_per_cap_totalcostspercap = Parameter(index=[time,region], unit="\$/person")
+    act_percap_adaptationcosts = Parameter(index=[time, region], unit="\$/person")
 
     # component parameters
-    impmax_maxSLRforadaptpolicySLR = Parameter(index = [region], unit = "m")
+    impmax_maxSLRforadaptpolicySLR = Parameter(index=[region], unit="m")
 
-    save_savingsrate = Parameter(unit = "%", default = 15.00) # pp33 PAGE09 documentation, "savings rate".
-    wincf_weightsfactor_sea = Parameter(index = [region], unit = "")
-    W_SatCalibrationSLR = Parameter(default = 1.0) # pp33 PAGE09 documentation, "Sea level impact at calibration sea level rise"
-    ipow_SLRIncomeFxnExponent = Parameter(default = -0.30)
-    pow_SLRImpactFxnExponent = Parameter(default = 0.7333333333333334)
-    iben_SLRInitialBenefit = Parameter(default = 0.00)
-    scal_calibrationSLR = Parameter(default = 0.5)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
+    save_savingsrate = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
+    wincf_weightsfactor_sea = Parameter(index=[region], unit="")
+    W_SatCalibrationSLR = Parameter(default=1.0) # pp33 PAGE09 documentation, "Sea level impact at calibration sea level rise"
+    ipow_SLRIncomeFxnExponent = Parameter(default=-0.30)
+    pow_SLRImpactFxnExponent = Parameter(default=0.7333333333333334)
+    iben_SLRInitialBenefit = Parameter(default=0.00)
+    scal_calibrationSLR = Parameter(default=0.5)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
 
     # component variables
-    cons_percap_aftercosts = Variable(index = [time, region], unit = "\$/person")
-    gdp_percap_aftercosts = Variable(index = [time, region], unit = "\$/person")
+    cons_percap_aftercosts = Variable(index=[time, region], unit="\$/person")
+    gdp_percap_aftercosts = Variable(index=[time, region], unit="\$/person")
 
-    atl_adjustedtolerablelevelofsealevelrise = Parameter(index = [time,region], unit = "m") # meter
-    imp_actualreductionSLR = Parameter(index = [time, region], unit = "%")
-    i_regionalimpactSLR = Variable(index = [time, region], unit = "m")
+    atl_adjustedtolerablelevelofsealevelrise = Parameter(index=[time,region], unit="m") # meter
+    imp_actualreductionSLR = Parameter(index=[time, region], unit="%")
+    i_regionalimpactSLR = Variable(index=[time, region], unit="m")
 
-    iref_ImpactatReferenceGDPperCapSLR = Variable(index = [time, region])
-    igdp_ImpactatActualGDPperCapSLR = Variable(index = [time, region])
+    iref_ImpactatReferenceGDPperCapSLR = Variable(index=[time, region])
+    igdp_ImpactatActualGDPperCapSLR = Variable(index=[time, region])
 
-    isatg_impactfxnsaturation = Parameter(unit = "unitless")
-    isat_ImpactinclSaturationandAdaptationSLR = Variable(index = [time,region])
-    isat_per_cap_SLRImpactperCapinclSaturationandAdaptation = Variable(index = [time, region], unit = "\$/person")
+    isatg_impactfxnsaturation = Parameter(unit="unitless")
+    isat_ImpactinclSaturationandAdaptationSLR = Variable(index=[time,region])
+    isat_per_cap_SLRImpactperCapinclSaturationandAdaptation = Variable(index=[time, region], unit="\$/person")
 
-    rcons_per_cap_SLRRemainConsumption = Variable(index = [time, region], unit = "\$/person") # include?
-    rgdp_per_cap_SLRRemainGDP = Variable(index = [time, region], unit = "\$/person")
+    rcons_per_cap_SLRRemainConsumption = Variable(index=[time, region], unit="\$/person") # include?
+    rgdp_per_cap_SLRRemainGDP = Variable(index=[time, region], unit="\$/person")
 
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
     # new parameters for convergence boundary system
-    use_convergence =                           Parameter(unit = "none", default = 1.)
-    cbabs_pcconsumptionbound =                  Parameter(unit = "\$/person", default = 740.65)
-    cbabsn_pcconsumptionbound_neighbourhood =   Parameter(unit = "\$/person")
-    cbaux1_pcconsumptionbound_auxiliary1 =      Parameter(unit = "none")
-    cbaux2_pcconsumptionbound_auxiliary2 =      Parameter(unit = "none")
-    cons_percap_consumption_noconvergence =     Parameter(index = [time, region], unit = "\$/person")
+    use_convergence =                           Parameter(unit="none", default=1.)
+    cbabs_pcconsumptionbound =                  Parameter(unit="\$/person", default=740.65)
+    cbabsn_pcconsumptionbound_neighbourhood =   Parameter(unit="\$/person")
+    cbaux1_pcconsumptionbound_auxiliary1 =      Parameter(unit="none")
+    cbaux2_pcconsumptionbound_auxiliary2 =      Parameter(unit="none")
+    cons_percap_consumption_noconvergence =     Parameter(index=[time, region], unit="\$/person")
     ###############################################
 
     function run_timestep(p, v, d, t)

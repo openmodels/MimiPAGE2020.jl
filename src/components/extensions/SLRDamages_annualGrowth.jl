@@ -107,75 +107,75 @@ end
     region = Index()
     year = Index()
 
-    y_year = Parameter(index = [time], unit = "year")
-    y_year_ann = Parameter(index = [year], unit = "year")
-    y_year_0 = Parameter(unit = "year")
+    y_year = Parameter(index=[time], unit="year")
+    y_year_ann = Parameter(index=[year], unit="year")
+    y_year_0 = Parameter(unit="year")
 
     # incoming parameters from SeaLevelRise
-    s_sealevel = Parameter(index = [time], unit = "m")
-    s0_initialSL = Parameter(unit = "m", default = 0.18999999999999997)               # mode initial sea level, from PAGE-ICE
-    s_sealevel_ann = Variable(index = [year], unit = "m")                                                                                   # interpolate (SeaLevelRise)
+    s_sealevel = Parameter(index=[time], unit="m")
+    s0_initialSL = Parameter(unit="m", default=0.18999999999999997)               # mode initial sea level, from PAGE-ICE
+    s_sealevel_ann = Variable(index=[year], unit="m")                                                                                   # interpolate (SeaLevelRise)
     # incoming parameters to calculate consumption per capita after Costs
-    cons_percap_consumption = Parameter(index = [time, region], unit = "\$/person")
-    cons_percap_consumption_ann = Parameter(index = [year, region], unit = "\$/person")
-    cons_percap_consumption_0 = Parameter(index = [region], unit = "\$/person")
-    tct_per_cap_totalcostspercap = Parameter(index = [time,region], unit = "\$/person")
-    tct_per_cap_totalcostspercap_ann = Variable(index = [year,region], unit = "\$/person")                                                 # interpolate (TotalAbatement)
-    act_percap_adaptationcosts = Parameter(index = [time, region], unit = "\$/person")
-    act_percap_adaptationcosts_ann = Parameter(index = [year, region], unit = "\$/person")
+    cons_percap_consumption = Parameter(index=[time, region], unit="\$/person")
+    cons_percap_consumption_ann = Parameter(index=[year, region], unit="\$/person")
+    cons_percap_consumption_0 = Parameter(index=[region], unit="\$/person")
+    tct_per_cap_totalcostspercap = Parameter(index=[time,region], unit="\$/person")
+    tct_per_cap_totalcostspercap_ann = Variable(index=[year,region], unit="\$/person")                                                 # interpolate (TotalAbatement)
+    act_percap_adaptationcosts = Parameter(index=[time, region], unit="\$/person")
+    act_percap_adaptationcosts_ann = Parameter(index=[year, region], unit="\$/person")
 
     # component parameters
-    impmax_maxSLRforadaptpolicySLR = Parameter(index = [region], unit = "m")
+    impmax_maxSLRforadaptpolicySLR = Parameter(index=[region], unit="m")
 
-    save_savingsrate = Parameter(unit = "%", default = 15.00) # pp33 PAGE09 documentation, "savings rate".
-    wincf_weightsfactor_sea = Parameter(index = [region], unit = "")
-    W_SatCalibrationSLR = Parameter(default = 1.0) # pp33 PAGE09 documentation, "Sea level impact at calibration sea level rise"
-    ipow_SLRIncomeFxnExponent = Parameter(default = -0.30)
-    pow_SLRImpactFxnExponent = Parameter(default = 0.7333333333333334)
-    iben_SLRInitialBenefit = Parameter(default = 0.00)
-    scal_calibrationSLR = Parameter(default = 0.5)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
+    save_savingsrate = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
+    wincf_weightsfactor_sea = Parameter(index=[region], unit="")
+    W_SatCalibrationSLR = Parameter(default=1.0) # pp33 PAGE09 documentation, "Sea level impact at calibration sea level rise"
+    ipow_SLRIncomeFxnExponent = Parameter(default=-0.30)
+    pow_SLRImpactFxnExponent = Parameter(default=0.7333333333333334)
+    iben_SLRInitialBenefit = Parameter(default=0.00)
+    scal_calibrationSLR = Parameter(default=0.5)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
 
     # component variables
-    cons_percap_aftercosts = Variable(index = [time, region], unit = "\$/person")
-    cons_percap_aftercosts_ann = Variable(index = [year, region], unit = "\$/person")
-    gdp_percap_aftercosts = Variable(index = [time, region], unit = "\$/person")
-    gdp_percap_aftercosts_ann = Variable(index = [year, region], unit = "\$/person")
+    cons_percap_aftercosts = Variable(index=[time, region], unit="\$/person")
+    cons_percap_aftercosts_ann = Variable(index=[year, region], unit="\$/person")
+    gdp_percap_aftercosts = Variable(index=[time, region], unit="\$/person")
+    gdp_percap_aftercosts_ann = Variable(index=[year, region], unit="\$/person")
 
-    atl_adjustedtolerablelevelofsealevelrise = Parameter(index = [time,region], unit = "m") # meter
-    atl_adjustedtolerablelevelofsealevelrise_ann = Parameter(index = [year,region], unit = "m") # meter
-    imp_actualreductionSLR = Parameter(index = [time, region], unit = "%")
-    imp_actualreductionSLR_ann = Parameter(index = [year, region], unit = "%")
-    i_regionalimpactSLR = Variable(index = [time, region], unit = "m")
-    i_regionalimpactSLR_ann = Variable(index = [year, region], unit = "m")
+    atl_adjustedtolerablelevelofsealevelrise = Parameter(index=[time,region], unit="m") # meter
+    atl_adjustedtolerablelevelofsealevelrise_ann = Parameter(index=[year,region], unit="m") # meter
+    imp_actualreductionSLR = Parameter(index=[time, region], unit="%")
+    imp_actualreductionSLR_ann = Parameter(index=[year, region], unit="%")
+    i_regionalimpactSLR = Variable(index=[time, region], unit="m")
+    i_regionalimpactSLR_ann = Variable(index=[year, region], unit="m")
 
-    iref_ImpactatReferenceGDPperCapSLR = Variable(index = [time, region])
-    iref_ImpactatReferenceGDPperCapSLR_ann = Variable(index = [year, region])
-    igdp_ImpactatActualGDPperCapSLR = Variable(index = [time, region])
-    igdp_ImpactatActualGDPperCapSLR_ann = Variable(index = [year, region])
+    iref_ImpactatReferenceGDPperCapSLR = Variable(index=[time, region])
+    iref_ImpactatReferenceGDPperCapSLR_ann = Variable(index=[year, region])
+    igdp_ImpactatActualGDPperCapSLR = Variable(index=[time, region])
+    igdp_ImpactatActualGDPperCapSLR_ann = Variable(index=[year, region])
 
-    isatg_impactfxnsaturation = Parameter(unit = "unitless")
-    isat_ImpactinclSaturationandAdaptationSLR = Variable(index = [time,region])
-    isat_ImpactinclSaturationandAdaptationSLR_ann = Variable(index = [year,region])
-    isat_per_cap_SLRImpactperCapinclSaturationandAdaptation = Variable(index = [time, region], unit = "\$/person")
-    isat_per_cap_SLRImpactperCapinclSaturationandAdaptation_ann = Variable(index = [year, region], unit = "\$/person")
+    isatg_impactfxnsaturation = Parameter(unit="unitless")
+    isat_ImpactinclSaturationandAdaptationSLR = Variable(index=[time,region])
+    isat_ImpactinclSaturationandAdaptationSLR_ann = Variable(index=[year,region])
+    isat_per_cap_SLRImpactperCapinclSaturationandAdaptation = Variable(index=[time, region], unit="\$/person")
+    isat_per_cap_SLRImpactperCapinclSaturationandAdaptation_ann = Variable(index=[year, region], unit="\$/person")
 
-    rcons_per_cap_SLRRemainConsumption = Variable(index = [time, region], unit = "\$/person") # include?
-    rcons_per_cap_SLRRemainConsumption_ann = Variable(index = [year, region], unit = "\$/person") # include?
-    rgdp_per_cap_SLRRemainGDP = Variable(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_SLRRemainGDP_ann = Variable(index = [year, region], unit = "\$/person")
+    rcons_per_cap_SLRRemainConsumption = Variable(index=[time, region], unit="\$/person") # include?
+    rcons_per_cap_SLRRemainConsumption_ann = Variable(index=[year, region], unit="\$/person") # include?
+    rgdp_per_cap_SLRRemainGDP = Variable(index=[time, region], unit="\$/person")
+    rgdp_per_cap_SLRRemainGDP_ann = Variable(index=[year, region], unit="\$/person")
 
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
     # new parameters for convergence boundary system
-    use_convergence =                           Parameter(unit = "none", default = 1.)
-    cbabs_pcconsumptionbound =                  Parameter(unit = "\$/person", default = 740.65)
-    cbabsn_pcconsumptionbound_neighbourhood =   Parameter(unit = "\$/person")
-    cbaux1_pcconsumptionbound_auxiliary1 =      Parameter(unit = "none")
-    cbaux2_pcconsumptionbound_auxiliary2 =      Parameter(unit = "none")
-    cons_percap_consumption_noconvergence =     Parameter(index = [time, region], unit = "\$/person")
-    cons_percap_consumption_noconvergence_ann = Parameter(index = [year, region], unit = "\$/person")
+    use_convergence =                           Parameter(unit="none", default=1.)
+    cbabs_pcconsumptionbound =                  Parameter(unit="\$/person", default=740.65)
+    cbabsn_pcconsumptionbound_neighbourhood =   Parameter(unit="\$/person")
+    cbaux1_pcconsumptionbound_auxiliary1 =      Parameter(unit="none")
+    cbaux2_pcconsumptionbound_auxiliary2 =      Parameter(unit="none")
+    cons_percap_consumption_noconvergence =     Parameter(index=[time, region], unit="\$/person")
+    cons_percap_consumption_noconvergence_ann = Parameter(index=[year, region], unit="\$/person")
     ###############################################
 
     function run_timestep(p, v, d, t)

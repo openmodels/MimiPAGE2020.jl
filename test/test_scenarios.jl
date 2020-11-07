@@ -1,11 +1,11 @@
 using Test
 using CSV
 
-df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header = false)
-rfrow0 = findfirst(x->!ismissing(x) && x == "RF in 2100", df[!, 1])
-gmstrow0 = findfirst(x->!ismissing(x) && x == "Temp. in 2100", df[!, 1])
-slrrow0 = findfirst(x->!ismissing(x) && x == "SLR in 2100", df[!, 1])
-terow0 = findfirst(x->!ismissing(x) && x == "Total effect NPV", df[!, 1])
+df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header=false)
+rfrow0 = findfirst(x -> !ismissing(x) && x == "RF in 2100", df[!, 1])
+gmstrow0 = findfirst(x -> !ismissing(x) && x == "Temp. in 2100", df[!, 1])
+slrrow0 = findfirst(x -> !ismissing(x) && x == "SLR in 2100", df[!, 1])
+terow0 = findfirst(x -> !ismissing(x) && x == "Total effect NPV", df[!, 1])
 
 for testscen in 2:size(df)[2]
     isdeterm = df[5, testscen] == "Deterministic"

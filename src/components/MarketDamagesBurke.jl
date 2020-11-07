@@ -1,38 +1,38 @@
 @defcomp MarketDamagesBurke begin
     region = Index()
-    y_year = Parameter(index = [time], unit = "year")
+    y_year = Parameter(index=[time], unit="year")
 
     # incoming parameters from Climate
-    rtl_realizedtemperature = Parameter(index = [time, region], unit = "degreeC")
+    rtl_realizedtemperature = Parameter(index=[time, region], unit="degreeC")
 
     # tolerability and impact variables from PAGE damages that Burke damages also require
-    rcons_per_cap_SLRRemainConsumption = Parameter(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_SLRRemainGDP = Parameter(index = [time, region], unit = "\$/person")
-    save_savingsrate = Parameter(unit = "%", default = 15.)
-    wincf_weightsfactor_market = Parameter(index = [region], unit = "")
-    ipow_MarketIncomeFxnExponent = Parameter(default = 0.0)
-    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit = "\$/person", default = 34298.93698672955)
+    rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, region], unit="\$/person")
+    rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit="\$/person")
+    save_savingsrate = Parameter(unit="%", default=15.)
+    wincf_weightsfactor_market = Parameter(index=[region], unit="")
+    ipow_MarketIncomeFxnExponent = Parameter(default=0.0)
+    GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
 
     # added impact parameters and variables specifically for Burke damage function
-    rtl_abs_0_realizedabstemperature = Parameter(index = [region]) # 1979-2005 means, Yumashev et al. 2019 Supplementary Table 16, table in /data directory
-    rtl_0_realizedtemperature = Parameter(index = [region]) # temperature change between PAGE base year temperature and rtl_abs_0 (?)
-    impf_coeff_lin = Parameter(default = -0.00829990966469437) # rescaled coefficients from Burke
-    impf_coeff_quadr = Parameter(default = -0.000500003403703578)
-    tcal_burke = Parameter(default = 21.) # calibration temperature for the impact function
-    nlag_burke = Parameter(default = 1.) # Yumashev et al. (2019) allow for one or two lags
+    rtl_abs_0_realizedabstemperature = Parameter(index=[region]) # 1979-2005 means, Yumashev et al. 2019 Supplementary Table 16, table in /data directory
+    rtl_0_realizedtemperature = Parameter(index=[region]) # temperature change between PAGE base year temperature and rtl_abs_0 (?)
+    impf_coeff_lin = Parameter(default=-0.00829990966469437) # rescaled coefficients from Burke
+    impf_coeff_quadr = Parameter(default=-0.000500003403703578)
+    tcal_burke = Parameter(default=21.) # calibration temperature for the impact function
+    nlag_burke = Parameter(default=1.) # Yumashev et al. (2019) allow for one or two lags
 
-    i_burke_regionalimpact = Variable(index = [time, region], unit = "degreeC") # Burke-specific warming impact, unlike PAGE-specific impact in absolute temperatures
-    i1log_impactlogchange = Variable(index = [time, region]) # intermediate variable for computation
+    i_burke_regionalimpact = Variable(index=[time, region], unit="degreeC") # Burke-specific warming impact, unlike PAGE-specific impact in absolute temperatures
+    i1log_impactlogchange = Variable(index=[time, region]) # intermediate variable for computation
 
     # impact variables from PAGE damages that Burke damages also require
-    isatg_impactfxnsaturation = Parameter(unit = "unitless")
-    rcons_per_cap_MarketRemainConsumption = Variable(index = [time, region], unit = "\$/person")
-    rgdp_per_cap_MarketRemainGDP = Variable(index = [time, region], unit = "\$/person")
-    iref_ImpactatReferenceGDPperCap = Variable(index = [time, region])
-    igdp_ImpactatActualGDPperCap = Variable(index = [time, region])
+    isatg_impactfxnsaturation = Parameter(unit="unitless")
+    rcons_per_cap_MarketRemainConsumption = Variable(index=[time, region], unit="\$/person")
+    rgdp_per_cap_MarketRemainGDP = Variable(index=[time, region], unit="\$/person")
+    iref_ImpactatReferenceGDPperCap = Variable(index=[time, region])
+    igdp_ImpactatActualGDPperCap = Variable(index=[time, region])
 
-    isat_ImpactinclSaturationandAdaptation = Variable(index = [time,region], unit = "\$")
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index = [time,region], unit = "\$/person")
+    isat_ImpactinclSaturationandAdaptation = Variable(index=[time,region], unit="\$")
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit="\$/person")
 
 
     function run_timestep(p, v, d, t)
