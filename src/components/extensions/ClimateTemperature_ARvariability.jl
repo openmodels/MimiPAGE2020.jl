@@ -1,7 +1,7 @@
-using CSV, Distributions
+using CSV, Distributions, DataFrames
 
 # Load once and make global
-arests = CSV.read(joinpath(@__DIR__, "../../../data/other/arestimates.csv"))
+arests = CSV.read(joinpath(@__DIR__, "../../../data/other/arestimates.csv"), DataFrame)
 
 function calc_temp(p, v, d, tt, annual_year)
     # for every year, do the same calculations, but then with the new annual_year variables
