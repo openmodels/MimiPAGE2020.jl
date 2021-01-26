@@ -1,10 +1,11 @@
 using Mimi
 using Test
 using CSV, DataFrames
+using Statistics
 
 import Mimi.has_parameter
+using MimiPAGE2020: getsim
 
-include("../src/mcs.jl")
 df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), DataFrame, header=false)
 rfrow0 = findfirst(x -> !ismissing(x) && x == "RF in 2100", df[!, 1])
 gmstrow0 = findfirst(x -> !ismissing(x) && x == "Temp. in 2100", df[!, 1])
@@ -41,8 +42,6 @@ for testscen in 2:size(df)[2]
         @test false # not handled
         continue
     end
-
-    include("../src/main_model.jl")
 
     m = getpage(scenario, use_permafrost, use_seaice, econfunc == "PAGE09 Default")
     if !eqweight

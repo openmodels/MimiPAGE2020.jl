@@ -1,8 +1,3 @@
-using Distributions
-using DataFrames
-
-include("utils/mctools.jl")
-
 function getsim()
     mcs = @defsim begin
 

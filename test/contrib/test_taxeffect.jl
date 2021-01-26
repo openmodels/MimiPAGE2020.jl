@@ -1,5 +1,4 @@
 using Test
-include("../../src/main_model.jl")
 include("../../src/contrib/taxeffect.jl")
 
 taxes = rand(10) * 100

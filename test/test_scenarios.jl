@@ -36,8 +36,6 @@ for testscen in 2:size(df)[2]
         continue
     end
 
-    include("../src/main_model.jl")
-
     m = getpage(scenario, use_permafrost, use_seaice, econfunc == "PAGE09 Default")
     if !eqweight
         set_param!(m, :EquityWeighting, :equity_proportion, 0.)

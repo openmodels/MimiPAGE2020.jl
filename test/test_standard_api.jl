@@ -1,5 +1,6 @@
 using Test
 using Mimi
+using MimiPAGE2020: compute_scc, get_marginal_model, compute_scc_mm
 
 @testset "Standard API" begin
 

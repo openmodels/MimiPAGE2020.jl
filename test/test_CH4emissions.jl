@@ -1,10 +1,10 @@
+using MimiPAGE2020: ch4emissions
+
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = test_page_model()
-    include("../src/components/RCPSSPScenario.jl")
-    include("../src/components/CH4emissions.jl")
 
     scenario = addrcpsspscenario(m, scenario)
     ch4emit = add_comp!(m, ch4emissions)

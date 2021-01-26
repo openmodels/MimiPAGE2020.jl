@@ -1,9 +1,6 @@
 using Test
 using Mimi
 
-include("../src/main_model.jl")
-include("../src/compute_scc.jl")
-
 m = getpage("RCP4.5 & SSP2", true, true, true)
 run(m)
 uds = [undiscount_scc(m, 2020), undiscount_scc(m, 2040), undiscount_scc(m, 2075)]
@@ -30,5 +27,3 @@ checksccs(sccs, [53.903, 129.330, 217.337, 361.739, 886.998, 306.914])
 
 # m = getpage("RCP8.5 & SSP5", true, true, false)
 # sccs = compute_scc_mcs(m, 1000, year=2020)
-
-end

@@ -1,4 +1,5 @@
 using Test
+using MimiPAGE2020: get_model
 
 let m = get_model()
     run(m)

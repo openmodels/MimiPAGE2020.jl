@@ -1,5 +1,5 @@
-name = "PAGE-2020"
-uuid = "e25d4f70-4200-11e9-37f3-3b45f1cef54f"
+name = "MimiPAGE2020"
+uuid = "daa1807e-96ac-4669-bc57-6ed081383131"
 version = "0.5-DEV"
 
 [deps]
@@ -23,6 +23,8 @@ julia = "1.4"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [targets]
-test = ["Test"]
+test = ["Test", "CSV", "Statistics"]

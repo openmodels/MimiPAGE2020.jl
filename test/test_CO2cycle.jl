@@ -1,6 +1,5 @@
 using Test
-
-include("../src/components/CO2cycle.jl")
+using MimiPAGE2020: addco2cycle
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)

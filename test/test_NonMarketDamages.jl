@@ -1,12 +1,12 @@
 using DataFrames
 using Test
+using MimiPAGE2020: addnonmarketdamages
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = test_page_model()
-    include("../src/components/NonMarketDamages.jl")
 
     nonmarketdamages = addnonmarketdamages(m)
 

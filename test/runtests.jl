@@ -1,7 +1,8 @@
 using Test
 using Mimi
+using MimiPAGE2020
 
-include("../src/main_model.jl")
+using MimiPAGE2020: buildpage, setdistinctparameter, initpage
 
 updatetestdata = false
 
@@ -23,7 +24,7 @@ function get_scenario(ii)
     end
 end
 
-@testset "mimi-page-2020" begin
+@testset "MimiPAGE2020" begin
 
     include("test_climatemodel.jl")
     include("test_AbatementCosts.jl")

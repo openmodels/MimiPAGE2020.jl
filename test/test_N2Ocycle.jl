@@ -1,11 +1,11 @@
 using Test
+using MimiPAGE2020: n2ocycle
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = test_page_model()
-    include("../src/components/N2Ocycle.jl")
 
     add_comp!(m, n2ocycle)
 

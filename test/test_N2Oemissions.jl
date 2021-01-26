@@ -1,12 +1,11 @@
 using Test
+using MimiPAGE2020: n2oemissions
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = test_page_model()
-    include("../src/components/RCPSSPScenario.jl")
-    include("../src/components/N2Oemissions.jl")
 
     scenario = addrcpsspscenario(m, scenario)
     n2oemit = add_comp!(m, n2oemissions)

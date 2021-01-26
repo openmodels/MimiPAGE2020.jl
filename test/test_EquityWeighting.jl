@@ -1,4 +1,5 @@
 using Test
+using MimiPAGE2020: EquityWeighting
 
 for testscen in 1:2
     if testscen == 2
@@ -9,8 +10,6 @@ for testscen in 1:2
     println(scenario)
 
     m = test_page_model()
-    include("../src/components/RCPSSPScenario.jl")
-    include("../src/components/EquityWeighting.jl")
 
     rcpsspscenario = addrcpsspscenario(m, scenario)
     equityweighting = add_comp!(m, EquityWeighting)

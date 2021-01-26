@@ -1,8 +1,5 @@
-include("../src/components/PermafrostSiBCASA.jl")
-include("../src/components/PermafrostJULES.jl")
-include("../src/components/PermafrostTotal.jl")
-
 using Test
+using MimiPAGE2020: PermafrostSiBCASA, PermafrostJULES, PermafrostTotal
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)

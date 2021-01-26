@@ -4,8 +4,6 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    include("../src/main_model.jl")
-
     m = getpage(scenario, use_permafrost, use_seaice)
     run(m)
 
@@ -22,6 +20,7 @@ for testscen in 1:2
     end
 
     if updatetestdata
+        # TODO Should this include be removed?
         include("../src/utils/save_parameters.jl")
         savepagedata(m, :Population, :pop_population, "test/validationdata/$valdir/pop_population.csv")
         savepagedata(m, :GDP, :cons_percap_consumption, "test/validationdata/$valdir/cons_percap_consumption.csv")

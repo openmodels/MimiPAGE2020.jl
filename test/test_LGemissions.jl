@@ -1,12 +1,11 @@
 using Test
+using MimiPAGE2020: LGemissions
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = test_page_model()
-    include("../src/components/RCPSSPScenario.jl")
-    include("../src/components/LGemissions.jl")
 
     rcpsspscenario = addrcpsspscenario(m, scenario)
     lgemit = add_comp!(m, LGemissions)

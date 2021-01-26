@@ -1,6 +1,6 @@
 using Test
 
-include("../src/climate_model.jl")
+using MimiPAGE2020: climatemodel, readpagedata
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)

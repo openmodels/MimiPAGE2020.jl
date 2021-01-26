@@ -1,6 +1,5 @@
 using Test
 
-include("../src/main_model.jl")
 let m = getpage("NDCs", false, false)
     run(m)
 

@@ -1,9 +1,7 @@
-include("../src/components/RCPSSPScenario.jl")
-include("../src/components/AbatementCostParameters.jl")
-include("../src/components/AbatementCosts.jl")
-
 using DataFrames
 using Test
+
+using MimiPAGE2020: addabatementcostparameters, addabatementcosts, readpagedata, addrcpsspscenario, load_parameters
 
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)

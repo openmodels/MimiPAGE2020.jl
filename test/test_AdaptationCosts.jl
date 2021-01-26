@@ -2,12 +2,13 @@
 using DataFrames
 using Test
 
+using MimiPAGE2020: addadaptationcosts_noneconomic, addadaptationcosts_economic, addadaptationcosts_sealevel, readpagedata
+
 for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
     m = test_page_model()
-    include("../src/components/AdaptationCosts.jl")
 
     adaptationcosts_noneconomic = addadaptationcosts_noneconomic(m)
 
