@@ -1,5 +1,3 @@
-using Mimi
-
 @defcomp PAGE09SeaLevelRise begin
 
   # Parameters

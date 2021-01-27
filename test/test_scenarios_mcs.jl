@@ -1,6 +1,7 @@
 using Mimi
 using Test
 using CSV, DataFrames
+using Statistics
 
 import Mimi.has_parameter
 

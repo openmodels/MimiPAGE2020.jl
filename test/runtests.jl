@@ -23,7 +23,7 @@ function get_scenario(ii)
     end
 end
 
-@testset "mimi-page-2020" begin
+@testset "MimiPAGE2020" begin
 
     include("test_climatemodel.jl")
     include("test_AbatementCosts.jl")
