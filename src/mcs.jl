@@ -223,9 +223,16 @@ function getsim()
              EquityWeighting.tpc_totalaggregatedcosts,
              EquityWeighting.tac_totaladaptationcosts,
              EquityWeighting.te_totaleffect,
+             EquityWeighting.wit_percap_equityweightedimpact,
+             EquityWeighting.eact_percap_weightedadaptationcosts,
+             EquityWeighting.cons_percap_aftercosts, # without equity
+             EquityWeighting.rcons_percap_dis, # without equity
+             EquityWeighting.act_percap_adaptationcosts, # without equity
              CO2Cycle.c_CO2concentration,
              TotalForcing.ft_totalforcing,
              ClimateTemperature.rt_g_globaltemperature,
+             GDP.cons_percap_consumption,
+             Population.pop_population,
              SeaLevelRise.s_sealevel,
              SLRDamages.rgdp_per_cap_SLRRemainGDP,
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
@@ -277,7 +284,6 @@ function reformat_RV_outputs(samplesize::Int; output_path::String=joinpath(@__DI
     save(joinpath(output_path, "mimipagemontecarlooutput.csv"), df)
 end
 
-
 function do_monte_carlo_runs(samplesize::Int, scenario::String="RCP4.5 & SSP2", output_path::String=joinpath(@__DIR__, "../output"))
     # get simulation
     mcs = getsim()
@@ -290,5 +296,5 @@ function do_monte_carlo_runs(samplesize::Int, scenario::String="RCP4.5 & SSP2", 
     res = run(mcs, m, samplesize; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)
 
     # reformat outputs for testing and analysis
-    reformat_RV_outputs(samplesize, output_path=output_path)
+    ##reformat_RV_outputs(samplesize, output_path=output_path)
 end
