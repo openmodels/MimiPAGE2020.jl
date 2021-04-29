@@ -1,6 +1,6 @@
 using Test
 using Mimi
-using Pkg
+import Pkg
 
 Pkg.activate("..")
 Pkg.instantiate()
