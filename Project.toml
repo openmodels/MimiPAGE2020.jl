@@ -1,6 +1,6 @@
 name = "MimiPAGE2020"
 uuid = "daa1807e-96ac-4669-bc57-6ed081383131"
-version = "0.5-DEV"
+version = "0.5.0-DEV"
 
 [deps]
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
@@ -22,9 +22,9 @@ Query = "0.12, 1.0"
 julia = "1.4"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test", "CSV", "Statistics"]
