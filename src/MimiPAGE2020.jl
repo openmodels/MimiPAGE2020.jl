@@ -1,14 +1,20 @@
+module MimiPAGE2020
+
 using Mimi
 using Random
+using Distributions
+using DataFrames
+
 
 import Random
 
 export getpage
 
+
 include("utils/load_parameters.jl")
 include("utils/mctools.jl")
 
-include("mcs.jl")
+include("models/mcs_def.jl")
 include("compute_scc.jl")
 
 include("components/RCPSSPScenario.jl")
@@ -49,3 +55,6 @@ include("components/PermafrostJULES.jl")
 include("components/PermafrostTotal.jl")
 
 include("models/main_model_def.jl")
+include("models/climate_model_def.jl")
+
+end
