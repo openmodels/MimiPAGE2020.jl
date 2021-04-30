@@ -23,9 +23,7 @@ function get_scenario(ii)
     end
 end
 
-import Pkg
-
-@testset "MimiPAGE2020" begin
+@testset "MimiPAGE2020-all" begin
 
     include("test_climatemodel.jl")
     include("test_AbatementCosts.jl")
