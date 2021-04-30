@@ -1,11 +1,7 @@
 using Test
 using Mimi
-##import Pkg
 
 @testset "Packagation" begin
-
-    # Pkg.activate("..")
-    # Pkg.instantiate()
 
     using MimiPAGE2020
 
