@@ -25,6 +25,7 @@ end
 
 @testset "MimiPAGE2020" begin
 
+    include("test_package.jl")
     include("test_climatemodel.jl")
     include("test_AbatementCosts.jl")
     include("test_AdaptationCosts.jl")
@@ -65,5 +66,4 @@ end
     include("test_standard_api.jl")
     ## include("test_scc.jl") # Takes very long to run.
     include("contrib/test_taxeffect.jl")
-    include("test_package.jl")
 end

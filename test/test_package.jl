@@ -2,13 +2,17 @@ using Test
 using Mimi
 import Pkg
 
-Pkg.activate("..")
-Pkg.instantiate()
+@testset "Packagatino" begin
 
-using MimiPAGE2020
+    Pkg.activate("..")
+    Pkg.instantiate()
 
-m = getpage()
-run(m)
+    using MimiPAGE2020
 
-## Just test that this was successful
-@test typeof(m) <: Mimi.Model
+    m = getpage()
+    run(m)
+
+    ## Just test that this was successful
+    @test typeof(m) <: Mimi.Model
+
+end
