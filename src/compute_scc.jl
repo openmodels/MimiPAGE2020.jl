@@ -47,12 +47,12 @@ end
     e_globalCO2emissions_adjusted = Variable(index=[time], unit="Mtonne/year")
 
     function run_timestep(p, v, d, t)
-        if gettime(t) == p.pulse_year
-            v.e_globalCO2emissions_adjusted[t] = p.e_globalCO2emissions[t] + p.pulse_size / getperiodlength(p.pulse_year)
-        else
-            v.e_globalCO2emissions_adjusted[t] = p.e_globalCO2emissions[t]
-        end
+    if gettime(t) == p.pulse_year
+        v.e_globalCO2emissions_adjusted[t] = p.e_globalCO2emissions[t] + p.pulse_size / getperiodlength(p.pulse_year)
+    else
+        v.e_globalCO2emissions_adjusted[t] = p.e_globalCO2emissions[t]
     end
+end
 end
 
 """
@@ -113,7 +113,7 @@ function compute_scc(
             update_param!(m, :ptp_timepreference, prtp * 100)   # or update_param! if it has been set
         end
     end
-
+        
     if !equity_weighting
         try
             set_param!(m, :equity_proportion, 0)
@@ -198,7 +198,7 @@ function compute_scc_mm(m::Model=get_model(); year::Union{Int,Nothing}=nothing, 
     scc = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
     scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] / undiscount_scc(mm.base, year)
 
-    return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
+return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
 end
 
 """

@@ -34,26 +34,26 @@
 
     function init(p, v, d)
         # Set the RCP values
-        if p.rcp == 10
-            v.er_CO2emissionsgrowth[:, :] =
+    if p.rcp == 10
+        v.er_CO2emissionsgrowth[:, :] =
                 weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_co2.csv"), readpagedata(nothing, "data/rcps/rcp45_co2.csv"),
                                   readpagedata(nothing, "data/rcps/rcp85_co2.csv"), p.weight_scenarios)
-            v.er_CH4emissionsgrowth[:, :] =
+        v.er_CH4emissionsgrowth[:, :] =
                 weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_ch4.csv"), readpagedata(nothing, "data/rcps/rcp45_ch4.csv"),
                                   readpagedata(nothing, "data/rcps/rcp85_ch4.csv"), p.weight_scenarios)
-            v.er_N2Oemissionsgrowth[:, :] =
+        v.er_N2Oemissionsgrowth[:, :] =
                 weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_n2o.csv"), readpagedata(nothing, "data/rcps/rcp45_n2o.csv"),
                                   readpagedata(nothing, "data/rcps/rcp85_n2o.csv"), p.weight_scenarios)
-            v.er_LGemissionsgrowth[:, :] =
+        v.er_LGemissionsgrowth[:, :] =
                 weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_lin.csv"), readpagedata(nothing, "data/rcps/rcp45_lin.csv"),
                                   readpagedata(nothing, "data/rcps/rcp85_lin.csv"), p.weight_scenarios)
-            v.pse_sulphatevsbase[:, :] =
+        v.pse_sulphatevsbase[:, :] =
                 weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_sulph.csv"), readpagedata(nothing, "data/rcps/rcp45_sulph.csv"),
                                   readpagedata(nothing, "data/rcps/rcp85_sulph.csv"), p.weight_scenarios)
-            v.exf_excessforcing[:] =
+        v.exf_excessforcing[:] =
                 weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_excess.csv"), readpagedata(nothing, "data/rcps/rcp45_excess.csv"),
                                   readpagedata(nothing, "data/rcps/rcp85_excess.csv"), p.weight_scenarios)
-        elseif p.rcp == 260
+    elseif p.rcp == 260
             # Fill in within run_timestep
         elseif p.rcp == 0
             v.er_CO2emissionsgrowth[:, :] .= 0.
@@ -69,62 +69,62 @@
             v.er_LGemissionsgrowth[:, :] = readpagedata(nothing, "data/rcps/rcp$(p.rcp)_lin.csv")
             v.pse_sulphatevsbase[:, :] = readpagedata(nothing, "data/rcps/rcp$(p.rcp)_sulph.csv")
             v.exf_excessforcing[:] = readpagedata(nothing, "data/rcps/rcp$(p.rcp)_excess.csv")
-        end
+    end
 
         # Set the SSP values
-        if p.ssp == 234 || p.ssp == 10
-            v.popgrw_populationgrowth[:, :] = (readpagedata(nothing, "data/ssps/ssp2_pop_rate.csv") +
+    if p.ssp == 234 || p.ssp == 10
+        v.popgrw_populationgrowth[:, :] = (readpagedata(nothing, "data/ssps/ssp2_pop_rate.csv") +
                                    readpagedata(nothing, "data/ssps/ssp3_pop_rate.csv") +
                                    readpagedata(nothing, "data/ssps/ssp4_pop_rate.csv")) / 3
-            v.grw_gdpgrowthrate[:, :] = (readpagedata(nothing, "data/ssps/ssp2_gdp_rate.csv") +
+        v.grw_gdpgrowthrate[:, :] = (readpagedata(nothing, "data/ssps/ssp2_gdp_rate.csv") +
                                          readpagedata(nothing, "data/ssps/ssp3_gdp_rate.csv") +
                                          readpagedata(nothing, "data/ssps/ssp4_gdp_rate.csv")) / 3
-            if p.ssp == 10
-                v.popgrw_populationgrowth[:, :] =
+        if p.ssp == 10
+            v.popgrw_populationgrowth[:, :] =
                     weighted_scenario(readpagedata(nothing, "data/ssps/ssp1_pop_rate.csv"), v.popgrw_populationgrowth[:, :],
                                       readpagedata(nothing, "data/ssps/ssp5_pop_rate.csv"), p.weight_scenarios)
-                v.grw_gdpgrowthrate[:, :] =
+            v.grw_gdpgrowthrate[:, :] =
                     weighted_scenario(readpagedata(nothing, "data/ssps/ssp1_gdp_rate.csv"), v.grw_gdpgrowthrate[:, :],
                                       readpagedata(nothing, "data/ssps/ssp5_gdp_rate.csv"), p.weight_scenarios)
-            end
-        else
-            v.popgrw_populationgrowth[:, :] = readpagedata(nothing, "data/ssps/ssp$(p.ssp)_pop_rate.csv")
-            v.grw_gdpgrowthrate[:, :] = readpagedata(nothing, "data/ssps/ssp$(p.ssp)_gdp_rate.csv")
         end
+    else
+        v.popgrw_populationgrowth[:, :] = readpagedata(nothing, "data/ssps/ssp$(p.ssp)_pop_rate.csv")
+        v.grw_gdpgrowthrate[:, :] = readpagedata(nothing, "data/ssps/ssp$(p.ssp)_gdp_rate.csv")
     end
+end
 
     function run_timestep(p, v, d, t)
         # Only used for rcp26extra
-        if p.rcp == 260
-            if is_first(t)
-                duration = 5
-            else
-                duration = p.y_year[t] - p.y_year[t - 1]
-            end
-
-            extra_abate_period = ifelse(p.y_year[t] <= p.extra_abate_start || p.y_year[t] > p.extra_abate_end, 1.,
-                                        (1 - p.extra_abate_rate / 100.)^duration)
-            if is_first(t)
-                v.extra_abate_compound[t] = extra_abate_period
-            else
-                v.extra_abate_compound[t] = extra_abate_period * v.extra_abate_compound[t - 1]
-            end
-
-            er_rcp26_CO2emissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_co2.csv")
-            er_rcp26_CH4emissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_ch4.csv")
-            er_rcp26_N2Oemissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_n2o.csv")
-            er_rcp26_LGemissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_lin.csv")
-            pse_rcp26_sulphatevsbase = readpagedata(nothing, "data/rcps/rcp26_sulph.csv")
-            exf_rcp26_excessforcing = readpagedata(nothing, "data/rcps/rcp26_excess.csv")
-
-            v.er_CO2emissionsgrowth[t, :] = (er_rcp26_CO2emissionsgrowth[t.t, :] - er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]) * v.extra_abate_compound[t] .+ er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]
-            v.er_CH4emissionsgrowth[t, :] = er_rcp26_CH4emissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.er_N2Oemissionsgrowth[t, :] = er_rcp26_N2Oemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.er_LGemissionsgrowth[t, :] = er_rcp26_LGemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.pse_sulphatevsbase[t, :] = pse_rcp26_sulphatevsbase[t.t, :] * v.extra_abate_compound[t]
-            v.exf_excessforcing[t, :] = exf_rcp26_excessforcing[t.t, :] * v.extra_abate_compound[t]
+    if p.rcp == 260
+        if is_first(t)
+            duration = 5
+        else
+            duration = p.y_year[t] - p.y_year[t - 1]
         end
+
+        extra_abate_period = ifelse(p.y_year[t] <= p.extra_abate_start || p.y_year[t] > p.extra_abate_end, 1.,
+                                        (1 - p.extra_abate_rate / 100.)^duration)
+        if is_first(t)
+            v.extra_abate_compound[t] = extra_abate_period
+        else
+            v.extra_abate_compound[t] = extra_abate_period * v.extra_abate_compound[t - 1]
+        end
+
+        er_rcp26_CO2emissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_co2.csv")
+        er_rcp26_CH4emissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_ch4.csv")
+        er_rcp26_N2Oemissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_n2o.csv")
+        er_rcp26_LGemissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_lin.csv")
+        pse_rcp26_sulphatevsbase = readpagedata(nothing, "data/rcps/rcp26_sulph.csv")
+        exf_rcp26_excessforcing = readpagedata(nothing, "data/rcps/rcp26_excess.csv")
+
+        v.er_CO2emissionsgrowth[t, :] = (er_rcp26_CO2emissionsgrowth[t.t, :] - er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]) * v.extra_abate_compound[t] .+ er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]
+        v.er_CH4emissionsgrowth[t, :] = er_rcp26_CH4emissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+        v.er_N2Oemissionsgrowth[t, :] = er_rcp26_N2Oemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+        v.er_LGemissionsgrowth[t, :] = er_rcp26_LGemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+        v.pse_sulphatevsbase[t, :] = pse_rcp26_sulphatevsbase[t.t, :] * v.extra_abate_compound[t]
+        v.exf_excessforcing[t, :] = exf_rcp26_excessforcing[t.t, :] * v.extra_abate_compound[t]
     end
+end
 end
 
 function weighted_scenario(lowscen, medscen, highscen, weight)

@@ -13,9 +13,9 @@
 
     function run_timestep(p, v, d, t)
 
-        for r in d.region
-            v.act_adaptationcosts_total[t,r] = p.ac_adaptationcosts_economic[t,r] + p.ac_adaptationcosts_sealevelrise[t,r] + p.ac_adaptationcosts_noneconomic[t,r]
-            v.act_percap_adaptationcosts[t,r] = v.act_adaptationcosts_total[t,r] / p.pop_population[t,r]
-        end
+    for r in d.region
+        v.act_adaptationcosts_total[t,r] = p.ac_adaptationcosts_economic[t,r] + p.ac_adaptationcosts_sealevelrise[t,r] + p.ac_adaptationcosts_noneconomic[t,r]
+        v.act_percap_adaptationcosts[t,r] = v.act_adaptationcosts_total[t,r] / p.pop_population[t,r]
     end
+end
 end

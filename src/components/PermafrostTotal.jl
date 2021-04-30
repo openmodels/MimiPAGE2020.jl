@@ -14,10 +14,10 @@
 
     function run_timestep(p, v, d, tt)
         # Cumulative emissions CO2 perm
-        v.perm_tot_ce_co2[tt] = 0.5 * (p.perm_sib_ce_co2[tt] + p.perm_jul_ce_co2[tt]) * (1 + p.perm_initial_c_stock_uncertainty / 100)
+    v.perm_tot_ce_co2[tt] = 0.5 * (p.perm_sib_ce_co2[tt] + p.perm_jul_ce_co2[tt]) * (1 + p.perm_initial_c_stock_uncertainty / 100)
         # Annual emissions CO2 perm
-        v.perm_tot_e_co2[tt] = 0.5 * (p.perm_sib_e_co2[tt] + p.perm_jul_e_co2[tt]) * (1 + p.perm_initial_c_stock_uncertainty / 100)
+    v.perm_tot_e_co2[tt] = 0.5 * (p.perm_sib_e_co2[tt] + p.perm_jul_e_co2[tt]) * (1 + p.perm_initial_c_stock_uncertainty / 100)
         # Cumulative emissions CH4 perm
-        v.perm_tot_ce_ch4[tt] = 0.5 * (p.perm_sib_ce_ch4[tt] + p.perm_jul_ce_ch4[tt]) * (1 + p.perm_initial_c_stock_uncertainty / 100)
-    end
+    v.perm_tot_ce_ch4[tt] = 0.5 * (p.perm_sib_ce_ch4[tt] + p.perm_jul_ce_ch4[tt]) * (1 + p.perm_initial_c_stock_uncertainty / 100)
+end
 end

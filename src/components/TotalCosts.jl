@@ -29,23 +29,23 @@
     function run_timestep(p, v, d, t)
 
         # Damages
-        v.total_damages_percap_peryear[t, :] =
+    v.total_damages_percap_peryear[t, :] =
             p.adaptation_costs_percap_peryear[t, :] +
             p.slr_damages_percap_peryear[t, :] +
             p.market_damages_percap_peryear[t, :] +
             p.non_market_damages_percap_peryear[t, :] +
             p.discontinuity_damages_percap_peryear[t, :]
-        v.total_damages_peryear[t, :] = v.total_damages_percap_peryear[t, :] .* p.population[t, :]
-        v.total_damages_aggregated[t, :] = v.total_damages_peryear[t, :] .* p.period_length[t]
+    v.total_damages_peryear[t, :] = v.total_damages_percap_peryear[t, :] .* p.population[t, :]
+    v.total_damages_aggregated[t, :] = v.total_damages_peryear[t, :] .* p.period_length[t]
 
         # Abatement
-        v.total_abatement_percap_peryear[t, :] = p.abatement_costs_percap_peryear[t, :]
-        v.total_abatement_peryear[t, :] = v.total_abatement_percap_peryear[t, :] .* p.population[t, :]
-        v.total_abatement_aggregated[t, :] = v.total_abatement_peryear[t, :] .* p.period_length[t]
+    v.total_abatement_percap_peryear[t, :] = p.abatement_costs_percap_peryear[t, :]
+    v.total_abatement_peryear[t, :] = v.total_abatement_percap_peryear[t, :] .* p.population[t, :]
+    v.total_abatement_aggregated[t, :] = v.total_abatement_peryear[t, :] .* p.period_length[t]
 
         # Total costs (damages + abatement)
-        v.total_costs_percap_peryear[t, :] = v.total_damages_percap_peryear[t, :] + p.abatement_costs_percap_peryear[t, :]
-        v.total_costs_peryear[t, :] = v.total_costs_percap_peryear[t, :] .* p.population[t, :]
-        v.total_costs_aggregated[t, :] = v.total_costs_peryear[t, :] .* p.period_length[t]
-    end
+    v.total_costs_percap_peryear[t, :] = v.total_damages_percap_peryear[t, :] + p.abatement_costs_percap_peryear[t, :]
+    v.total_costs_peryear[t, :] = v.total_costs_percap_peryear[t, :] .* p.population[t, :]
+    v.total_costs_aggregated[t, :] = v.total_costs_peryear[t, :] .* p.period_length[t]
+end
 end

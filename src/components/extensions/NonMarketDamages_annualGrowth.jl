@@ -103,69 +103,69 @@ end
         # # interpolate the parameters that require interpolation:
         # interpolate_parameters_nonmarketdamages(p, v, d, t)
 
-        for r in d.region
+    for r in d.region
 
-            if p.rtl_realizedtemperature[t,r] - p.atl_adjustedtolerableleveloftemprise[t,r] < 0
-                v.i_regionalimpact[t,r] = 0
-            else
-                v.i_regionalimpact[t,r] = p.rtl_realizedtemperature[t,r] - p.atl_adjustedtolerableleveloftemprise[t,r]
-            end
+        if p.rtl_realizedtemperature[t,r] - p.atl_adjustedtolerableleveloftemprise[t,r] < 0
+            v.i_regionalimpact[t,r] = 0
+        else
+            v.i_regionalimpact[t,r] = p.rtl_realizedtemperature[t,r] - p.atl_adjustedtolerableleveloftemprise[t,r]
+        end
 
-            v.iref_ImpactatReferenceGDPperCap[t,r] = p.wincf_weightsfactor_nonmarket[r] *
+        v.iref_ImpactatReferenceGDPperCap[t,r] = p.wincf_weightsfactor_nonmarket[r] *
                 ((p.w_NonImpactsatCalibrationTemp + p.iben_NonMarketInitialBenefit * p.tcal_CalibrationTemp) *
                     (v.i_regionalimpact[t,r] / p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact[t,r] * p.iben_NonMarketInitialBenefit)
 
-            v.igdp_ImpactatActualGDPperCap[t,r] = v.iref_ImpactatReferenceGDPperCap[t,r] *
+        v.igdp_ImpactatActualGDPperCap[t,r] = v.iref_ImpactatReferenceGDPperCap[t,r] *
                 (p.rgdp_per_cap_MarketRemainGDP[t,r] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_NonMarketIncomeFxnExponent
 
-            if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
-                v.isat_ImpactinclSaturationandAdaptation[t,r] = v.igdp_ImpactatActualGDPperCap[t,r]
-            else
-                v.isat_ImpactinclSaturationandAdaptation[t,r] = p.isatg_impactfxnsaturation +
+        if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
+            v.isat_ImpactinclSaturationandAdaptation[t,r] = v.igdp_ImpactatActualGDPperCap[t,r]
+        else
+            v.isat_ImpactinclSaturationandAdaptation[t,r] = p.isatg_impactfxnsaturation +
                 ((100 - p.save_savingsrate) - p.isatg_impactfxnsaturation) *
                 ((v.igdp_ImpactatActualGDPperCap[t,r] - p.isatg_impactfxnsaturation) /
                  (((100 - p.save_savingsrate) - p.isatg_impactfxnsaturation) +
                   (v.igdp_ImpactatActualGDPperCap[t,r] -
                    p.isatg_impactfxnsaturation)))
-            end
+        end
 
-            if v.i_regionalimpact[t,r] < p.impmax_maxtempriseforadaptpolicyNM[r]
-                v.isat_ImpactinclSaturationandAdaptation[t,r] = v.isat_ImpactinclSaturationandAdaptation[t,r] * (1 - p.imp_actualreduction[t,r] / 100)
-            else
-                v.isat_ImpactinclSaturationandAdaptation[t,r] = v.isat_ImpactinclSaturationandAdaptation[t,r] *
+        if v.i_regionalimpact[t,r] < p.impmax_maxtempriseforadaptpolicyNM[r]
+            v.isat_ImpactinclSaturationandAdaptation[t,r] = v.isat_ImpactinclSaturationandAdaptation[t,r] * (1 - p.imp_actualreduction[t,r] / 100)
+        else
+            v.isat_ImpactinclSaturationandAdaptation[t,r] = v.isat_ImpactinclSaturationandAdaptation[t,r] *
                     (1 - (p.imp_actualreduction[t,r] / 100) * p.impmax_maxtempriseforadaptpolicyNM[r] /
                      v.i_regionalimpact[t,r])
-            end
+        end
 
-            v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r] = (v.isat_ImpactinclSaturationandAdaptation[t,r] / 100) * p.rgdp_per_cap_MarketRemainGDP[t,r]
-            v.rcons_per_cap_NonMarketRemainConsumption[t,r] = p.rcons_per_cap_MarketRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
-            v.rgdp_per_cap_NonMarketRemainGDP[t,r] = v.rcons_per_cap_NonMarketRemainConsumption[t,r] / (1 - p.save_savingsrate / 100)
+        v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r] = (v.isat_ImpactinclSaturationandAdaptation[t,r] / 100) * p.rgdp_per_cap_MarketRemainGDP[t,r]
+        v.rcons_per_cap_NonMarketRemainConsumption[t,r] = p.rcons_per_cap_MarketRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
+        v.rgdp_per_cap_NonMarketRemainGDP[t,r] = v.rcons_per_cap_NonMarketRemainConsumption[t,r] / (1 - p.save_savingsrate / 100)
 
             # calculate  for this specific year
-            if is_first(t)
-                for annual_year = 2015:(gettime(t))
-                    calc_nonmarketdamages(p, v, d, t, annual_year, r)
-                end
-                if isequal(r, 8)
-                    v.rgdp_per_cap_NonMarketRemainGDP_sum = sum(v.rgdp_per_cap_NonMarketRemainGDP[t,:]) * p.yagg_periodspan[t]
-                end
-            else
-                for annual_year = (gettime(t - 1) + 1):(gettime(t))
-                    calc_nonmarketdamages(p, v, d, t, annual_year, r)
+        if is_first(t)
+            for annual_year = 2015:(gettime(t))
+                calc_nonmarketdamages(p, v, d, t, annual_year, r)
+            end
+            if isequal(r, 8)
+                v.rgdp_per_cap_NonMarketRemainGDP_sum = sum(v.rgdp_per_cap_NonMarketRemainGDP[t,:]) * p.yagg_periodspan[t]
+            end
+        else
+            for annual_year = (gettime(t - 1) + 1):(gettime(t))
+                calc_nonmarketdamages(p, v, d, t, annual_year, r)
 
-                    if isequal(annual_year, 2300)
-                        if isequal(r, 8)
-                            v.rgdp_per_cap_NonMarketRemainGDP_ann_sum = sum(v.rgdp_per_cap_NonMarketRemainGDP_ann[:,:])
-                            v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann_sum_nonmarket = sum(v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[:,:])
-                        end
+                if isequal(annual_year, 2300)
+                    if isequal(r, 8)
+                        v.rgdp_per_cap_NonMarketRemainGDP_ann_sum = sum(v.rgdp_per_cap_NonMarketRemainGDP_ann[:,:])
+                        v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann_sum_nonmarket = sum(v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[:,:])
                     end
                 end
-                if isequal(r, 8)
-                    v.rgdp_per_cap_NonMarketRemainGDP_sum = v.rgdp_per_cap_NonMarketRemainGDP_sum + sum(v.rgdp_per_cap_NonMarketRemainGDP[t,:]) * p.yagg_periodspan[t]
-                end
+            end
+            if isequal(r, 8)
+                v.rgdp_per_cap_NonMarketRemainGDP_sum = v.rgdp_per_cap_NonMarketRemainGDP_sum + sum(v.rgdp_per_cap_NonMarketRemainGDP[t,:]) * p.yagg_periodspan[t]
             end
         end
     end
+end
 end
 
 

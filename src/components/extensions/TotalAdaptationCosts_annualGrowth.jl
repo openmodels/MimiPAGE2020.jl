@@ -26,22 +26,22 @@ end
 
     function run_timestep(p, v, d, t)
 
-        for r in d.region
-            v.act_adaptationcosts_total[t,r] = p.ac_adaptationcosts_economic[t,r] + p.ac_adaptationcosts_sealevelrise[t,r] + p.ac_adaptationcosts_noneconomic[t,r]
-            v.act_percap_adaptationcosts[t,r] = v.act_adaptationcosts_total[t,r] / p.pop_population[t,r]
+    for r in d.region
+        v.act_adaptationcosts_total[t,r] = p.ac_adaptationcosts_economic[t,r] + p.ac_adaptationcosts_sealevelrise[t,r] + p.ac_adaptationcosts_noneconomic[t,r]
+        v.act_percap_adaptationcosts[t,r] = v.act_adaptationcosts_total[t,r] / p.pop_population[t,r]
 
 
             # calculate  for this specific year
-            if is_first(t)
-                for annual_year = 2015:(gettime(t))
-                    calc_totaladaptationcosts(p, v, d, t, annual_year, r)
-                end
-            else
-                for annual_year = (gettime(t - 1) + 1):(gettime(t))
-                    calc_totaladaptationcosts(p, v, d, t, annual_year, r)
-                end
+        if is_first(t)
+            for annual_year = 2015:(gettime(t))
+                calc_totaladaptationcosts(p, v, d, t, annual_year, r)
             end
-
+        else
+            for annual_year = (gettime(t - 1) + 1):(gettime(t))
+                calc_totaladaptationcosts(p, v, d, t, annual_year, r)
+            end
         end
+
     end
+end
 end

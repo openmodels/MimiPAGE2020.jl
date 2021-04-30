@@ -62,53 +62,53 @@
 
     function run_timestep(p, v, d, t)
 
-        for r in d.region
-            v.emit_UncertaintyinBAUEmissFactor[r] = p.emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear *
+    for r in d.region
+        v.emit_UncertaintyinBAUEmissFactor[r] = p.emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear *
                 p.emitf_uncertaintyinBAUemissfactor[r]
-            v.q0propinit_CutbacksinNegativeCostinBaseYear[r] = p.q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear *
+        v.q0propinit_CutbacksinNegativeCostinBaseYear[r] = p.q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear *
                 p.q0f_negativecostpercentagefactor[r]
-            v.cmaxinit_MaxCutbackCostinBaseYear[r] = p.cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear *
+        v.cmaxinit_MaxCutbackCostinBaseYear[r] = p.cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear *
                 p.cmaxf_maxcostfactor[r]
 
-            v.zc_zerocostemissions[t,r] = (1 + v.emit_UncertaintyinBAUEmissFactor[r] / 100 * (p.y_year[t] - p.y_year_0) / (p.y_year[end] - p.y_year_0)) * p.bau_businessasusualemissions[t,r]
+        v.zc_zerocostemissions[t,r] = (1 + v.emit_UncertaintyinBAUEmissFactor[r] / 100 * (p.y_year[t] - p.y_year_0) / (p.y_year[end] - p.y_year_0)) * p.bau_businessasusualemissions[t,r]
 
-            if is_first(t)
-                v.cumcbe_cumulativereductionssincebaseyear[t,r] = 0.
-            else
-                v.cumcbe_cumulativereductionssincebaseyear[t,r] = v.cumcbe_cumulativereductionssincebaseyear[t - 1, r] + p.cbe_absoluteemissionreductions[t - 1, r] * p.yagg[t - 1]
-            end
-        end
-
-        v.cumcbe_g_totalreductions[t] = sum(v.cumcbe_cumulativereductionssincebaseyear[t,:])
-
-        v.auto = (1 - p.automult_autonomoustechchange^(1 / (p.y_year_lssp - p.y_year_0))) * 100
-        v.autofac[t] = (1 - v.auto / 100)^(p.y_year[t] - p.y_year_0)
-
-        v.c0g = (p.c0mult_mostnegativecostinfinalyear^(1 / (p.y_year_lssp - p.y_year_0)) - 1) * 100
-        v.c0[t] = p.c0init_MostNegativeCostCutbackinBaseYear * (1 + v.c0g / 100)^(p.y_year[t] - p.y_year_0)
-
-        v.qmaxminusq0propg = (p.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear^(1 / (p.y_year_lssp - p.y_year_0)) - 1) * 100
-        v.qmaxminusq0prop = p.qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear * (1 + v.qmaxminusq0propg / 100)^(p.y_year[t] - p.y_year_0)
-
-        v.q0propg = (p.q0propmult_cutbacksatnegativecostinfinalyear^(1 / (p.y_year_lssp - p.y_year_0)) - 1) * 100
-
-        for r in d.region
-            v.learnfac_learning[t,r] = ((p.cross_experiencecrossoverratio * v.cumcbe_g_totalreductions[t] + (1 - p.cross_experiencecrossoverratio) * v.cumcbe_cumulativereductionssincebaseyear[t,r] + p.ies_InitialExperienceStockofCutbacks) / p.ies_InitialExperienceStockofCutbacks)^-(log(1 / (1 - p.learn_learningrate)) / log(2))
-
-            v.q0prop[t,r] = v.q0propinit_CutbacksinNegativeCostinBaseYear[r] * (1 + v.q0propg / 100)^(p.y_year[t] - p.y_year_0)
-
-            v.q0_absolutecutbacksatnegativecost[t,r] = (v.q0prop[t,r] / 100) * (v.zc_zerocostemissions[t,r] / 100) * p.e0_baselineemissions[r]
-
-            v.qmax_maxreferencereductions[t,r] = (v.qmaxminusq0prop / 100) * (v.zc_zerocostemissions[t,r] / 100) * p.e0_baselineemissions[r] + v.q0_absolutecutbacksatnegativecost[t,r]
-
-            v.cmax[t,r] = v.cmaxinit_MaxCutbackCostinBaseYear[r] * v.learnfac_learning[t,r] * v.autofac[t]
-
-            v.blo[t,r] = -2 * log((1 + p.curve_below_curvatureofMACcurvebelowzerocost) / (1 - p.curve_below_curvatureofMACcurvebelowzerocost)) / v.q0_absolutecutbacksatnegativecost[t,r]
-            v.alo[t,r] = v.c0[t] / (exp(-v.blo[t,r] * v.q0_absolutecutbacksatnegativecost[t,r]) - 1)
-            v.bhi[t,r] = 2 * log((1 + p.curve_above_curvatureofMACcurveabovezerocost) / (1 - p.curve_above_curvatureofMACcurveabovezerocost)) / (v.qmax_maxreferencereductions[t,r] - v.q0_absolutecutbacksatnegativecost[t,r])
-            v.ahi[t,r] = v.cmax[t,r] / (exp(v.bhi[t,r] * (v.qmax_maxreferencereductions[t,r] - v.q0_absolutecutbacksatnegativecost[t,r])) - 1)
+        if is_first(t)
+            v.cumcbe_cumulativereductionssincebaseyear[t,r] = 0.
+        else
+            v.cumcbe_cumulativereductionssincebaseyear[t,r] = v.cumcbe_cumulativereductionssincebaseyear[t - 1, r] + p.cbe_absoluteemissionreductions[t - 1, r] * p.yagg[t - 1]
         end
     end
+
+    v.cumcbe_g_totalreductions[t] = sum(v.cumcbe_cumulativereductionssincebaseyear[t,:])
+
+    v.auto = (1 - p.automult_autonomoustechchange^(1 / (p.y_year_lssp - p.y_year_0))) * 100
+    v.autofac[t] = (1 - v.auto / 100)^(p.y_year[t] - p.y_year_0)
+
+    v.c0g = (p.c0mult_mostnegativecostinfinalyear^(1 / (p.y_year_lssp - p.y_year_0)) - 1) * 100
+    v.c0[t] = p.c0init_MostNegativeCostCutbackinBaseYear * (1 + v.c0g / 100)^(p.y_year[t] - p.y_year_0)
+
+    v.qmaxminusq0propg = (p.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear^(1 / (p.y_year_lssp - p.y_year_0)) - 1) * 100
+    v.qmaxminusq0prop = p.qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear * (1 + v.qmaxminusq0propg / 100)^(p.y_year[t] - p.y_year_0)
+
+    v.q0propg = (p.q0propmult_cutbacksatnegativecostinfinalyear^(1 / (p.y_year_lssp - p.y_year_0)) - 1) * 100
+
+    for r in d.region
+        v.learnfac_learning[t,r] = ((p.cross_experiencecrossoverratio * v.cumcbe_g_totalreductions[t] + (1 - p.cross_experiencecrossoverratio) * v.cumcbe_cumulativereductionssincebaseyear[t,r] + p.ies_InitialExperienceStockofCutbacks) / p.ies_InitialExperienceStockofCutbacks)^-(log(1 / (1 - p.learn_learningrate)) / log(2))
+
+        v.q0prop[t,r] = v.q0propinit_CutbacksinNegativeCostinBaseYear[r] * (1 + v.q0propg / 100)^(p.y_year[t] - p.y_year_0)
+
+        v.q0_absolutecutbacksatnegativecost[t,r] = (v.q0prop[t,r] / 100) * (v.zc_zerocostemissions[t,r] / 100) * p.e0_baselineemissions[r]
+
+        v.qmax_maxreferencereductions[t,r] = (v.qmaxminusq0prop / 100) * (v.zc_zerocostemissions[t,r] / 100) * p.e0_baselineemissions[r] + v.q0_absolutecutbacksatnegativecost[t,r]
+
+        v.cmax[t,r] = v.cmaxinit_MaxCutbackCostinBaseYear[r] * v.learnfac_learning[t,r] * v.autofac[t]
+
+        v.blo[t,r] = -2 * log((1 + p.curve_below_curvatureofMACcurvebelowzerocost) / (1 - p.curve_below_curvatureofMACcurvebelowzerocost)) / v.q0_absolutecutbacksatnegativecost[t,r]
+        v.alo[t,r] = v.c0[t] / (exp(-v.blo[t,r] * v.q0_absolutecutbacksatnegativecost[t,r]) - 1)
+        v.bhi[t,r] = 2 * log((1 + p.curve_above_curvatureofMACcurveabovezerocost) / (1 - p.curve_above_curvatureofMACcurveabovezerocost)) / (v.qmax_maxreferencereductions[t,r] - v.q0_absolutecutbacksatnegativecost[t,r])
+        v.ahi[t,r] = v.cmax[t,r] / (exp(v.bhi[t,r] * (v.qmax_maxreferencereductions[t,r] - v.q0_absolutecutbacksatnegativecost[t,r])) - 1)
+    end
+end
 end
 
 function addabatementcostparameters(model::Model, class::Symbol, policy::String="policy-a")

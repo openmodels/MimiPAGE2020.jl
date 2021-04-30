@@ -14,11 +14,11 @@
     function run_timestep(p, v, d, t)
 
         # eq.4 in Hope (2006) - regional LG emissions as % change from baseline
-        for r in d.region
-            v.e_regionalLGemissions[t,r] = p.er_LGemissionsgrowth[t,r] * p.e0_baselineLGemissions[r] / 100
-        end
+    for r in d.region
+        v.e_regionalLGemissions[t,r] = p.er_LGemissionsgrowth[t,r] * p.e0_baselineLGemissions[r] / 100
+    end
 
         # eq. 5 in Hope (2006) - global LG emissions are sum of regional emissions
-        v.e_globalLGemissions[t] = sum(v.e_regionalLGemissions[t,:])
-    end
+    v.e_globalLGemissions[t] = sum(v.e_regionalLGemissions[t,:])
+end
 end

@@ -85,54 +85,54 @@ end
     function run_timestep(p, v, d, tt)
 
         # Hope (2009), p. 21, equation -5
-        auto_autonomoustechchangepercent = (1 - p.automult_autonomoustechchange^(1 / (p.y_year_lssp - p.y_year_0))) * 100 # % per year
-        v.autofac_autonomoustechchangefraction[tt] = (1 - auto_autonomoustechchangepercent / 100)^(p.y_year[tt] - p.y_year_0) # Varies by year
+    auto_autonomoustechchangepercent = (1 - p.automult_autonomoustechchange^(1 / (p.y_year_lssp - p.y_year_0))) * 100 # % per year
+    v.autofac_autonomoustechchangefraction[tt] = (1 - auto_autonomoustechchangepercent / 100)^(p.y_year[tt] - p.y_year_0) # Varies by year
 
-        for rr in d.region
+    for rr in d.region
             # calculate adjusted tolerable level and max impact based on adaptation policy
-            if (p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) < 0
-                v.atl_adjustedtolerablelevel[tt,rr] = 0
-            elseif ((p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) / p.pyears_yearstilfulleffect[rr]) < 1.
+        if (p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) < 0
+            v.atl_adjustedtolerablelevel[tt,rr] = 0
+        elseif ((p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) / p.pyears_yearstilfulleffect[rr]) < 1.
                 v.atl_adjustedtolerablelevel[tt,rr] =
                     ((p.y_year[tt] - p.pstart_startdateofadaptpolicy[rr]) / p.pyears_yearstilfulleffect[rr]) *
                     p.plateau_increaseintolerableplateaufromadaptation[rr]
             else
                 v.atl_adjustedtolerablelevel[tt,rr] = p.plateau_increaseintolerableplateaufromadaptation[rr]
-            end
+        end
 
-            if (p.y_year[tt] - p.istart_startdate[rr]) < 0
-                v.imp_adaptedimpacts[tt,rr] = 0
-            elseif ((p.y_year[tt] - p.istart_startdate[rr]) / p.iyears_yearstilfulleffect[rr]) < 1
+        if (p.y_year[tt] - p.istart_startdate[rr]) < 0
+            v.imp_adaptedimpacts[tt,rr] = 0
+        elseif ((p.y_year[tt] - p.istart_startdate[rr]) / p.iyears_yearstilfulleffect[rr]) < 1
                 v.imp_adaptedimpacts[tt,rr] =
                     (p.y_year[tt] - p.istart_startdate[rr]) / p.iyears_yearstilfulleffect[rr] *
                     p.impred_eventualpercentreduction[rr]
             else
                 v.imp_adaptedimpacts[tt,rr] = p.impred_eventualpercentreduction[rr]
-            end
+        end
 
             # Hope (2009), p. 25, equations 1-2
-            cp_costplateau_regional = p.cp_costplateau_eu * p.cf_costregional[rr]
-            ci_costimpact_regional = p.ci_costimpact_eu * p.cf_costregional[rr]
+        cp_costplateau_regional = p.cp_costplateau_eu * p.cf_costregional[rr]
+        ci_costimpact_regional = p.ci_costimpact_eu * p.cf_costregional[rr]
 
             # Hope (2009), p. 25, equations 3-4
-            v.acp_adaptivecostplateau[tt, rr] = v.atl_adjustedtolerablelevel[tt, rr] * cp_costplateau_regional * p.gdp[tt, rr] * v.autofac_autonomoustechchangefraction[tt] / 100
-            v.aci_adaptivecostimpact[tt, rr] = v.imp_adaptedimpacts[tt, rr] * ci_costimpact_regional * p.gdp[tt, rr] * p.impmax_maximumadaptivecapacity[rr] * v.autofac_autonomoustechchangefraction[tt] / 100
+        v.acp_adaptivecostplateau[tt, rr] = v.atl_adjustedtolerablelevel[tt, rr] * cp_costplateau_regional * p.gdp[tt, rr] * v.autofac_autonomoustechchangefraction[tt] / 100
+        v.aci_adaptivecostimpact[tt, rr] = v.imp_adaptedimpacts[tt, rr] * ci_costimpact_regional * p.gdp[tt, rr] * p.impmax_maximumadaptivecapacity[rr] * v.autofac_autonomoustechchangefraction[tt] / 100
 
             # Hope (2009), p. 25, equation 5
-            v.ac_adaptivecosts[tt, rr] = v.acp_adaptivecostplateau[tt, rr] + v.aci_adaptivecostimpact[tt, rr]
-        end
+        v.ac_adaptivecosts[tt, rr] = v.acp_adaptivecostplateau[tt, rr] + v.aci_adaptivecostimpact[tt, rr]
+    end
 
         # calculate  for this specific year
-        if is_first(tt)
-            for annual_year = 2015:(gettime(tt))
-                calc_adaptationcosts(p, v, d, tt, annual_year)
-            end
-        else
-            for annual_year = (gettime(tt - 1) + 1):(gettime(tt))
-                calc_adaptationcosts(p, v, d, tt, annual_year)
-            end
+    if is_first(tt)
+        for annual_year = 2015:(gettime(tt))
+            calc_adaptationcosts(p, v, d, tt, annual_year)
+        end
+    else
+        for annual_year = (gettime(tt - 1) + 1):(gettime(tt))
+            calc_adaptationcosts(p, v, d, tt, annual_year)
         end
     end
+end
 end
 
 function addadaptationcosts_sealevel(model::Model)

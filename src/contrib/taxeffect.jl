@@ -19,35 +19,35 @@
 
     function run_timestep(p, v, d, t)
 
-        for rr in d.region
+    for rr in d.region
             # Invert equation for mc_marginalcost from AbatementCosts
             # Assume zc_zerocostemissions > er_emissionsgrowth (otherwise not reduced)
 
             # If cbe_absoluteemissionreductions < q0_absolutecutbacksatnegativecost
-            if p.alo[t, rr] + 1 > 0
-                er_lowside = p.zc_zerocostemissions[t, rr] - (log(p.taxrate[t] / p.alo[t, rr] + 1) / p.blo[t, rr] + p.q0_absolutecutbacksatnegativecost[t, rr]) / (p.e0_baselineemissions[rr] / 100)
-                cbe_lowside = (p.zc_zerocostemissions[t, rr] - er_lowside) * p.e0_baselineemissions[rr] / 100
-            else
-                cbe_lowside = Inf
-            end
+        if p.alo[t, rr] + 1 > 0
+            er_lowside = p.zc_zerocostemissions[t, rr] - (log(p.taxrate[t] / p.alo[t, rr] + 1) / p.blo[t, rr] + p.q0_absolutecutbacksatnegativecost[t, rr]) / (p.e0_baselineemissions[rr] / 100)
+            cbe_lowside = (p.zc_zerocostemissions[t, rr] - er_lowside) * p.e0_baselineemissions[rr] / 100
+        else
+            cbe_lowside = Inf
+        end
 
             # Else
-            if p.ahi[t, rr] + 1 > 0
-                er_highside = p.zc_zerocostemissions[t, rr] - (log(p.taxrate[t] / p.ahi[t, rr] + 1) / p.bhi[t, rr] + p.q0_absolutecutbacksatnegativecost[t, rr]) / (p.e0_baselineemissions[rr] / 100)
-                cbe_highside = (p.zc_zerocostemissions[t, rr] - er_highside) * p.e0_baselineemissions[rr] / 100
-            else
-                cbe_highside = -Inf
-            end
+        if p.ahi[t, rr] + 1 > 0
+            er_highside = p.zc_zerocostemissions[t, rr] - (log(p.taxrate[t] / p.ahi[t, rr] + 1) / p.bhi[t, rr] + p.q0_absolutecutbacksatnegativecost[t, rr]) / (p.e0_baselineemissions[rr] / 100)
+            cbe_highside = (p.zc_zerocostemissions[t, rr] - er_highside) * p.e0_baselineemissions[rr] / 100
+        else
+            cbe_highside = -Inf
+        end
 
-            if cbe_lowside < p.q0_absolutecutbacksatnegativecost[t, rr]
-                v.er_emissionsgrowth[t, rr] = er_lowside
-            elseif cbe_highside >= p.q0_absolutecutbacksatnegativecost[t, rr]
+        if cbe_lowside < p.q0_absolutecutbacksatnegativecost[t, rr]
+            v.er_emissionsgrowth[t, rr] = er_lowside
+        elseif cbe_highside >= p.q0_absolutecutbacksatnegativecost[t, rr]
                 v.er_emissionsgrowth[t, rr] = er_highside
             else
                 v.er_emissionsgrowth[t, rr] = 100.
-            end
         end
     end
+end
 end
 
 function addtaxdrivengrowth(model::Model, class::Symbol)
@@ -79,11 +79,11 @@ end
 
     function run_timestep(p, v, d, t)
 
-        v.taxrate_CO2[t] = p.uniformtax[t]
-        v.taxrate_CH4[t] = p.uniformtax[t]
-        v.taxrate_N2O[t] = p.uniformtax[t]
-        v.taxrate_Lin[t] = p.uniformtax[t]
-    end
+    v.taxrate_CO2[t] = p.uniformtax[t]
+    v.taxrate_CH4[t] = p.uniformtax[t]
+    v.taxrate_N2O[t] = p.uniformtax[t]
+    v.taxrate_Lin[t] = p.uniformtax[t]
+end
 end
 
 """Construct a model with a uniform (global and all gases, but time-varying) tax."""

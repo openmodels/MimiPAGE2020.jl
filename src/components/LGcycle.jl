@@ -20,35 +20,35 @@
     re_remainLGbase = Variable(unit="Mtonne")
 
     function run_timestep(p, v, d, t)
-        if is_first(t)
+    if is_first(t)
             # eq.3 from Hope (2006) - natural emissions (carbon cycle) feedback, using global temperatures calculated in ClimateTemperature component
-            nte0 = p.stim_LGemissionfeedback * p.rtl_g0_baselandtemp
-            v.nte_natLGemissions[t] = p.stim_LGemissionfeedback * p.rtl_g0_baselandtemp
+        nte0 = p.stim_LGemissionfeedback * p.rtl_g0_baselandtemp
+        v.nte_natLGemissions[t] = p.stim_LGemissionfeedback * p.rtl_g0_baselandtemp
             # eq.6 from Hope (2006) - emissions to atmosphere depend on the sum of natural and anthropogenic emissions
-            tea0 = (p.e_0globalLGemissions + nte0) * p.air_LGfractioninatm / 100
-            v.tea_LGemissionstoatm[t] = (p.e_globalLGemissions[t] + v.nte_natLGemissions[t]) * p.air_LGfractioninatm / 100
-            v.teay_LGemissionstoatm[t] = (v.tea_LGemissionstoatm[t] + tea0) * (p.y_year[t] - p.y_year_0) / 2
+        tea0 = (p.e_0globalLGemissions + nte0) * p.air_LGfractioninatm / 100
+        v.tea_LGemissionstoatm[t] = (p.e_globalLGemissions[t] + v.nte_natLGemissions[t]) * p.air_LGfractioninatm / 100
+        v.teay_LGemissionstoatm[t] = (v.tea_LGemissionstoatm[t] + tea0) * (p.y_year[t] - p.y_year_0) / 2
             # adapted from eq.1 in Hope(2006) - calculate excess concentration in base year
-            v.exc_excessconcLG = p.c0_LGconcbaseyr - p.pic_preindustconcLG
+        v.exc_excessconcLG = p.c0_LGconcbaseyr - p.pic_preindustconcLG
             # Eq. 2 from Hope (2006) - base-year remaining emissions
-            v.re_remainLGbase = v.exc_excessconcLG * p.den_LGdensity
-            v.re_remainLG[t] = v.re_remainLGbase * exp(-(p.y_year[t] - p.y_year_0) / p.res_LGatmlifetime) +
+        v.re_remainLGbase = v.exc_excessconcLG * p.den_LGdensity
+        v.re_remainLG[t] = v.re_remainLGbase * exp(-(p.y_year[t] - p.y_year_0) / p.res_LGatmlifetime) +
                 v.teay_LGemissionstoatm[t] * p.res_LGatmlifetime * (1 - exp(-(p.y_year[t] - p.y_year_0) / p.res_LGatmlifetime)) / (p.y_year[t] - p.y_year_0)
-        else
+    else
             # eq.3 from Hope (2006) - natural emissions (carbon cycle) feedback, using global temperatures calculated in ClimateTemperature component
             # Here assume still using area-weighted average regional temperatures (i.e. land temperatures) for natural emissions feedback
-            v.nte_natLGemissions[t] = p.stim_LGemissionfeedback * p.rtl_g_landtemperature[t - 1]
+        v.nte_natLGemissions[t] = p.stim_LGemissionfeedback * p.rtl_g_landtemperature[t - 1]
             # eq.6 from Hope (2006) - emissions to atmosphere depend on the sum of natural and anthropogenic emissions
-            v.tea_LGemissionstoatm[t] = (p.e_globalLGemissions[t] + v.nte_natLGemissions[t]) * p.air_LGfractioninatm / 100
+        v.tea_LGemissionstoatm[t] = (p.e_globalLGemissions[t] + v.nte_natLGemissions[t]) * p.air_LGfractioninatm / 100
             # eq.7 from Hope (2006) - average emissions to atm over time period
-            v.teay_LGemissionstoatm[t] = (v.tea_LGemissionstoatm[t] + v.tea_LGemissionstoatm[t - 1]) * (p.y_year[t] - p.y_year[t - 1]) / 2
+        v.teay_LGemissionstoatm[t] = (v.tea_LGemissionstoatm[t] + v.tea_LGemissionstoatm[t - 1]) * (p.y_year[t] - p.y_year[t - 1]) / 2
             # eq.10 from Hope (2006) - remaining emissions in atmosphere
-            v.re_remainLG[t] = v.re_remainLG[t - 1] * exp(-(p.y_year[t] - p.y_year[t - 1]) / p.res_LGatmlifetime) +
+        v.re_remainLG[t] = v.re_remainLG[t - 1] * exp(-(p.y_year[t] - p.y_year[t - 1]) / p.res_LGatmlifetime) +
                 v.teay_LGemissionstoatm[t] * p.res_LGatmlifetime * (1 - exp(-(p.y_year[t] - p.y_year[t - 1]) / p.res_LGatmlifetime)) / (p.y_year[t] - p.y_year[t - 1])
-        end
+    end
 
     # eq.11 from Hope(2006) - LG concentration
-        v.c_LGconcentration[t] = p.pic_preindustconcLG + v.exc_excessconcLG * v.re_remainLG[t] / v.re_remainLGbase
+    v.c_LGconcentration[t] = p.pic_preindustconcLG + v.exc_excessconcLG * v.re_remainLG[t] / v.re_remainLGbase
 
-    end
+end
 end

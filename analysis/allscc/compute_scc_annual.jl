@@ -56,14 +56,14 @@ If no values are provided, the discount factors will be computed using the defau
 """
 function compute_scc_mm(m::Model=get_model(); year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000.)
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
-    !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
+!(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
     eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
     prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
 
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
+scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
     scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated_ann] / undiscount_scc(mm.base, year)
 
     return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
@@ -90,7 +90,7 @@ function get_marginal_model(m::Model=get_model(); year::Union{Int,Nothing}=nothi
 
     # set random seed to have similar variability development in the base and the marginal model.
     if use_variability
-        Random.seed!(varseed);
+    Random.seed!(varseed);
     end
 
     run(mm)
