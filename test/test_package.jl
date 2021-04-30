@@ -3,9 +3,9 @@ using Mimi
 
 @testset "Packagation" begin
 
-    using MimiPAGE2020
+    import MimiPAGE2020
 
-    m = getpage()
+    m = MimiPAGE2020.getpage()
     run(m)
 
     ## Just test that this was successful
