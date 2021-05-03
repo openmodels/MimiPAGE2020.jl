@@ -42,9 +42,19 @@ For more information about the Mimi component framework, you can refer to the [M
 
 ## Installing PAGE-2020
 
+There are two primary ways to install and use PAGE-2020, and the preferred method will depend on the intended use cases.  
+
+### Option 1: As a Repository
+
 Clone or download the PAGE-2020 repository from the PAGE-2020 [Github website](https://github.com/openmodels/PAGE-2020).
 
+### Option 2: As a Package
+
+Add PAGE-2020 as a package with `Pkg.add("MimiPAGE2020")`, or simply `add MimiPAGE2020` in the Pkg REPL mode.
+
 ## Using PAGE-2020
+
+If you have installed PAGE-2020 as a repository (Option 1 above), then you may follow the filepath-based steps described next.  If you have installed it as a package, the following will still apply although you can use package-based syntax instead of including files ie. type `using MimiPAGE2020` to bring the package into your namespace and then use syntax such as `MimiPAGE2020.getpage()` (or the generic alias for that call `MimiPAGE2020.get_model()`) to utilize the package's API.
 
 To run the model, run the `main.jl` file in the examples folder. This
 runs the deterministic version of PAGE-2020 with central parameter
@@ -81,3 +91,4 @@ desired. For more information, see the [Technical Guide](technicaluserguide.md).
 To troubleshoot individual components, you can refer to the `test` directory, which has separate files that check each component.
 
 For specific questions, you can send an email to [James Rising](http://existencia.org/pro) (<j.a.rising@lse.ac.uk>).
+
