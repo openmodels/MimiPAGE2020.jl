@@ -1,6 +1,6 @@
 name = "MimiPAGE2020"
 uuid = "daa1807e-96ac-4669-bc57-6ed081383131"
-version = "0.5.0-DEV"
+version = "1.7"
 
 [deps]
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
