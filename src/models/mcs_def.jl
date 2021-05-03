@@ -227,7 +227,7 @@ function getsim()
              TotalForcing.ft_totalforcing,
              ClimateTemperature.rt_g_globaltemperature,
              GDP.cons_percap_consumption,
-             Population.pop_population
+             Population.pop_population,
              SeaLevelRise.s_sealevel,
              SLRDamages.rgdp_per_cap_SLRRemainGDP,
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
