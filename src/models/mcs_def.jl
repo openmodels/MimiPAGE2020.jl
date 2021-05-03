@@ -218,9 +218,16 @@ function getsim()
              EquityWeighting.tpc_totalaggregatedcosts,
              EquityWeighting.tac_totaladaptationcosts,
              EquityWeighting.te_totaleffect,
+             EquityWeighting.wit_percap_equityweightedimpact,
+             EquityWeighting.eact_percap_weightedadaptationcosts,
+             EquityWeighting.cons_percap_aftercosts, # without equity
+             EquityWeighting.rcons_percap_dis, # without equity
+             EquityWeighting.act_percap_adaptationcosts, # without equity
              CO2Cycle.c_CO2concentration,
              TotalForcing.ft_totalforcing,
              ClimateTemperature.rt_g_globaltemperature,
+             GDP.cons_percap_consumption,
+             Population.pop_population,
              SeaLevelRise.s_sealevel,
              SLRDamages.rgdp_per_cap_SLRRemainGDP,
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
