@@ -3,7 +3,7 @@ using CSVFiles
 using DataFrames
 using Distributions
 
-regenerate = false # do a large MC run, to regenerate information needed for std. errors
+regenerate = true # do a large MC run, to regenerate information needed for std. errors
 samplesize = 1000 # normal MC sample size (takes ~5 seconds)
 confidence = 2.576 # 99% CI by default; use 1.96 to apply a 95% CI, but expect more spurious errors
 
@@ -31,14 +31,14 @@ if regenerate
 
     for ii in 1:nrow(compare)
         name = Symbol(compare[ii, :Variable_Name])
-        if kurtosis(df[name]) > 2.9 # exponential distribution
+        if kurtosis(df[!, name]) > 2.9 # exponential distribution
             if name == :tpc # negative across all quantiles
-                print("    :$name => Dict(:transform => x -> log(-x), :mu => $(mean(log(-df[df[name] .< 0, name]))), :sigma => $(std(log(-df[df[name] .< 0, name]))))")
+                print("    :$name => Dict(:transform => x -> log(-x), :mu => $(mean(log(-df[df[!, name] .< 0, name]))), :sigma => $(std(log.(-df[df[!, name] .< 0, name]))))")
             else
-                print("    :$name => Dict(:transform => x -> log(x), :mu => $(mean(log(df[df[name] .> 0, name]))), :sigma => $(std(log(df[df[name] .> 0, name]))))")
+                print("    :$name => Dict(:transform => x -> log(x), :mu => $(mean(log.(df[df[!, name] .> 0, name]))), :sigma => $(std(log.(df[df[!, name] .> 0, name]))))")
             end
         else
-            print("    :$name => Dict(:transform => x -> x, :mu => $(mean(df[name])), :sigma => $(std(df[name])))")
+            print("    :$name => Dict(:transform => x -> x, :mu => $(mean(df[!, name])), :sigma => $(std(df[!, name])))")
         end
         if ii != nrow(compare)
             println(",")

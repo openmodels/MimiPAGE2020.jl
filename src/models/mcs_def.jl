@@ -298,7 +298,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String=joinpath(@__DI
 end
 
 
-function do_monte_carlo_runs(samplesize::Int, scenario::String="RCP4.5 & SSP2", output_path::String=joinpath(@__DIR__, "../output"))
+function do_monte_carlo_runs(samplesize::Int, scenario::String="RCP4.5 & SSP2", output_path::String=joinpath(@__DIR__, "../../output"))
     # get simulation
     mcs = getsim()
 
