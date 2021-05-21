@@ -37,19 +37,19 @@ function getsim()
         # The following RVs are divided into blocks by component
 
         # CO2cycle
-        co2cyle.air_CO2fractioninatm = TriangularDist(57, 67, 62)
-        co2cyle.res_CO2atmlifetime = TriangularDist(50, 100, 70)
-        # co2cyle.ccf_CO2feedback = TriangularDist(0, 0, 0) # only usable if lb <> ub
-        co2cyle.ccfmax_maxCO2feedback = TriangularDist(10, 30, 20)
-        co2cyle.stay_fractionCO2emissionsinatm = TriangularDist(0.25, 0.35, 0.3)
-        co2cyle.ce_0_basecumCO2emissions = TriangularDist(1830000, 2240000, 2040000)
-        co2cyle.a1_percentco2oceanlong = TriangularDist(4.3,	41.6, 23.0)
-        co2cyle.a2_percentco2oceanshort = TriangularDist(23.1, 30.1, 26.6)
-        co2cyle.a3_percentco2land = TriangularDist(11.4, 42.5, 27.0)
-        co2cyle.t1_timeco2oceanlong = TriangularDist(248.9, 376.2, 312.5)
-        co2cyle.t2_timeco2oceanshort = TriangularDist(25.9, 43.9, 34.9)
-        co2cyle.t3_timeco2land = TriangularDist(2.8, 5.7, 4.3)
-        co2cyle.rt_g0_baseglobaltemp = TriangularDist(0.903, 0.989, 0.946)
+        CO2Cycle.air_CO2fractioninatm = TriangularDist(57, 67, 62)
+        CO2Cycle.res_CO2atmlifetime = TriangularDist(50, 100, 70)
+        # CO2Cycle.ccf_CO2feedback = TriangularDist(0, 0, 0) # only usable if lb <> ub
+        CO2Cycle.ccfmax_maxCO2feedback = TriangularDist(10, 30, 20)
+        CO2Cycle.stay_fractionCO2emissionsinatm = TriangularDist(0.25, 0.35, 0.3)
+        CO2Cycle.ce_0_basecumCO2emissions = TriangularDist(1830000, 2240000, 2040000)
+        CO2Cycle.a1_percentco2oceanlong = TriangularDist(4.3,	41.6, 23.0)
+        CO2Cycle.a2_percentco2oceanshort = TriangularDist(23.1, 30.1, 26.6)
+        CO2Cycle.a3_percentco2land = TriangularDist(11.4, 42.5, 27.0)
+        CO2Cycle.t1_timeco2oceanlong = TriangularDist(248.9, 376.2, 312.5)
+        CO2Cycle.t2_timeco2oceanshort = TriangularDist(25.9, 43.9, 34.9)
+        CO2Cycle.t3_timeco2land = TriangularDist(2.8, 5.7, 4.3)
+        CO2Cycle.rt_g0_baseglobaltemp = TriangularDist(0.903, 0.989, 0.946)
 
         # SiBCASA Permafrost
         PermafrostSiBASCA.perm_sib_af = TriangularDist(1.42609149897258, 2.32504747848815, 1.87556948873036)
