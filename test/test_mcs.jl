@@ -3,31 +3,32 @@ using CSVFiles
 using DataFrames
 using Distributions
 
-regenerate = true # do a large MC run, to regenerate information needed for std. errors
+regenerate = false # do a large MC run, to regenerate information needed for std. errors
 samplesize = 1000 # normal MC sample size (takes ~5 seconds)
 confidence = 2.576 # 99% CI by default; use 1.96 to apply a 95% CI, but expect more spurious errors
 
 # Monte Carlo distribution information
-# Filled in from a run with regenerate = true
+# Filled in from a run with regenerate = true as of MimiPAGE2020 master May 21, 2021
 information = Dict(
-    :td => Dict(:transform => x -> log(x), :mu => 19.268649852193303, :sigma => 1.0189429437682878),
-    :tpc => Dict(:transform => x -> log(-x), :mu => 16.723536381185546, :sigma => 0.9100375935397476),
-    :tac => Dict(:transform => x -> log(x), :mu => 17.35110886191308, :sigma => 0.3586397403122257),
-    :te => Dict(:transform => x -> log(x), :mu => 19.30193679432187, :sigma => 1.048364875171592),
-    :c_co2concentration => Dict(:transform => x -> x, :mu => 913073.0003103315, :sigma => 71674.18878428967),
-    :ft => Dict(:transform => x -> x, :mu => 8.637901336461365, :sigma => 0.4315112767385383),
-    :rt_g => Dict(:transform => x -> x, :mu => 5.888175260413073, :sigma => 1.7673873280904946),
-    :sealevel => Dict(:transform => x -> x, :mu => 1.6056649448621665, :sigma => 0.6124270241884567)
+    :td => Dict(:transform => x -> log(x), :mu => 20.81239274908614, :sigma => 0.698871178820148),
+    :tpc => Dict(:transform => x -> x, :mu => 3.2710207541329093e7, :sigma => 6.4358907565097585e7),
+    :tac => Dict(:transform => x -> log(x), :mu => 14.946481605793073, :sigma => 0.463121438238524),
+    :te => Dict(:transform => x -> log(x), :mu => 20.840543904070486, :sigma => 0.6972809898278868),
+    :c_co2concentration => Dict(:transform => x -> x, :mu => 650830.3737942933, :sigma => 46059.30516329839),
+    :ft => Dict(:transform => x -> x, :mu => 6.2142186666437595, :sigma => 0.3987477922892589),
+    :rt_g => Dict(:transform => x -> x, :mu => 4.354812617545005, :sigma => 1.2159698493733873),
+    :sealevel => Dict(:transform => x -> x, :mu => 3.0173153069055116, :sigma => 1.1416218843630537)
 )
 
 compare = DataFrame(load(joinpath(@__DIR__, "validationdata/PAGE09montecarloquantiles.csv")))
+output_path = joinpath(@__DIR__, "../output")
 
 if regenerate
     println("Regenerating MC distribution information")
 
     # Perform a large MC run and extract statistics
-    do_monte_carlo_runs(100_000)
-    df = DataFrame(load(joinpath(@__DIR__, "../output/mimipagemontecarlooutput.csv")))
+    do_monte_carlo_runs(100_000, "RCP4.5 & SSP2", output_path)
+    df = DataFrame(load(joinpath(output_path, "mimipagemontecarlooutput.csv")))
 
     for ii in 1:nrow(compare)
         name = Symbol(compare[ii, :Variable_Name])
@@ -47,12 +48,13 @@ if regenerate
 else
     println("Performing MC sample")
     # Perform a small MC run
-    do_monte_carlo_runs(samplesize)
-    df = DataFrame(load(joinpath(@__DIR__, "../output/mimipagemontecarlooutput.csv")))
+    do_monte_carlo_runs(samplesize, "RCP4.5 & SSP2", output_path)
+    df = DataFrame(load(joinpath(output_path, "mimipagemontecarlooutput.csv")))
 end
 
 # Compare all known quantiles
 for ii in 1:nrow(compare)
+    println(ii)
     name = Symbol(compare[ii, :Variable_Name])
     transform = information[name][:transform]
     distribution = Normal(information[name][:mu], information[name][:sigma])
