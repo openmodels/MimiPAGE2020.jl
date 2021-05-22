@@ -8,16 +8,15 @@ samplesize = 1000 # normal MC sample size (takes ~5 seconds)
 confidence = 2.576 # 99% CI by default; use 1.96 to apply a 95% CI, but expect more spurious errors
 
 # Monte Carlo distribution information
-# Filled in from a run with regenerate = true as of MimiPAGE2020 master May 21, 2021
 information = Dict(
-    :td => Dict(:transform => x -> log(x), :mu => 20.81239274908614, :sigma => 0.698871178820148),
-    :tpc => Dict(:transform => x -> x, :mu => 3.2710207541329093e7, :sigma => 6.4358907565097585e7),
-    :tac => Dict(:transform => x -> log(x), :mu => 14.946481605793073, :sigma => 0.463121438238524),
-    :te => Dict(:transform => x -> log(x), :mu => 20.840543904070486, :sigma => 0.6972809898278868),
-    :c_co2concentration => Dict(:transform => x -> x, :mu => 650830.3737942933, :sigma => 46059.30516329839),
-    :ft => Dict(:transform => x -> x, :mu => 6.2142186666437595, :sigma => 0.3987477922892589),
-    :rt_g => Dict(:transform => x -> x, :mu => 4.354812617545005, :sigma => 1.2159698493733873),
-    :sealevel => Dict(:transform => x -> x, :mu => 3.0173153069055116, :sigma => 1.1416218843630537)
+    :td => Dict(:transform => x -> log(x), :mu => 20.867456327307856, :sigma => 0.7170848435689282),
+    :tpc => Dict(:transform => x -> x, :mu => 3.269855709984657e7, :sigma => 6.399405798915053e7),
+    :tac => Dict(:transform => x -> log(x), :mu => 14.949565049913051, :sigma => 0.452568702427104),
+    :te => Dict(:transform => x -> log(x), :mu => 20.8942561684838, :sigma => 0.7150629261233239),
+    :c_co2concentration => Dict(:transform => x -> x, :mu => 651186.90267267, :sigma => 46249.12698762989),
+    :ft => Dict(:transform => x -> x, :mu => 6.21732179204286, :sigma => 0.4003145327410246),
+    :rt_g => Dict(:transform => x -> x, :mu => 4.369819586469511, :sigma => 1.2227973526532832),
+    :sealevel => Dict(:transform => x -> x, :mu => 3.030064017722661, :sigma => 1.1553309825462488)
 )
 
 compare = DataFrame(load(joinpath(@__DIR__, "validationdata/PAGE2020montecarloquantiles.csv")))
@@ -34,7 +33,7 @@ if regenerate
         name = Symbol(compare[ii, :Variable_Name])
         if kurtosis(df[!, name]) > 2.9 # exponential distribution
             if name == :tpc # negative across all quantiles
-                print("    :$name => Dict(:transform => x -> log(-x), :mu => $(mean(log(-df[df[!, name] .< 0, name]))), :sigma => $(std(log.(-df[df[!, name] .< 0, name]))))")
+                print("    :$name => Dict(:transform => x -> log(-x), :mu => $(mean(log.(-df[df[!, name] .< 0, name]))), :sigma => $(std(log.(-df[df[!, name] .< 0, name]))))")
             else
                 print("    :$name => Dict(:transform => x -> log(x), :mu => $(mean(log.(df[df[!, name] .> 0, name]))), :sigma => $(std(log.(df[df[!, name] .> 0, name]))))")
             end
