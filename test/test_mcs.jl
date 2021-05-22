@@ -20,7 +20,7 @@ information = Dict(
     :sealevel => Dict(:transform => x -> x, :mu => 3.0173153069055116, :sigma => 1.1416218843630537)
 )
 
-compare = DataFrame(load(joinpath(@__DIR__, "validationdata/PAGE09montecarloquantiles.csv")))
+compare = DataFrame(load(joinpath(@__DIR__, "validationdata/PAGE2020montecarloquantiles.csv")))
 output_path = joinpath(@__DIR__, "../output")
 
 if regenerate
@@ -54,7 +54,6 @@ end
 
 # Compare all known quantiles
 for ii in 1:nrow(compare)
-    println(ii)
     name = Symbol(compare[ii, :Variable_Name])
     transform = information[name][:transform]
     distribution = Normal(information[name][:mu], information[name][:sigma])
@@ -68,3 +67,23 @@ for ii in 1:nrow(compare)
         @test estimated ≈ expected rtol = ceil(confidence * stderr; digits=-trunc(Int, log10(stderr)))
     end
 end
+
+## Code used to produce PAGE 2020 quantiles from master on May 21, 2021
+
+# using DataFrames
+# using CSV 
+
+# output_path = joinpath(@__DIR__, "../output")
+# do_monte_carlo_runs(100_000, "RCP4.5 & SSP2", output_path)
+# df = DataFrame(load(joinpath(output_path, "mimipagemontecarlooutput.csv")))
+
+# quantiles = DataFrame(load(joinpath(@__DIR__, "validationdata/PAGE09montecarloquantiles.csv")))
+# for row in nrow(quantiles)
+#     for (i, qval) in enumerate([.05, .10, .25, .50, .75, .90, .95])
+#         variable_name = Symbol(quantiles[i, :Variable_Name])
+#         new_quantile = quantile(collect(Missings.skipmissing(df[!, col_name])), qval)
+#         quantiles[i, Symbol("perc_$(trunc(Int, qval * 100))")] = new_quantile
+#     end
+# end
+# CSV.write(joinpath(@__DIR__, "validationdata/PAGE2020montecarloquantiles.csv"), quantiles)
+  
