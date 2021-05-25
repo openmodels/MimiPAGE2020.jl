@@ -66,5 +66,5 @@ end
     ## include("test_scc.jl") # Takes very long to run.
     include("contrib/test_taxeffect.jl")
     include("test_package.jl")
-    ## include("test_extensions.jl") # NB will currently clean out the 'output' folder! - tests number of model extension output files for PAGE2020 update
+    include("test_extensions.jl") # NB will currently clean out the 'output' folder! - tests number of model extension output files for PAGE2020 update
 end
