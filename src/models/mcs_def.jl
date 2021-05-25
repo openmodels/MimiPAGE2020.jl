@@ -21,10 +21,15 @@ function getsim()
 
         # each component should have the same value for its tcal_CalibrationTemp
         # so we use an RV here because in the model this is not an explicitly
-        # shared parameter, then assign below in component section
+        # shared parameter, then assign to components
         rv(RV_tcal_CalibrationTemp) = TriangularDist(2.5, 3.5, 3.)
         MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
+        
+        # each component should have the same value for its q0propmult_cutbacksatnegativecostinfinalyear
+        # so we use an RV here because in the model this is not an explicitly
+        # shared parameter, then assign to components
+        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3, 1.2, 0.7)
 
         # CO2cycle
         CO2Cycle.air_CO2fractioninatm = TriangularDist(57, 67, 62)
@@ -172,7 +177,6 @@ function getsim()
         cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
 
         # Others
-        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3, 1.2, 0.7)
         qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1, 1.5, 1.3)
         c0mult_mostnegativecostinfinalyear = TriangularDist(0.5, 1.2, 0.8)
         curve_below_curvatureofMACcurvebelowzerocost = TriangularDist(0.25, 0.8, 0.45)

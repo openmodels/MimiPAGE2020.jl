@@ -38,10 +38,56 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
 
         # each component should have the same value for its tcal_CalibrationTemp
         # so we use an RV here because in the model this is not an explicitly
-        # shared parameter, then assign below in component section
+        # shared parameter, then assign to components
         rv(RV_tcal_CalibrationTemp) = TriangularDist(2.5, 3.5, 3.)
         MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
+
+        # each component should have the same value for the following Abatement 
+        # Cost Parameters so we use an RV here because in the model this is not 
+        # an explicitly shared parameter, then assign to components
+
+        rv(RV_q0propmult_cutbacksatnegativecostinfinalyear) = TriangularDist(0.3, 1.2, 0.7)
+        AbatementCostParametersCO2.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+        AbatementCostParametersCH4.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+        AbatementCostParametersN2O.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+        AbatementCostParametersLin.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+
+        rv(RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear) = TriangularDist(1, 1.5, 1.3)
+        AbatementCostParametersCO2.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+        AbatementCostParametersCH4.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+        AbatementCostParametersN2O.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+        AbatementCostParametersLin.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+
+        rv(RV_c0mult_mostnegativecostinfinalyear) = TriangularDist(0.5, 1.2, 0.8)
+        AbatementCostParametersCO2.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        AbatementCostParametersCH4.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        AbatementCostParametersN2O.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        AbatementCostParametersLin.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        
+        rv(RV_curve_below_curvatureofMACcurvebelowzerocost) = TriangularDist(0.25, 0.8, 0.45)
+        AbatementCostParametersCO2.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        AbatementCostParametersCH4.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        AbatementCostParametersN2O.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        AbatementCostParametersLin.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        
+        rv(RV_curve_above_curvatureofMACcurveabovezerocost) = TriangularDist(0.1, 0.7, 0.4)
+        AbatementCostParametersCO2.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        AbatementCostParametersCH4.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        AbatementCostParametersN2O.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        AbatementCostParametersLin.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        
+        rv(RV_cross_experiencecrossoverratio) = TriangularDist(0.1, 0.3, 0.2)
+        AbatementCostParametersCO2.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        AbatementCostParametersCH4.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        AbatementCostParametersN2O.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        AbatementCostParametersLin.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        
+        rv(RV_learn_learningrate) = TriangularDist(0.05, 0.35, 0.2)
+        AbatementCostParametersCO2.learn_learningrate = RV_learn_learningrate
+        AbatementCostParametersCH4.learn_learningrate = RV_learn_learningrate
+        AbatementCostParametersN2O.learn_learningrate = RV_learn_learningrate
+        AbatementCostParametersLin.learn_learningrate = RV_learn_learningrate
 
         # CO2cycle
         CO2Cycle.air_CO2fractioninatm = TriangularDist(57, 67, 62)
@@ -68,11 +114,11 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         PermafrostSiBCASA.perm_sib_pow_c_ch4 = TriangularDist(-0.108779283732708, 0.610889007954489, 0.25105486211089)
 
         # JULES Permafrost
-        PermafrostJULES.pperm_jul_af = TriangularDist(1.70960411816136, 2.16221162526313, 1.93590787171224)
-        PermafrostJULES.pperm_jul_sens_c_co2 = TriangularDist(24726.8035695649, 99008.7553497378, 61867.7794596514)
-        PermafrostJULES.pperm_jul_lag_c_co2 = TriangularDist(252.558368389676, 834.674343162273, 543.616355775975)
-        PermafrostJULES.pperm_jul_pow_c_co2 = TriangularDist(-0.226045987062471, 1.14010750072118, 0.457030756829357)
-        PermafrostJULES.pperm_jul_ch4_co2_c_ratio = TriangularDist(2.77492291880781, 9.52902519167579, 6.04453870625663)
+        PermafrostJULES.perm_jul_af = TriangularDist(1.70960411816136, 2.16221162526313, 1.93590787171224)
+        PermafrostJULES.perm_jul_sens_c_co2 = TriangularDist(24726.8035695649, 99008.7553497378, 61867.7794596514)
+        PermafrostJULES.perm_jul_lag_c_co2 = TriangularDist(252.558368389676, 834.674343162273, 543.616355775975)
+        PermafrostJULES.perm_jul_pow_c_co2 = TriangularDist(-0.226045987062471, 1.14010750072118, 0.457030756829357)
+        PermafrostJULES.perm_jul_ch4_co2_c_ratio = TriangularDist(2.77492291880781, 9.52902519167579, 6.04453870625663)
 
         # SulphateForcing
         SulphateForcing.d_sulphateforcingbase = TriangularDist(-0.8, -0.2, -0.4)
@@ -191,16 +237,6 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         cf_costregional["SEAsia"] = TriangularDist(0.4, 1.2, 0.8)
         cf_costregional["Africa"] = TriangularDist(0.4, 0.8, 0.6)
         cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
-
-        # Others
-        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3, 1.2, 0.7)
-        qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1, 1.5, 1.3)
-        c0mult_mostnegativecostinfinalyear = TriangularDist(0.5, 1.2, 0.8)
-        curve_below_curvatureofMACcurvebelowzerocost = TriangularDist(0.25, 0.8, 0.45)
-        curve_above_curvatureofMACcurveabovezerocost = TriangularDist(0.1, 0.7, 0.4)
-        cross_experiencecrossoverratio = TriangularDist(0.1, 0.3, 0.2)
-        learn_learningrate = TriangularDist(0.05, 0.35, 0.2)
-
 
         # NOTE: the below can probably be resolved into unique, unshared parameters with the same name
         # in the new Mimi paradigm of shared and unshared parameters, but for now this will 

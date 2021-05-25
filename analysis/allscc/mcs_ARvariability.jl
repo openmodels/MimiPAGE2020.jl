@@ -27,25 +27,71 @@ function getsim()
 
         # each component should have the same value for its tcal_CalibrationTemp
         # so we use an RV here because in the model this is not an explicitly
-        # shared parameter, then assign below in component section
+        # shared parameter, then assign to components
         rv(RV_tcal_CalibrationTemp) = TriangularDist(2.5, 3.5, 3.)
         MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
+        
+        # each component should have the same value for the following Abatement 
+        # Cost Parameters so we use an RV here because in the model this is not 
+        # an explicitly shared parameter, then assign to components
+
+        rv(RV_q0propmult_cutbacksatnegativecostinfinalyear) = TriangularDist(0.3, 1.2, 0.7)
+        AbatementCostParametersCO2.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+        AbatementCostParametersCH4.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+        AbatementCostParametersN2O.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+        AbatementCostParametersLin.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
+
+        rv(RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear) = TriangularDist(1, 1.5, 1.3)
+        AbatementCostParametersCO2.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+        AbatementCostParametersCH4.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+        AbatementCostParametersN2O.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+        AbatementCostParametersLin.qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = RV_qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear
+
+        rv(RV_c0mult_mostnegativecostinfinalyear) = TriangularDist(0.5, 1.2, 0.8)
+        AbatementCostParametersCO2.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        AbatementCostParametersCH4.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        AbatementCostParametersN2O.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        AbatementCostParametersLin.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
+        
+        rv(RV_curve_below_curvatureofMACcurvebelowzerocost) = TriangularDist(0.25, 0.8, 0.45)
+        AbatementCostParametersCO2.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        AbatementCostParametersCH4.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        AbatementCostParametersN2O.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        AbatementCostParametersLin.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
+        
+        rv(RV_curve_above_curvatureofMACcurveabovezerocost) = TriangularDist(0.1, 0.7, 0.4)
+        AbatementCostParametersCO2.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        AbatementCostParametersCH4.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        AbatementCostParametersN2O.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        AbatementCostParametersLin.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
+        
+        rv(RV_cross_experiencecrossoverratio) = TriangularDist(0.1, 0.3, 0.2)
+        AbatementCostParametersCO2.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        AbatementCostParametersCH4.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        AbatementCostParametersN2O.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        AbatementCostParametersLin.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
+        
+        rv(RV_learn_learningrate) = TriangularDist(0.05, 0.35, 0.2)
+        AbatementCostParametersCO2.learn_learningrate = RV_learn_learningrate
+        AbatementCostParametersCH4.learn_learningrate = RV_learn_learningrate
+        AbatementCostParametersN2O.learn_learningrate = RV_learn_learningrate
+        AbatementCostParametersLin.learn_learningrate = RV_learn_learningrate
 
         # CO2cycle
-        CO2cycle.air_CO2fractioninatm = TriangularDist(57, 67, 62)
-        CO2cycle.res_CO2atmlifetime = TriangularDist(50, 100, 70)
-        # CO2cycle.ccf_CO2feedback = TriangularDist(0, 0, 0) # only usable if lb <> ub
-        CO2cycle.ccfmax_maxCO2feedback = TriangularDist(10, 30, 20)
-        CO2cycle.stay_fractionCO2emissionsinatm = TriangularDist(0.25, 0.35, 0.3)
-        CO2cycle.ce_0_basecumCO2emissions = TriangularDist(1830000, 2240000, 2040000)
-        CO2cycle.a1_percentco2oceanlong = TriangularDist(4.3,	41.6, 23.0)
-        CO2cycle.a2_percentco2oceanshort = TriangularDist(23.1, 30.1, 26.6)
-        CO2cycle.a3_percentco2land = TriangularDist(11.4, 42.5, 27.0)
-        CO2cycle.t1_timeco2oceanlong = TriangularDist(248.9, 376.2, 312.5)
-        CO2cycle.t2_timeco2oceanshort = TriangularDist(25.9, 43.9, 34.9)
-        CO2cycle.t3_timeco2land = TriangularDist(2.8, 5.7, 4.3)
-        CO2cycle.rt_g0_baseglobaltemp = TriangularDist(0.903, 0.989, 0.946)
+        CO2Cycle.air_CO2fractioninatm = TriangularDist(57, 67, 62)
+        CO2Cycle.res_CO2atmlifetime = TriangularDist(50, 100, 70)
+        # CO2Cycle.ccf_CO2feedback = TriangularDist(0, 0, 0) # only usable if lb <> ub
+        CO2Cycle.ccfmax_maxCO2feedback = TriangularDist(10, 30, 20)
+        CO2Cycle.stay_fractionCO2emissionsinatm = TriangularDist(0.25, 0.35, 0.3)
+        CO2Cycle.ce_0_basecumCO2emissions = TriangularDist(1830000, 2240000, 2040000)
+        CO2Cycle.a1_percentco2oceanlong = TriangularDist(4.3,	41.6, 23.0)
+        CO2Cycle.a2_percentco2oceanshort = TriangularDist(23.1, 30.1, 26.6)
+        CO2Cycle.a3_percentco2land = TriangularDist(11.4, 42.5, 27.0)
+        CO2Cycle.t1_timeco2oceanlong = TriangularDist(248.9, 376.2, 312.5)
+        CO2Cycle.t2_timeco2oceanshort = TriangularDist(25.9, 43.9, 34.9)
+        CO2Cycle.t3_timeco2land = TriangularDist(2.8, 5.7, 4.3)
+        CO2Cycle.rt_g0_baseglobaltemp = TriangularDist(0.903, 0.989, 0.946)
 
         # SiBCASA Permafrost
         PermafrostSiBCASA.perm_sib_af = TriangularDist(1.42609149897258, 2.32504747848815, 1.87556948873036)
@@ -65,7 +111,7 @@ function getsim()
 
         # SulphateForcing
         SulphateForcing.d_sulphateforcingbase = TriangularDist(-0.8, -0.2, -0.4)
-        SulphateForcinind_slopeSEforcing_indirect = TriangularDist(-0.8, 0, -0.4)
+        SulphateForcing.ind_slopeSEforcing_indirect = TriangularDist(-0.8, 0, -0.4)
 
         # ClimateTemperature
         ClimateTemperature.frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation
@@ -82,9 +128,9 @@ function getsim()
 
         # SeaLevelRise
         SeaLevelRise.s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
-        SeaLevelRisesltemp_SLtemprise = TriangularDist(0.7, 3., 1.5)                            # median sensitivity to GMST changes
-        SeaLevelRisesla_SLbaselinerise = TriangularDist(0.5, 1.5, 1.)                           # asymptote for pre-industrial
-        SeaLevelRisesltau_SLresponsetime = Gamma(16.0833333333333333, 24.)                      # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
+        SeaLevelRise.sltemp_SLtemprise = TriangularDist(0.7, 3., 1.5)                            # median sensitivity to GMST changes
+        SeaLevelRise.sla_SLbaselinerise = TriangularDist(0.5, 1.5, 1.)                           # asymptote for pre-industrial
+        SeaLevelRise.sltau_SLresponsetime = Gamma(16.0833333333333333, 24.)                      # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
 
         # GDP
         GDP.isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
@@ -186,15 +232,6 @@ function getsim()
         cf_costregional["SEAsia"] = TriangularDist(0.4, 1.2, 0.8)
         cf_costregional["Africa"] = TriangularDist(0.4, 0.8, 0.6)
         cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
-
-        # Others
-        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3, 1.2, 0.7)
-        qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1, 1.5, 1.3)
-        c0mult_mostnegativecostinfinalyear = TriangularDist(0.5, 1.2, 0.8)
-        curve_below_curvatureofMACcurvebelowzerocost = TriangularDist(0.25, 0.8, 0.45)
-        curve_above_curvatureofMACcurveabovezerocost = TriangularDist(0.1, 0.7, 0.4)
-        cross_experiencecrossoverratio = TriangularDist(0.1, 0.3, 0.2)
-        learn_learningrate = TriangularDist(0.05, 0.35, 0.2)
 
         # NOTE: the below can probably be resolved into unique, unshared parameters with the same name
         # in the new Mimi paradigm of shared and unshared parameters, but for now this will 
