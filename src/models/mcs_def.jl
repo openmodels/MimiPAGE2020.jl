@@ -93,16 +93,6 @@ function getsim()
         MarketDamagesBurke.impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
         MarketDamagesBurke.impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
 
-        # MarketDamagesBurke
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["EU"] = TriangularDist(6.76231496767033, 13.482086163781, 10.1222005657257)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USA"] = TriangularDist(9.54210085883826, 17.3151395362191, 13.4286201975287)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["OECD"] = TriangularDist(9.07596053028087, 15.0507477943984, 12.0633541623396)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USSR"] = TriangularDist(3.01320548016903, 11.2132204366259, 7.11321295839747)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["China"] = TriangularDist(12.2330402806912, 17.7928749427573, 15.0129576117242)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["SEAsia"] = TriangularDist(23.3863348263352, 26.5136231383473, 24.9499789823412)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["Africa"] = TriangularDist(20.1866940491107, 23.5978086497453, 21.892251349428)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
-
         # NonMarketDamages
         NonMarketDamages.iben_NonMarketInitialBenefit = TriangularDist(0, .2, .05)
         NonMarketDamages.w_NonImpactsatCalibrationTemp = TriangularDist(.1, 1, .5)
@@ -173,14 +163,6 @@ function getsim()
         cmaxf_maxcostfactor["Africa"] = TriangularDist(1, 1.5, 1.2)
         cmaxf_maxcostfactor["LatAmerica"] = TriangularDist(0.4, 1.0, 0.7)
 
-        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3, 1.2, 0.7)
-        qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1, 1.5, 1.3)
-        c0mult_mostnegativecostinfinalyear = TriangularDist(0.5, 1.2, 0.8)
-        curve_below_curvatureofMACcurvebelowzerocost = TriangularDist(0.25, 0.8, 0.45)
-        curve_above_curvatureofMACcurveabovezerocost = TriangularDist(0.1, 0.7, 0.4)
-        cross_experiencecrossoverratio = TriangularDist(0.1, 0.3, 0.2)
-        learn_learningrate = TriangularDist(0.05, 0.35, 0.2)
-
         cf_costregional["USA"] = TriangularDist(0.6, 1, 0.8)
         cf_costregional["OECD"] = TriangularDist(0.4, 1.2, 0.8)
         cf_costregional["USSR"] = TriangularDist(0.2, 0.6, 0.4)
@@ -189,9 +171,28 @@ function getsim()
         cf_costregional["Africa"] = TriangularDist(0.4, 0.8, 0.6)
         cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
 
+        # Others
+        q0propmult_cutbacksatnegativecostinfinalyear = TriangularDist(0.3, 1.2, 0.7)
+        qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear = TriangularDist(1, 1.5, 1.3)
+        c0mult_mostnegativecostinfinalyear = TriangularDist(0.5, 1.2, 0.8)
+        curve_below_curvatureofMACcurvebelowzerocost = TriangularDist(0.25, 0.8, 0.45)
+        curve_above_curvatureofMACcurveabovezerocost = TriangularDist(0.1, 0.7, 0.4)
+        cross_experiencecrossoverratio = TriangularDist(0.1, 0.3, 0.2)
+        learn_learningrate = TriangularDist(0.05, 0.35, 0.2)
+
         # NOTE: the below can probably be resolved into unique, unshared parameters with the same name
         # in the new Mimi paradigm of shared and unshared parameters, but for now this will 
         # continue to work!
+
+        # MarketDamagesBurke
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["EU"] = TriangularDist(6.76231496767033, 13.482086163781, 10.1222005657257)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USA"] = TriangularDist(9.54210085883826, 17.3151395362191, 13.4286201975287)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["OECD"] = TriangularDist(9.07596053028087, 15.0507477943984, 12.0633541623396)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USSR"] = TriangularDist(3.01320548016903, 11.2132204366259, 7.11321295839747)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["China"] = TriangularDist(12.2330402806912, 17.7928749427573, 15.0129576117242)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["SEAsia"] = TriangularDist(23.3863348263352, 26.5136231383473, 24.9499789823412)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["Africa"] = TriangularDist(20.1866940491107, 23.5978086497453, 21.892251349428)
+        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
 
         # AbatementCosts
         AbatementCostParametersCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50, 6.0, -22)
