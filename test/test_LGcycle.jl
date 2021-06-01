@@ -15,7 +15,7 @@ for testscen in 1:2
     set_param!(m, :LGcycle, :rtl_g_landtemperature, readpagedata(m, "test/validationdata/$valdir/rtl_g_landtemperature.csv"))
 
     p = load_parameters(m)
-    update_leftover_params!(m, p) # important for setting left over component values
+    set_leftover_params!(m, p) # important for setting left over component values
 
     # run Model
     run(m)

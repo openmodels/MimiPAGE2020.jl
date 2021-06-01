@@ -30,7 +30,7 @@ for testscen in 1:2
     equityweighting[:popgrw_populationgrowth] = rcpsspscenario[:popgrw_populationgrowth]
 
     p = load_parameters(m)
-    update_leftover_params!(m, p)
+    set_leftover_params!(m, p)
 
     run(m)
 

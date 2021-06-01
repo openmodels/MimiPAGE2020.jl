@@ -88,7 +88,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     p = load_parameters(m)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
-    update_leftover_params!(m, p)
+    set_leftover_params!(m, p)
 
     run(m)
     m

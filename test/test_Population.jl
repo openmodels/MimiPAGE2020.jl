@@ -17,7 +17,7 @@ for testscen in 1:2
 
     p = load_parameters(m)
 
-    update_leftover_params!(m, p)
+    set_leftover_params!(m, p)
 
     run(m)
 

@@ -15,7 +15,7 @@ for testscen in 1:2
     set_param!(m, :CO2Cycle, :y_year_0, 2015.)# real value
     set_param!(m, :CO2Cycle, :rt_g_globaltemperature, readpagedata(m, "test/validationdata/$valdir/rt_g_globaltemperature.csv"))
     p = load_parameters(m)
-    update_leftover_params!(m, p) # important for setting left over component values
+    set_leftover_params!(m, p) # important for setting left over component values
     ##running Model
     run(m)
 

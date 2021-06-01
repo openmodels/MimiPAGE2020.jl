@@ -16,7 +16,7 @@ for testscen in 1:2
 
     p = load_parameters(m)
     p["y_year"] = Mimi.dim_keys(m.md, :time)
-    update_leftover_params!(m, p)
+    set_leftover_params!(m, p)
 
     # running Model
     run(m)
