@@ -281,7 +281,7 @@ function initpage(m::Model)
     p = load_parameters(m)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
-    set_leftover_params!(m, p)
+    update_leftover_params!(m, p)
 end
 
 function getpage(scenario::String="NDCs", use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)

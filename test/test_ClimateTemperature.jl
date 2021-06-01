@@ -14,7 +14,7 @@ for testscen in 1:2
     climatetemperature[:fant_anthroforcing] = readpagedata(m, "test/validationdata/$valdir/fgt.csv")
 
     p = load_parameters(m)
-    set_leftover_params!(m, p)
+    update_leftover_params!(m, p)
 
     ##running Model
     run(m)

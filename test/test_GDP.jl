@@ -18,7 +18,7 @@ for testscen in 1:2
     gdp[:y_year_0] = 2015.
 
     p = load_parameters(m)
-    set_leftover_params!(m, p)
+    update_leftover_params!(m, p)
 
     # run model
     run(m)
