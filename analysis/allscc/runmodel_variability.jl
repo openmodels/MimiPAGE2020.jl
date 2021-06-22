@@ -19,7 +19,7 @@ end
 # set global values for technical configuration options
 set_globalbools()
 
-#run main_model file
+# run main_model file
 include("main_model_annual.jl")
 include("mcs_annual.jl")
 include("compute_scc_annual.jl")

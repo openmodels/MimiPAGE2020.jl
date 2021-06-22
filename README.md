@@ -5,8 +5,7 @@
 PAGE-2020 (Policy Analysis of Greenhouse Effect, v. 2020) is a
 cost-benefit Integrated Assessment Model. It builds upon
 the [PAGE-ICE model](https://github.com/openmodels/PAGE-ICE/),
-developed
-by
+developed by
 [Yumashev et al. (2019)](https://www.nature.com/articles/s41467-019-09863-x#Sec14).
 
 The main advancements for the PAGE-2020 are:

@@ -5,7 +5,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/TotalAbatementCosts.jl")
 
     add_comp!(m, TotalAbatementCosts)
@@ -26,7 +26,7 @@ for testscen in 1:2
     cost_compare = readpagedata(m, "test/validationdata/$valdir/tct_totalcosts.csv")
     cost_cap_compare = readpagedata(m, "test/validationdata/$valdir/tct_per_cap_totalcostspercap.csv")
 
-    @test abate_cost ≈ cost_compare rtol=1e-4
-    @test abate_cost_per_cap ≈ cost_cap_compare rtol=1e-7
+    @test abate_cost ≈ cost_compare rtol = 1e-4
+    @test abate_cost_per_cap ≈ cost_cap_compare rtol = 1e-7
 end
 

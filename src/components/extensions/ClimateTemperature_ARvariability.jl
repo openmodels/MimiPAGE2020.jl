@@ -1,7 +1,7 @@
-using CSV, Distributions
+using CSV, Distributions, DataFrames
 
 # Load once and make global
-arests = CSV.read(joinpath(@__DIR__, "../../../data/other/arestimates.csv"))
+arests = CSV.read(joinpath(@__DIR__, "../../../data/other/arestimates.csv"), DataFrame)
 
 function calc_temp(p, v, d, tt, annual_year)
     # for every year, do the same calculations, but then with the new annual_year variables
@@ -11,14 +11,14 @@ function calc_temp(p, v, d, tt, annual_year)
     ## interpolation here is also linear for 2015-2020
     if is_first(tt)
         frac = annual_year - 2015
-        fraction_timestep = frac/((gettime(tt))-2015)
+        fraction_timestep = frac / ((gettime(tt)) - 2015)
 
-        v.pt_g_preliminarygmst_ann[yr] = (v.pt_g_preliminarygmst[tt])*(fraction_timestep) + p.rt_g0_baseglobaltemp*(1-fraction_timestep)  # difference_to_next_tt * ratio_to_there
+        v.pt_g_preliminarygmst_ann[yr] = (v.pt_g_preliminarygmst[tt]) * (fraction_timestep) + p.rt_g0_baseglobaltemp * (1 - fraction_timestep)  # difference_to_next_tt * ratio_to_there
     else
-        frac = annual_year - gettime(tt-1)
-        fraction_timestep = frac/((gettime(tt))-(gettime(tt-1))) # check if +1 might also need to feature here.
+        frac = annual_year - gettime(tt - 1)
+        fraction_timestep = frac / ((gettime(tt)) - (gettime(tt - 1))) # check if +1 might also need to feature here.
 
-        v.pt_g_preliminarygmst_ann[yr] = (v.pt_g_preliminarygmst[tt] )*(fraction_timestep) + v.pt_g_preliminarygmst[tt-1]*(1-fraction_timestep) # difference_to_next_tt * ratio_to_there
+        v.pt_g_preliminarygmst_ann[yr] = (v.pt_g_preliminarygmst[tt] ) * (fraction_timestep) + v.pt_g_preliminarygmst[tt - 1] * (1 - fraction_timestep) # difference_to_next_tt * ratio_to_there
     end
     # Without surface albedo, just equal
     v.rt_g_globaltemperature_ann[yr] = v.pt_g_preliminarygmst_ann[yr]
@@ -67,17 +67,17 @@ end
     year = Index()
 
     # Basic parameters
-    area = Parameter(index=[region], unit="km2")
+    area = Parameter(index=[region], unit="km^2")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
     y_year_ann = Parameter(index=[year], unit="year")
     area_e_eartharea = Parameter(unit="km2", default=5.1e8)
-    use_seaice::Bool = Parameter()
+    use_seaice = Parameter{Bool}()
 
     # Initial temperature outputs
-    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) #needed for feedback in CO2 cycle component
+    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component
     rtl_0_baselandtemp = Variable(index=[region], unit="degreeC")
-    rtl_g0_baselandtemp = Variable(unit="degreeC") #needed for feedback in CH4 and N2O cycles
+    rtl_g0_baselandtemp = Variable(unit="degreeC") # needed for feedback in CH4 and N2O cycles
 
     # variability parameters
     tvarorder_arestimatesrows = Parameter(index=[region], unit="none")
@@ -151,16 +151,16 @@ end
         v.ecs_climatesensitivity = p.tcr_transientresponse / (1. - (p.frt_warminghalflife / 70.) * (1. - exp(-70. / p.frt_warminghalflife)))
 
         ## Surface albedo internal variables
-        v.alb_fsaf_y0 = ((p.alb_saf_quadr_mean_t2_coeff*(p.rt_g0_baseglobaltemp^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(p.rt_g0_baseglobaltemp^2)/2 + p.alb_saf_quadr_mean_t0_coeff*p.rt_g0_baseglobaltemp) + (p.alb_saf_quadr_std*p.rt_g0_baseglobaltemp) * p.alb_emulator_rand)
-        v.alb_saf_y0 = (p.alb_saf_quadr_mean_t2_coeff*(p.rt_g0_baseglobaltemp^2)/2 + p.alb_saf_quadr_mean_t1_coeff*p.rt_g0_baseglobaltemp + p.alb_saf_quadr_mean_t0_coeff) + p.alb_saf_quadr_std * p.alb_emulator_rand
+        v.alb_fsaf_y0 = ((p.alb_saf_quadr_mean_t2_coeff * (p.rt_g0_baseglobaltemp^3) / 3 + p.alb_saf_quadr_mean_t1_coeff * (p.rt_g0_baseglobaltemp^2) / 2 + p.alb_saf_quadr_mean_t0_coeff * p.rt_g0_baseglobaltemp) + (p.alb_saf_quadr_std * p.rt_g0_baseglobaltemp) * p.alb_emulator_rand)
+        v.alb_saf_y0 = (p.alb_saf_quadr_mean_t2_coeff * (p.rt_g0_baseglobaltemp^2) / 2 + p.alb_saf_quadr_mean_t1_coeff * p.rt_g0_baseglobaltemp + p.alb_saf_quadr_mean_t0_coeff) + p.alb_saf_quadr_std * p.alb_emulator_rand
 
         if v.ecs_climatesensitivity <= p.alb_t_switch
-            v.alb_fsaf_ecs = (p.alb_saf_quadr_mean_t2_coeff*(v.ecs_climatesensitivity^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(v.ecs_climatesensitivity^2)/2 + p.alb_saf_quadr_mean_t0_coeff*v.ecs_climatesensitivity) + (p.alb_saf_quadr_std*v.ecs_climatesensitivity) * p.alb_emulator_rand
+            v.alb_fsaf_ecs = (p.alb_saf_quadr_mean_t2_coeff * (v.ecs_climatesensitivity^3) / 3 + p.alb_saf_quadr_mean_t1_coeff * (v.ecs_climatesensitivity^2) / 2 + p.alb_saf_quadr_mean_t0_coeff * v.ecs_climatesensitivity) + (p.alb_saf_quadr_std * v.ecs_climatesensitivity) * p.alb_emulator_rand
         else
-            v.alb_fsaf_ecs = (p.alb_saf_quadr_mean_t2_coeff*( p.alb_t_switch^3)/3 + p.alb_saf_quadr_mean_t1_coeff*( p.alb_t_switch^2)/2 + p.alb_saf_quadr_mean_t0_coeff*p.alb_t_switch + p.alb_saf_lin_mean*(v.ecs_climatesensitivity - p.alb_t_switch)) + (p.alb_saf_quadr_std*p.alb_t_switch + p.alb_saf_lin_std*(v.ecs_climatesensitivity - p.alb_t_switch)) * p.alb_emulator_rand
+            v.alb_fsaf_ecs = (p.alb_saf_quadr_mean_t2_coeff * ( p.alb_t_switch^3) / 3 + p.alb_saf_quadr_mean_t1_coeff * ( p.alb_t_switch^2) / 2 + p.alb_saf_quadr_mean_t0_coeff * p.alb_t_switch + p.alb_saf_lin_mean * (v.ecs_climatesensitivity - p.alb_t_switch)) + (p.alb_saf_quadr_std * p.alb_t_switch + p.alb_saf_lin_std * (v.ecs_climatesensitivity - p.alb_t_switch)) * p.alb_emulator_rand
         end
         v.alb_saf_ecs = v.alb_fsaf_ecs / v.ecs_climatesensitivity
-        v.alb_fsaf_t_switch = (p.alb_saf_quadr_mean_t2_coeff*(p.alb_t_switch^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(p.alb_t_switch^2)/2 + p.alb_saf_quadr_mean_t0_coeff*p.alb_t_switch) + (p.alb_saf_quadr_std*p.alb_t_switch) * p.alb_emulator_rand
+        v.alb_fsaf_t_switch = (p.alb_saf_quadr_mean_t2_coeff * (p.alb_t_switch^3) / 3 + p.alb_saf_quadr_mean_t1_coeff * (p.alb_t_switch^2) / 2 + p.alb_saf_quadr_mean_t0_coeff * p.alb_t_switch) + (p.alb_saf_quadr_std * p.alb_t_switch) * p.alb_emulator_rand
 
         tvarconst, tvarar, tvargmst = tvar_getcoeffs(findfirst(arests[!, :region] .== "global"))
         v.tvarconst_g_globaltemperatureintercept = tvarconst
@@ -193,13 +193,13 @@ end
             fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
             rate_fant = 0 # inferred from spreadsheet
             deltat = p.y_year[tt] - p.y_year_0
-        elseif is_timestep(tt, 2)
+        elseif tt == TimestepIndex(2)
             fant0 = p.ft_0_totalforcing0 + p.fsd_g_0_directsulphate0 + p.fsi_g_0_indirectsulphate0
-            rate_fant = (p.fant_anthroforcing[tt-1] - fant0) / (p.y_year[tt-1] - p.y_year_0)
-            deltat = p.y_year[tt] - p.y_year[tt-1]
+            rate_fant = (p.fant_anthroforcing[tt - 1] - fant0) / (p.y_year[tt - 1] - p.y_year_0)
+            deltat = p.y_year[tt] - p.y_year[tt - 1]
         else
-            rate_fant = (p.fant_anthroforcing[tt-1] - p.fant_anthroforcing[tt-2]) / (p.y_year[tt-1] - p.y_year[tt-2])
-            deltat = p.y_year[tt] - p.y_year[tt-1]
+            rate_fant = (p.fant_anthroforcing[tt - 1] - p.fant_anthroforcing[tt - 2]) / (p.y_year[tt - 1] - p.y_year[tt - 2])
+            deltat = p.y_year[tt] - p.y_year[tt - 1]
         end
 
         BB = v.ecs_climatesensitivity / (p.fslope_CO2forcingslope * log(2.0)) * rate_fant
@@ -210,28 +210,28 @@ end
             AA = v.ecs_climatesensitivity / (p.fslope_CO2forcingslope * log(2.0)) * fant0
             v.pt_g_preliminarygmst[tt] = p.rt_g0_baseglobaltemp + (AA - p.rt_g0_baseglobaltemp) * (1 - EXPT) # Drop BB because 0
         else
-            AA = v.ecs_climatesensitivity / (p.fslope_CO2forcingslope * log(2.0)) * p.fant_anthroforcing[tt-1]
-            v.pt_g_preliminarygmst[tt] = v.pt_g_preliminarygmst[tt-1] + (AA - p.frt_warminghalflife*BB - v.pt_g_preliminarygmst[tt-1]) * (1 - EXPT) + deltat * BB
+            AA = v.ecs_climatesensitivity / (p.fslope_CO2forcingslope * log(2.0)) * p.fant_anthroforcing[tt - 1]
+            v.pt_g_preliminarygmst[tt] = v.pt_g_preliminarygmst[tt - 1] + (AA - p.frt_warminghalflife * BB - v.pt_g_preliminarygmst[tt - 1]) * (1 - EXPT) + deltat * BB
         end
 
         if !p.use_seaice
             # Without surface albedo, just equal
             v.rt_g_globaltemperature[tt] = v.pt_g_preliminarygmst[tt]
         else
-            alb_saf_approx = (((p.alb_saf_quadr_mean_t2_coeff*(v.pt_g_preliminarygmst[tt]^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(v.pt_g_preliminarygmst[tt]^2)/2 + p.alb_saf_quadr_mean_t0_coeff*v.pt_g_preliminarygmst[tt]) + (p.alb_saf_quadr_std*v.pt_g_preliminarygmst[tt]) * p.alb_emulator_rand) - v.alb_fsaf_y0) / (v.pt_g_preliminarygmst[tt] - p.rt_g0_baseglobaltemp)
+            alb_saf_approx = (((p.alb_saf_quadr_mean_t2_coeff * (v.pt_g_preliminarygmst[tt]^3) / 3 + p.alb_saf_quadr_mean_t1_coeff * (v.pt_g_preliminarygmst[tt]^2) / 2 + p.alb_saf_quadr_mean_t0_coeff * v.pt_g_preliminarygmst[tt]) + (p.alb_saf_quadr_std * v.pt_g_preliminarygmst[tt]) * p.alb_emulator_rand) - v.alb_fsaf_y0) / (v.pt_g_preliminarygmst[tt] - p.rt_g0_baseglobaltemp)
             alb_saf_adjust = alb_saf_approx - v.alb_saf_ecs
-            ecs_alb_adj = v.ecs_climatesensitivity / (1 - v.ecs_climatesensitivity * alb_saf_adjust / (log(2)*p.fslope_CO2forcingslope))
-            frt_alb_adj = p.frt_warminghalflife / (1 - v.ecs_climatesensitivity * alb_saf_adjust / (log(2)*p.fslope_CO2forcingslope))
+            ecs_alb_adj = v.ecs_climatesensitivity / (1 - v.ecs_climatesensitivity * alb_saf_adjust / (log(2) * p.fslope_CO2forcingslope))
+            frt_alb_adj = p.frt_warminghalflife / (1 - v.ecs_climatesensitivity * alb_saf_adjust / (log(2) * p.fslope_CO2forcingslope))
             if is_first(tt)
-                alb_fsaf_adjust = ((p.alb_saf_quadr_mean_t2_coeff*(p.rt_g0_baseglobaltemp^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(p.rt_g0_baseglobaltemp^2)/2 + p.alb_saf_quadr_mean_t0_coeff*p.rt_g0_baseglobaltemp) + (p.alb_saf_quadr_std*p.rt_g0_baseglobaltemp) * p.alb_emulator_rand) - alb_saf_approx*p.rt_g0_baseglobaltemp
-                v.rt_g_globaltemperature[tt] = p.rt_g0_baseglobaltemp + (ecs_alb_adj * (fant0 + alb_fsaf_adjust) / (log(2) * p.fslope_CO2forcingslope) - p.rt_g0_baseglobaltemp) * (1 - exp(-deltat/frt_alb_adj))
+                alb_fsaf_adjust = ((p.alb_saf_quadr_mean_t2_coeff * (p.rt_g0_baseglobaltemp^3) / 3 + p.alb_saf_quadr_mean_t1_coeff * (p.rt_g0_baseglobaltemp^2) / 2 + p.alb_saf_quadr_mean_t0_coeff * p.rt_g0_baseglobaltemp) + (p.alb_saf_quadr_std * p.rt_g0_baseglobaltemp) * p.alb_emulator_rand) - alb_saf_approx * p.rt_g0_baseglobaltemp
+                v.rt_g_globaltemperature[tt] = p.rt_g0_baseglobaltemp + (ecs_alb_adj * (fant0 + alb_fsaf_adjust) / (log(2) * p.fslope_CO2forcingslope) - p.rt_g0_baseglobaltemp) * (1 - exp(-deltat / frt_alb_adj))
             else
-                if v.rt_g_globaltemperature[tt-1] <= p.alb_t_switch
-                    alb_fsaf_adjust = ((p.alb_saf_quadr_mean_t2_coeff*(v.rt_g_globaltemperature[tt-1]^3)/3 + p.alb_saf_quadr_mean_t1_coeff*(v.rt_g_globaltemperature[tt-1]^2)/2 + p.alb_saf_quadr_mean_t0_coeff*v.rt_g_globaltemperature[tt-1]) + (p.alb_saf_quadr_std*v.rt_g_globaltemperature[tt-1]) * p.alb_emulator_rand) - alb_saf_approx * v.rt_g_globaltemperature[tt-1]
+                if v.rt_g_globaltemperature[tt - 1] <= p.alb_t_switch
+                    alb_fsaf_adjust = ((p.alb_saf_quadr_mean_t2_coeff * (v.rt_g_globaltemperature[tt - 1]^3) / 3 + p.alb_saf_quadr_mean_t1_coeff * (v.rt_g_globaltemperature[tt - 1]^2) / 2 + p.alb_saf_quadr_mean_t0_coeff * v.rt_g_globaltemperature[tt - 1]) + (p.alb_saf_quadr_std * v.rt_g_globaltemperature[tt - 1]) * p.alb_emulator_rand) - alb_saf_approx * v.rt_g_globaltemperature[tt - 1]
                 else
-                    alb_fsaf_adjust = v.alb_fsaf_t_switch + p.alb_saf_lin_mean*(v.rt_g_globaltemperature[tt-1] - p.alb_t_switch) + (p.alb_saf_lin_std*(v.rt_g_globaltemperature[tt-1] - p.alb_t_switch)) * p.alb_emulator_rand - alb_saf_approx * v.rt_g_globaltemperature[tt-1]
+                    alb_fsaf_adjust = v.alb_fsaf_t_switch + p.alb_saf_lin_mean * (v.rt_g_globaltemperature[tt - 1] - p.alb_t_switch) + (p.alb_saf_lin_std * (v.rt_g_globaltemperature[tt - 1] - p.alb_t_switch)) * p.alb_emulator_rand - alb_saf_approx * v.rt_g_globaltemperature[tt - 1]
                 end
-                v.rt_g_globaltemperature[tt] = v.rt_g_globaltemperature[tt-1] + (ecs_alb_adj * (p.fant_anthroforcing[tt-1] - rate_fant*frt_alb_adj + alb_fsaf_adjust) / (log(2)*p.fslope_CO2forcingslope) - v.rt_g_globaltemperature[tt-1]) * (1 - exp(-deltat/frt_alb_adj)) + ecs_alb_adj * (rate_fant*deltat) / (log(2)*p.fslope_CO2forcingslope)
+                v.rt_g_globaltemperature[tt] = v.rt_g_globaltemperature[tt - 1] + (ecs_alb_adj * (p.fant_anthroforcing[tt - 1] - rate_fant * frt_alb_adj + alb_fsaf_adjust) / (log(2) * p.fslope_CO2forcingslope) - v.rt_g_globaltemperature[tt - 1]) * (1 - exp(-deltat / frt_alb_adj)) + ecs_alb_adj * (rate_fant * deltat) / (log(2) * p.fslope_CO2forcingslope)
             end
         end
 
@@ -252,7 +252,7 @@ end
                 calc_temp(p, v, d, tt, annual_year) # NEW -- introduce function for calulating temperature
             end
         else
-            for annual_year = (gettime(tt-1)+1):gettime(tt)
+            for annual_year = (gettime(tt - 1) + 1):gettime(tt)
                 calc_temp(p, v, d, tt, annual_year) # NEW -- use  function for calulating temperature
             end
         end
@@ -285,6 +285,10 @@ function tvar_getmvnormal(rr::Int64)
     MvNormal([tvarcoeffs...], tvarsigma)
 end
 
+function tvar_getregions(regionorder::Vector{Union{Missing,Float64}}, coeffproc::Function=tvar_getcoeffs)
+    tvar_getregions(convert(Vector{Float64}, regionorder), coeffproc)
+end
+
 function tvar_getregions(regionorder::Vector{Float64}, coeffproc::Function=tvar_getcoeffs)
     regionorder = convert(Vector{Int64}, regionorder)
     tvar_getregions(regionorder, coeffproc)
@@ -310,7 +314,7 @@ function addclimatetemperature(model::Model, use_seaice::Bool)
     climtemp[:use_seaice] = use_seaice
 
     region_keys = Mimi.dim_keys(model.md, :region)
-    regionmapping = Dict{String, String}("EU" => "eu", "USA" => "usa", "OECD" => "oth", "Africa" => "afr", "China" => "chi+", "SEAsia" => "ind+", "LatAmerica" => "lat", "USSR" => "rus+")
+    regionmapping = Dict{String,String}("EU" => "eu", "USA" => "usa", "OECD" => "oth", "Africa" => "afr", "China" => "chi+", "SEAsia" => "ind+", "LatAmerica" => "lat", "USSR" => "rus+")
 
     tvarorder = zeros(Int64, length(region_keys))
     for rr in 1:length(region_keys)

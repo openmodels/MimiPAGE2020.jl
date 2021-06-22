@@ -8,7 +8,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/RCPSSPScenario.jl")
     include("../src/components/EquityWeighting.jl")
 
@@ -71,20 +71,20 @@ for testscen in 1:2
     addt_gt_compare = (scenario == "NDCs" ? 9.938302679477245e8 : 3.242546277441784e8)
     te_compare = (scenario == "NDCs" ? 1.0295055580383469e9 : 4.8471657538027054e8)
 
-    @test df ≈ df_compare rtol=1e-8
-    @test wtct_percap ≈ wtct_percap_compare rtol=1e-7
-    @test pct_percap ≈ pct_percap_compare rtol=1e-7
-    @test dr ≈ dr_compare rtol=1e-5
-    @test dfc ≈ dfc_compare rtol=1e-7
-    @test pct ≈ pct_compare rtol=1e-3
-    @test pcdt ≈ pcdt_compare rtol=1e-3
-    @test wacdt ≈ wacdt_compare rtol=1e-4
+    @test df ≈ df_compare rtol = 1e-8
+    @test wtct_percap ≈ wtct_percap_compare rtol = 1e-7
+    @test pct_percap ≈ pct_percap_compare rtol = 1e-7
+    @test dr ≈ dr_compare rtol = 1e-5
+    @test dfc ≈ dfc_compare rtol = 1e-7
+    @test pct ≈ pct_compare rtol = 1e-3
+    @test pcdt ≈ pcdt_compare rtol = 1e-3
+    @test wacdt ≈ wacdt_compare rtol = 1e-4
 
-    @test aact ≈ aact_compare rtol=1e-3
+    @test aact ≈ aact_compare rtol = 1e-3
 
-    @test wit ≈ wit_compare rtol=1e-3
-    @test addt ≈ addt_compare rtol=1e-2
-    @test addt_gt ≈ addt_gt_compare rtol=1e-2
+    @test wit ≈ wit_compare rtol = 1e-3
+    @test addt ≈ addt_compare rtol = 1e-2
+    @test addt_gt ≈ addt_gt_compare rtol = 1e-2
 
-    @test te ≈ te_compare rtol=1e-2
+    @test te ≈ te_compare rtol = 1e-2
 end

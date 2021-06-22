@@ -36,16 +36,16 @@ scc_pulse_size = 75000.
 ################################################################################
 
 # PART I: SCC for fixed rho values (growth effects)
-df_sccMC_singleGE = DataFrame(damagePAGE09 = false, permafr = false, seaice = false, ge = -999., scen = "-999", pulse_size = -999.,
-                                 civvalue = -999.,
-                                  mean = -999., median = -999., min = -999., max = -999., perc25 = -999.,
-                                  perc75 = -999., sd = -999., varcoeff = -999., perc05 = -999., perc95 = -999.,
-                                  perc10 = -999., perc90 = -999.)
+df_sccMC_singleGE = DataFrame(damagePAGE09=false, permafr=false, seaice=false, ge=-999., scen="-999", pulse_size=-999.,
+                                 civvalue=-999.,
+                                  mean=-999., median=-999., min=-999., max=-999., perc25=-999.,
+                                  perc75=-999., sd=-999., varcoeff=-999., perc05=-999., perc95=-999.,
+                                  perc10=-999., perc90=-999.)
 for jj_page09damages in [false]
-  for jj_permafr in [true, false]
-      for jj_seaice in [true, false]
-          for jj_scen in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
-              for jj_civvalue in [1., 10.0^20]
+    for jj_permafr in [true, false]
+        for jj_seaice in [true, false]
+            for jj_scen in ["1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
+                for jj_civvalue in [1., 10.0^20]
 #              for jj_gdploss in [1., 0.]
 
                     # jump undesired combinations
@@ -74,15 +74,15 @@ for jj_page09damages in [false]
                         # fix the seed and calculate the SCC using a triangular distribution collapsing to a single value and removing the civilization value bound
                         Random.seed!(masterseed)
                         global scc_mcs_object = get_scc_mcs(samplesize, 2020, dir_MCoutput,
-                                                                scenario = jj_scen,
-                                                                pulse_size = scc_pulse_size,
-                                                                use_permafrost = jj_permafr,
-                                                                use_seaice = jj_seaice,
-                                                                use_page09damages = jj_page09damages,
-                                                                ge_minimum = jj_ge,
-                                                                ge_maximum = jj_ge + 10^(-10),
-                                                                ge_mode = jj_ge,
-                                                                civvalue_multiplier = jj_civvalue)
+                                                                scenario=jj_scen,
+                                                                pulse_size=scc_pulse_size,
+                                                                use_permafrost=jj_permafr,
+                                                                use_seaice=jj_seaice,
+                                                                use_page09damages=jj_page09damages,
+                                                                ge_minimum=jj_ge,
+                                                                ge_maximum=jj_ge + 10^(-10),
+                                                                ge_mode=jj_ge,
+                                                                civvalue_multiplier=jj_civvalue)
 
                         # write results into the data frame
                         push!(df_sccMC_singleGE, [jj_page09damages, jj_permafr, jj_seaice, jj_ge,
@@ -101,7 +101,7 @@ for jj_page09damages in [false]
                                                       StatsBase.percentile(scc_mcs_object[:, 1], 90)])
 
                       # clean out the MCS objects
-                      scc_mcs_object = nothing
+                        scc_mcs_object = nothing
                     end
                 end
             end
@@ -117,12 +117,12 @@ CSV.write(string(dir_output, "MimiPageGrowthEffectsResults_SCC_fixedGE.csv"), df
 
 
 # PART II: triangular rho (growth effects) distributions
-df_sccMC = DataFrame(permafr = false, seaice = false, ge_string = "-999", scen = "-999",
-                                  convergence = -999.,  bound = -999., eqwshare = -999.,
-                                  civvalue = -999., pulse = -999.,
-                                  mean = -999., median = -999., min = -999., max = -999., perc25 = -999.,
-                                  perc75 = -999., sd = -999., varcoeff = -999.,
-                                  perc05 = -999., perc95 = -999., perc10 = -999., perc90 = -999.)
+df_sccMC = DataFrame(permafr=false, seaice=false, ge_string="-999", scen="-999",
+                                  convergence=-999.,  bound=-999., eqwshare=-999.,
+                                  civvalue=-999., pulse=-999.,
+                                  mean=-999., median=-999., min=-999., max=-999., perc25=-999.,
+                                  perc75=-999., sd=-999., varcoeff=-999.,
+                                  perc05=-999., perc95=-999., perc10=-999., perc90=-999.)
 
 # get the SCC for three different growth effects distributions and scenarios
 for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Target"]
@@ -133,10 +133,10 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
                     for jj_cbabs in [740.65, 740.65 / 2, 740.65 * 2]
                         for jj_eqwshare in [0.99, 0.95, 0.999]
                             for jj_convergence in [1., 0.]
-                                for jj_pulse in [scc_pulse_size, scc_pulse_size/1000., scc_pulse_size/10., scc_pulse_size*10.]
+                                for jj_pulse in [scc_pulse_size, scc_pulse_size / 1000., scc_pulse_size / 10., scc_pulse_size * 10.]
 
                                     # jump undesired or infeasible combinations
-                                    if  jj_scen != "RCP4.5 & SSP2" && (jj_gestring != "EMPIRICAL" || jj_permafr != true ||
+                                    if jj_scen != "RCP4.5 & SSP2" && (jj_gestring != "EMPIRICAL" || jj_permafr != true ||
                                                                         jj_seaice != true || jj_civvalue != 1. || jj_cbabs != 740.65 ||
                                                                         jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size)
                                         continue
@@ -196,19 +196,19 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
                                     # calculate the stochastic mean SCC
                                     Random.seed!(masterseed)
                                     global scc_mcs_object = get_scc_mcs(samplesize, 2020, dir_MCoutput,
-                                                                        scenario = jj_scen,
-                                                                        pulse_size = jj_pulse,
-                                                                        use_permafrost = jj_permafr,
-                                                                        use_seaice = jj_seaice,
-                                                                        use_page09damages = false,
-                                                                        ge_minimum = ge_string_min,
-                                                                        ge_maximum = ge_string_max,
-                                                                        ge_mode = ge_string_mode,
-                                                                        ge_use_empirical = ge_use_empirical,
-                                                                        civvalue_multiplier = jj_civvalue,
-                                                                        use_convergence = jj_convergence,
-                                                                        cbabs = jj_cbabs,
-                                                                        eqwbound = jj_eqwshare)
+                                                                        scenario=jj_scen,
+                                                                        pulse_size=jj_pulse,
+                                                                        use_permafrost=jj_permafr,
+                                                                        use_seaice=jj_seaice,
+                                                                        use_page09damages=false,
+                                                                        ge_minimum=ge_string_min,
+                                                                        ge_maximum=ge_string_max,
+                                                                        ge_mode=ge_string_mode,
+                                                                        ge_use_empirical=ge_use_empirical,
+                                                                        civvalue_multiplier=jj_civvalue,
+                                                                        use_convergence=jj_convergence,
+                                                                        cbabs=jj_cbabs,
+                                                                        eqwbound=jj_eqwshare)
 
                                     # write out the full distribution
                                     writedlm(string(dir_output, "SCC_MCS_scen", jj_scen, "_per", jj_permafr, "_sea", jj_seaice,

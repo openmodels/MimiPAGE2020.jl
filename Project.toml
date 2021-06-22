@@ -1,5 +1,6 @@
 name = "MimiPAGE2020"
-uuid = "e25d4f70-4200-11e9-37f3-3b45f1cef54f"
+uuid = "daa1807e-96ac-4669-bc57-6ed081383131"
+version = "1.7"
 
 [deps]
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
@@ -9,18 +10,21 @@ Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 ExcelReaders = "c04bee98-12a5-510c-87df-2a230cb6e075"
 Mimi = "e4e893b0-ee5e-52ea-8111-44b3bdec128c"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
-VegaLite = "112f6efa-9a02-5b7d-90c0-432ed331239a"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
-CSVFiles = "0.16.0"
-DataFrames = "0.19.1"
-Distributions = "0.20, 0.21"
-Mimi = "0.9.3"
-Query = "0.12"
-julia = "1"
+CSVFiles = "0.16, 1"
+DataFrames = "0.19.1, 0.20, 0.21, 0.22, 1.0"
+Distributions = "0.20, 0.21, 0.22, 0.23, 0.24, 0.25"
+ExcelReaders = "0.11"
+Mimi = "0.10, 1.0"
+Query = "0.12, 1.0"
+julia = "1.4"
 
 [extras]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["Test", "CSV", "Statistics"]

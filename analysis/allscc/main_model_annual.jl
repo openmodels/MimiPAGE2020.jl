@@ -44,7 +44,7 @@ include("../../src/components/PermafrostTotal.jl")
 
 function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
 
-    #add all the components
+    # add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
     if use_permafrost
@@ -68,15 +68,17 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     totalforcing = add_comp!(m, TotalForcing)
     add_comp!(m, SeaLevelRise)
 
-    #Socio-Economics
+    # Socio-Economics
     population = addpopulation(m)
     gdp = add_comp!(m, GDP)
 
-    #Abatement Costs
+    # Abatement Costs
     abatementcostparameters_CO2 = addabatementcostparameters(m, :CO2)
     abatementcostparameters_CH4 = addabatementcostparameters(m, :CH4)
     abatementcostparameters_N2O = addabatementcostparameters(m, :N2O)
     abatementcostparameters_Lin = addabatementcostparameters(m, :Lin)
+
+    set_param!(m, :automult_autonomoustechchange, .65)
 
     abatementcosts_CO2 = addabatementcosts(m, :CO2)
     abatementcosts_CH4 = addabatementcosts(m, :CH4)
@@ -84,7 +86,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     abatementcosts_Lin = addabatementcosts(m, :Lin)
     add_comp!(m, TotalAbatementCosts)
 
-    #Adaptation Costs
+    # Adaptation Costs
     adaptationcosts_sealevel = addadaptationcosts_sealevel(m)
     adaptationcosts_economic = addadaptationcosts_economic(m)
     adaptationcosts_noneconomic = addadaptationcosts_noneconomic(m)
@@ -97,10 +99,10 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     nonmarketdamages = addnonmarketdamages(m)
     add_comp!(m, Discontinuity)
 
-    #Equity weighting and Total Costs
+    # Equity weighting and Total Costs
     equityweighting = add_comp!(m, EquityWeighting)
 
-    #connect parameters together
+    # connect parameters together
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
 
     if use_permafrost
@@ -242,7 +244,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption)
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption_ann)
     end
-    connect_param!(m, :NonMarketDamages =>:atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic =>:atl_adjustedtolerablelevel, ignoreunits=true)
+    connect_param!(m, :NonMarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic => :atl_adjustedtolerablelevel, ignoreunits=true)
     connect_param!(m, :NonMarketDamages => :imp_actualreduction, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts)
     connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :NonMarketDamages => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
@@ -275,12 +277,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 end
 
 function initpage(m::Model)
-    set_param!(m, :ClimateTemperature, :y_year_ann, collect(2015:2300))
-    set_param!(m, :MarketDamages, :y_year_ann, collect(2015:2300))
-    set_param!(m, :MarketDamagesBurke, :y_year_ann, collect(2015:2300))
-    set_param!(m, :NonMarketDamages, :y_year_ann, collect(2015:2300))
-    set_param!(m, :Discontinuity, :y_year_ann, collect(2015:2300))
-    set_param!(m, :EquityWeighting, :y_year_ann, collect(2015:2300))
+    setorup_param!(m, :y_year_ann, collect(2015:2300))
     p = load_parameters(m)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)

@@ -4,7 +4,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/RCPSSPScenario.jl")
     include("../src/components/Population.jl")
 
@@ -27,5 +27,5 @@ for testscen in 1:2
     # Recorded data
     pop_compare = readpagedata(m, "test/validationdata/$valdir/pop_population.csv")
 
-    @test pop ≈ pop_compare rtol=1e-3
+    @test pop ≈ pop_compare rtol = 1e-3
 end

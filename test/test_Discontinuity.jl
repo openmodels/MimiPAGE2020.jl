@@ -4,7 +4,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/Discontinuity.jl")
 
     add_comp!(m, Discontinuity)
@@ -30,10 +30,10 @@ for testscen in 1:2
     @test !isnan(m[:Discontinuity, :isat_per_cap_DiscImpactperCapinclSaturation][10,8])
     @test !isnan(m[:Discontinuity, :rcons_per_cap_DiscRemainConsumption][10])
 
-    #validating - comparison spreadsheet has discontinuity occuring in 2200
-    #keep running model until m[:Discontinuity,:occurdis_occurrencedummy] shows discontiuity occuring in 2200
-    output=m[:Discontinuity,:rcons_per_cap_DiscRemainConsumption]
-    validation=readpagedata(m, "test/validationdata/$valdir/rcons_per_cap_DiscRemainConsumption.csv")
+    # validating - comparison spreadsheet has discontinuity occuring in 2200
+    # keep running model until m[:Discontinuity,:occurdis_occurrencedummy] shows discontiuity occuring in 2200
+    output = m[:Discontinuity,:rcons_per_cap_DiscRemainConsumption]
+    validation = readpagedata(m, "test/validationdata/$valdir/rcons_per_cap_DiscRemainConsumption.csv")
 
-    @test output ≈ validation rtol=1e-2
+    @test output ≈ validation rtol = 1e-2
 end

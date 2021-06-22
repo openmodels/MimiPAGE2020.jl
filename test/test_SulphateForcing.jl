@@ -4,7 +4,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/RCPSSPScenario.jl")
     include("../src/components/SulphateForcing.jl")
 
@@ -20,8 +20,8 @@ for testscen in 1:2
 
     run(m)
 
-    forcing=m[:SulphateForcing,:fs_sulphateforcing]
-    forcing_compare=readpagedata(m,"test/validationdata/$valdir/fs_sulfateforcing.csv")
+    forcing = m[:SulphateForcing,:fs_sulphateforcing]
+    forcing_compare = readpagedata(m, "test/validationdata/$valdir/fs_sulfateforcing.csv")
 
-    @test forcing ≈ forcing_compare rtol=1e-3
+    @test forcing ≈ forcing_compare rtol = 1e-3
 end

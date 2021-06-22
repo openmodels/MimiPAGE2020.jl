@@ -4,7 +4,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/RCPSSPScenario.jl")
     include("../src/components/GDP.jl")
 
@@ -17,8 +17,8 @@ for testscen in 1:2
     gdp[:y_year] = Mimi.dim_keys(m.md, :time)
     gdp[:y_year_0] = 2015.
 
-    p=load_parameters(m)
-    set_leftover_params!(m,p)
+    p = load_parameters(m)
+    set_leftover_params!(m, p)
 
     # run model
     run(m)
@@ -29,8 +29,8 @@ for testscen in 1:2
     # Recorded data
     gdp_compare = readpagedata(m, "test/validationdata/$valdir/gdp.csv")
 
-    @test gdp ≈ gdp_compare rtol=100
+    @test gdp ≈ gdp_compare rtol = 100
 
     cons_percap_consumption_0_compare = readpagedata(m, "test/validationdata/cons_percap_consumption_0.csv")
-    @test m[:GDP, :cons_percap_consumption_0] ≈ cons_percap_consumption_0_compare rtol=1e-2
+    @test m[:GDP, :cons_percap_consumption_0] ≈ cons_percap_consumption_0_compare rtol = 1e-2
 end

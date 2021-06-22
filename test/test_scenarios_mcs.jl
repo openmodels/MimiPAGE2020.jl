@@ -1,9 +1,12 @@
 using Mimi
 using Test
-using CSV
+using CSV, DataFrames
+using Statistics
+
+import Mimi.has_parameter
 
 include("../src/mcs.jl")
-df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), header=false)
+df = CSV.read(joinpath(@__DIR__, "validationdata/allscenarios.csv"), DataFrame, header=false)
 rfrow0 = findfirst(x -> !ismissing(x) && x == "RF in 2100", df[!, 1])
 gmstrow0 = findfirst(x -> !ismissing(x) && x == "Temp. in 2100", df[!, 1])
 slrrow0 = findfirst(x -> !ismissing(x) && x == "SLR in 2100", df[!, 1])
@@ -40,8 +43,6 @@ for testscen in 2:size(df)[2]
         continue
     end
 
-    Mimi.reset_compdefs()
-
     include("../src/main_model.jl")
 
     m = getpage(scenario, use_permafrost, use_seaice, econfunc == "PAGE09 Default")
@@ -70,14 +71,14 @@ for testscen in 2:size(df)[2]
     for (quant, drow, rtolmult) in [(0.05, 1, 100), (.25, 2, 60), (.5, 3, 30), (.75, 4, 60), (.95, 5, 100)]
         rt_g = quantile(allrt_g, quant)
         rt_g_compare = parse(Float64, df[gmstrow0 + drow, testscen])
-        @test rt_g ≈ rt_g_compare rtol=1e-2*rtolmult
+        @test rt_g ≈ rt_g_compare rtol = 1e-2 * rtolmult
 
         slr = quantile(allslr, quant)
         slr_compare = parse(Float64, df[slrrow0 + drow, testscen])
-        @test slr ≈ slr_compare rtol=1e-2*rtolmult
+        @test slr ≈ slr_compare rtol = 1e-2 * rtolmult
 
         te = quantile(allte, quant)
         te_compare = parse(Float64, df[terow0 + drow, testscen])
-        @test te ≈ te_compare rtol=1e4*rtolmult
+        @test te ≈ te_compare rtol = 1e4 * rtolmult
     end
 end

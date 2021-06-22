@@ -7,8 +7,8 @@
 @defcomp RCPSSPScenario begin
     region = Index()
 
-    rcp::Int64 = Parameter() # like rcp26
-    ssp::Int64 = Parameter() # like ssp1
+    rcp = Parameter{Int64}() # like rcp26
+    ssp = Parameter{Int64}() # like ssp1
 
     y_year = Parameter(index=[time], unit="year")
     weight_scenarios = Parameter(unit="%") # from -100% to 100%, only used for sspw, rcpw
@@ -29,7 +29,7 @@
 
     # SSP scenario values
     popgrw_populationgrowth = Variable(index=[time, region], unit="%/year") # From p.32 of Hope 2009
-    grw_gdpgrowthrate = Variable(index=[time, region], unit="%/year") #From p.32 of Hope 2009
+    grw_gdpgrowthrate = Variable(index=[time, region], unit="%/year") # From p.32 of Hope 2009
 
 
     function init(p, v, d)
@@ -99,7 +99,7 @@
             if is_first(t)
                 duration = 5
             else
-                duration = p.y_year[t] - p.y_year[t-1]
+                duration = p.y_year[t] - p.y_year[t - 1]
             end
 
             extra_abate_period = ifelse(p.y_year[t] <= p.extra_abate_start || p.y_year[t] > p.extra_abate_end, 1.,
@@ -107,7 +107,7 @@
             if is_first(t)
                 v.extra_abate_compound[t] = extra_abate_period
             else
-                v.extra_abate_compound[t] = extra_abate_period * v.extra_abate_compound[t-1]
+                v.extra_abate_compound[t] = extra_abate_period * v.extra_abate_compound[t - 1]
             end
 
             er_rcp26_CO2emissionsgrowth = readpagedata(nothing, "data/rcps/rcp26_co2.csv")
@@ -117,20 +117,20 @@
             pse_rcp26_sulphatevsbase = readpagedata(nothing, "data/rcps/rcp26_sulph.csv")
             exf_rcp26_excessforcing = readpagedata(nothing, "data/rcps/rcp26_excess.csv")
 
-            v.er_CO2emissionsgrowth[t.t, :] = (er_rcp26_CO2emissionsgrowth[t.t, :] - er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]) * v.extra_abate_compound[t] .+ er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]
-            v.er_CH4emissionsgrowth[t.t, :] = er_rcp26_CH4emissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.er_N2Oemissionsgrowth[t.t, :] = er_rcp26_N2Oemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.er_LGemissionsgrowth[t.t, :] = er_rcp26_LGemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
-            v.pse_sulphatevsbase[t.t, :] = pse_rcp26_sulphatevsbase[t.t, :] * v.extra_abate_compound[t]
-            v.exf_excessforcing[t.t, :] = exf_rcp26_excessforcing[t.t, :] * v.extra_abate_compound[t]
+            v.er_CO2emissionsgrowth[t, :] = (er_rcp26_CO2emissionsgrowth[t.t, :] - er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]) * v.extra_abate_compound[t] .+ er_rcp26_CO2emissionsgrowth[p.y_year[:] .== 2100, :][:]
+            v.er_CH4emissionsgrowth[t, :] = er_rcp26_CH4emissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+            v.er_N2Oemissionsgrowth[t, :] = er_rcp26_N2Oemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+            v.er_LGemissionsgrowth[t, :] = er_rcp26_LGemissionsgrowth[t.t, :] * v.extra_abate_compound[t]
+            v.pse_sulphatevsbase[t, :] = pse_rcp26_sulphatevsbase[t.t, :] * v.extra_abate_compound[t]
+            v.exf_excessforcing[t, :] = exf_rcp26_excessforcing[t.t, :] * v.extra_abate_compound[t]
         end
     end
 end
 
 function weighted_scenario(lowscen, medscen, highscen, weight)
-    lowscen * .25 * (1 - weight/100)^2 +
-        medscen * .5 * (1 - (weight/100)^2) +
-        highscen * .25 * (1 + weight/100)^2
+    lowscen * .25 * (1 - weight / 100)^2 +
+        medscen * .5 * (1 - (weight / 100)^2) +
+        highscen * .25 * (1 + weight / 100)^2
 end
 
 function addrcpsspscenario(model::Model, scenario::String)

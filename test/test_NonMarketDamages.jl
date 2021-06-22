@@ -5,7 +5,7 @@ for testscen in 1:2
     valdir, scenario, use_permafrost, use_seaice = get_scenario(testscen)
     println(scenario)
 
-    m = page_model()
+    m = test_page_model()
     include("../src/components/NonMarketDamages.jl")
 
     nonmarketdamages = addnonmarketdamages(m)
@@ -26,9 +26,9 @@ for testscen in 1:2
 
     rcons_per_cap = m[:NonMarketDamages, :rcons_per_cap_NonMarketRemainConsumption]
     rcons_per_cap_compare = readpagedata(m, "test/validationdata/$valdir/rcons_per_cap_NonMarketRemainConsumption.csv")
-    @test rcons_per_cap ≈ rcons_per_cap_compare rtol=1e-2
+    @test rcons_per_cap ≈ rcons_per_cap_compare rtol = 1e-2
 
     rgdp_per_cap = m[:NonMarketDamages, :rgdp_per_cap_NonMarketRemainGDP]
     rgdp_per_cap_compare = readpagedata(m, "test/validationdata/$valdir/rgdp_per_cap_NonMarketRemainGDP.csv")
-    @test rgdp_per_cap ≈ rgdp_per_cap_compare rtol=1e-2
+    @test rgdp_per_cap ≈ rgdp_per_cap_compare rtol = 1e-2
 end
