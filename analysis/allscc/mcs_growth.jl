@@ -237,27 +237,10 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         ############################################################################
 
         save(EquityWeighting.td_totaldiscountedimpacts,
-             EquityWeighting.tpc_totalaggregatedcosts,
-             EquityWeighting.tac_totaladaptationcosts,
-             EquityWeighting.te_totaleffect,
-             CO2Cycle.c_CO2concentration,
-             TotalForcing.ft_totalforcing,
              ClimateTemperature.rt_g_globaltemperature,
-             SeaLevelRise.s_sealevel,
-             SLRDamages.rgdp_per_cap_SLRRemainGDP,
-             MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
-             NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
-             Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
-             GDP.ge_growtheffects,
              GDP.gdp,
-             EquityWeighting.lgdp_gdploss,
              EquityWeighting.grwnet_realizedgdpgrowth,
-             Discontinuity.occurdis_occurrencedummy,
-             GDP.cbreg_regionsatbound,
-             EquityWeighting.excdampv_excessdamagespresvalue,
-             MarketDamagesBurke.isat_ImpactinclSaturationandAdaptation,
-             GDP.ge_growtheffects,
-             GDP.ge_use_empiricaldistribution
+             GDP.cbreg_regionsatbound
              )
 
     end # de
@@ -381,7 +364,7 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String=joinpath(@_
         setorup_param!(m, :eqwbound_maxshareofweighteddamages, eqwbound)
     end
     if geadrate != nothing
-        update_param!(m, :geadrate_growtheffects_adaptationrate, geadrate)
+        setorup_param!(m, :geadrate_growtheffects_adaptationrate, geadrate)
     end
 
     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
