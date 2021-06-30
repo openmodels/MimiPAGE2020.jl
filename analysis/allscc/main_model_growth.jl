@@ -308,7 +308,7 @@ function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, us
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
-    set_dimension!(m, :draw, Array(1:10^6))
+    set_dimension!(m, :draw, Array(1:10^3))
 
     buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages)
 
