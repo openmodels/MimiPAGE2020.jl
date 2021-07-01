@@ -37,10 +37,10 @@ jj_seaice = true
 jj_civvalue = 1.
 
 # define the persistence (which should differ across runs) - VARY THIS ACROSS WORKERS
-jj_ge = 0.5 # range to be covered: [0:0.1:1;]
+jj_ge = parse(Float64, ARGS[1]) * 0.1 # range to be covered: [0:0.1:1;]
 
 # define the adaptation parameter
-jj_geadapt = 0.00 # range to be covered: [0:0.005:0.04] - VARY THIS ACROSS WORKERS
+jj_geadapt = parse(Float64, ARGS[2]) * 0.005 # range to be covered: [0:0.005:0.04] - VARY THIS ACROSS WORKERS
 
 # throw an error to halt the process if zero persistence is combined with non-zero adaptation (which is redundant)
 if jj_geadapt > 0. && jj_ge == 0.
