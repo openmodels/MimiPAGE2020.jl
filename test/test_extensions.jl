@@ -1,4 +1,5 @@
 using Test
+using Mimi
 
 # Test that all models run
 outdir = joinpath(@__DIR__, "../output")
