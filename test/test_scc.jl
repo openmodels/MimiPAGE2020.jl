@@ -18,12 +18,20 @@ end
 
 m = getpage("RCP4.5 & SSP2", true, true, true)
 sccs = compute_scc_mcs(m, 100_000, year=2020)
+# TODO - get the baseline values to test against!
+# checksccs(sccs, [])
 
 m = getpage("RCP8.5 & SSP5", true, true, true)
 sccs = compute_scc_mcs(m, 100_000, year=2020)
+# TODO - get the baseline values to test against!
+# checksccs(sccs, [])
 
 m = getpage("RCP4.5 & SSP2", true, true, false)
 sccs = compute_scc_mcs(m, 1000, year=2020)
+# TODO - get the baseline values to test against!
+# checksccs(sccs, [])
 
 m = getpage("RCP8.5 & SSP5", true, true, false)
 sccs = compute_scc_mcs(m, 100_000, year=2020)
+# TODO - get the baseline values to test against!
+# checksccs(sccs, [])
