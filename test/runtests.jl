@@ -75,6 +75,3 @@ end
     include("test_package.jl")
 
 end
-
-# This takes a long time to run, may want to comment out
-# for expediency in intermediate testing
