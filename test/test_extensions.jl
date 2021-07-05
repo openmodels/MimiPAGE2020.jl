@@ -7,10 +7,6 @@ rm(outdir, recursive=true) # NB !!cleans out the 'output' folder!!
 mkdir(outdir)
 
 include("../analysis/allscc/runmodel.jl")
-<<<<<<< HEAD
-# @test sum([length(files) for (root, dirs, files) in walkdir(outdir)]) == 60
-=======
->>>>>>> mcs-testing-original
 @test sum([length(files) for (root, dirs, files) in walkdir(outdir)]) == 88 # 4 scenario folders x 21 files + 4 SCC files = 88 files
 rm(outdir, recursive=true)
 mkdir(outdir)
