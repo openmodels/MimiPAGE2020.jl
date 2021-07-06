@@ -100,6 +100,7 @@ The components in this portion of PAGE-2020 include:
 - Adaptation Costs (for each impact sector)
 - Total Abatement Costs
 - Total Adaptation Costs
+- Total Costs
 - Equity Weighting
 
 ### Model interface scripts
