@@ -26,9 +26,22 @@ pkg> add Mimi
 
 ## Running the Model
 
-Iit is highly recommended to read the Mimi documentation first to
+It is highly recommended to read the Mimi documentation first to
 understand the code structure. For starter code on running the model
 just once, see the code in the file `examples/main.jl`.
+
+In order to create a reproducible environment, you can move into the main
+directory of this repository, do
+```julia
+pkg> activate .
+(MimiPAGE2020) pkg> instantiate
+```
+which should install the correct dependencies.
+
+Running the model can be done in several ways, for instance from the root of the directory by doing:
+```julia
+julia> include("src/runpage.jl")
+```
 
 ## More documentation
 
