@@ -1,121 +1,63 @@
-################################################################################
-#
-# Mapping GHG emissions from the SSP database onto GHG categories and regions of 
-# the PAGE IAM
-#
-# Dmitry Yumashev
-#
-################################################################################
+#' Function script: Mapping emissions, GDP, and population from SSPs to PAGE ====
+#' Author: Dmitry Yumashev (+ edits Jarmo Kikstra) ====
 
-###
-###
 
-# install.packages("stringr")   
+# 0.0: install and load packages ==== 
+pkgs.install <- c("stringr",
+                  "readxl",
+                  "writexl",
+                  "tidyverse",
+                  "data.table",
+                  "here")
+# install.packages(pkgs.install) #uncomment if packages above not installed.
 library(stringr)
-
-# we also need to install and load the "readxl" package (the data is given in the "Data_from_Vanessa_DY.xlsx" file), if this hasn' been done before
-# install.packages("readxl")
 library(readxl)
-
-# we also need to install and load the "xlsx" package to write into an excel file
-# install.packages("rJava")
-# install.packages("xlsx")
-# library(xlsx)
-
-# load tidyverse for functions such as rename
+library(writexl)
 library(tidyverse)
+library(data.table)
+library(here)
 
-# install.packages("data.table")                                    # Install data.table
-library(data.table)                                             # Load data.table package
+# 0.1: set correct working directory and paths ====
+# # set working directory to this file
+try(setwd(dirname(rstudioapi::getActiveDocumentContext()$path)))
+# base path 
+here::i_am("SSP_IAM_V2_201811.csv")
+RAW_DATA_PATH <- paste0(here(), "/")
+DATA_PATH_SSP <- paste0(RAW_DATA_PATH, "SSP_IAM_V2_201811.csv")
+OUT_DATA_PATH <- paste0(here(), "/../data/")
 
-
-##############
-
-# define the required data paths -- update them accordingly on your machine
-DATA_PATH_SSP <- ("C:\\Users\\dmitr\\OneDrive - Lancaster University\\ICE-ARC\\PAGE\\PAGE-ICE\\Supplementary Files")
-
-# set working directory for the SSP data: 
-
-setwd(DATA_PATH_SSP)
-
-##############
-
-# define the required scenario years for which the SSP data is to be prepared
-
-scenario_years <- 2010:2100 
+# 0.2: specification of years to prepare ====
+scenario_years <- 2010:2100 # define the required scenario years for which the SSP data is to be prepared
 total_scenario_years = length(scenario_years)
-
-# define the base year relative to which the % changes in emissions are to be calculated
-
-base_year <- 2020
+base_year <- 2020 # define the base year relative to which the % changes in emissions are to be calculated
 
 
-##############
-
-### read SSP R5.2 and PAGE region codes mapping
-
-filenametext <- "Region_Mapping_SSP_PAGE.csv"
-
-RegionGroupingData <- read.csv(filenametext, header = TRUE)
-
-# check the variables in the data frame
-# str(RegionGroupingData)
-
-r5_regions <- RegionGroupingData$R5
-
+# 0.3: read regional mappings of SSP R5.2 and PAGE region codes ====
+filenametext.region <- paste0(RAW_DATA_PATH, "Region_Mapping_SSP_PAGE.csv")
+RegionGroupingData <- read.csv(filenametext.region, header = TRUE)
 RegionGroupingData$R_PAGE_Description <- NULL
+r5_regions <- unique(RegionGroupingData$R5)
 
 
-##############
-
-### read SSP and PAGE GHG group mapping
-
-filenametext <- "GHG_Mapping_SSP_PAGE.csv"
-
-GHGGroupingData <- read.csv(filenametext, header = TRUE)
-
-# check the variables in the data frame
-# str(GHGGroupingData)
-
+# 0.3: read GHG mappings of SSP R5.2 and PAGE region codes ====
+filenametext.ghg <- paste0(RAW_DATA_PATH, "GHG_Mapping_SSP_PAGE.csv")
+GHGGroupingData <- read.csv(filenametext.ghg, header = TRUE)
 GHGGroupingData$GHG_PAGE_Description <- NULL
 
 
-##############
-
-### read country-level SSP projections for R5.2-level emissions (from SSP database)
-
-
-filenametext <- "SSP_IAM_V2_201811.csv"
-
-RawData <- read.csv(filenametext, header = TRUE)
-
+# 0.4: read SSP data (country-level SSP projections for R5.2-level emissions (from SSP database)) ====
+filenametext.ssp <- paste0(RAW_DATA_PATH, "SSP_IAM_V2_201811.csv")
+RawData <- read.csv(filenametext.ssp, header = TRUE)
 str(RawData)
-
-# specify the variables to read -- see the structure of the file
-selected_cols_char <- c("MODEL", "SCENARIO", "REGION", "VARIABLE", "UNIT")
+selected_cols_char <- c("MODEL", "SCENARIO", "REGION", "VARIABLE", "UNIT") # specify the variables to read -- see the structure of the file
 selected_ssp_years <- seq(min(scenario_years), max(scenario_years), by = 10) # see the structure of the file 
-
 total_selected_ssp_years <- length(selected_ssp_years)
-
-# auxiliary variable to match with the year names as read from the csv file
-selected_ssp_years_x <- paste("X", selected_ssp_years, sep="")
-
-# all selected columns combined
-selected_cols_all <- c(selected_cols_char, selected_ssp_years_x)
-
+selected_ssp_years_x <- paste("X", selected_ssp_years, sep="") # auxiliary variable to match with the year names as read from the csv file
+selected_cols_all <- c(selected_cols_char, selected_ssp_years_x) # all selected columns combined
 RawData <- RawData[ , selected_cols_all]
 
-#
-
-### now specify the values of the "MODEL", "SCENARIO", "REGION", "VARIABLE" variables to extract
-
-selected_models <- unique(RawData$MODEL) # "OECD Env-Growth" # this model has GDP projections for all WA countries; other model's don't
-
+# 0.5: select and extract scenarios and (GHG) variables to extract  ====
 required_scenarios <- "SSP1-19" # paste("SSP", 1:5, sep="") # SSP1 - SSP5
-total_scenarios <- length(required_scenarios)
-
-required_scenarios_with_suffix <- required_scenarios # paste(required_scenarios, "_v9_130325", sep="") # as in the input file
-
 selected_variables <- c("Emissions|BC",
                         "Emissions|CH4",
                         "Emissions|CO",
@@ -129,9 +71,10 @@ selected_variables <- c("Emissions|BC",
                         "Emissions|Sulfur",
                         "Emissions|VOC") 
 
+selected_models <- unique(RawData$MODEL) # "OECD Env-Growth" # this model has GDP projections for all WA countries; other model's don't
+total_scenarios <- length(required_scenarios)
+required_scenarios_with_suffix <- required_scenarios # paste(required_scenarios, "_v9_130325", sep="") # as in the input file
 total_variables <- length(selected_variables)
-
-#
 
 SelectedData <- RawData[RawData$MODEL %in% selected_models & 
                           RawData$SCENARIO %in% required_scenarios_with_suffix &
@@ -139,177 +82,123 @@ SelectedData <- RawData[RawData$MODEL %in% selected_models &
                           RawData$VARIABLE %in% selected_variables, ]
 
 str(SelectedData)
-
 rm(RawData)
 
+
+
+# 0.6: reformat selected data ====
+
 ### now use gather() to reformat the data frame from wide to long, clustering all ssp years in a single data column
-
 ReformattedData <- SelectedData %>% gather(Year, Value, selected_ssp_years_x) # NOTE: use the adjusted variable name for years, containing X
-
 # set the scaling flag to zero
 flag_scaling <- 0
-
 str(ReformattedData)
-
 rm(SelectedData)
+ReformattedData$Year <- as.numeric(str_remove(ReformattedData$Year, "X")) ### remove X in front of the years and convert into numbers
+
+# 0.7: prepare for creating separate data frames for each variable ====
+VariableUnits <- ReformattedData[ReformattedData$VARIABLE %in% selected_variables, c("VARIABLE", "UNIT")] # extract units for each variable as a separate data frame 
+VariableUnits <- VariableUnits[!duplicated(VariableUnits), ] # remove duplicates
+ReformattedData$UNIT <- NULL # remove the units variable from the main dataframe 
 
 
-### remove X in front of the years and convert into numbers
-
-ReformattedData$Year <- as.numeric(str_remove(ReformattedData$Year, "X"))
-
-# ### remove "_v9_130325" from the SSP strings
-# 
-# ReformattedData$SCENARIO <- str_remove(ReformattedData$SCENARIO, "_v9_130325")
-
-
-##############
-
-# extract units for each variable as a separate data frame 
-
-VariableUnits <- ReformattedData[ReformattedData$VARIABLE %in% selected_variables, c("VARIABLE", "UNIT")] 
-
-# remove duplicates
-
-VariableUnits <- VariableUnits[!duplicated(VariableUnits), ]
-
-# remove the units variable from the main dataframe 
-
-ReformattedData$UNIT <- NULL
-
-
-##############
-
-### now scale all GHG emissions relative to their values in the base year
-
-# extract the dataframe containing only the base year values
-
-rowsselection <- which(ReformattedData$Year == base_year)
-
+# 0.8: scale GHG emissions, as index relative to their values in the base year ====
+rowsselection <- which(ReformattedData$Year == base_year) # extract the dataframe containing only the base year values
 df <- ReformattedData[rowsselection, ]
-
-# replicate this dataframe for all ssp years
-
-df_rep <- df[rep(seq_len(nrow(df)), each = total_selected_ssp_years), ]  # Base R
-
-# merge df_rep with the main dataframe
-
-df <- merge(ReformattedData, df_rep, by=c("MODEL", "SCENARIO", "REGION", "VARIABLE"))
+df_rep <- df[rep(seq_len(nrow(df)), each = total_selected_ssp_years), ]  # replicate this dataframe for all ssp years, Base R functions
+df <- merge(ReformattedData, df_rep, by=c("MODEL", "SCENARIO", "REGION", "VARIABLE")) # merge df_rep with the main dataframe
 
 # after the merger, Value.x contains original values in all SSP years, while Value.y 
 # contains the corresponding values from 2020; divide one by another to get the 
 # required percentage relative to the vase year and create a new column for these new values
-
 df[c("ValRelPct")] <- 100 * df$Value.x / df$Value.y # UNITS: % relative to base year
 
 # rename Year.x back to Year and remove the other columns
-
 df <- df %>% rename(Year = Year.x)
 df$Value.x <- NULL
 df$Year.y <- NULL
 df$Value.y <- NULL
 
-### restore the previous name
-
+# restore the previous name
 ReformattedData <- df
 
 
-##############
+
+# 0.9: Add PAGE-ICE GHG category information to the original dataframe ====
 
 ### rename GHG_SSP to VARIABLE in the auxiliary GHGGroupingData dataframe and merge 
 ### it with the main SSP dataframe to map to PAGE GHG catagories 
-
 GHGGroupingData <- GHGGroupingData  %>% rename(VARIABLE = GHG_SSP)
-
-#
-
 ReformattedData <- merge(ReformattedData, GHGGroupingData, by = c("VARIABLE"))
-
-# remove the original VARIABLE
-
-ReformattedData$VARIABLE <- NULL
+ReformattedData$VARIABLE <- NULL # remove the original VARIABLE
 
 
-##############
+# 1: perform calculations on the SSP data ====
 
-### now work out the mean of ValRelPct over all the components of the Excess GHG category;
-
+# 1.1: [N/A] work out the mean of ValRelPct over all GHG componentsthe components of the Excess GHG category ====
 ### NOTE: This is a very rough calculation since the Excess category includes multiple GHGs with very different levels of emissions and GWP;
 ### However, the decline in the emissions relative to their base year values follows roughly the same trajectory for all the components involved, 
 ### which is why we simply average over the individual trajectories
 
-### Perform the averaging automatically for ALL PAGE GHG groups for the ease of calculation and in case there 
-### are further multiple entries
+# therefore - we skip this and do it for all PAGE GHG groups in the same manner.
 
+# 1.2: Perform the averaging automatically for ALL PAGE GHG groups ====  
+### for gas, model - done together for the ease of calculation and in case there are further multiple entries
 df <- ReformattedData
-
 df <- aggregate(x = df[c("ValRelPct")], by=df[c("MODEL", "SCENARIO", "REGION", "Year", "GHG_PAGE")], FUN=mean)
-
 ReformattedData <- df
 
-
-##############
-
-### now work out the mean of ValRelPct over all the models used to derive SSPs;
-
+### for gas - now work out the mean of ValRelPct over all the models used to derive SSPs;
 df <- ReformattedData
-
 df <- aggregate(x = df[c("ValRelPct")], by=df[c("SCENARIO", "REGION", "Year", "GHG_PAGE")], FUN=mean)
-
 ReformattedData <- df
 
-
-##############
+# 1.3: Map onto PAGE-regions ====
 
 ### finally, we arrived at the stage when we can rename R5 to REGION in the auxiliary 
 ### RegionGroupingData dataframe and merge it with the main SSP dataframe to map to PAGE regions 
-
 RegionGroupingData <- RegionGroupingData  %>% rename(REGION = R5)
-
-#
-
 ReformattedData <- merge(ReformattedData, RegionGroupingData, by = c("REGION"))
-
-# remove the original REGION variable
-
-ReformattedData$REGION <- NULL
-
-# also remove the scenario column (unless multiple scenarios need to be processed)
-
-ReformattedData$SCENARIO <- NULL
-
-
-###################
+ReformattedData$REGION <- NULL # remove the original REGION variable
+ReformattedData$SCENARIO <- NULL # also remove the scenario column (unless multiple scenarios need to be processed)
 
 ### sort the order of rows and columns
-
 rowsselection <- order(ReformattedData$R_PAGE, ReformattedData$GHG_PAGE, ReformattedData$Year)
-                       
 colsselection <- c("R_PAGE", "GHG_PAGE", "Year", "ValRelPct")
-
 ReformattedData <- ReformattedData[rowsselection, colsselection]
 
 
-###################
+# 2: Write out data ====
+# map page rcp simple file names 
+ssp_gas_names <- ordered(unique(ReformattedData_mimi$GHG_PAGE))
+page_gas_names <- c("ch4", "co2", "excess", "lin", "n2o", "sulph") 
+gas.conversion <- page_gas_names
+names(gas.conversion) <- ssp_gas_names
 
-### finally, reshape into wide format consistent with that of PAGE GHG policy entries
+### write out long-format data
+ReformattedData_mimi <- tibble(ReformattedData) %>% 
+  pivot_wider(names_from = "R_PAGE", values_from = "ValRelPct") %>% 
+  mutate(ghg_out_name=gas.conversion[GHG_PAGE][[1]])
 
-PAGEFormatData <- reshape(ReformattedData, idvar = c("R_PAGE", "GHG_PAGE"), timevar = "Year", direction = "wide")
+# loop to write out all gases in separate data frames
+### N.B. requires editing to make more flexible for multiple RCPs, or to include other variables like GDP and population
+for (gas in page_gas_names){
+  filenametext_output <- paste0(
+    OUT_DATA_PATH,
+    "rcps/",
+    "rcp19_",
+    gas,
+    ".csv"
+  )
+  
+  write.csv(ReformattedData_mimi %>% 
+              filter(ghg_out_name==gas) %>% 
+              select(-GHG_PAGE, -ghg_out_name) %>% 
+              rename(year=Year), 
+            filenametext_output, quote = TRUE, row.names = FALSE)  
+}
 
-### sort rows according to GHG categories 
 
-rowsselection <- order(PAGEFormatData$GHG_PAGE)
-
-PAGEFormatData <- PAGEFormatData[rowsselection, ]
-
-
-###################
-
-### write the resulting dataframe into csv file
-
-filenametext_output <- paste(paste("PAGE", "Emissions", required_scenarios , sep = "_"), ".csv", sep ="")
-
-write.csv(PAGEFormatData, filenametext_output, quote = TRUE, row.names = FALSE)
 
 
 
