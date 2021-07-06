@@ -24,13 +24,26 @@ try(setwd(dirname(rstudioapi::getActiveDocumentContext()$path)))
 here::i_am("SSP_IAM_V2_201811.csv")
 RAW_DATA_PATH <- paste0(here(), "/")
 DATA_PATH_SSP <- paste0(RAW_DATA_PATH, "SSP_IAM_V2_201811.csv")
+OUT_DATA_PATH_TEMP <- paste0(here(), "/../data-raw/")
 OUT_DATA_PATH <- paste0(here(), "/../data/")
 
-# 0.2: specification of years to prepare ====
+# 0.2: specification of years, variables, and scenarios to prepare ====
 scenario_years <- 2010:2100 # define the required scenario years for which the SSP data is to be prepared
 total_scenario_years = length(scenario_years)
 base_year <- 2020 # define the base year relative to which the % changes in emissions are to be calculated
-
+required_scenarios <- "SSP1-19" # paste("SSP", 1:5, sep="") # SSP1 - SSP5
+selected_variables <- c("Emissions|BC",
+                        "Emissions|CH4",
+                        "Emissions|CO",
+                        "Emissions|CO2",
+                        "Emissions|F-Gases",
+                        ### "Emissions|Kyoto Gases", # This is an aggregate category itself! Exclude it from the mapping for obvious reasons
+                        "Emissions|N2O",
+                        ### "Emissions|NH3", # This is an indirect GHG as some of it may get converted to N2O, a direct GHG. Exclude it due to large uncertainties involved
+                        ### "Emissions|NOx", # This is an indirect GHG as some of it may get converted to N2O, a direct GHG. Exclude it due to large uncertainties involved
+                        "Emissions|OC",
+                        "Emissions|Sulfur",
+                        "Emissions|VOC") 
 
 # 0.3: read regional mappings of SSP R5.2 and PAGE region codes ====
 filenametext.region <- paste0(RAW_DATA_PATH, "Region_Mapping_SSP_PAGE.csv")
@@ -56,21 +69,7 @@ selected_ssp_years_x <- paste("X", selected_ssp_years, sep="") # auxiliary varia
 selected_cols_all <- c(selected_cols_char, selected_ssp_years_x) # all selected columns combined
 RawData <- RawData[ , selected_cols_all]
 
-# 0.5: select and extract scenarios and (GHG) variables to extract  ====
-required_scenarios <- "SSP1-19" # paste("SSP", 1:5, sep="") # SSP1 - SSP5
-selected_variables <- c("Emissions|BC",
-                        "Emissions|CH4",
-                        "Emissions|CO",
-                        "Emissions|CO2",
-                        "Emissions|F-Gases",
-                        ### "Emissions|Kyoto Gases", # This is an aggregate category itself! Exclude it from the mapping for obvious reasons
-                        "Emissions|N2O",
-                        ### "Emissions|NH3", # This is an indirect GHG as some of it may get converted to N2O, a direct GHG. Exclude it due to large uncertainties involved
-                        ### "Emissions|NOx", # This is an indirect GHG as some of it may get converted to N2O, a direct GHG. Exclude it due to large uncertainties involved
-                        "Emissions|OC",
-                        "Emissions|Sulfur",
-                        "Emissions|VOC") 
-
+# 0.5: extract scenarios and (GHG) variables to extract  ====
 selected_models <- unique(RawData$MODEL) # "OECD Env-Growth" # this model has GDP projections for all WA countries; other model's don't
 total_scenarios <- length(required_scenarios)
 required_scenarios_with_suffix <- required_scenarios # paste(required_scenarios, "_v9_130325", sep="") # as in the input file
@@ -178,13 +177,13 @@ names(gas.conversion) <- ssp_gas_names
 ### write out long-format data
 ReformattedData_mimi <- tibble(ReformattedData) %>% 
   pivot_wider(names_from = "R_PAGE", values_from = "ValRelPct") %>% 
-  mutate(ghg_out_name=gas.conversion[GHG_PAGE][[1]])
+  mutate(ghg_out_name=gas.conversion[ReformattedData_mimi$GHG_PAGE])
 
 # loop to write out all gases in separate data frames
 ### N.B. requires editing to make more flexible for multiple RCPs, or to include other variables like GDP and population
 for (gas in page_gas_names){
   filenametext_output <- paste0(
-    OUT_DATA_PATH,
+    OUT_DATA_PATH_TEMP,
     "rcps/",
     "rcp19_",
     gas,
