@@ -35,8 +35,10 @@ directory of this repository, do
 ```julia
 pkg> activate .
 (MimiPAGE2020) pkg> instantiate
+(MimiPAGE2020) pkg> up
 ```
-which should install the correct dependencies.
+which should first install the correct package dependencies, and
+then `up` forces compatibility.
 
 Running the model can be done in several ways, for instance from the root of the directory by doing:
 ```julia
