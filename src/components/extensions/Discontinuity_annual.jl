@@ -26,6 +26,7 @@ function calc_discontinuity(p, v, d, t, annual_year, r)
         end
     end
 
+    # in growth effects with feedback, `p.rgdp_per_cap_NonMarketRemainGDP_ann[yr,r]` goes below zero, leading to issues here.
     v.igdpeqdis_eqdiscimpact_ann[yr,r] = v.irefeqdis_eqdiscimpact[r] * (p.rgdp_per_cap_NonMarketRemainGDP_ann[yr,r] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
 
     if is_first(t)

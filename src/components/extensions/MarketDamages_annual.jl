@@ -90,6 +90,10 @@ function calc_marketdamages(p, v, d, t, annual_year, r)
     v.rcons_per_cap_MarketRemainConsumption_ann[yr,r] = v.rcons_per_cap_SLRRemainConsumption_ann[yr,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r]
     v.rgdp_per_cap_MarketRemainGDP_ann[yr,r] = v.rcons_per_cap_MarketRemainConsumption_ann[yr,r] / (1 - p.save_savingsrate / 100)
 
+    if v.rgdp_per_cap_MarketRemainGDP_ann[yr,r] < 0
+        v.rgdp_per_cap_MarketRemainGDP_ann[yr,r] = 0
+    end
+
 end
 
 
