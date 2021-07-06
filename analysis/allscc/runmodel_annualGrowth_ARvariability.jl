@@ -151,7 +151,7 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Tar
 end
 
 # remove the first placeholder row
-df_sccMC = df_sccMC[df_sccMC[:scen] .!= "-999", :]
+df_sccMC = df_sccMC[df_sccMC[!, :scen] .!= "-999", :]
 
 # export the results
 CSV.write(string(dir_output, "MimiPageGrowthEffectsResultsMonteCarlo.csv"), df_sccMC)

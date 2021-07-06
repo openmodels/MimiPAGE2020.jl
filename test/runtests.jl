@@ -1,3 +1,11 @@
+## Primary testing file for local, faster testing, excluding two tests that are run
+## in `runtests_clean.jl`:
+
+# (1) We only run tests for the SCC in runtests_clean.jl 
+# since they are fairly slow
+# (2) We only run tests for the extensions in runtests_clean.jl
+# since they too are slow, and also clean out the output folders
+
 using Test
 using Mimi
 
@@ -59,11 +67,11 @@ end
     include("test_TotalCosts.jl")
     include("test_TotalForcing.jl")
     include("test_Permafrost.jl")
-    ## include("test_mcs.jl") # missing data
+    include("test_mcs.jl")
     include("test_scenarios_mcs.jl")
     include("test_scenarios.jl")
     include("test_standard_api.jl")
-    ## include("test_scc.jl") # Takes very long to run.
     include("contrib/test_taxeffect.jl")
     include("test_package.jl")
+
 end
