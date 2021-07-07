@@ -1,6 +1,6 @@
 # PAGE-2020 - Open-Source Repository for the PAGE-2020 Integrated Assessment Model
 
-![](https://github.com/mimiframework/Mimi.jl/workflows/Run%20CI%20on%20master/badge.svg)
+![](https://github.com/openmodels/MimiPAGE2020.jl/blob/master/.github/workflows/jlpkgbutler-ci-master-workflow.yml/badge.svg)
 
 PAGE-2020 (Policy Analysis of Greenhouse Effect, v. 2020) is a
 cost-benefit Integrated Assessment Model. It builds upon
