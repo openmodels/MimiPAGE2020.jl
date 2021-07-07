@@ -221,10 +221,10 @@
             end
 
             v.excdampv_excessdamagespresvalue[tt, rr] = v.excdam_excessdamages[tt, rr] *  v.dfc_consumptiondiscountrate[tt, rr]
-
+            
 
             v.addt_equityweightedimpact_discountedaggregated[tt, rr] = v.widt_partiallyweighted_discounted[tt, rr] * p.yagg_periodspan[tt]
-            v.aact_equityweightedadaptation_discountedaggregated[tt, rr] = v.wacdt_partiallyweighted_discounted[tt, rr] * p.yagg_periodspan[tt]
+        v.aact_equityweightedadaptation_discountedaggregated[tt, rr] = v.wacdt_partiallyweighted_discounted[tt, rr] * p.yagg_periodspan[tt]
         end
 
         v.pct_g_partiallyweighted_global[tt] = sum(v.pct_partiallyweighted[tt, :])

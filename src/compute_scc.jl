@@ -194,7 +194,7 @@ function compute_scc_mm(m::Model=get_model(); year::Union{Int,Nothing}=nothing, 
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
-    if eta != nothing
+        if eta != nothing
         try
             set_param!(m, :emuc_utilityconvexity, eta)      # since eta is a default parameter in PAGE, we need to use `set_param!` if it hasn't been set yet
         catch e
