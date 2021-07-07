@@ -1,6 +1,6 @@
 name = "MimiPAGE2020"
 uuid = "daa1807e-96ac-4669-bc57-6ed081383131"
-version = "1.8.0"
+version = "1.8.1-DEV"
 
 [deps]
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
