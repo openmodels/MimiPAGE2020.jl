@@ -59,7 +59,7 @@ end
     include("test_TotalCosts.jl")
     include("test_TotalForcing.jl")
     include("test_Permafrost.jl")
-    ## include("test_mcs.jl") # missing data
+    include("test_mcs.jl")
     include("test_scenarios_mcs.jl")
     include("test_scenarios.jl")
     include("test_standard_api.jl")

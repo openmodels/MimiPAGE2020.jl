@@ -45,10 +45,10 @@ df_sccMC_singleGE = DataFrame(damagePAGE09=false, permafr=false, seaice=false, g
                                   share_zeroSCC = -999.)
 
 for jj_page09damages in [false]
-    for jj_permafr in [true] #, false]
-        for jj_seaice in [true] #, false]
-            for jj_scen in ["RCP4.5 & SSP2"] #"1.5 degC Target", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
-                for jj_civvalue in [1.] #, 10.0^20]
+    for jj_permafr in [true, false]
+        for jj_seaice in [true, false]
+            for jj_scen in ["RCP1.9 & SSP1", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
+                for jj_civvalue in [1., 10.0^20]
 #              for jj_gdploss in [1., 0.]
 
                     # jump undesired combinations
@@ -137,9 +137,15 @@ df_sccMC = DataFrame(permafr=false, seaice=false, ge_string="-999", scen="-999",
                                   perc05=-999., perc95=-999., perc10=-999., perc90=-999.,
                                   share_zeroSCC = -999.)
 
+<<<<<<< HEAD
 # get the SCC for the empirical persistence distribution at different adaptation rates
 for jj_scen in ["RCP4.5 & SSP2"] #, "RCP2.6 & SSP1", "RCP8.5 & SSP5", "1.5 degC Target"]
     for jj_gestring in ["EMPIRICAL"] #, "MEDIUM", "MILD", "EMPIRICAL+"]
+=======
+# get the SCC for three different growth effects distributions and scenarios
+for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP1"]
+    for jj_gestring in ["EMPIRICAL", "MEDIUM", "MILD", "EMPIRICAL+"]
+>>>>>>> add-rcp19
         for jj_permafr in [true]
             for jj_seaice in [true]
                 for jj_civvalue in [1.] #, 10.0^20]
