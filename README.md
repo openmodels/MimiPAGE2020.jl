@@ -20,7 +20,7 @@ For software requirements, installation instructions, and basic usage,
 see the [Getting started](https://github.com/openmodels/PAGE-2020/tree/master/docs/getting-started.md) page.
 
 Information on computing an SCC in PAGE-2020 is available in
-the [Calculating the Social Cost of Carbon](https://github.com/openmodels/PAGE-2020/tree/master/docs/calc-scc.m)] page.
+the [Calculating the Social Cost of Carbon](https://github.com/openmodels/PAGE-2020/tree/master/docs/calc-scc.md) page.
 
 ## Running the Model
 
