@@ -36,47 +36,23 @@
         # Set the RCP values
         if p.rcp == 10
             v.er_CO2emissionsgrowth[:, :] =
-                weighted_scenario(
-                    readpagedata(nothing, "data/rcps/rcp19_co2.csv"),
-                    readpagedata(nothing, "data/rcps/rcp26_co2.csv"),
-                    readpagedata(nothing, "data/rcps/rcp45_co2.csv"),
-                    readpagedata(nothing, "data/rcps/rcp85_co2.csv"),
-                    p.weight_scenarios)
+                weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_co2.csv"), readpagedata(nothing, "data/rcps/rcp45_co2.csv"),
+                                  readpagedata(nothing, "data/rcps/rcp85_co2.csv"), p.weight_scenarios)
             v.er_CH4emissionsgrowth[:, :] =
-                weighted_scenario(
-                    readpagedata(nothing, "data/rcps/rcp19_ch4.csv"),
-                    readpagedata(nothing, "data/rcps/rcp26_ch4.csv"),
-                    readpagedata(nothing, "data/rcps/rcp45_ch4.csv"),
-                    readpagedata(nothing, "data/rcps/rcp85_ch4.csv"),
-                    p.weight_scenarios)
+                weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_ch4.csv"), readpagedata(nothing, "data/rcps/rcp45_ch4.csv"),
+                                  readpagedata(nothing, "data/rcps/rcp85_ch4.csv"), p.weight_scenarios)
             v.er_N2Oemissionsgrowth[:, :] =
-                weighted_scenario(
-                    readpagedata(nothing, "data/rcps/rcp19_n2o.csv"),
-                    readpagedata(nothing, "data/rcps/rcp26_n2o.csv"),
-                    readpagedata(nothing, "data/rcps/rcp45_n2o.csv"),
-                    readpagedata(nothing, "data/rcps/rcp85_n2o.csv"),
-                    p.weight_scenarios)
+                weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_n2o.csv"), readpagedata(nothing, "data/rcps/rcp45_n2o.csv"),
+                                  readpagedata(nothing, "data/rcps/rcp85_n2o.csv"), p.weight_scenarios)
             v.er_LGemissionsgrowth[:, :] =
-                weighted_scenario(
-                    readpagedata(nothing, "data/rcps/rcp19_lin.csv"),
-                    readpagedata(nothing, "data/rcps/rcp26_lin.csv"),
-                    readpagedata(nothing, "data/rcps/rcp45_lin.csv"),
-                    readpagedata(nothing, "data/rcps/rcp85_lin.csv"),
-                    p.weight_scenarios)
+                weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_lin.csv"), readpagedata(nothing, "data/rcps/rcp45_lin.csv"),
+                                  readpagedata(nothing, "data/rcps/rcp85_lin.csv"), p.weight_scenarios)
             v.pse_sulphatevsbase[:, :] =
-                weighted_scenario(
-                    readpagedata(nothing, "data/rcps/rcp19_sulph.csv"),
-                    readpagedata(nothing, "data/rcps/rcp26_sulph.csv"),
-                    readpagedata(nothing, "data/rcps/rcp45_sulph.csv"),
-                    readpagedata(nothing, "data/rcps/rcp85_sulph.csv"),
-                    p.weight_scenarios)
+                weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_sulph.csv"), readpagedata(nothing, "data/rcps/rcp45_sulph.csv"),
+                                  readpagedata(nothing, "data/rcps/rcp85_sulph.csv"), p.weight_scenarios)
             v.exf_excessforcing[:] =
-                weighted_scenario(
-                    readpagedata(nothing, "data/rcps/rcp19_excess.csv"),
-                    readpagedata(nothing, "data/rcps/rcp26_excess.csv"),
-                    readpagedata(nothing, "data/rcps/rcp45_excess.csv"),
-                    readpagedata(nothing, "data/rcps/rcp85_excess.csv"),
-                    p.weight_scenarios)
+                weighted_scenario(readpagedata(nothing, "data/rcps/rcp26_excess.csv"), readpagedata(nothing, "data/rcps/rcp45_excess.csv"),
+                                  readpagedata(nothing, "data/rcps/rcp85_excess.csv"), p.weight_scenarios)
         elseif p.rcp == 260
             # Fill in within run_timestep
         elseif p.rcp == 0
