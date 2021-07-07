@@ -1,4 +1,4 @@
-using Query
+using Query, CSVFiles
 
 """
 Create a parameter `component`_`name` with the given value,
