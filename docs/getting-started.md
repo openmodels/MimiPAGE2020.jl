@@ -1,17 +1,16 @@
 # Getting Started
 
-This guide will briefly explain how to install Julia and PAGE-2020.
+This guide will briefly explain how to install Julia and MimiPAGE2020.
 
 ## Installing Julia
 
-PAGE-2020 requires the programming
+MimiPAGE2020 requires the programming
 language [Julia](http://julialang.org/), version 1.1 or later, to
 run. Download and install the current release from the Julia [download page](http://julialang.org/downloads/).
 
 ## Installing Mimi
 
-The PAGE-2020 model is written for the Mimi modeling framework, which
-needs to be installed as a standard Julia package.
+The MimiPAGE2020 model is written for the Mimi modeling framework, which needs to be installed as a standard Julia package.
 
 Once Julia is installed, start Julia and you should see a Julia command prompt. To install the Mimi package, issue the following command:
 ```julia
@@ -28,23 +27,20 @@ To exit the Pkg REPL-mode, simply backspace once to re-enter the Julia REPL.
 
 You only have to run this (whichever method you choose) once on your machine.
 
-PAGE-2020 also requires the Distributions, DataFrames, CSVFiles, Query, and Missings packages.
+MimiPAGE2020 also requires the Distributions, DataFrames, CSVFiles, Query, and Missings packages.
 
 For more information about the Mimi component framework, you can refer to the [Mimi](https://www.mimiframework.org/) site, which has a documentation and links to various models that are based on Mimi.
 
-## Installing PAGE-2020
+## Installing MimiPAGE2020
 
-There are two primary ways to install and use PAGE-2020, and the
-preferred method will depend on the intended use cases. You can use it
-as a package or as a repository. Install it as a repository if you
-plan to modify the code.
+There are two primary ways to install and use MimiPAGE2020, and the preferred method will depend on the intended use cases. You can use it as a package or as a repository. Install it as a repository if you plan to modify the code.
 
-### Option 1: Installing PAGE-2020 as a repository
+### Option 1: Installing MimiPAGE2020 as a repository
 
-Clone or download the PAGE-2020 repository from the
-PAGE-2020 [Github website](https://github.com/openmodels/PAGE-2020).
+Clone or download the MimiPAGE2020 repository from the
+MimiPAGE2020 [Github website](https://github.com/openmodels/MimiPAGE2020).
 
-To load PAGE-2020, you can `include` the `main_model.jl` file, like
+To load MimiPAGE2020, you can `include` the `main_model.jl` file, like
 so:
 ```
 using Mimi
@@ -55,37 +51,21 @@ run(m)
 explore(m)
 ```
 
-### Option 2: Installing PAGE-2020 as a package
+### Option 2: Installing MimiPAGE2020 as a package
 
-You first need to connect your julia installation with the central
-[Mimi registry](https://github.com/mimiframework/MimiRegistry) of Mimi models.
-This central registry is like a catalogue of models that use Mimi that is
-maintained by the Mimi project. To add this registry, run the following
-command at the julia package REPL:
-`
+Add the MimiPAGE2020 as a package using the following command at the julia package REPL:
+
 ```julia
-pkg> registry add https://github.com/mimiframework/MimiRegistry.git
-```
-You only need to run this command once on a computer.
-The next step is to install MimiPAGE2020.jl itself. You need to run the
-following command at the julia package REPL:
-```julia
-pkg> add MimiPAGE2020
+pkg> add https://github.com/openmodels/MimiPAGE2020.jl.git
 ```
 
-## Loading PAGE-2020
+## Loading MimiPAGE2020
 
-How you load and use the model depends on how you installed it. The
-key difference is how you load the model. Below is shown how to run
-the deterministic version of PAGE-2020 with central parameter
-estimates. The `getpage()` function creates the initialized PAGE
-model.
+How you load and use the model depends on how you installed it. The key difference is how you load the model. Below is shown how to run the deterministic version of MimiPAGE2020 with central parameter estimates. The `getpage()` function creates the initialized PAGE model.
 
-## Option 1: When PAGE-2020 is installed as a repository
+## Option 1: When MimiPAGE2020 is installed as a repository
 
-If you have installed PAGE-2020 as a repository (Option 1 above), then
-load the model by including the `main_model.jl` and running
-`getpage()`, as follows:
+If you have installed MimiPAGE2020 as a repository (Option 1 above), then load the model by including the `main_model.jl` and running `getpage()`, as follows:
 ```
 using Mimi
 include("src/main_model.jl")
@@ -93,10 +73,9 @@ include("src/main_model.jl")
 m = getpage()
 ```
 
-## Option 2: When PAGE-2020 is installed as a package
+## Option 2: When MimiPAGE2020 is installed as a package
 
-If you installed PAGE-2020 as a package, you will use the
-package-based syntax, as follows:
+If you installed MimiPAGE2020 as a package, you will use the package-based syntax, as follows:
 ```
 using MimiPAGE2020
 
@@ -105,35 +84,22 @@ m = MimiPAGE2020.getpage()
 
 ## Basic usage
 
-Once you have a model object (`m` from above), you can print the model, by typing `m`, which
-returns a list of components and each of their incoming parameters and
-outgoing variables.
+Once you have a model object (`m` from above), you can print the model, by typing `m`, which returns a list of components and each of their incoming parameters and outgoing variables.
 
 The first thing you will want to do is run the model. Do this with
 ```
 run(m)
 ```
 
-Results can be viewed by running `m[:ComponentName, :VariableName]` 
-for the desired component and variable. You may also explore the results graphically
-by running `explore(m)` to view all variables and parameters, or `explore(m, :VariableName)`
-for just one.
+Results can be viewed by running `m[:ComponentName, :VariableName]`  for the desired component and variable. You may also explore the results graphically by running `explore(m)` to view all variables and parameters, or `explore(m, :VariableName)` for just one.
 
-For more details on the graphical interface of Mimi look to the
-documentation in the
-Mimi
-[User Guide](https://www.mimiframework.org/Mimi.jl/stable/userguide/) under
-Plotting and the Explorer UI.
+For more details on the graphical interface of Mimi look to the documentation in the Mimi [User Guide](https://www.mimiframework.org/Mimi.jl/stable/userguide/) under Plotting and the Explorer UI.
 
-To run the stochastic version of PAGE-2020, which uses parameter
-distributions, see the `mcs.jl` file in the src folder and the documentation for
-Mimi Monte Carlo support [here](https://github.com/mimiframework/Mimi.jl/blob/master/docs/src/internals/montecarlo.md). The simplest version of the stochastic can be implemented as follows:
+To run the stochastic version of MimiPAGE2020, which uses parameter distributions, see the `mcs.jl` file in the src folder and the documentation for Mimi Monte Carlo support [here](https://github.com/mimiframework/Mimi.jl/blob/master/docs/src/internals/montecarlo.md). The simplest version of the stochastic can be implemented as follows:
 ```julia
 julia> do_monte_carlo_runs(1000) # 1000 runs
 ```
-The current Monte Carlo process outputs a selection of variables that are
-important for validation, but these can be modified by the user if
-desired. For more information, see the [Technical Guide](technicaluserguide.md).
+The current Monte Carlo process outputs a selection of variables that are important for validation, but these can be modified by the user if desired. For more information, see the [Technical Guide](technicaluserguide.md).
 
 ## Troubleshooting
 

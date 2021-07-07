@@ -1,6 +1,6 @@
 # PAGE-2020 - Open-Source Repository for the PAGE-2020 Integrated Assessment Model
 
-[![Build Status](https://travis-ci.com/openmodels/PAGE-2020.svg?branch=master)](https://travis-ci.com/openmodels/PAGE-2020)
+![](https://github.com/mimiframework/Mimi.jl/workflows/Run%20CI%20on%20master/badge.svg)
 
 PAGE-2020 (Policy Analysis of Greenhouse Effect, v. 2020) is a
 cost-benefit Integrated Assessment Model. It builds upon
@@ -30,6 +30,4 @@ see the code in the file `examples/main.jl`.
 
 ## More documentation
 
-More documentation is available under
-the
-[docs](https://github.com/openmodels/PAGE-2020/tree/master/docs) directory.
+More documentation is available under the [docs](https://github.com/openmodels/PAGE-2020/tree/master/docs) directory.
