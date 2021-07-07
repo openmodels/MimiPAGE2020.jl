@@ -14,21 +14,19 @@ The main advancements for the PAGE-2020 are:
  - Partial growth feedbacks
  - Optional annual timesteps and variability
 
-## Software Requirements
-You need to install [julia 1.1](https://julialang.org) or newer to run this model.
+## Getting started
 
-The model uses the Mimi framework, and you will want to install the
-Mimi package into your julia environment:
+For software requirements, installation instructions, and basic usage,
+see the [Getting started][docs/getting-started.md] page.
 
-```julia
-pkg> add Mimi
-```
+Information on computing an SCC in PAGE-2020 is available in
+the [Calculating the Social Cost of Carbon][docs/calc-scc.md] page.
 
 ## Running the Model
 
-Iit is highly recommended to read the Mimi documentation first to
-understand the code structure. For starter code on running the model
-just once, see the code in the file `examples/main.jl`.
+It is recommended to read the Mimi documentation first to understand
+the code structure. For starter code on running the model just once,
+see the code in the file `examples/main.jl`.
 
 ## More documentation
 
