@@ -347,7 +347,8 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String=joinpath(@_
                       use_convergence::Union{Float64, Nothing} = nothing,
                       cbabs::Union{Float64, Nothing} = nothing,
                       eqwbound::Union{Float64, Nothing} = nothing,
-                      geadrate::Union{Float64, Nothing} = nothing)
+                      geadrate::Union{Float64, Nothing} = nothing,
+                      emfeedback::Union{Float64, Nothing} = nothing)
 
     # Setup the marginal model and modify key parameters if they are specified
     m = getpage(scenario, use_permafrost, use_seaice, use_page09damages)
@@ -365,6 +366,9 @@ function get_scc_mcs(samplesize::Int, year::Int, output_path::String=joinpath(@_
     end
     if geadrate != nothing
         setorup_param!(m, :geadrate_growtheffects_adaptationrate, geadrate)
+    end
+    if emfeedback != nothing
+        setorup_param!(m, :emfeed_emissionfeedback, emfeedback)
     end
 
     mm = compute_scc_mm(m, year=year, eta=eta, prtp=prtp, pulse_size=pulse_size)[:mm]
