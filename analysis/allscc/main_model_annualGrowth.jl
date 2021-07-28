@@ -11,7 +11,7 @@ include("compute_scc_annualGrowth.jl")                  ## based on compute_scc_
 include("../../src/components/RCPSSPScenario.jl")
 include("../../src/components/extensions/CO2emissions_annualGrowth.jl")
 include("../../src/components/CO2cycle.jl")
-include("../../src/components/CO2forcing.jl")
+include("../../src/components/extensions/CO2forcing_growth.jl")
 include("../../src/components/extensions/CH4emissions_annualGrowth.jl")
 include("../../src/components/CH4cycle.jl")
 include("../../src/components/CH4forcing.jl")
@@ -38,8 +38,8 @@ include("../../src/components/TotalAbatementCosts.jl")
 include("../../src/components/extensions/TotalAdaptationCosts_annualGrowth.jl")  # annualised, based on the PAGE-ICE file
 include("../../src/components/Population.jl")
 include("../../src/components/extensions/EquityWeighting_annualGrowth.jl")       # annualised, based on the PAGE-Growth file
-include("../../src/components/PermafrostSiBCASA.jl")
-include("../../src/components/PermafrostJULES.jl")
+include("../../src/components/extensions/PermafrostSiBCASA_growth.jl")
+include("../../src/components/extensions/PermafrostJULES_growth.jl")
 include("../../src/components/PermafrostTotal.jl")
 
 function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
