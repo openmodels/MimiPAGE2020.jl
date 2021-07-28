@@ -70,6 +70,8 @@ for jj_page09damages in [false]
                             # skip redundant iterations with non-zero adaptation and zero persistence
                             if jj_ge == 0. && jj_geadapt > 0.
                                 continue
+                            elseif jj_geadapt != 0. && jj_civvalue != 1.
+                                continue
                             end
 
                             # print out the growth effects to track progress
@@ -132,7 +134,7 @@ CSV.write(string(dir_output, "MimiPageGrowthEffectsResults_SCC_fixedGE.csv"), df
 df_sccMC = DataFrame(permafr=false, seaice=false, ge_string="-999", scen="-999",
                                   convergence=-999.,  bound=-999., eqwshare=-999.,
                                   civvalue=-999., pulse=-999., ge_adapt = -999.,
-                                  emfeed = -999.,
+                                  emfeed = -999., switch = -999.,
                                   mean=-999., median=-999., min=-999., max=-999., perc25=-999.,
                                   perc75=-999., sd=-999., varcoeff=-999.,
                                   perc05=-999., perc95=-999., perc10=-999., perc90=-999.,
@@ -149,7 +151,8 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
                             for jj_convergence in [1., 0.]
                                 for jj_pulse in [scc_pulse_size]
                                     for jj_geadapt in [0.0:0.01:0.05;]
-                                        for jj_emfeed in [1.]
+                                        for jj_emfeed in [1., 0.]
+                                            for jj_regionswitch in [0., 1.]
 
                                         # overwrite jj_geadapt with nothing if its zero (which will triger the deterministic default value of zero)
                                         if jj_geadapt == 0.
@@ -160,28 +163,30 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
                                         if jj_scen != "RCP4.5 & SSP2" && (jj_gestring != "EMPIRICAL" || jj_permafr != true ||
                                                                             jj_seaice != true || jj_civvalue != 1. || jj_cbabs != 740.65 ||
                                                                             jj_eqwshare != 0.99 || jj_convergence != 1. || jj_pulse != scc_pulse_size ||
-                                                                            jj_geadapt != nothing || jj_emfeed != 1.)
+                                                                            jj_geadapt != nothing || jj_emfeed != 1. || jj_regionswitch != 0.)
                                             continue
                                         elseif jj_permafr != jj_seaice
                                             continue
                                         elseif jj_gestring != "EMPIRICAL" && (jj_cbabs != 740.65 || jj_eqwshare != 0.99 || jj_convergence != 1. ||
-                                                                                jj_pulse != scc_pulse_size || jj_geadapt != nothing  || jj_emfeed != 1.)
+                                                                                jj_pulse != scc_pulse_size || jj_geadapt != nothing  || jj_emfeed != 1. || jj_regionswitch != 0.)
                                             continue
                                         elseif jj_civvalue != 1. && (jj_cbabs != 740.65 || jj_eqwshare != 0.99 || jj_convergence != 1. ||
-                                                                    jj_pulse != scc_pulse_size || jj_geadapt != nothing || jj_emfeed != 1.)
+                                                                    jj_pulse != scc_pulse_size || jj_geadapt != nothing || jj_emfeed != 1. || jj_regionswitch != 0.)
                                             continue
                                         elseif jj_cbabs != 740.65 && (jj_civvalue != 1. || jj_gestring != "EMPIRICAL" || jj_eqwshare != 0.99 ||
-                                                                    jj_convergence != 1. || jj_pulse != scc_pulse_size || jj_geadapt != nothing || jj_emfeed != 1.)
+                                                                    jj_convergence != 1. || jj_pulse != scc_pulse_size || jj_geadapt != nothing || jj_emfeed != 1. || jj_regionswitch != 0.)
                                             continue
                                         elseif jj_eqwshare != 0.99 && (jj_civvalue != 1. || jj_gestring != "EMPIRICAL" || jj_convergence != 1. ||
-                                                                        jj_pulse != scc_pulse_size || jj_geadapt != nothing || jj_emfeed != 1.)
+                                                                        jj_pulse != scc_pulse_size || jj_geadapt != nothing || jj_emfeed != 1. || jj_regionswitch != 0.)
                                             continue
                                         elseif jj_convergence != 1. && (jj_civvalue != 1. || jj_gestring != "EMPIRICAL" || jj_pulse != scc_pulse_size ||
-                                                                        jj_geadapt != nothing  || jj_emfeed != 1.)
+                                                                        jj_geadapt != nothing  || jj_emfeed != 1. || jj_regionswitch != 0.)
                                             continue
-                                        elseif jj_pulse != scc_pulse_size && (jj_geadapt != nothing  || jj_emfeed != 1.)
+                                        elseif jj_pulse != scc_pulse_size && (jj_geadapt != nothing  || jj_emfeed != 1. || jj_regionswitch != 0.)
                                             continue
-                                        elseif jj_geadapt != nothing  && jj_emfeed != 1.
+                                        elseif jj_geadapt != nothing  && (jj_emfeed != 1. || jj_regionswitch != 0.)
+                                            continue
+                                        elseif jj_emfeed != 1. && jj_regionswitch != 0.
                                             continue
                                         end
 
@@ -213,7 +218,8 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
                                                      " Permafr_", jj_permafr, " Seaice_", jj_seaice, " Civvalue_", jj_civvalue,
                                                      " cbabs_", jj_cbabs, " eqwshare_", jj_eqwshare,
                                                      " convergence", jj_convergence, "pulse_", jj_pulse,
-                                                     " geadapt", jj_geadapt, " emfeed", jj_emfeed))
+                                                     " geadapt", jj_geadapt, " emfeed", jj_emfeed,
+                                                     " switch", jj_regionswitch))
 
                                         # define the output for the Monte Carlo files
                                         dir_MCoutput = string(dir_output, "mc_diGE/ge", jj_gestring,
@@ -225,6 +231,7 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
                                                                         "_p", jj_pulse,
                                                                         "_gead", jj_geadapt,
                                                                         "_emfe", jj_emfeed,
+                                                                        "_sw", jj_regionswitch,
                                                                          "/")
 
                                         # calculate the stochastic mean SCC
@@ -244,7 +251,8 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
                                                                             cbabs=jj_cbabs,
                                                                             eqwbound=jj_eqwshare,
                                                                             geadrate = jj_geadapt,
-                                                                            emfeedback = jj_emfeed
+                                                                            emfeedback = jj_emfeed,
+                                                                            ge_use_switch = jj_regionswitch
                                                                             )
 
                                         # write out the full distribution
@@ -256,7 +264,7 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
                                                         jj_convergence,  jj_cbabs, jj_eqwshare,
                                                         jj_civvalue, jj_pulse,
                                                         ifelse(jj_geadapt == nothing, 0., jj_geadapt),
-                                                        jj_emfeed,
+                                                        jj_emfeed, jj_regionswitch,
                                                         mean(scc_mcs_object[:, 1]),
                                                         median(scc_mcs_object[:, 1]),
                                                         minimum(scc_mcs_object[:, 1]),
@@ -277,6 +285,7 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
                                         ge_string_max = nothing
                                         ge_string_mode = nothing
 
+                                            end
                                         end
                                     end
                                 end
