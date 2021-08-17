@@ -13,6 +13,11 @@ function calc_nonmarketdamages(p, v, d, t, annual_year, r)
         ((p.w_NonImpactsatCalibrationTemp + p.iben_NonMarketInitialBenefit * p.tcal_CalibrationTemp) *
             (v.i_regionalimpact_ann[yr,r] / p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact_ann[yr,r] * p.iben_NonMarketInitialBenefit)
 
+    # line below in error thrown because of negative value in base of power
+    # base = (p.rgdp_per_cap_MarketRemainGDP_ann[yr,r] / p.GDP_per_cap_focus_0_FocusRegionEU)
+    # negative: either p.rgdp_per_cap_MarketRemainGDP_ann or p.GDP_per_cap_focus_0_FocusRegionEU
+    # however, since GDP_per_cap_focus_0_FocusRegionEU = 27934.244777382406, we know that:
+    # p.rgdp_per_cap_MarketRemainGDP_ann must be zero
     v.igdp_ImpactatActualGDPperCap_ann[yr,r] = v.iref_ImpactatReferenceGDPperCap_ann[yr,r] *
         (p.rgdp_per_cap_MarketRemainGDP_ann[yr,r] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_NonMarketIncomeFxnExponent
 
@@ -37,6 +42,9 @@ function calc_nonmarketdamages(p, v, d, t, annual_year, r)
     v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r] = (v.isat_ImpactinclSaturationandAdaptation_ann[yr,r] / 100) * p.rgdp_per_cap_MarketRemainGDP_ann[yr,r]
     v.rcons_per_cap_NonMarketRemainConsumption_ann[yr,r] = p.rcons_per_cap_MarketRemainConsumption_ann[yr,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann[yr,r]
     v.rgdp_per_cap_NonMarketRemainGDP_ann[yr,r] = v.rcons_per_cap_NonMarketRemainConsumption_ann[yr,r] / (1 - p.save_savingsrate / 100)
+    if v.rgdp_per_cap_NonMarketRemainGDP_ann[yr,r] < 0
+        v.rgdp_per_cap_NonMarketRemainGDP_ann[yr,r] = 0
+    end
 end
 
 
@@ -151,6 +159,7 @@ end
                 end
             else
                 for annual_year = (gettime(t - 1) + 1):(gettime(t))
+                    # call below throws and error because of negative value
                     calc_nonmarketdamages(p, v, d, t, annual_year, r)
 
                     if isequal(annual_year, 2300)

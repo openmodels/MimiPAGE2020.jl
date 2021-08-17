@@ -30,8 +30,10 @@
     gdp_leveleffect   = Variable(index=[time, region], unit="\$M")
     isat_ImpactinclSaturationandAdaptation = Parameter(index=[time,region], unit="\$")
     lgdp_gdploss =  Variable(index=[time, region], unit="\$M")
-    ge_growtheffects = Parameter(unit="none", default=0.)
-    grwnet_realizedgdpgrowth = Variable(index=[time, region], unit="%/year")
+    ge_growtheffects = Parameter(unit = "none", default =  0.)
+    geadrate_growtheffects_adaptationrate = Parameter(unit = "none", default = 0.)
+    geadpt_growtheffects_adapted = Variable(index = [time], unit = "none")
+    grwnet_realizedgdpgrowth = Variable(index=[time, region], unit = "%/year")
     # bound variables
     use_convergence = Parameter(unit="none", default=1.)
     cbabs_pcconsumptionbound = Parameter(unit="\$/person", default=740.65)
@@ -45,6 +47,9 @@
     ge_empirical_distribution = Parameter(index=[draw], unit="none")
     ge_use_empiricaldistribution = Parameter(unit="none", default=0.)
     ge_seed_empiricaldistribution = Parameter(unit="none", default=1.)
+    # switch to shut off persistence for certain regions
+    ge_regionswitch = Parameter(index=[region], unit="none")
+    ge_use_regionswitch = Parameter(unit="none", default = 0.)
     ###############################################
 
     function init(p, v, d)
@@ -90,6 +95,8 @@
             end
         end
 
+        # calculate the growth effects parameter net of the assumed adaptation to damage persistence
+        v.geadpt_growtheffects_adapted[t] = p.ge_growtheffects * (1 - p.geadrate_growtheffects_adaptationrate)^(p.y_year[t] - p.y_year_0)
 
         for r in d.region
             # eq.28 in Hope 2002
@@ -102,9 +109,10 @@
                 v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
                 v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
             else
-                v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation[t - 1,r]
-                v.gdp[t, r] = v.gdp[t - 1, r] * (1 + (v.grwnet_realizedgdpgrowth[t,r] / 100))^(p.y_year[t] - p.y_year[t - 1])
-                v.gdp_leveleffect[t,r] = v.gdp_leveleffect[t - 1, r] *  (1 + (p.grw_gdpgrowthrate[t,r] / 100))^(p.y_year[t] - p.y_year[t - 1])
+                # if region switch is used, multiply the growth effect by the switch; otherwise, multiply by one
+                v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r] - ifelse(p.ge_use_regionswitch == 1., p.ge_regionswitch[r], 1.) * v.geadpt_growtheffects_adapted[t] * p.isat_ImpactinclSaturationandAdaptation[t-1,r]
+                v.gdp[t, r] = v.gdp[t-1, r] * (1 + (v.grwnet_realizedgdpgrowth[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
+                v.gdp_leveleffect[t,r] = v.gdp_leveleffect[t-1, r] *  (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
 
                 v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
                 v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
