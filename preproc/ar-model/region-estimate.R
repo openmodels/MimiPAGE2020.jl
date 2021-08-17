@@ -1,4 +1,4 @@
-# setwd("~/research/mimi-page/mimi-page-2020.jl/preproc/ar-model")
+# setwd("~/research/iamup/mimi-page-2020.jl/preproc/ar-model")
 
 df.co2.hist <- read.csv("co2conc.csv")
 df.co2.obs <- read.table("co2_annmean_gl.txt")
@@ -31,6 +31,7 @@ for (region in names(df)[1:8])
 
 results <- data.frame()
 allmods <- list()
+errors <- data.frame(year=1850:2018)
 globmod <- NULL
 for (region in c(names(df)[1:8], 'global')) {
     ##mod.ar <- lm(as.formula(paste0("`", region, "` ~ `", region, ".delay` + co2.delay")), data=df)
@@ -60,6 +61,8 @@ for (region in c(names(df)[1:8], 'global')) {
     row$varerror <- errsigma^2
 
     results <- rbind(results, row)
+
+    errors[-1, region] <- mod.ar$residuals
 }
 
 write.csv(results, "arestimates.csv", row.names=F)
@@ -68,3 +71,75 @@ library(stargazer)
 
 stargazer(globmod)
 stargazer(allmods)
+
+## How much correlation is there between error terms?
+
+library(reshape2)
+
+cormat <- round(cor(errors, use="complete"), 2)
+
+cormat2 <- cormat
+cormat2[lower.tri(cormat)] <- NA
+cormat3 <- melt(cormat2)
+
+allcor <- cbind(cormat3, model="Full AR Model")
+cstats <- data.frame(model="Full AR Model", medvar=median(results$varerror),
+                     medcor=median(abs(cormat2), na.rm=T))
+
+## Original correlation
+varerrors <- sapply(c(names(df)[1:8], 'gmst'), function(reg) var(df[, reg]))
+cormat <- round(cor(df[, c('year', names(df)[1:8], 'gmst')], use="complete"), 2)
+rownames(cormat)[10] <- "global"
+colnames(cormat)[10] <- "global"
+
+cormat2 <- cormat
+cormat2[lower.tri(cormat)] <- NA
+cormat3 <- melt(cormat2)
+
+allcor <- rbind(allcor, cbind(cormat3, model="Raw Temperatures"))
+cstats <- rbind(cstats,
+                data.frame(model="Raw Temperatures", medvar=median(varerrors),
+                           medcor=median(abs(cormat2), na.rm=T)))
+
+## After remove smooth
+varerrors2 <- c()
+errors2 <- data.frame(year=1850:2018)
+for (region in c(names(df)[1:8], 'global')) {
+    if (region == 'global') {
+        mod.ar <- lm(gmst ~ smooth, data=df)
+    } else {
+        mod.ar <- lm(as.formula(paste0("`", region, "` ~ smooth")), data=df)
+    }
+
+    errors2[, region] <- mod.ar$residuals
+    varerrors2 <- c(varerrors2, var(mod.ar$residuals))
+}
+
+cormat <- round(cor(errors2, use="complete"), 2)
+
+cormat2 <- cormat
+cormat2[lower.tri(cormat)] <- NA
+cormat3 <- melt(cormat2)
+
+allcor <- rbind(allcor, cbind(cormat3, model="LOESS-only Model"))
+cstats <- rbind(cstats,
+                data.frame(model="LOESS-only Model", medvar=median(varerrors2),
+                           medcor=median(abs(cormat2), na.rm=T)))
+
+allcor$model <- factor(allcor$model, levels=c('Raw Temperatures', 'LOESS-only Model', 'Full AR Model'))
+cstats$model <- factor(cstats$model, levels=c('Raw Temperatures', 'LOESS-only Model', 'Full AR Model'))
+
+library(ggplot2)
+ggplot(data=allcor) +
+    facet_wrap(~ model) +
+    geom_tile(aes(x=Var1, y=Var2, fill=value), color = "white")+
+    geom_label(data=cstats, aes(label="Medians:"), y=4.6, x=7) +
+    geom_label(data=cstats, aes(label=paste0("SD(e) = ", round(sqrt(medvar), 2))), y=3.3, x=7) +
+    geom_label(data=cstats, aes(label=paste0("|cor| = ", round(medcor, 2))), y=2, x=7) +
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                         midpoint = 0, limit = c(-1,1), space = "Lab",
+                         name="Pearson\nCorrelation") +
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 45, vjust = 1,
+                                     size = 9, hjust = 1))+
+    coord_fixed() + xlab(NULL) + ylab(NULL)

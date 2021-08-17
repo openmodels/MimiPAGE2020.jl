@@ -89,7 +89,7 @@ function compute_scc(
         eta::Union{Float64,Nothing}=nothing,
         prtp::Union{Float64,Nothing}=nothing,
         equity_weighting::Bool=true,
-        pulse_size=100_000.,
+        pulse_size=75000.,
         n::Union{Int,Nothing}=nothing,
         trials_output_filename::Union{String,Nothing}=nothing,
         seed::Union{Int,Nothing}=nothing

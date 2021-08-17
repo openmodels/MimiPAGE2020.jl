@@ -62,6 +62,9 @@ function calc_SLRDamages(p, v, d, t, annual_year)
         elseif p.use_convergence != 1. && (v.cons_percap_aftercosts_ann[yr, r] < p.cbabs_pcconsumptionbound)
             v.cons_percap_aftercosts_ann[yr, r] = p.cbabs_pcconsumptionbound
         end
+	if v.cons_percap_aftercosts_ann[yr, r] < 0
+	    v.cons_percap_aftercosts_ann[yr, r] = 0
+	end
 
         v.gdp_percap_aftercosts_ann[yr,r] = v.cons_percap_aftercosts_ann[yr, r] / (1 - p.save_savingsrate / 100)
 
