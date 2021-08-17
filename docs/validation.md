@@ -18,10 +18,7 @@ We obtained PAGE 2009 values from the Excel version of PAGE 2009, provided by Ch
 
 Running the Excel version of PAGE 2009 requires the @RISK 7.5 Industial software (available at http://go.palisade.com/RISKDownload.html), which facilitates probabilistic modeling in Excel. Free 15-day trials of the software are available
 
-In order to perform tests of individual components, known values were
-extracted from PAGE '09 or the PAGE written documentation. Where they
-were obtained from PAGE 2009, values were exported with full precision
-using a separate extraction tool. (Key values are saved in the `validationdata` folder within the `test` folder.) Truncating precision can lead to compounding errors which will cause Mimi PAGE results to diverge from PAGE 2009.
+In order to perform tests of individual components, known values were extracted from PAGE '09 or the PAGE written documentation. Where they were obtained from PAGE 2009, values were exported with full precision using a separate extraction tool. (Key values are saved in the `validationdata` folder within the `test` folder.) Truncating precision can lead to compounding errors which will cause Mimi PAGE results to diverge from PAGE 2009.
 
 
 ## Deterministic validations
@@ -76,14 +73,8 @@ The graph below shows the output from both PAGE 2009 and Mimi PAGE.
 
 ## Probabilistic validation
 
-For the probabilistic version of the model, we graphed and compared
-distributions of total damages, total preventative costs, total
-adaptation costs, and total effects.  Differences between quantiles of
-the distribution for 4 model end-point variables are shown in the
-graph below. Error bars show the 95% confidence interval associated
-with sampling uncertainty.
+For the probabilistic version of the model, we graphed and compared distributions of total damages, total preventative costs, total adaptation costs, and total effects.  Differences between quantiles of the distribution for 4 model end-point variables are shown in the graph below. Error bars show the 95% confidence interval associated with sampling uncertainty.
 
-Distributions matched closely (<1.5% difference) for all outputs,
-based on 100,000 runs.
+Distributions matched closely (<1.5% difference) for all outputs, based on 100,000 runs.
 
 ![MC-validation.JPG](assets/MC-validation.png)

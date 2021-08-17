@@ -1,6 +1,6 @@
 # PAGE-2020 - Open-Source Repository for the PAGE-2020 Integrated Assessment Model
 
-[![Build Status](https://travis-ci.com/openmodels/PAGE-2020.svg?branch=master)](https://travis-ci.com/openmodels/PAGE-2020)
+![](https://github.com/openmodels/MimiPAGE2020.jl/workflows/Run%20CI%20on%20master/badge.svg)
 
 PAGE-2020 (Policy Analysis of Greenhouse Effect, v. 2020) is a
 cost-benefit Integrated Assessment Model. It builds upon
@@ -14,15 +14,13 @@ The main advancements for the PAGE-2020 are:
  - Partial growth feedbacks
  - Optional annual timesteps and variability
 
-## Software Requirements
-You need to install [julia 1.1](https://julialang.org) or newer to run this model.
+## Getting started
 
-The model uses the Mimi framework, and you will want to install the
-Mimi package into your julia environment:
+For software requirements, installation instructions, and basic usage,
+see the [Getting started](https://github.com/openmodels/PAGE-2020/tree/master/docs/getting-started.md) page.
 
-```julia
-pkg> add Mimi
-```
+Information on computing an SCC in PAGE-2020 is available in
+the [Calculating the Social Cost of Carbon](https://github.com/openmodels/PAGE-2020/tree/master/docs/calc-scc.md) page.
 
 ## Running the Model
 
@@ -47,6 +45,4 @@ julia> include("src/runpage.jl")
 
 ## More documentation
 
-More documentation is available under
-the
-[docs](https://github.com/openmodels/PAGE-2020/tree/master/docs) directory.
+More documentation is available under the [docs](https://github.com/openmodels/PAGE-2020/tree/master/docs) directory.

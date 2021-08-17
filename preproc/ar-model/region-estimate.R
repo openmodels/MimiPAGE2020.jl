@@ -83,8 +83,11 @@ cormat2[lower.tri(cormat)] <- NA
 cormat3 <- melt(cormat2)
 
 allcor <- cbind(cormat3, model="Full AR Model")
+
+cormat2x <- cormat2
+diag(cormat2x) <- NA
 cstats <- data.frame(model="Full AR Model", medvar=median(results$varerror),
-                     medcor=median(abs(cormat2), na.rm=T))
+                     medcor=median(abs(cormat2x), na.rm=T))
 
 ## Original correlation
 varerrors <- sapply(c(names(df)[1:8], 'gmst'), function(reg) var(df[, reg]))
@@ -97,9 +100,11 @@ cormat2[lower.tri(cormat)] <- NA
 cormat3 <- melt(cormat2)
 
 allcor <- rbind(allcor, cbind(cormat3, model="Raw Temperatures"))
+cormat2x <- cormat2
+diag(cormat2x) <- NA
 cstats <- rbind(cstats,
                 data.frame(model="Raw Temperatures", medvar=median(varerrors),
-                           medcor=median(abs(cormat2), na.rm=T)))
+                           medcor=median(abs(cormat2x), na.rm=T)))
 
 ## After remove smooth
 varerrors2 <- c()
@@ -122,24 +127,58 @@ cormat2[lower.tri(cormat)] <- NA
 cormat3 <- melt(cormat2)
 
 allcor <- rbind(allcor, cbind(cormat3, model="LOESS-only Model"))
+cormat2x <- cormat2
+diag(cormat2x) <- NA
 cstats <- rbind(cstats,
                 data.frame(model="LOESS-only Model", medvar=median(varerrors2),
-                           medcor=median(abs(cormat2), na.rm=T)))
+                           medcor=median(abs(cormat2x), na.rm=T)))
 
-allcor$model <- factor(allcor$model, levels=c('Raw Temperatures', 'LOESS-only Model', 'Full AR Model'))
-cstats$model <- factor(cstats$model, levels=c('Raw Temperatures', 'LOESS-only Model', 'Full AR Model'))
+## After remove AR
+varerrors2 <- c()
+errors2 <- data.frame(year=1851:2018)
+for (region in c(names(df)[1:8], 'global')) {
+    if (region == 'global') {
+        mod.ar <- lm(gmst ~ gmst.delay, data=df)
+    } else {
+        df$my.delay <- df[, paste0(region, '.delay')]
+        mod.ar <- lm(as.formula(paste0("`", region, "` ~ my.delay")), data=df)
+    }
+
+    errors2[, region] <- mod.ar$residuals
+    varerrors2 <- c(varerrors2, var(mod.ar$residuals))
+}
+
+cormat <- round(cor(errors2, use="complete"), 2)
+
+cormat2 <- cormat
+cormat2[lower.tri(cormat)] <- NA
+cormat3 <- melt(cormat2)
+
+allcor <- rbind(allcor, cbind(cormat3, model="AR-only Model"))
+cormat2x <- cormat2
+diag(cormat2x) <- NA
+cstats <- rbind(cstats,
+                data.frame(model="AR-only Model", medvar=median(varerrors2),
+                           medcor=median(abs(cormat2x), na.rm=T)))
+
+allcor$model <- factor(allcor$model, levels=c('Raw Temperatures', 'LOESS-only Model', "AR-only Model", 'Full AR Model'))
+cstats$model <- factor(cstats$model, levels=c('Raw Temperatures', 'LOESS-only Model', "AR-only Model", 'Full AR Model'))
+
+allcor$Var1 <- factor(allcor$Var1)
+allcor$Var2 <- factor(allcor$Var2, levels=rev(levels(allcor$Var1)))
 
 library(ggplot2)
 ggplot(data=allcor) +
     facet_wrap(~ model) +
     geom_tile(aes(x=Var1, y=Var2, fill=value), color = "white")+
-    geom_label(data=cstats, aes(label="Medians:"), y=4.6, x=7) +
-    geom_label(data=cstats, aes(label=paste0("SD(e) = ", round(sqrt(medvar), 2))), y=3.3, x=7) +
-    geom_label(data=cstats, aes(label=paste0("|cor| = ", round(medcor, 2))), y=2, x=7) +
+    geom_label(data=cstats, aes(label="Medians:"), y=9.6, x=7) +
+    geom_label(data=cstats, aes(label=paste0("Var(e) = ", round(medvar, 2))), y=8.3, x=7) +
+    geom_label(data=cstats, aes(label=paste0("|cor| = ", round(medcor, 2))), y=7, x=7) +
     scale_fill_gradient2(low = "blue", high = "red", mid = "white",
                          midpoint = 0, limit = c(-1,1), space = "Lab",
                          name="Pearson\nCorrelation") +
-    theme_minimal()+
+    theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1,
                                      size = 9, hjust = 1))+
     coord_fixed() + xlab(NULL) + ylab(NULL)
+
