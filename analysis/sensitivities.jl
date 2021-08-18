@@ -9,9 +9,9 @@ using DataFrames
 using CSV
 
 # define an output directory where the sensitivity analysis results will be stored
-dir_output = "INSERT THE OUTPUT DIRECTORY HERE"
+dir_output = "INSERT OUTPUT DIRECTORY HERE"
 
-# define the model regions in the right order (copy-pasted from main_model.jl, line 314)
+# define the model regions in the right order (copy-pasted from main_model.jl)
 page_regions = ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"]
 
 # initiate a Data Frame that will store sensitivity results
@@ -40,12 +40,6 @@ scc_for_1std_push = function(parameter,
         run(m)
         scc_for_default = PAGE2020.compute_scc(m, year = year)
 
-        # ensure that the distribution mode is indeed the default value used by the model (currently commented out as SCC impact is calculate relative to the distribution mean)
-        #if  round(scc_for_mode - scc_no_push, digits = 2) != 0.
-        #        error(string("For the parameter", parameter, " the mode of the given distribution ", distribution, " does not seem to match the model's default value. Please inspect and override the
-        #                        distribution mode by using the 'manual default' argument of the scc_for_1std_push() function."))
-        # end
-
         Mimi.update_param!(m, parameter, default_value + std(distribution))
         Mimi.run(m)
         scc_pushed = PAGE2020.compute_scc(m, year = year)
@@ -55,7 +49,6 @@ scc_for_1std_push = function(parameter,
 end
 
 # define a function for parameters that have identical names in different components (across abatement cost and adaptation cost components)
-# this function only updates the parameter in the selected component instead of being applied to all components alike
 scc_for_1std_push_abatement = function(component,
                                         parameter,
                                         distribution,
@@ -85,7 +78,7 @@ scc_for_1std_push_abatement = function(component,
 end
 
 # write a function for all parameters that have region-specific entries
-# note: although component is an input, this is only used to read out the region-specific defaults. the parameter change is applied to the whole model (unlike for the function above)
+# note: although component is an input, this is only used to read out the region-specific defaults. the parameter change is applied to the whole model
 scc_for_1std_push_regional = function(component,
                                         parameter,
                                         region_shocked,
@@ -120,7 +113,8 @@ scc_for_1std_push_regional = function(component,
         scc_for_default, scc_pushed, scc_pushed - scc_for_default, abs(scc_pushed - scc_for_default)]
 end
 
-
+## re-calculate the SCC for a standard deviation push and save the results into the df_sens DataFrame
+# distribution definitions are copy-pasted from mcs.jl
         # save_savingsrate = TriangularDist(10, 20, 15) # components: MarketDamages, MarketDamagesBurke, NonMarketDamages. GDP, SLRDamages
         push!(df_sens, scc_for_1std_push(:save_savingsrate, TriangularDist(10, 20, 15)))
 
@@ -159,6 +153,7 @@ end
         push!(df_sens, scc_for_1std_push(:res_CO2atmlifetime, TriangularDist(50, 100, 70)))
 
         # ccf_CO2feedback = TriangularDist(0, 0, 0) # only usable if lb <> ub          # note: this parameter is already commented out in the mcs.jl file (as of 20/03/2021)
+
         # ccfmax_maxCO2feedback = TriangularDist(10, 30, 20)
         push!(df_sens, scc_for_1std_push(:ccfmax_maxCO2feedback, TriangularDist(10, 30, 20)))
 
@@ -603,13 +598,8 @@ end
 # sort the data frame according to the absolute value of SCC change
 sort!(df_sens, :scc_impact_abs, rev = true)
 
-# calculate the default SCC
-m = PAGE2020.getpage()
-Mimi.run(m)
-df_sens[:scc_default] = PAGE2020.compute_scc(m, year = 2020)
-
 # remove the placeholder rows
-df_sens = df_sens[df_sens[:param_mean] .!= -999., :]
+df_sens = df_sens[df_sens[!, :param_mean] .!= -999., :]
 
 # write out the results
 CSV.write(string(dir_output, "MimiPageSensitivitySCC.csv"), df_sens)
