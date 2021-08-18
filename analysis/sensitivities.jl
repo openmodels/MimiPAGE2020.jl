@@ -1,5 +1,5 @@
 # read in the model module
-include("PAGE-2020.jl")
+include("../src/PAGE-2020.jl")
 
 # call additional packages
 using Distributions
@@ -9,7 +9,7 @@ using DataFrames
 using CSV
 
 # define an output directory where the sensitivity analysis results will be stored
-dir_output = "INSERT OUTPUT DIRECTORY HERE"
+dir_output = joinpath(@__DIR__, "../output/")
 
 # define the model regions in the right order (copy-pasted from main_model.jl)
 page_regions = ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"]
@@ -18,7 +18,8 @@ page_regions = ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica
 df_sens = DataFrame(parameter = ":placeholder", distribution = [TriangularDist(-99, -90, -95), Uniform(-99, -95),
                                                                 Gamma(90, 9)],
                         param_mean = -999., param_std = -999.,
-                        scc_for_default = -999., scc_pushed = -999., scc_impact = -999., scc_impact_abs = -999.
+                        scc_for_default = -999., scc_pushed = -999., scc_impact = -999., scc_impact_abs = -999.,
+                        scc_pushed_neg = -999., scc_impact_neg = -999., scc_impact_neg_abs = -999.
 )
 
 # define a function that pushes parameters by one standard deviation and stores the SCC impact and key summary stats into a vector
@@ -44,8 +45,13 @@ scc_for_1std_push = function(parameter,
         Mimi.run(m)
         scc_pushed = PAGE2020.compute_scc(m, year = year)
 
+        Mimi.update_param!(m, parameter, default_value - std(distribution))
+        Mimi.run(m)
+        scc_pushed_neg = PAGE2020.compute_scc(m, year = year)
+
         [string(parameter), distribution, default_value, std(distribution),
-        scc_for_default, scc_pushed, scc_pushed - scc_for_default, abs(scc_pushed - scc_for_default)]
+        scc_for_default, scc_pushed, scc_pushed - scc_for_default, abs(scc_pushed - scc_for_default),
+        scc_pushed_neg, scc_pushed_neg - scc_for_default, abs(scc_pushed_neg - scc_for_default)]
 end
 
 # define a function for parameters that have identical names in different components (across abatement cost and adaptation cost components)
@@ -73,8 +79,14 @@ scc_for_1std_push_abatement = function(component,
         Mimi.run(m)
         scc_pushed = PAGE2020.compute_scc(m, year = year)
 
+        m = PAGE2020.getpage()
+        Mimi.set_param!(m, component, parameter, default_value - std(distribution))
+        Mimi.run(m)
+        scc_pushed_neg = PAGE2020.compute_scc(m, year = year)
+
         [string(component, "_", parameter), distribution, default_value, std(distribution),
-        scc_for_default, scc_pushed, scc_pushed - scc_for_default, abs(scc_pushed - scc_for_default)]
+        scc_for_default, scc_pushed, scc_pushed - scc_for_default, abs(scc_pushed - scc_for_default),
+        scc_pushed_neg, scc_pushed_neg - scc_for_default, abs(scc_pushed_neg - scc_for_default)]
 end
 
 # write a function for all parameters that have region-specific entries
@@ -109,8 +121,15 @@ scc_for_1std_push_regional = function(component,
         Mimi.run(m)
         scc_pushed = PAGE2020.compute_scc(m, year = year)
 
+        param_to_modify[position_region_shocked] .= default_value - std(distribution)
+
+        Mimi.update_param!(m, parameter, param_to_modify)
+        Mimi.run(m)
+        scc_pushed_neg = PAGE2020.compute_scc(m, year = year)
+
         [string(parameter, "_", region_shocked), distribution, default_value, std(distribution),
-        scc_for_default, scc_pushed, scc_pushed - scc_for_default, abs(scc_pushed - scc_for_default)]
+        scc_for_default, scc_pushed, scc_pushed - scc_for_default, abs(scc_pushed - scc_for_default),
+        scc_pushed_neg, scc_pushed_neg - scc_for_default, abs(scc_pushed_neg - scc_for_default)]
 end
 
 ## re-calculate the SCC for a standard deviation push and save the results into the df_sens DataFrame
