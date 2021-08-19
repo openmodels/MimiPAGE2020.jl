@@ -318,3 +318,40 @@ df_sccMC = df_sccMC[df_sccMC[:, :scen] .!= "-999", :]
 
 # export the results
 CSV.write(string(dir_output, "MimiPageGrowthEffectsResultsMonteCarlo.csv"), df_sccMC)
+
+
+### PART III: run the default scenario/parameter settings with an empirical persistence distribution derived from low-pass filtering climate vars
+
+# rerun the main settings for an empirical distribution that is derived from low-pass filtering climate variables
+include("main_model_growth_lowpass.jl")
+
+# set the output directory for MC results
+dir_MCoutput = string(dir_output, "lowpassfiltered_persistence/")
+
+# calculate the stochastic mean SCC using the default parameter & scenario settings
+Random.seed!(masterseed)
+global scc_mcs_object = get_scc_mcs(samplesize, 2020, dir_MCoutput,
+                                    scenario="RCP4.5 & SSP2",
+                                    pulse_size=scc_pulse_size,
+                                    use_permafrost=true,
+                                    use_seaice=true,
+                                    use_page09damages=false,
+                                    ge_minimum=0.,
+                                    ge_maximum=0.0001,
+                                    ge_mode=0.,
+                                    ge_use_empirical=1.,
+                                    civvalue_multiplier=1.,
+                                    use_convergence= 1.,
+                                    cbabs=740.65,
+                                    eqwbound=0.99,
+                                    geadrate = 0.,
+                                    emfeedback = 1.,
+                                    ge_use_switch = 0.
+                                    )
+
+# # write out the full distribution
+writedlm(string(dir_MCoutput, "SCC_MC.csv"),
+                        scc_mcs_object, ",")
+
+# clean out
+global scc_mcs_object = nothing
