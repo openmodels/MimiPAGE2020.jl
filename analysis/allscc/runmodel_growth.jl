@@ -132,8 +132,8 @@ for jj_page09damages in [false] # whether or not to use the market damage functi
     end
 end
 
-# remove the placeholder row
-df_sccMC_singleGE = df_sccMC_singleGE[df_sccMC_singleGE[:, :scen] .!= "-999", :]
+# remove the first placeholder row
+df_sccMC_singleGE = df_sccMC_singleGE[df_sccMC_singleGE[!, :scen] .!= "-999", :]
 
 # export the results
 CSV.write(string(dir_output, "MimiPageGrowthEffectsResults_SCC_fixedGE.csv"), df_sccMC_singleGE)
@@ -313,8 +313,8 @@ for jj_scen in ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP
     end
 end
 
-# remove the placeholder row
-df_sccMC = df_sccMC[df_sccMC[:, :scen] .!= "-999", :]
+# remove the first placeholder row
+df_sccMC = df_sccMC[df_sccMC[!, :scen] .!= "-999", :]
 
 # export the results
 CSV.write(string(dir_output, "MimiPageGrowthEffectsResultsMonteCarlo.csv"), df_sccMC)

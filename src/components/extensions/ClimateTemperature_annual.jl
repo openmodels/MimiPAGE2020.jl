@@ -55,11 +55,11 @@ end
     year = Index()
 
     # Basic parameters
-    area = Parameter(index=[region], unit="km^2")
+    area = Parameter(index=[region], unit="km2")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
     y_year_ann = Parameter(index=[year], unit="year")
-    area_e_eartharea = Parameter(unit="km2", default=5.1e8)
+    area_e_eartharea = Parameter(unit="km^2", default=5.1e8)
     use_seaice = Parameter{Bool}()
 
     # Initial temperature outputs

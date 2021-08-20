@@ -18,33 +18,19 @@ This folder has the main model composition and run code.
 
 **data**
 
-Here you will find data that are utilized by the components. This
-includes initial values, input parameters, and socioeconomic
-scenarios. The data we used to calibrate our model comes from the
-PAGE09 Excel version, generously provided by Chris Hope.
+Here you will find data that are utilized by the components. This includes initial values, input parameters, and socioeconomic scenarios. The data we used to calibrate our model comes from the PAGE09 Excel version, generously provided by Chris Hope.
 
 **docs**
 
-The documentation is stored here, including the the index, getting
-started, scientific guide, and this file.
+The documentation is stored here, including the the index, getting started, scientific guide, and this file.
 
 **test**
 
-This folder contains files that were and still can be used to make
-sure a component is fully functional. The tests run each individual
-component separately so you can diagnose which might not be working
-and why. (They should all work). The tests take inputs, normally
-provided by other components, and produce outputs that often would
-otherwise go to other components. Both are stored in
-`test/validationdata`. There is also test for the entire model in "test_mainmodel.jl"
+This folder contains files that were and still can be used to make sure a component is fully functional. The tests run each individual component separately so you can diagnose which might not be working and why. (They should all work). The tests take inputs, normally provided by other components, and produce outputs that often would otherwise go to other components. Both are stored in `test/validationdata`. There is also test for the entire model in "test_mainmodel.jl"
 
 **data/policy-b** and **test/validationdata/policy-b**
 
-PAGE '09 provides a low emissions policy scenario.  The input data for
-that scenario is provided in `data/policy-b` and validation data in
-`test/validationdata/policy-b`.  See `test/test_mainmodel_policyb/jl`
-for an example of its usage.  The code is designed so that other
-policies can be added in the same fashion.
+PAGE '09 provides a low emissions policy scenario.  The input data for that scenario is provided in `data/policy-b` and validation data in `test/validationdata/policy-b`.  See `test/test_mainmodel_policyb/jl` for an example of its usage.  The code is designed so that other policies can be added in the same fashion.
 
 ## Code format
 
@@ -62,8 +48,7 @@ Here we show the code for the CO2 Forcing component to provide an example of the
 using Mimi
 ```
 
-Now we will define the component with its parameters (inputs) and
-variables (outputs).
+Now we will define the component with its parameters (inputs) and variables (outputs).
 
 ```
 @defcomp co2forcing begin 
@@ -89,9 +74,7 @@ function run_timestep(p, v, d, t)
 end
 ```
 
-In some cases we also define a function that is used to add the component to the main model
-where we can set exogenous parameters imported from a CSV file.  In this case such
-a step is not needed.
+In some cases we also define a function that is used to add the component to the main model where we can set exogenous parameters imported from a CSV file.  In this case such a step is not needed.
 
 
 In the `src/main_model.jl` file, you will find code that sends variables between components. For example,
@@ -102,8 +85,7 @@ CO2forcing[:c_CO2concentration] = CO2cycle[:c_CO2concentration] # incoming = out
 # and then sent to the `CO2forcing` component.
 ```
 
-Once the model has run, you can access variable outputs with this
-syntax (note, that the model is referred to as `m`):
+Once the model has run, you can access variable outputs with this syntax (note, that the model is referred to as `m`):
 
 ```
 m[:co2forcing, :f_CO2forcing]

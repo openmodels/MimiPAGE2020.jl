@@ -67,11 +67,11 @@ end
     year = Index()
 
     # Basic parameters
-    area = Parameter(index=[region], unit="km^2")
+    area = Parameter(index=[region], unit="km2")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
     y_year_ann = Parameter(index=[year], unit="year")
-    area_e_eartharea = Parameter(unit="km2", default=5.1e8)
+    area_e_eartharea = Parameter(unit="km^2", default=5.1e8)
     use_seaice = Parameter{Bool}()
 
     # Initial temperature outputs
@@ -259,7 +259,7 @@ end
     end
 end
 
-function tvar_getcoeffs(rr::Int64)
+function tvar_getcoeffs(rr::Union{Int64, Int32})
     tvarconst = arests[rr, :intercept][1]
     tvarar = arests[rr, :ar][1]
     tvargmst = arests[rr, :gmst][1]
@@ -267,11 +267,11 @@ function tvar_getcoeffs(rr::Int64)
     tvarconst, tvarar, tvargmst
 end
 
-function tvar_geterror(rr::Int64)
+function tvar_geterror(rr::Union{Int64, Int32})
     arests[rr, :varerror][1]
 end
 
-function tvar_getmvnormal(rr::Int64)
+function tvar_getmvnormal(rr::Union{Int64, Int32})
     tvarcoeffs = tvar_getcoeffs(rr)
 
     names = ["intercept", "ar", "gmst"]
