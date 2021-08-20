@@ -296,10 +296,7 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         # Indicate which parameters to save for each model run
         ############################################################################
 
-        save(EquityWeighting.td_totaldiscountedimpacts,
-             ClimateTemperature.rt_g_globaltemperature,
-             GDP.gdp,
-             GDP.ge_growtheffects,
+        save(GDP.gdp,
              EquityWeighting.grwnet_realizedgdpgrowth,
              GDP.cbreg_regionsatbound
              )

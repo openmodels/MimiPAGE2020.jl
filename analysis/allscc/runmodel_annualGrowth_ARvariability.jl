@@ -31,7 +31,7 @@ set_globalbools()
 
 include("main_model_annualGrowth.jl")
 
-scenarios = ["RCP4.5 & SSP2", "RCP2.6 & SSP1", "RCP8.5 & SSP5", "RCP1.9 & SSP1"]
+scenarios = ["RCP1.9 & SSP1", "RCP2.6 & SSP1", "RCP4.5 & SSP2", "RCP8.5 & SSP5"]
 if length(ARGS) > 0
     scenarios = [scenarios[parse(Int64, ARGS[1])]]
 end
@@ -61,7 +61,7 @@ df_sccMC = DataFrame(permafr=false, seaice=false, ge_string="-999", scen="-999",
                                   mean=-999., median=-999., min=-999., max=-999., perc25=-999.,
                                   perc75=-999., sd=-999., varcoeff=-999.,
                                   perc05=-999., perc95=-999., perc10=-999., perc90=-999.,
-                                  share_zeroSCC = -999.)
+                                  share_zeroSCC = -999., count_NaN = -999)
 
 # get the SCC for three different growth effects distributions and scenarios
 for jj_scen in scenarios
@@ -113,6 +113,9 @@ for jj_scen in scenarios
                                     writedlm(string(dir_MCoutput, "SCC_MC.csv"),
                                                             scc_mcs_object, ",")
 
+                                    # create a NaN-free version of the SCC distribution
+                                    scc_mcs_object = filter(!isnan, scc_mcs_object)
+
                                     # push the results into the data frame
                                     push!(df_sccMC, [jj_permafr, jj_seaice, jj_gestring,  jj_scen,
                                                     jj_convergence,  jj_cbabs, jj_eqwshare,
@@ -129,7 +132,8 @@ for jj_scen in scenarios
                                                     StatsBase.percentile(scc_mcs_object[:, 1], 95),
                                                     StatsBase.percentile(scc_mcs_object[:, 1], 10),
                                                     StatsBase.percentile(scc_mcs_object[:, 1], 90),
-                                                    count(scc_mcs_object .== 0.) / samplesize])
+                                                    count(scc_mcs_object .== 0.) / length(scc_mcs_object),
+                                                    samplesize - length(scc_mcs_object)])
 
                                     # clean out the scc_mcs_object
                                     global scc_mcs_object = nothing
