@@ -2,7 +2,7 @@ function getsim()
     mcs = @defsim begin
 
         ## NOTE: some assignment to global variables can probably be avoided now
-        ## with new treatment of shared and unshared parameters, but this will 
+        ## with new treatment of shared and unshared parameters, but this will
         ## all work for now!
 
         ############################################################################
@@ -25,7 +25,7 @@ function getsim()
         rv(RV_tcal_CalibrationTemp) = TriangularDist(2.5, 3.5, 3.)
         MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
-        
+
         # each component should have the same value for its q0propmult_cutbacksatnegativecostinfinalyear
         # so we use an RV here because in the model this is not an explicitly
         # shared parameter, then assign to components
@@ -103,7 +103,7 @@ function getsim()
         NonMarketDamages.w_NonImpactsatCalibrationTemp = TriangularDist(.1, 1, .5)
         NonMarketDamages.pow_NonMarketExponent = TriangularDist(1.5, 3, 2)
         NonMarketDamages.ipow_NonMarketIncomeFxnExponent = TriangularDist(-.2, .2, 0)
-        
+
         # SLRDamages
         SLRDamages.scal_calibrationSLR = TriangularDist(0.45, 0.55, .5)
         # SLRDamages.iben_SLRInitialBenefit = TriangularDist(0, 0, 0) # only usable if lb <> ub
@@ -123,12 +123,12 @@ function getsim()
         EquityWeighting.civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
         EquityWeighting.ptp_timepreference = TriangularDist(0.1, 2, 1)
         EquityWeighting.emuc_utilityconvexity = TriangularDist(0.5, 2, 1)
-   
+
         ############################################################################
         # Define random variables (RVs) - for SHARED parameters
         ############################################################################
-        
-        # shared parameter linked to components: SLRDamages, Discontinuity (weights 
+
+        # shared parameter linked to components: SLRDamages, Discontinuity (weights
         # for market and nonmarket are non-stochastic and uniformly 1)
         wincf_weightsfactor_sea["USA"] = TriangularDist(.6, 1, .8)
         wincf_weightsfactor_sea["OECD"] = TriangularDist(.4, 1.2, .8)
@@ -185,7 +185,7 @@ function getsim()
         learn_learningrate = TriangularDist(0.05, 0.35, 0.2)
 
         # NOTE: the below can probably be resolved into unique, unshared parameters with the same name
-        # in the new Mimi paradigm of shared and unshared parameters, but for now this will 
+        # in the new Mimi paradigm of shared and unshared parameters, but for now this will
         # continue to work!
 
         # MarketDamagesBurke
