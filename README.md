@@ -8,6 +8,14 @@ the [PAGE-ICE model](https://github.com/openmodels/PAGE-ICE/),
 developed by
 [Yumashev et al. (2019)](https://www.nature.com/articles/s41467-019-09863-x#Sec14).
 
+The most up-to-date publication for the PAGE-2020 model is Jarmo et
+al. (2021). The social cost of carbon dioxide under climate-economy
+feedbacks and temperature variability. ERL.
+https://iopscience.iop.org/article/10.1088/1748-9326/ac1d0b
+
+Reproduction data and scripts for that paper are available at
+https://zenodo.org/record/5417548.
+
 The main advancements for the PAGE-2020 are:
  - Extended and corrected SSP data
  - Improved market damages, based on Burke et al. (2015).
