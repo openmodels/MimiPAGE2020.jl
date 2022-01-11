@@ -3,7 +3,7 @@
 
     # Configuration
 
-    compute_growtheffects{Bool} = Parameter(default=false)
+    compute_growtheffects = Parameter{Bool}(default=false)
 
     # Parameters and Variable
 

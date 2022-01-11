@@ -4,7 +4,7 @@
 
     # Configuration
 
-    compute_gdpfeedback{Bool} = Parameter(default=false)
+    compute_gdpfeedback = Parameter{Bool}(default=false)
 
     # Parameters and Variables
 

@@ -5,7 +5,7 @@
 
     # Configuration
 
-    interpolate_parameters{Bool} = Parameter(default=false)
+    interpolate_parameters = Parameter{Bool}(default=false)
 
     # Parameters and Variable
 
