@@ -2,6 +2,12 @@
 @defcomp LGemissions begin
     region = Index()
 
+    # Configuration
+
+    compute_gdpfeedback{Bool} = Parameter(default=false)
+
+    # Parameters and Variables
+
     # global emissions
     e_globalLGemissions = Variable(index=[time], unit="Mtonne/year")
     # baseline emissions
@@ -11,11 +17,21 @@
     # growth rate by region
     er_LGemissionsgrowth = Parameter(index=[time,region], unit="%")
 
+    # read in counterfactual GDP in absence of growth effects (gdp_leveleffects) and actual GDP
+    gdp = Parameter(index=[time, region], unit="\$M")
+    gdp_leveleffect   = Parameter(index=[time, region], unit="\$M")
+    emfeed_emissionfeedback = Parameter(unit="none", default=1.)
+
     function run_timestep(p, v, d, t)
 
         # eq.4 in Hope (2006) - regional LG emissions as % change from baseline
         for r in d.region
             v.e_regionalLGemissions[t,r] = p.er_LGemissionsgrowth[t,r] * p.e0_baselineLGemissions[r] / 100
+
+            # rescale emissions based on GDP deviation from original scenario pathway
+            if p.compute_gdpfeedback && p.emfeed_emissionfeedback > 0.
+                v.e_regionalLGemissions[t,r] = v.e_regionalLGemissions[t,r] * (p.gdp[t,r] / p.gdp_leveleffect[t,r])
+            end
         end
 
         # eq. 5 in Hope (2006) - global LG emissions are sum of regional emissions

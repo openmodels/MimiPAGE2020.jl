@@ -1,4 +1,4 @@
-@defcomp GDP begin
+@defcomp GDP_growth begin
     # GDP: Gross domestic product $M
     # GRW: GDP growth rate %/year
     region            = Index()
@@ -7,27 +7,19 @@
     gdp               = Variable(index=[time, region], unit="\$M")
     cons_consumption  = Variable(index=[time, region], unit="\$million")
     cons_percap_consumption = Variable(index=[time, region], unit="\$/person")
-    cons_percap_consumption_0 = Variable(index=[region], unit="\$/person")
-    yagg_periodspan = Variable(index=[time], unit="year")
 
     # Parameters
     y_year_0          = Parameter(unit="year")
     y_year            = Parameter(index=[time], unit="year")
     grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year") # From p.32 of Hope 2009
-    gdp_0             = Parameter(index=[region], unit="\$M") # GDP in y_year_0
     save_savingsrate  = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
-    pop0_initpopulation = Parameter(index=[region], unit="million person")
     pop_population    = Parameter(index=[time,region], unit="million person")
-
-    # Saturation, used in impacts
-    isat0_initialimpactfxnsaturation = Parameter(unit="unitless", default=20.0) # pp34 PAGE09 documentation
-    isatg_impactfxnsaturation = Variable(unit="unitless")
 
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
     # parameters and variables for growth effects
-    gdp_leveleffect   = Variable(index=[time, region], unit="\$M")
+    gdp_leveleffect   = Parameter(index=[time, region], unit="\$M")
     isat_ImpactinclSaturationandAdaptation = Parameter(index=[time,region], unit="\$")
     lgdp_gdploss =  Variable(index=[time, region], unit="\$M")
     ge_growtheffects = Parameter(unit = "none", default =  0.)
@@ -52,30 +44,7 @@
     ge_use_regionswitch = Parameter(unit="none", default = 0.)
     ###############################################
 
-    function init(p, v, d)
-
-        v.isatg_impactfxnsaturation = p.isat0_initialimpactfxnsaturation * (1 - p.save_savingsrate / 100)
-        for rr in d.region
-            v.cons_percap_consumption_0[rr] = (p.gdp_0[rr] / p.pop0_initpopulation[rr]) * (1 - p.save_savingsrate / 100)
-        end
-    end
-
     function run_timestep(p, v, d, t)
-
-        # Analysis period ranges - required for abatemnt costs and equity weighting, from Hope (2006)
-        if is_first(t)
-            ylo_periodstart = p.y_year_0
-        else
-            ylo_periodstart = (p.y_year[t] + p.y_year[t - 1]) / 2
-        end
-
-        if t.t == length(p.y_year)
-            yhi_periodend = p.y_year[t]
-        else
-            yhi_periodend = (p.y_year[t] + p.y_year[t + 1]) / 2
-        end
-
-        v.yagg_periodspan[t] = yhi_periodend - ylo_periodstart
 
         if is_first(t)
             # calculate the lower consumption bound and the consumption level which triggers the convergence system
@@ -88,10 +57,10 @@
             # if the switch is set to one, overwrite the growth effects parameter with an empirical distribution, using the seed parameter
             if p.ge_use_empiricaldistribution == 1.
                 Random.seed!(trunc(Int, p.ge_seed_empiricaldistribution))
-                p.ge_growtheffects = p.ge_empirical_distribution[Random.rand(1:10^6)]
+                p.ge_growtheffects = p.ge_empirical_distribution[Random.rand(1:length(p.ge_empirical_distribution))]
             elseif p.ge_use_empiricaldistribution == 2. # set negative rho values to zero if switch set to two
                 Random.seed!(trunc(Int, p.ge_seed_empiricaldistribution))
-                p.ge_growtheffects = max(p.ge_empirical_distribution[Random.rand(1:10^6)], 0)
+                p.ge_growtheffects = max(p.ge_empirical_distribution[Random.rand(1:length(p.ge_empirical_distribution))], 0)
             end
         end
 
@@ -101,18 +70,13 @@
         for r in d.region
             # eq.28 in Hope 2002
             if is_first(t)
-                v.gdp[t, r] = p.gdp_0[r] * (1 + (p.grw_gdpgrowthrate[t,r] / 100))^(p.y_year[t] - p.y_year_0)
-
                 v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r]
-                v.gdp_leveleffect[t,r] = v.gdp[t,r]
-
-                v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
+                v.cons_consumption[t, r] = p.gdp_leveleffect[t, r] * (1 - p.save_savingsrate / 100)
                 v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
             else
                 # if region switch is used, multiply the growth effect by the switch; otherwise, multiply by one
                 v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r] - ifelse(p.ge_use_regionswitch == 1., p.ge_regionswitch[r], 1.) * v.geadpt_growtheffects_adapted[t] * p.isat_ImpactinclSaturationandAdaptation[t-1,r]
                 v.gdp[t, r] = v.gdp[t-1, r] * (1 + (v.grwnet_realizedgdpgrowth[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
-                v.gdp_leveleffect[t,r] = v.gdp_leveleffect[t-1, r] *  (1 + (p.grw_gdpgrowthrate[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
 
                 v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
                 v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
@@ -157,7 +121,7 @@
                 end
             end
 
-            v.lgdp_gdploss[t,r] = v.gdp_leveleffect[t,r] - v.gdp[t,r]
+            v.lgdp_gdploss[t,r] = p.gdp_leveleffect[t,r] - v.gdp[t,r]
 
         end
     end
