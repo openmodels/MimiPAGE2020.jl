@@ -10,22 +10,23 @@ include("mcs_growth.jl")
 include("compute_scc_growth.jl")
 
 include("../../src/components/RCPSSPScenario.jl")
-include("../../src/components/extensions/CO2emissions_growth.jl")
+include("../../src/components/extensions/CO2emissions_feedback.jl")
 include("../../src/components/CO2cycle.jl")
-include("../../src/components/extensions/CO2forcing_growth.jl")
-include("../../src/components/extensions/CH4emissions_growth.jl")
+include("../../src/components/CO2forcing.jl")
+include("../../src/components/extensions/CH4emissions_feedback.jl")
 include("../../src/components/CH4cycle.jl")
 include("../../src/components/CH4forcing.jl")
-include("../../src/components/extensions/N2Oemissions_growth.jl")
+include("../../src/components/extensions/N2Oemissions_feedback.jl")
 include("../../src/components/N2Ocycle.jl")
 include("../../src/components/N2Oforcing.jl")
-include("../../src/components/extensions/LGemissions_growth.jl")
+include("../../src/components/extensions/LGemissions_feedback.jl")
 include("../../src/components/LGcycle.jl")
 include("../../src/components/LGforcing.jl")
 include("../../src/components/SulphateForcing.jl")
 include("../../src/components/TotalForcing.jl")
 include("../../src/components/ClimateTemperature.jl")
 include("../../src/components/SeaLevelRise.jl")
+include("../../src/components/GDP.jl")
 include("../../src/components/extensions/GDP_growth.jl")
 include("../../src/components/MarketDamages.jl")
 include("../../src/components/MarketDamagesBurke.jl")
@@ -57,6 +58,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     # Socio-Economics
     population = addpopulation(m)
     gdp = add_comp!(m, GDP) # one can change the names per @defcomp to normal names to make the changes throughout this file minimal from the original.
+    gdp_grw = add_comp!(m, GDP_growth)
 
     co2emit = add_comp!(m, co2emissions)
     co2cycle = addco2cycle(m, use_permafrost)
@@ -111,6 +113,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
     gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+
+    connect_param!(m, :GDP_growth => :pop_population, :Population => :pop_population)
+    gdp_grw[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
 
     if use_permafrost
         permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]

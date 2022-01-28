@@ -14,10 +14,11 @@ include("../../src/components/LGcycle.jl")
 include("../../src/components/LGforcing.jl")
 include("../../src/components/SulphateForcing.jl")
 include("../../src/components/TotalForcing.jl")
+include("../../src/components/ClimateTemperature.jl")
 include("../../src/components/extensions/ClimateTemperature_annual.jl")
-include("../../src/components/extensions/PermafrostSiBCASA_annual.jl")
-include("../../src/components/extensions/PermafrostJULES_annual.jl")
-include("../../src/components/extensions/PermafrostTotal_annual.jl")
+include("../../src/components/PermafrostSiBCASA.jl")
+include("../../src/components/PermafrostJULES.jl")
+include("../../src/components/PermafrostTotal.jl")
 
 function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true)
     m = Model()
@@ -28,6 +29,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     # add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
+    climtemp_ann = add_comp!(m, ClimateTemperature_annual)
     if use_permafrost
         permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
         permafrost_jules = add_comp!(m, PermafrostJULES)
@@ -49,10 +51,11 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     totalforcing = add_comp!(m, TotalForcing)
 
     # connect parameters together
-    set_param!(m, :ClimateTemperature, :y_year_ann, collect(2015:2300))
     set_param!(m, :ClimateTemperature, :y_year, [2020.,2030.,2040.,2050.,2075.,2100.,2150.,2200.,2250.,2300.])
     set_param!(m, :ClimateTemperature, :y_year_0, 2015.)
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
+
+    climtemp_ann[:pt_g_preliminarygmst] = climtemp[:pt_g_preliminarygmst]
 
     if use_permafrost
         permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]

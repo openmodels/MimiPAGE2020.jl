@@ -1,4 +1,4 @@
-@defcomp NonMarketDamages begin
+@defcomp NonMarketDamages_annual begin
 
     region = Index()
     year = Index()

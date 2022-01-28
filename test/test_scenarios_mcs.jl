@@ -22,7 +22,7 @@ for testscen in 2:size(df)[2]
     end
 
     feedback = df[1, testscen]
-    scenario = df[2, testscen]
+    scenario = String(df[2, testscen])
     econfunc = df[3, testscen]
     eqweight = df[4, testscen] == "Equity weighting ON, PTP discounting"
 

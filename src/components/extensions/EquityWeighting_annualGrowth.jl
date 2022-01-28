@@ -1,4 +1,4 @@
-@defcomp EquityWeighting_annualGrowth begin
+@defcomp EquityWeighting begin
     region = Index()
     year = Index()
 

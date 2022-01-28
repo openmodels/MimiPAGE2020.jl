@@ -9,23 +9,26 @@ include("mcs_annualGrowth.jl")                          ## done - based on mcs_A
 include("compute_scc_annualGrowth.jl")                  ## based on compute_scc_growth.jl, changed 4 variables to their annual versions
 
 include("../../src/components/RCPSSPScenario.jl")
-include("../../src/components/extensions/CO2emissions_annualGrowth.jl")
+include("../../src/components/extensions/CO2emissions_feedback.jl")
 include("../../src/components/CO2cycle.jl")
-include("../../src/components/extensions/CO2forcing_growth.jl")
-include("../../src/components/extensions/CH4emissions_annualGrowth.jl")
+include("../../src/components/CO2forcing.jl")
+include("../../src/components/extensions/CH4emissions_feedback.jl")
 include("../../src/components/CH4cycle.jl")
 include("../../src/components/CH4forcing.jl")
-include("../../src/components/extensions/N2Oemissions_annualGrowth.jl")
+include("../../src/components/extensions/N2Oemissions_feedback.jl")
 include("../../src/components/N2Ocycle.jl")
 include("../../src/components/N2Oforcing.jl")
-include("../../src/components/extensions/LGemissions_annualGrowth.jl")
+include("../../src/components/extensions/LGemissions_feedback.jl")
 include("../../src/components/LGcycle.jl")
 include("../../src/components/LGforcing.jl")
 include("../../src/components/SulphateForcing.jl")
 include("../../src/components/TotalForcing.jl")
+include("../../src/components/ClimateTemperature.jl")
 include("../../src/components/extensions/ClimateTemperature_ARvariability.jl")       # runs default with AR variability!
 include("../../src/components/SeaLevelRise.jl")
-include("../../src/components/extensions/GDP_annualGrowth.jl")                   # annualised, based on the PAGE-Growth file
+include("../../src/components/GDP.jl")
+include("../../src/components/extensions/GDP_annual.jl")                   # annualised, based on the PAGE-Growth file
+include("../../src/components/extensions/GDP_growth.jl")                   # annualised, based on the PAGE-Growth file
 include("../../src/components/extensions/SLRDamages_annualGrowth.jl")            # annualised, based on the PAGE-Growth file
 include("../../src/components/extensions/MarketDamages_annualGrowth.jl")         # annualised, based on the PAGE-ANN file
 include("../../src/components/extensions/MarketDamagesBurke_annualGrowth.jl")    # annualised, based on the PAGE-ANN file
@@ -47,6 +50,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     # add all the components
     scenario = addrcpsspscenario(m, scenario)
     climtemp = addclimatetemperature(m, use_seaice)
+    climtemp_arv = add_comp!(m, ClimateTemperature_ARvariability)
     if use_permafrost
         permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
         permafrost_jules = add_comp!(m, PermafrostJULES)
@@ -56,6 +60,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     # Socio-Economics
     population = addpopulation(m)
     gdp = add_comp!(m, GDP)
+    gdp_ann = add_comp!(m, GDP_annual)
+    gdp_grw = add_comp!(m, GDP_growth)
 
     co2emit = add_comp!(m, co2emissions)
     co2cycle = addco2cycle(m, use_permafrost)
@@ -105,6 +111,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     # connect parameters together
     connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
+    climtemp_arv[:pt_g_preliminarygmst] = climtemp[:pt_g_preliminarygmst]
 
     if use_permafrost
         permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
@@ -185,15 +192,21 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
     gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
 
+    connect_param!(m, :GDP_annual => :pop_population, :Population => :pop_population)
+    gdp_ann[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+
+    connect_param!(m, :GDP_growth => :pop_population, :Population => :pop_population)
+    gdp_grw[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
     if use_page09damages
-        connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamages => :isat_ImpactinclSaturationandAdaptation)
-        connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation_ann, :MarketDamages => :isat_ImpactinclSaturationandAdaptation_ann)
+        connect_param!(m, :GDP_growth => :isat_ImpactinclSaturationandAdaptation, :MarketDamages => :isat_ImpactinclSaturationandAdaptation)
+        connect_param!(m, :GDP_annual => :isat_ImpactinclSaturationandAdaptation_ann, :MarketDamages => :isat_ImpactinclSaturationandAdaptation_ann)
     else
-        connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation)
-        connect_param!(m, :GDP => :isat_ImpactinclSaturationandAdaptation_ann, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation_ann)
+        connect_param!(m, :GDP_growth => :isat_ImpactinclSaturationandAdaptation, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation)
+        connect_param!(m, :GDP_annual => :isat_ImpactinclSaturationandAdaptation_ann, :MarketDamagesBurke => :isat_ImpactinclSaturationandAdaptation_ann)
     end
     ###############################################
 
@@ -225,11 +238,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :TotalAbatementCosts => :pop_population, :Population => :pop_population)
 
     connect_param!(m, :AdaptiveCostsEconomic => :gdp, :GDP => :gdp)
-    connect_param!(m, :AdaptiveCostsEconomic => :gdp_ann, :GDP => :gdp_ann)
+    connect_param!(m, :AdaptiveCostsEconomic => :gdp_ann, :GDP_annual => :gdp_ann)
     connect_param!(m, :AdaptiveCostsNonEconomic => :gdp, :GDP => :gdp)
-    connect_param!(m, :AdaptiveCostsNonEconomic => :gdp_ann, :GDP => :gdp_ann)
+    connect_param!(m, :AdaptiveCostsNonEconomic => :gdp_ann, :GDP_annual => :gdp_ann)
     connect_param!(m, :AdaptiveCostsSeaLevel => :gdp, :GDP => :gdp)
-    connect_param!(m, :AdaptiveCostsSeaLevel => :gdp_ann, :GDP => :gdp_ann)
+    connect_param!(m, :AdaptiveCostsSeaLevel => :gdp_ann, :GDP_annual => :gdp_ann)
 
     connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_economic, :AdaptiveCostsEconomic => :ac_adaptivecosts)
     connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_economic_ann, :AdaptiveCostsEconomic => :ac_adaptivecosts_ann)
@@ -238,11 +251,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_sealevelrise, :AdaptiveCostsSeaLevel => :ac_adaptivecosts)
     connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_sealevelrise_ann, :AdaptiveCostsSeaLevel => :ac_adaptivecosts_ann)
     connect_param!(m, :TotalAdaptationCosts => :pop_population, :Population => :pop_population)
-    connect_param!(m, :TotalAdaptationCosts => :pop_population_ann, :GDP => :pop_population_ann)
+    connect_param!(m, :TotalAdaptationCosts => :pop_population_ann, :GDP_annual => :pop_population_ann)
 
     connect_param!(m, :SLRDamages => :s_sealevel, :SeaLevelRise => :s_sealevel)
     connect_param!(m, :SLRDamages => :cons_percap_consumption, :GDP => :cons_percap_consumption)
-    connect_param!(m, :SLRDamages => :cons_percap_consumption_ann, :GDP => :cons_percap_consumption_ann)
+    connect_param!(m, :SLRDamages => :cons_percap_consumption_ann, :GDP_annual => :cons_percap_consumption_ann)
     connect_param!(m, :SLRDamages => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :SLRDamages => :tct_per_cap_totalcostspercap, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)
     connect_param!(m, :SLRDamages => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
@@ -256,7 +269,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     # Growth Effects - additional variables and parameters
     ###############################################
     connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence, :GDP => :cons_percap_consumption_noconvergence)
-    connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence_ann, :GDP => :cons_percap_consumption_noconvergence_ann)
+    connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence_ann, :GDP_annual => :cons_percap_consumption_noconvergence_ann)
     connect_param!(m, :SLRDamages => :cbabsn_pcconsumptionbound_neighbourhood, :GDP => :cbabsn_pcconsumptionbound_neighbourhood)
     connect_param!(m, :SLRDamages => :cbaux1_pcconsumptionbound_auxiliary1, :GDP => :cbaux1_pcconsumptionbound_auxiliary1)
     connect_param!(m, :SLRDamages => :cbaux2_pcconsumptionbound_auxiliary2, :GDP => :cbaux2_pcconsumptionbound_auxiliary2)
@@ -315,7 +328,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :Discontinuity => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
     connect_param!(m, :EquityWeighting => :pop_population, :Population => :pop_population)
-    connect_param!(m, :EquityWeighting => :pop_population_ann, :GDP => :pop_population_ann)
+    connect_param!(m, :EquityWeighting => :pop_population_ann, :GDP_annual => :pop_population_ann)
     connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_per_cap_totalcostspercap)
     connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total_ann, :SLRDamages => :tct_per_cap_totalcostspercap_ann)
     connect_param!(m, :EquityWeighting => :act_adaptationcosts_total, :TotalAdaptationCosts => :act_adaptationcosts_total)
@@ -323,7 +336,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
     connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts_ann, :TotalAdaptationCosts => :act_percap_adaptationcosts_ann)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption_ann, :GDP => :cons_percap_consumption_ann)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption_ann, :GDP_annual => :cons_percap_consumption_ann)
     connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts_ann, :SLRDamages => :cons_percap_aftercosts_ann)
@@ -335,9 +348,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     # Growth Effects - additional variables and parameters
     ###############################################
     connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth, :GDP => :grwnet_realizedgdpgrowth)
-    connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth_ann, :GDP => :grwnet_realizedgdpgrowth_ann)
+    connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth_ann, :GDP_annual => :grwnet_realizedgdpgrowth_ann)
     connect_param!(m, :EquityWeighting => :lgdp_gdploss, :GDP => :lgdp_gdploss)
-    connect_param!(m, :EquityWeighting => :lgdp_gdploss_ann, :GDP => :lgdp_gdploss_ann)
+    connect_param!(m, :EquityWeighting => :lgdp_gdploss_ann, :GDP_annual => :lgdp_gdploss_ann)
     ###############################################
     equityweighting[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
 
