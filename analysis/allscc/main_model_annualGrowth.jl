@@ -30,19 +30,24 @@ include("../../src/components/GDP.jl")
 include("../../src/components/extensions/GDP_annual.jl")                   # annualised, based on the PAGE-Growth file
 include("../../src/components/extensions/GDP_growth.jl")                   # annualised, based on the PAGE-Growth file
 include("../../src/components/extensions/SLRDamages_annualGrowth.jl")            # annualised, based on the PAGE-Growth file
+include("../../src/components/extensions/MarketDamages.jl")         # annualised, based on the PAGE-ANN file
 include("../../src/components/extensions/MarketDamages_annualGrowth.jl")         # annualised, based on the PAGE-ANN file
+include("../../src/components/extensions/MarketDamagesBurke.jl")    # annualised, based on the PAGE-ANN file
 include("../../src/components/extensions/MarketDamagesBurke_annualGrowth.jl")    # annualised, based on the PAGE-ANN file
+include("../../src/components/extensions/NonMarketDamages.jl")      # annualised, based on the PAGE-ANN file
 include("../../src/components/extensions/NonMarketDamages_annualGrowth.jl")      # annualised, based on the PAGE-ANN file
+include("../../src/components/extensions/Discontinuity.jl")                           ## stays same as normal annual damages!
 include("../../src/components/extensions/Discontinuity_annual.jl")                           ## stays same as normal annual damages!
-include("../../src/components/extensions/AdaptationCosts_annualGrowth.jl")       # annualised, based on the PAGE-ICE file
+include("../../src/components/extensions/AdaptationCosts.jl")       # annualised, based on the PAGE-ICE file
+include("../../src/components/extensions/AdaptationCosts_annual.jl")       # annualised, based on the PAGE-ICE file
 include("../../src/components/AbatementCostParameters.jl")
 include("../../src/components/AbatementCosts.jl")
 include("../../src/components/TotalAbatementCosts.jl")
 include("../../src/components/extensions/TotalAdaptationCosts_annualGrowth.jl")  # annualised, based on the PAGE-ICE file
 include("../../src/components/Population.jl")
 include("../../src/components/extensions/EquityWeighting_annualGrowth.jl")       # annualised, based on the PAGE-Growth file
-include("../../src/components/extensions/PermafrostSiBCASA_growth.jl")
-include("../../src/components/extensions/PermafrostJULES_growth.jl")
+include("../../src/components/PermafrostSiBCASA.jl")
+include("../../src/components/PermafrostJULES.jl")
 include("../../src/components/PermafrostTotal.jl")
 
 function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
@@ -99,12 +104,21 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     adaptationcosts_noneconomic = addadaptationcosts_noneconomic(m)
     add_comp!(m, TotalAdaptationCosts)
 
+    adaptationcosts_sealevel_ann = addadaptationcosts_sealevel_ann(m)
+    adaptationcosts_economic_ann = addadaptationcosts_economic_ann(m)
+    adaptationcosts_noneconomic_ann = addadaptationcosts_noneconomic_ann(m)
+    add_comp!(m, TotalAdaptationCosts_annual)
+
     # Impacts
     slrdamages = addslrdamages(m)
     marketdamages = addmarketdamages(m)
+    marketdamages_ann = add_comp!(m, MarketDamages_annual)
     marketdamagesburke = addmarketdamagesburke(m)
+    marketdamagesburke_ann = add_comp!(m, MarketDamagesBurke_annual)
     nonmarketdamages = addnonmarketdamages(m)
-    add_comp!(m, Discontinuity)
+    nonmarketdamages_ann = add_comp!(m, NonMarketDamages_annual)
+    discontinuity = add_comp!(m, Discontinuity)
+    discontinuity_ann = add_comp!(m, Discontinuity_annual)
 
     # Equity weighting and Total Costs
     equityweighting = add_comp!(m, EquityWeighting)
@@ -276,56 +290,73 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     ###############################################
 
     connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
-    connect_param!(m, :MarketDamages => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
     connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
-    connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)
     connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
-    connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)
     connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits=true) # not required for Burke damages
-    connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel_ann, ignoreunits=true)
     connect_param!(m, :MarketDamages => :imp_actualreduction, :AdaptiveCostsEconomic => :imp_adaptedimpacts) # not required for Burke damages
-    connect_param!(m, :MarketDamages => :imp_actualreduction_ann, :AdaptiveCostsEconomic => :imp_adaptedimpacts_ann)
     connect_param!(m, :MarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
+    connect_param!(m, :MarketDamages_annual => :rtl_realizedtemperature_ann, :ClimateTemperature_ARvariability => :rtl_realizedtemperature_ann)
+    connect_param!(m, :MarketDamages_annual => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
+    marketdamages_ann[:atl_adjustedtolerableleveloftemprise] = marketdamages[:atl_adjustedtolerableleveloftemprise]
+    marketdamages_ann[:imp_actualreduction] = marketdamages[:imp_actualreduction]
+    marketdamages_ann[:rcons_per_cap_SLRRemainConsumption] = marketdamages[:rcons_per_cap_SLRRemainConsumption]
+    marketdamages_ann[:rgdp_per_cap_SLRRemainGDP] = marketdamages[:rgdp_per_cap_SLRRemainGDP]
+    connect_param!(m, :MarketDamages_annual => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)
+    connect_param!(m, :MarketDamages_annual => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)
+    connect_param!(m, :MarketDamages_annual => :atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel_ann, ignoreunits=true)
+    connect_param!(m, :MarketDamages_annual => :imp_actualreduction_ann, :AdaptiveCostsEconomic => :imp_adaptedimpacts_ann)
+
     connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
-    connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
     connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
-    connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)
     connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
-    connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)
     connect_param!(m, :MarketDamagesBurke => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :MarketDamagesBurke => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
+    connect_param!(m, :MarketDamagesBurke_annual => :rtl_realizedtemperature_ann, :ClimateTemperature_ARvariability => :rtl_realizedtemperature_ann)
+    connect_param!(m, :MarketDamagesBurke_annual => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
+    connect_param!(m, :MarketDamagesBurke_annual => :rgdp_per_cap_SLRRemainGDP_ann, :SLRDamages => :rgdp_per_cap_SLRRemainGDP_ann)
+    connect_param!(m, :MarketDamagesBurke_annual => :rcons_per_cap_SLRRemainConsumption_ann, :SLRDamages => :rcons_per_cap_SLRRemainConsumption_ann)
+
     connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
-    connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
     if use_page09damages
         connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamages => :rgdp_per_cap_MarketRemainGDP)
-        connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP_ann, :MarketDamages => :rgdp_per_cap_MarketRemainGDP_ann)
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamages => :rcons_per_cap_MarketRemainConsumption)
-        connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamages => :rcons_per_cap_MarketRemainConsumption_ann)
     else
         connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP)
-        connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP_ann, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP_ann)
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption)
-        connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption_ann)
     end
     connect_param!(m, :NonMarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic => :atl_adjustedtolerablelevel, ignoreunits=true)
-    connect_param!(m, :NonMarketDamages => :atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsNonEconomic => :atl_adjustedtolerablelevel_ann, ignoreunits=true)
     connect_param!(m, :NonMarketDamages => :imp_actualreduction, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts)
-    connect_param!(m, :NonMarketDamages => :imp_actualreduction_ann, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts_ann)
     connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :NonMarketDamages => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
 
+    connect_param!(m, :NonMarketDamages_annual => :rtl_realizedtemperature_ann, :ClimateTemperature => :rtl_realizedtemperature_ann)
+    if use_page09damages
+        connect_param!(m, :NonMarketDamages_annual => :rgdp_per_cap_MarketRemainGDP_ann, :MarketDamages_annual => :rgdp_per_cap_MarketRemainGDP_ann)
+        connect_param!(m, :NonMarketDamages_annual => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamages_annual => :rcons_per_cap_MarketRemainConsumption_ann)
+    else
+        connect_param!(m, :NonMarketDamages_annual => :rgdp_per_cap_MarketRemainGDP_ann, :MarketDamagesBurke_annual => :rgdp_per_cap_MarketRemainGDP_ann)
+        connect_param!(m, :NonMarketDamages_annual => :rcons_per_cap_MarketRemainConsumption_ann, :MarketDamagesBurke_annual => :rcons_per_cap_MarketRemainConsumption_ann)
+    end
+    connect_param!(m, :NonMarketDamages_annual => :atl_adjustedtolerableleveloftemprise_ann, :AdaptiveCostsNonEconomic => :atl_adjustedtolerablelevel_ann, ignoreunits=true)
+    connect_param!(m, :NonMarketDamages_annual => :imp_actualreduction_ann, :AdaptiveCostsNonEconomic => :imp_adaptedimpacts_ann)
+
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
-    connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP_ann, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP_ann)
     connect_param!(m, :Discontinuity => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
-    connect_param!(m, :Discontinuity => :rt_g_globaltemperature_ann, :ClimateTemperature => :rt_g_globaltemperature_ann)
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
-    connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP_ann, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP_ann)
     connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption)
-    connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption_ann, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption_ann)
     connect_param!(m, :Discontinuity => :isatg_saturationmodification, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :Discontinuity => :yagg_periodspan, :GDP => :yagg_periodspan) # added for doing in-component summation
+
+    discontinuity_ann[:occurdis_occurrencedummy] = discontinuity[:occurdis_occurrencedummy]
+    discontinuity_ann[:isat_per_cap_DiscImpactperCapinclSaturation] = discontinuity[:isat_per_cap_DiscImpactperCapinclSaturation]
+    discontinuity_ann[:rcons_per_cap_DiscRemainConsumption] = discontinuity[:rcons_per_cap_DiscRemainConsumption]
+
+    connect_param!(m, :Discontinuity_annual => :rgdp_per_cap_NonMarketRemainGDP_ann, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP_ann)
+    connect_param!(m, :Discontinuity_annual => :rt_g_globaltemperature_ann, :ClimateTemperature_ARvariability => :rt_g_globaltemperature_ann)
+    connect_param!(m, :Discontinuity_annual => :rgdp_per_cap_NonMarketRemainGDP_ann, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP_ann)
+    connect_param!(m, :Discontinuity_annual => :rcons_per_cap_NonMarketRemainConsumption_ann, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption_ann)
 
     connect_param!(m, :EquityWeighting => :pop_population, :Population => :pop_population)
     connect_param!(m, :EquityWeighting => :pop_population_ann, :GDP_annual => :pop_population_ann)

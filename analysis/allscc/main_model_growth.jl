@@ -40,8 +40,8 @@ include("../../src/components/TotalAbatementCosts.jl")
 include("../../src/components/TotalAdaptationCosts.jl")
 include("../../src/components/Population.jl")
 include("../../src/components/extensions/EquityWeighting_growth.jl")
-include("../../src/components/extensions/PermafrostSiBCASA_growth.jl")
-include("../../src/components/extensions/PermafrostJULES_growth.jl")
+include("../../src/components/PermafrostSiBCASA.jl")
+include("../../src/components/PermafrostJULES.jl")
 include("../../src/components/PermafrostTotal.jl")
 
 function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false)
@@ -131,8 +131,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
 
     # feed counterfactual GDP (for level effects) and actual GDP into emissions components to re-scale scenario emissions
-    connect_param!(m, :co2emissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
-    connect_param!(m, :co2emissions => :gdp, :GDP => :gdp)
+    connect_param!(m, :co2emissions => :gdp_leveleffect, :GDP => :gdp)
+    connect_param!(m, :co2emissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :CO2Cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
     connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
@@ -144,8 +144,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
 
-    connect_param!(m, :ch4emissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
-    connect_param!(m, :ch4emissions => :gdp, :GDP => :gdp)
+    connect_param!(m, :ch4emissions => :gdp_leveleffect, :GDP => :gdp)
+    connect_param!(m, :ch4emissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
     connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
@@ -159,8 +159,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
 
-    connect_param!(m, :n2oemissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
-    connect_param!(m, :n2oemissions => :gdp, :GDP => :gdp)
+    connect_param!(m, :n2oemissions => :gdp_leveleffect, :GDP => :gdp)
+    connect_param!(m, :n2oemissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :n2ocycle => :e_globalN2Oemissions, :n2oemissions => :e_globalN2Oemissions)
     connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
@@ -171,8 +171,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
 
-    connect_param!(m, :LGemissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
-    connect_param!(m, :LGemissions => :gdp, :GDP => :gdp)
+    connect_param!(m, :LGemissions => :gdp_leveleffect, :GDP => :gdp)
+    connect_param!(m, :LGemissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :LGcycle => :e_globalLGemissions, :LGemissions => :e_globalLGemissions)
     connect_param!(m, :LGcycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
