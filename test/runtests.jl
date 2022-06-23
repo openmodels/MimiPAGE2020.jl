@@ -8,6 +8,7 @@
 
 using Test
 using Mimi
+using MimiPAGE2020
 
 include("../src/main_model.jl")
 
