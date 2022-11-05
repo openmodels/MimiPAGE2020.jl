@@ -282,11 +282,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
-    connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence, :GDP => :cons_percap_consumption_noconvergence)
+    connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence, :GDP_growth => :cons_percap_consumption_noconvergence)
     connect_param!(m, :SLRDamages => :cons_percap_consumption_noconvergence_ann, :GDP_annual => :cons_percap_consumption_noconvergence_ann)
-    connect_param!(m, :SLRDamages => :cbabsn_pcconsumptionbound_neighbourhood, :GDP => :cbabsn_pcconsumptionbound_neighbourhood)
-    connect_param!(m, :SLRDamages => :cbaux1_pcconsumptionbound_auxiliary1, :GDP => :cbaux1_pcconsumptionbound_auxiliary1)
-    connect_param!(m, :SLRDamages => :cbaux2_pcconsumptionbound_auxiliary2, :GDP => :cbaux2_pcconsumptionbound_auxiliary2)
+    connect_param!(m, :SLRDamages => :cbabsn_pcconsumptionbound_neighbourhood, :GDP_growth => :cbabsn_pcconsumptionbound_neighbourhood)
+    connect_param!(m, :SLRDamages => :cbaux1_pcconsumptionbound_auxiliary1, :GDP_growth => :cbaux1_pcconsumptionbound_auxiliary1)
+    connect_param!(m, :SLRDamages => :cbaux2_pcconsumptionbound_auxiliary2, :GDP_growth => :cbaux2_pcconsumptionbound_auxiliary2)
     ###############################################
 
     connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
@@ -378,9 +378,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     ###############################################
     # Growth Effects - additional variables and parameters
     ###############################################
-    connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth, :GDP => :grwnet_realizedgdpgrowth)
+    connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth, :GDP_growth => :grwnet_realizedgdpgrowth)
     connect_param!(m, :EquityWeighting => :grwnet_realizedgdpgrowth_ann, :GDP_annual => :grwnet_realizedgdpgrowth_ann)
-    connect_param!(m, :EquityWeighting => :lgdp_gdploss, :GDP => :lgdp_gdploss)
+    connect_param!(m, :EquityWeighting => :lgdp_gdploss, :GDP_growth => :lgdp_gdploss)
     connect_param!(m, :EquityWeighting => :lgdp_gdploss_ann, :GDP_annual => :lgdp_gdploss_ann)
     ###############################################
     equityweighting[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]

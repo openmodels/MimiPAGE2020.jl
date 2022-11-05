@@ -1,4 +1,4 @@
-@defcomp EquityWeighting begin
+@defcomp EquityWeighting_growth begin
     region = Index()
 
     # Basic information
