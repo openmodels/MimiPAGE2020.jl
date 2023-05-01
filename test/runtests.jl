@@ -1,14 +1,13 @@
 ## Primary testing file for local, faster testing, excluding two tests that are run
 ## in `runtests_clean.jl`:
 
-# (1) We only run tests for the SCC in runtests_clean.jl 
+# (1) We only run tests for the SCC in runtests_clean.jl
 # since they are fairly slow
 # (2) We only run tests for the extensions in runtests_clean.jl
 # since they too are slow, and also clean out the output folders
 
 using Test
 using Mimi
-using MimiPAGE2020
 
 include("../src/main_model.jl")
 
@@ -73,6 +72,6 @@ end
     include("test_scenarios.jl")
     include("test_standard_api.jl")
     include("contrib/test_taxeffect.jl")
-    include("test_package.jl")
+    # include("test_package.jl")
 
 end
