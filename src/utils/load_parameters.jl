@@ -72,7 +72,7 @@ function readpagedata(model::Union{Model,Nothing}, filepath::AbstractString)
     end
 end
 
-function load_parameters(model::Model)
+function load_parameters(model::Model; lowpass::Bool=false)
     parameters = Dict{Any,Any}()
 
     parameter_directory = joinpath(dirname(@__FILE__), "..", "..", "data")
@@ -81,6 +81,9 @@ function load_parameters(model::Model)
         filepath = joinpath(parameter_directory, file)
 
         parameters[parametername] = readpagedata(model, filepath)
+    end
+    if lowpass
+        parameters["ge_empirical_distribution"] = readpagedata(model, joinpath(parameter_directory, "ge_empirical_distribution_lowpass.csv"))
     end
     return parameters
 end

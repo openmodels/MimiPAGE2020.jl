@@ -3,6 +3,7 @@
     year = Index()
 
     # Basic information
+    y_year = Parameter(index=[time], unit="year")
     y_year_0 = Parameter(unit="year")
     y_year_ann = Parameter(index=[year], unit="year")
 
@@ -46,11 +47,14 @@
     popgrw_populationgrowth = Parameter(index=[time, region], unit="%/year")
     popgrw_populationgrowth_ann = Variable(index=[year, region], unit="%/year")
 
+    dr_discountrate = Variable(index=[time, region], unit="%/year")
     dr_discountrate_ann = Variable(index=[year, region], unit="%/year")
     yp_yearsperiod = Variable(index=[time], unit="year") # defined differently from yagg
     yp_yearsperiod_ann = Variable(index=[year], unit="year")
+    dfc_consumptiondiscountrate = Variable(index=[time, region], unit="1/year")
     dfc_consumptiondiscountrate_ann = Variable(index=[year, region], unit="1/year")
 
+    df_utilitydiscountfactor = Variable(index=[time], unit="fraction")
     df_utilitydiscountfactor_ann = Variable(index=[year], unit="fraction")
 
     # Discounted costs
@@ -58,30 +62,39 @@
     pcdt_g_partiallyweighted_discountedglobal_ann = Variable(index=[year], unit="\$million")
 
     pcdat_partiallyweighted_discountedaggregated_ann = Variable(index=[year, region], unit="\$million")
+    tpc_totalaggregatedcosts = Variable(unit="\$million")
     tpc_totalaggregatedcosts_ann = Variable(unit="\$million")
 
     wacdt_partiallyweighted_discounted_ann = Variable(index=[year, region], unit="\$million")
 
     # Equity weighted impact totals
+    rcons_percap_dis = Parameter(index=[time, region], unit="\$/person")
     rcons_percap_dis_ann = Parameter(index=[year, region], unit="\$/person")
 
+    wit_partiallyweighted = Variable(index=[time, region], unit="\$million")
     wit_partiallyweighted_ann = Variable(index=[year, region], unit="\$million")
+    widt_partiallyweighted_discounted = Variable(index=[time, region], unit="\$million")
     widt_partiallyweighted_discounted_ann = Variable(index=[year, region], unit="\$million")
 
-    yagg_periodspan_ann = Variable(index=[year], unit="year")
+    yagg_periodspan = Parameter(index=[time], unit="year")
 
+    addt_equityweightedimpact_discountedaggregated = Variable(index=[time, region], unit="\$million")
     addt_equityweightedimpact_discountedaggregated_ann = Variable(index=[year, region], unit="\$million")
+    addt_gt_equityweightedimpact_discountedglobal = Variable(unit="\$million")
     addt_gt_equityweightedimpact_discountedglobal_ann = Variable(unit="\$million")
 
     civvalue_civilizationvalue = Parameter(unit="\$million", default=6.1333333333333336e10) # Called "CIV_VALUE"
+    td_totaldiscountedimpacts = Variable(unit="\$million")
     td_totaldiscountedimpacts_ts = Variable(index=[time], unit="\$million") # for analysis
     td_totaldiscountedimpacts_ann = Variable(unit="\$million")
     td_totaldiscountedimpacts_ann_yr = Variable(index=[year], unit="\$million") # for analysis
 
     aact_equityweightedadaptation_discountedaggregated_ann = Variable(index=[year, region], unit="\$million")
+    tac_totaladaptationcosts = Variable(unit="\$million")
     tac_totaladaptationcosts_ann = Variable(unit="\$million")
 
     # Final result: total effect of climate change
+    te_totaleffect = Variable(unit="\$million")
     te_totaleffect_ann = Variable(unit="\$million")
     te_totaleffect_ann_yr = Variable(index=[year], unit="\$million") # for analysis
 
@@ -129,13 +142,20 @@
         if is_first(tt)
             v.eqwaux1_weighteddamages_auxiliary1 = 2 * (p.eqwbound_maxshareofweighteddamages - p.eqwboundn_maxshareofweighteddamages_neighbourhood)
             v.eqwaux2_weighteddamages_auxiliary2 = 4 / v.eqwaux1_weighteddamages_auxiliary1
-
+            v.addt_gt_equityweightedimpact_discountedglobal = 0
         end
 
         if p.discfix_fixediscountrate != 0.
             v.df_utilitydiscountfactor[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
+        else
+            v.df_utilitydiscountfactor[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
         end
 
+        if is_first(tt)
+            v.yp_yearsperiod[TimestepIndex(1)] = p.y_year[TimestepIndex(1)] - p.y_year_0
+        else
+            v.yp_yearsperiod[tt] = p.y_year[tt] - p.y_year[tt - 1]
+        end
 
         for rr in d.region
             # Discount rate calculations
@@ -143,6 +163,12 @@
 
             if p.discfix_fixediscountrate != 0.
                 v.dr_discountrate[tt, rr] = p.discfix_fixediscountrate
+            end
+
+            if is_first(tt)
+                v.dfc_consumptiondiscountrate[TimestepIndex(1), rr] = (1 + v.dr_discountrate[TimestepIndex(1), rr] / 100)^(-v.yp_yearsperiod[TimestepIndex(1)])
+            else
+                v.dfc_consumptiondiscountrate[tt, rr] = v.dfc_consumptiondiscountrate[tt - 1, rr] * (1 + v.dr_discountrate[tt, rr] / 100)^(-v.yp_yearsperiod[tt])
             end
 
             # calculate the total damages due to impacts
@@ -211,6 +237,7 @@
             v.tpc_totalaggregatedcosts_ann = 0
             v.addt_gt_equityweightedimpact_discountedglobal_ann = 0
             v.tac_totaladaptationcosts_ann = 0
+            v.td_totaldiscountedimpacts_ann = 0
             v.te_totaleffect_ann = 0
             for annual_year = 2015:(gettime(tt))
                 calc_equityweighting(p, v, d, tt, annual_year)
@@ -341,7 +368,7 @@ function calc_equityweighting(p, v, d, t, annual_year)
         end
 
         ## Equity weighted impacts (end of page 28, Hope 2009)
-        if p.lossinc_includegdplosses == 0. && p.equity_proportion == 0.
+if p.lossinc_includegdplosses == 0. && p.equity_proportion == 0.
             v.wit_partiallyweighted_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r]  - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_ann[yr, r]
             v.widt_partiallyweighted_discounted_ann[yr, r] = v.wit_partiallyweighted_ann[yr, r] * v.dfc_consumptiondiscountrate_ann[yr, r]
         elseif p.lossinc_includegdplosses == 0. && p.equity_proportion == 1.

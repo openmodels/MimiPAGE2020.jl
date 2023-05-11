@@ -16,9 +16,9 @@
     rtl_realizedtemperature_ann = Parameter(index=[year, region], unit="degreeC")
 
     # tolerability and impact variables from PAGE damages that Burke damages also require
-    rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, region], unit="\$/person")
+    rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, region], unit="\$/person") # only used with interpolation
     rcons_per_cap_SLRRemainConsumption_ann = Variable(index=[year, region], unit="\$/person")
-    rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit="\$/person")
+    rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit="\$/person") # only used with interpolation
     rgdp_per_cap_SLRRemainGDP_ann = Variable(index=[year, region], unit="\$/person")
     save_savingsrate = Parameter(unit="%", default=15.)
     wincf_weightsfactor_market = Parameter(index=[region], unit="")
@@ -45,6 +45,7 @@
     rgdp_per_cap_MarketRemainGDP_ann = Variable(index=[year, region], unit="\$/person")
     rgdp_per_cap_MarketRemainGDP_ann_sum = Variable(unit="\$/person") # for analysis
     iref_ImpactatReferenceGDPperCap_ann = Variable(index=[year, region])
+    igdp_ImpactatActualGDPperCap = Parameter(index=[time, region])
     igdp_ImpactatActualGDPperCap_ann = Variable(index=[year, region])
 
     isat_ImpactinclSaturationandAdaptation_ann = Variable(index=[year, region])
@@ -58,7 +59,7 @@
 
         if p.interpolate_parameters
             # interpolate the parameters that require interpolation:
-            interpolate_parameters_marketdamagesburke(p, v, d, t)
+            interpolate_parameters_marketdamagesburke(p, v, d, t) # NB: always run, so get rcons_pc_slr_ann
         end
 
         for r in d.region
@@ -179,7 +180,7 @@ function calc_marketdamagesburke(p, v, d, t, annual_year, r)
 
     # calculate impacts at actual GDP
     v.igdp_ImpactatActualGDPperCap_ann[yr,r] = v.iref_ImpactatReferenceGDPperCap_ann[yr,r] *
-        (p.rgdp_per_cap_SLRRemainGDP_ann[yr,r] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+        (v.rgdp_per_cap_SLRRemainGDP_ann[yr,r] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
 
     # send impacts down a logistic path if saturation threshold is exceeded
     if p.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation

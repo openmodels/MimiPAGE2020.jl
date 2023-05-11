@@ -55,7 +55,7 @@
 
         if p.interpolate_parameters
             # interpolate the parameters that require interpolation:
-            interpolate_parameters_nonmarketdamages(p, v, d, t)
+            interpolate_parameters_nonmarketdamages(p, v, d, t) # NB: Always run, since later may need
         end
 
         for r in d.region

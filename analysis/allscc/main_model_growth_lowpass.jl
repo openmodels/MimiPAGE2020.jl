@@ -118,6 +118,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     connect_param!(m, :GDP_growth => :pop_population, :Population => :pop_population)
     gdp_grw[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+    gdp_grw[:gdp_leveleffect] = gdp[:gdp]
 
     if use_permafrost
         permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
@@ -133,7 +134,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
 
     # feed counterfactual GDP (for level effects) and actual GDP into emissions components to re-scale scenario emissions
-    connect_param!(m, :co2emissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
+    connect_param!(m, :co2emissions => :gdp_leveleffect, :GDP => :gdp)
     connect_param!(m, :co2emissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :CO2Cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
@@ -146,7 +147,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
 
-    connect_param!(m, :ch4emissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
+    connect_param!(m, :ch4emissions => :gdp_leveleffect, :GDP => :gdp)
     connect_param!(m, :ch4emissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
@@ -161,7 +162,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
 
-    connect_param!(m, :n2oemissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
+    connect_param!(m, :n2oemissions => :gdp_leveleffect, :GDP => :gdp)
     connect_param!(m, :n2oemissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :n2ocycle => :e_globalN2Oemissions, :n2oemissions => :e_globalN2Oemissions)
@@ -173,7 +174,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
 
-    connect_param!(m, :LGemissions => :gdp_leveleffect, :GDP => :gdp_leveleffect)
+    connect_param!(m, :LGemissions => :gdp_leveleffect, :GDP => :gdp)
     connect_param!(m, :LGemissions => :gdp, :GDP_growth => :gdp)
 
     connect_param!(m, :LGcycle => :e_globalLGemissions, :LGemissions => :e_globalLGemissions)
@@ -296,10 +297,15 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     # Growth Effects - additional variables and parameters
     ###############################################
     equityweighting_grw[:dfc_consumptiondiscountrate] = equityweighting[:dfc_consumptiondiscountrate]
+    equityweighting_grw[:df_utilitydiscountfactor] = equityweighting[:df_utilitydiscountfactor]
     equityweighting_grw[:tpc_totalaggregatedcosts] = equityweighting[:tpc_totalaggregatedcosts]
     equityweighting_grw[:tac_totaladaptationcosts] = equityweighting[:tac_totaladaptationcosts]
     connect_param!(m, :EquityWeighting_growth => :grwnet_realizedgdpgrowth, :GDP_growth => :grwnet_realizedgdpgrowth)
     connect_param!(m, :EquityWeighting_growth => :lgdp_gdploss, :GDP_growth => :lgdp_gdploss)
+    connect_param!(m, :EquityWeighting_growth => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
+    connect_param!(m, :EquityWeighting_growth => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
+    connect_param!(m, :EquityWeighting_growth => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
+    connect_param!(m, :EquityWeighting_growth => :yagg_periodspan, :GDP => :yagg_periodspan)
     ###############################################
     equityweighting[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
     equityweighting[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
@@ -310,7 +316,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 end
 
 function initpage(m::Model)
-    p = load_parameters(m)
+    p = load_parameters(m; lowpass=true)
     p["y_year_0"] = 2015.
     p["y_year"] = Mimi.dim_keys(m.md, :time)
     set_leftover_params!(m, p)

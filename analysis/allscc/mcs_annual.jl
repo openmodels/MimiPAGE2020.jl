@@ -9,7 +9,7 @@ function getsim()
 
 
         ## NOTE: some assignment to global variables can probably be avoided now
-        ## with new treatment of shared and unshared parameters, but this will 
+        ## with new treatment of shared and unshared parameters, but this will
         ## all work for now!
 
         ############################################################################
@@ -33,8 +33,8 @@ function getsim()
         MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
 
-        # each component should have the same value for the following Abatement 
-        # Cost Parameters so we use an RV here because in the model this is not 
+        # each component should have the same value for the following Abatement
+        # Cost Parameters so we use an RV here because in the model this is not
         # an explicitly shared parameter, then assign to components
 
         rv(RV_q0propmult_cutbacksatnegativecostinfinalyear) = TriangularDist(0.3, 1.2, 0.7)
@@ -54,25 +54,25 @@ function getsim()
         AbatementCostParametersCH4.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
         AbatementCostParametersN2O.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
         AbatementCostParametersLin.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
-        
+
         rv(RV_curve_below_curvatureofMACcurvebelowzerocost) = TriangularDist(0.25, 0.8, 0.45)
         AbatementCostParametersCO2.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
         AbatementCostParametersCH4.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
         AbatementCostParametersN2O.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
         AbatementCostParametersLin.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
-        
+
         rv(RV_curve_above_curvatureofMACcurveabovezerocost) = TriangularDist(0.1, 0.7, 0.4)
         AbatementCostParametersCO2.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
         AbatementCostParametersCH4.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
         AbatementCostParametersN2O.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
         AbatementCostParametersLin.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
-        
+
         rv(RV_cross_experiencecrossoverratio) = TriangularDist(0.1, 0.3, 0.2)
         AbatementCostParametersCO2.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
         AbatementCostParametersCH4.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
         AbatementCostParametersN2O.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
         AbatementCostParametersLin.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
-        
+
         rv(RV_learn_learningrate) = TriangularDist(0.05, 0.35, 0.2)
         AbatementCostParametersCO2.learn_learningrate = RV_learn_learningrate
         AbatementCostParametersCH4.learn_learningrate = RV_learn_learningrate
@@ -128,15 +128,15 @@ function getsim()
         ClimateTemperature.ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
 
         # ClimateTemperature - Climate Variability Parameters
-        ClimateTemperature.gvarsd_globalvariabilitystandarddeviation = Normal(0.11294, 0.021644) # ranges from https://github.com/jkikstra/climvar
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["EU"] = Normal(0.35251, 0.019147)
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["USA"] = Normal(0.39171, 0.030440)
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["OECD"] = Normal(0.35272, 0.042962)
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["USSR"] = Normal(0.39679, 0.030228)
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["China"] = Normal(0.26032, 0.059394)
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["SEAsia"] = Normal(0.20009, 0.039896)
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["Africa"] = Normal(0.18202, 0.050171)
-        ClimateTemperature.rvarsd_regionalvariabilitystandarddeviation["LatAmerica"] = Normal(0.15618, 0.054156)
+        ClimateTemperature_annual.gvarsd_globalvariabilitystandarddeviation = Normal(0.11294, 0.021644) # ranges from https://github.com/jkikstra/climvar
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["EU"] = Normal(0.35251, 0.019147)
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["USA"] = Normal(0.39171, 0.030440)
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["OECD"] = Normal(0.35272, 0.042962)
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["USSR"] = Normal(0.39679, 0.030228)
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["China"] = Normal(0.26032, 0.059394)
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["SEAsia"] = Normal(0.20009, 0.039896)
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["Africa"] = Normal(0.18202, 0.050171)
+        ClimateTemperature_annual.rvarsd_regionalvariabilitystandarddeviation["LatAmerica"] = Normal(0.15618, 0.054156)
 
         # SeaLevelRise
         SeaLevelRise.s0_initialSL = TriangularDist(0.17, 0.21, 0.19)                             # taken from PAGE-ICE v6.20 default
@@ -187,7 +187,7 @@ function getsim()
         # Define random variables (RVs) - for SHARED parameters
         ############################################################################
 
-        # shared parameter linked to components: SLRDamages, Discontinuity (weights 
+        # shared parameter linked to components: SLRDamages, Discontinuity (weights
         # for market and nonmarket are non-stochastic and uniformly 1)
         wincf_weightsfactor_sea["USA"] = TriangularDist(.6, 1, .8)
         wincf_weightsfactor_sea["OECD"] = TriangularDist(.4, 1.2, .8)
@@ -202,7 +202,7 @@ function getsim()
 
         # the following variables need to be set, but set the same in all 4 abatement cost components
         # note that for these regional variables, the first region is the focus region (EU), which is set in the preceding code, and so is always one for these variables
-        
+
         emitf_uncertaintyinBAUemissfactor["USA"] = TriangularDist(0.8, 1.2, 1.0)
         emitf_uncertaintyinBAUemissfactor["OECD"] = TriangularDist(0.8, 1.2, 1.0)
         emitf_uncertaintyinBAUemissfactor["USSR"] = TriangularDist(0.65, 1.35, 1.0)
@@ -236,7 +236,7 @@ function getsim()
         cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
 
         # NOTE: the below can probably be resolved into unique, unshared parameters with the same name
-        # in the new Mimi paradigm of shared and unshared parameters, but for now this will 
+        # in the new Mimi paradigm of shared and unshared parameters, but for now this will
         # continue to work!
 
         # MarketDamagesBurke
@@ -294,33 +294,33 @@ function getsim()
 
         save(
              EquityWeighting.td_totaldiscountedimpacts,
-             EquityWeighting.td_totaldiscountedimpacts_ann,
-             EquityWeighting.td_totaldiscountedimpacts_ann_yr,
+             EquityWeighting_annual.td_totaldiscountedimpacts_ann,
+             EquityWeighting_annual.td_totaldiscountedimpacts_ann_yr,
              EquityWeighting.tpc_totalaggregatedcosts,
-             EquityWeighting.tpc_totalaggregatedcosts_ann,
+             EquityWeighting_annual.tpc_totalaggregatedcosts_ann,
              EquityWeighting.tac_totaladaptationcosts,
-             EquityWeighting.tac_totaladaptationcosts_ann,
+             EquityWeighting_annual.tac_totaladaptationcosts_ann,
              EquityWeighting.te_totaleffect,
-             EquityWeighting.te_totaleffect_ann,
-             EquityWeighting.te_totaleffect_ann_yr,
+             EquityWeighting_annual.te_totaleffect_ann,
+             EquityWeighting_annual.te_totaleffect_ann_yr,
              CO2Cycle.c_CO2concentration,
              TotalForcing.ft_totalforcing,
              ClimateTemperature.rt_g_globaltemperature,
-             ClimateTemperature.rt_g_globaltemperature_ann,
+             ClimateTemperature_annual.rt_g_globaltemperature_ann,
              SeaLevelRise.s_sealevel,
              SLRDamages.rgdp_per_cap_SLRRemainGDP,
-             MarketDamagesBurke.rgdp_per_cap_SLRRemainGDP_ann, # note that the SLR module in itself is not annualised, Burke=default
+             MarketDamagesBurke_annual.rgdp_per_cap_SLRRemainGDP_ann, # note that the SLR module in itself is not annualised, Burke=default
              MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP,
-             MarketDamagesBurke.rgdp_per_cap_MarketRemainGDP_ann,
-             MarketDamagesBurke.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
+             MarketDamagesBurke_annual.rgdp_per_cap_MarketRemainGDP_ann,
+             MarketDamagesBurke_annual.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
              NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP,
-             NonMarketDamages.rgdp_per_cap_NonMarketRemainGDP_ann,
-             NonMarketDamages.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
+             NonMarketDamages_annual.rgdp_per_cap_NonMarketRemainGDP_ann,
+             NonMarketDamages_annual.isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann,
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP,
-             Discontinuity.rgdp_per_cap_NonMarketRemainGDP_ann,
-             Discontinuity.isat_per_cap_DiscImpactperCapinclSaturation_ann,
-             EquityWeighting.cons_percap_consumption_ann,
-             EquityWeighting.pop_population_ann,
+             Discontinuity_annual.rgdp_per_cap_NonMarketRemainGDP_ann,
+             Discontinuity_annual.isat_per_cap_DiscImpactperCapinclSaturation_ann,
+             EquityWeighting_annual.cons_percap_consumption_ann,
+             EquityWeighting_annual.pop_population_ann,
              )
 
     end # de
@@ -363,37 +363,37 @@ function reformat_RV_outputs(samplesize::Int; output_path::String=joinpath(@__DI
     # load raw data
     # no filter
     td      = load_RV("EquityWeighting_td_totaldiscountedimpacts", "td_totaldiscountedimpacts"; output_path=output_path)
-    td_ann      = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann", "td_totaldiscountedimpacts_ann"; output_path=output_path)
+    td_ann      = load_RV("EquityWeighting_annual_td_totaldiscountedimpacts_ann", "td_totaldiscountedimpacts_ann"; output_path=output_path)
     tpc     = load_RV("EquityWeighting_tpc_totalaggregatedcosts", "tpc_totalaggregatedcosts"; output_path=output_path)
-    tpc_ann     = load_RV("EquityWeighting_tpc_totalaggregatedcosts_ann", "tpc_totalaggregatedcosts_ann"; output_path=output_path)
+    tpc_ann     = load_RV("EquityWeighting_annual_tpc_totalaggregatedcosts_ann", "tpc_totalaggregatedcosts_ann"; output_path=output_path)
     tac     = load_RV("EquityWeighting_tac_totaladaptationcosts", "tac_totaladaptationcosts"; output_path=output_path)
-    tac_ann     = load_RV("EquityWeighting_tac_totaladaptationcosts_ann", "tac_totaladaptationcosts_ann"; output_path=output_path)
+    tac_ann     = load_RV("EquityWeighting_annual_tac_totaladaptationcosts_ann", "tac_totaladaptationcosts_ann"; output_path=output_path)
     te      = load_RV("EquityWeighting_te_totaleffect", "te_totaleffect"; output_path=output_path)
-    te_ann      = load_RV("EquityWeighting_te_totaleffect_ann", "te_totaleffect_ann"; output_path=output_path)
+    te_ann      = load_RV("EquityWeighting_annual_te_totaleffect_ann", "te_totaleffect_ann"; output_path=output_path)
 
     # time index
     c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path=output_path)
     ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path=output_path)
     rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path=output_path)
-    rt_g_ann    = load_RV("ClimateTemperature_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path=output_path)
+    rt_g_ann    = load_RV("ClimateTemperature_annual_rt_g_globaltemperature_ann", "rt_g_globaltemperature_ann"; output_path=output_path)
     s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path=output_path)
-    te_ann_yr      = load_RV("EquityWeighting_te_totaleffect_ann_yr", "te_totaleffect_ann_yr"; output_path=output_path)
-    td_ann_yr   = load_RV("EquityWeighting_td_totaldiscountedimpacts_ann_yr", "td_totaldiscountedimpacts_ann_yr"; output_path=output_path)
+    te_ann_yr      = load_RV("EquityWeighting_annual_te_totaleffect_ann_yr", "te_totaleffect_ann_yr"; output_path=output_path)
+    td_ann_yr   = load_RV("EquityWeighting_annual_td_totaldiscountedimpacts_ann_yr", "td_totaldiscountedimpacts_ann_yr"; output_path=output_path)
 
     # region index
     rgdppercap_slr          = load_RV("SLRDamages_rgdp_per_cap_SLRRemainGDP", "rgdp_per_cap_SLRRemainGDP"; output_path=output_path)
-    rgdppercap_slr_ann          = load_RV("MarketDamagesBurke_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path=output_path) # note that the SLR module in itself is not annualised, Burke=default
+    rgdppercap_slr_ann          = load_RV("MarketDamagesBurke_annual_rgdp_per_cap_SLRRemainGDP_ann", "rgdp_per_cap_SLRRemainGDP_ann"; output_path=output_path) # note that the SLR module in itself is not annualised, Burke=default
     rgdppercap_market       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP", "rgdp_per_cap_MarketRemainGDP"; output_path=output_path)
-    rgdppercap_market_ann       = load_RV("MarketDamagesBurke_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path=output_path)
-    rimpactpercap_market_ann       = load_RV("MarketDamagesBurke_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path=output_path)
+    rgdppercap_market_ann       = load_RV("MarketDamagesBurke_annual_rgdp_per_cap_MarketRemainGDP_ann", "rgdp_per_cap_MarketRemainGDP_ann"; output_path=output_path)
+    rimpactpercap_market_ann       = load_RV("MarketDamagesBurke_annual_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path=output_path)
     rgdppercap_nonmarket    = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path=output_path)
-    rgdppercap_nonmarket_ann    = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path=output_path)
-    rimpactpercap_nonmarket_ann    = load_RV("NonMarketDamages_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path=output_path)
+    rgdppercap_nonmarket_ann    = load_RV("NonMarketDamages_annual_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path=output_path)
+    rimpactpercap_nonmarket_ann    = load_RV("NonMarketDamages_annual_isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann", "isat_per_cap_ImpactperCapinclSaturationandAdaptation_ann"; output_path=output_path)
     rgdppercap_disc         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP", "rgdp_per_cap_NonMarketRemainGDP"; output_path=output_path) # redundant?
-    rgdppercap_disc_ann         = load_RV("NonMarketDamages_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path=output_path) # redundant?
-    rimpactpercap_disc_ann         = load_RV("Discontinuity_isat_per_cap_DiscImpactperCapinclSaturation_ann", "isat_per_cap_DiscImpactperCapinclSaturation_ann"; output_path=output_path)
-    gdp = load_RV("EquityWeighting_cons_percap_consumption_ann", "cons_percap_consumption_ann"; output_path=output_path)
-    pop = load_RV("EquityWeighting_pop_population_ann", "pop_population_ann"; output_path=output_path)
+    rgdppercap_disc_ann         = load_RV("NonMarketDamages_annual_rgdp_per_cap_NonMarketRemainGDP_ann", "rgdp_per_cap_NonMarketRemainGDP_ann"; output_path=output_path) # redundant?
+    rimpactpercap_disc_ann         = load_RV("Discontinuity_annual_isat_per_cap_DiscImpactperCapinclSaturation_ann", "isat_per_cap_DiscImpactperCapinclSaturation_ann"; output_path=output_path)
+    gdp = load_RV("EquityWeighting_annual_cons_percap_consumption_ann", "cons_percap_consumption_ann"; output_path=output_path)
+    pop = load_RV("EquityWeighting_annual_pop_population_ann", "pop_population_ann"; output_path=output_path)
 
 
     # resave aggregate data

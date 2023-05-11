@@ -14,10 +14,14 @@ end
 """
 Applies undiscounting factor to get the SCC, discounted to the emissions year instead of the base year.
 """
-function undiscount_scc(m::Model, year::Int)
-    df = m[:EquityWeighting, :df_utilitydiscountfactor_ann]
+function undiscount_scc(m::Model, year::Int, annualGDP::Bool=false, equityweighting_annual_comp::Symbol=:EquityWeighting_annual)
+    df = m[equityweighting_annual_comp, :df_utilitydiscountfactor_ann]
     consfocus0 = m[:GDP, :cons_percap_consumption_0][1]
-    consfocus = m[:GDP, :cons_percap_consumption][:, 1]
+    if annualGDP
+        consfocus = m[:GDP_annual, :cons_percap_consumption_ann][:, 1]
+    else
+        consfocus = m[:GDP, :cons_percap_consumption][:, 1]
+    end
     emuc = m[:EquityWeighting, :emuc_utilityconvexity]
     sccii = getpageindexfromyear(year)
 
@@ -32,7 +36,7 @@ If no model is provided, the default model from main_model.get_model() is used.
 Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
 If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
 """
-function compute_scc(m::Model=get_model(); year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000.)
+function compute_scc(m::Model=get_model(); year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000., annualGDP::Bool=false)
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
@@ -40,7 +44,7 @@ function compute_scc(m::Model=get_model(); year::Union{Int,Nothing}=nothing, eta
     prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
+    scc = mm[:EquityWeighting_annual, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year, annualGDP)
 
     return scc
 end
@@ -54,7 +58,7 @@ If no model is provided, the default model from main_model.get_model() is used.
 Discounting scheme can be specified by the `eta` and `prtp` parameters, which will update the values of emuc_utilitiyconvexity and ptp_timepreference in the model.
 If no values are provided, the discount factors will be computed using the default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
 """
-function compute_scc_mm(m::Model=get_model(); year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000.)
+function compute_scc_mm(m::Model=get_model(); year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000., annualGDP::Bool=false, equityweighting_annual_comp::Symbol=:EquityWeighting_annual)
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
 
@@ -63,8 +67,8 @@ function compute_scc_mm(m::Model=get_model(); year::Union{Int,Nothing}=nothing, 
 
     mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
 
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
-    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated_ann] / undiscount_scc(mm.base, year)
+    scc = mm[equityweighting_annual_comp, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year, annualGDP, equityweighting_annual_comp)
+    scc_disaggregated = mm[equityweighting_annual_comp, :addt_equityweightedimpact_discountedaggregated_ann] / undiscount_scc(mm.base, year, annualGDP, equityweighting_annual_comp)
 
     return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
 end
@@ -75,7 +79,7 @@ Returns a Mimi MarginalModel where the provided m is the base model, and the mar
 If no Model m is provided, the default model from main_model.get_model() is used as the base model.
 Note that the returned MarginalModel has already been run.
 """
-function get_marginal_model(m::Model=get_model(); year::Union{Int,Nothing}=nothing, pulse_size=75000.)# , varseed::Union{Int, Nothing} = nothing)
+function get_marginal_model(m::Model=get_model(); year::Union{Int,Nothing}=nothing, pulse_size=75000., varseed::Union{Int, Nothing} = nothing)
     year === nothing ? error("Must specify an emission year. Try `get_marginal_model(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot add marginal emissions in $year, year must be within the model's time index $page_years.") : nothing
 
@@ -97,14 +101,14 @@ function get_marginal_model(m::Model=get_model(); year::Union{Int,Nothing}=nothi
     return mm
 end
 
-function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000.)# , varseed::Union{Int, Nothing} = nothing)
+function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000., varseed::Union{Int, Nothing} = nothing, annualGDP::Bool=false)
     # Setup of location of final results
     scc_results = zeros(samplesize)
 
     function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
         marginal = sim_inst.models[1]
 
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year)
+        marg_damages = marginal[:EquityWeighting_annual, :td_totaldiscountedimpacts_ann] / undiscount_scc(mm.base, year, annualGDP)
 
         scc_results[trialnum] = marg_damages
     end
@@ -116,10 +120,10 @@ function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing}=not
     eta == nothing ? nothing : setorup_param!(m, :emuc_utilityconvexity, eta)
     prtp == nothing ? nothing : setorup_param!(m, :ptp_timepreference, prtp * 100.)
 
-    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)# , varseed=varseed)   # Returns a marginal model that has already been run
+    mm = get_marginal_model(m, year=year, pulse_size=pulse_size, varseed=varseed)   # Returns a marginal model that has already been run
 
     # Run
     res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
 
-    return scc_results
+    scc_results
 end

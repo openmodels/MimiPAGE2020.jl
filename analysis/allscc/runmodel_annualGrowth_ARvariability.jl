@@ -37,7 +37,7 @@ if length(ARGS) > 0
 end
 
 # define the output directory
-dir_output = joinpath(@__DIR__, "../../output-annualGrowthAR/")
+dir_output = joinpath(@__DIR__, "../../output/")
 
 # define number of Monte Carlo runs
 if !@isdefined samplesize

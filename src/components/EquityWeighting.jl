@@ -44,6 +44,8 @@
 
     df_utilitydiscountfactor = Variable(index=[time], unit="fraction")
 
+    discfix_fixediscountrate = Parameter(unit="none", default=0.) # override the discount rates with something exogenous
+
     # Discounted costs
     pcdt_partiallyweighted_discounted = Variable(index=[time, region], unit="\$million")
     pcdt_g_partiallyweighted_discountedglobal = Variable(index=[time], unit="\$million")
@@ -93,7 +95,11 @@
 
         end
 
-        v.df_utilitydiscountfactor[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
+        if p.discfix_fixediscountrate != 0.
+            v.df_utilitydiscountfactor[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
+        else
+            v.df_utilitydiscountfactor[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
+        end
 
         for rr in d.region
 
@@ -115,7 +121,12 @@
 
             v.pct_partiallyweighted[tt, rr] = v.pct_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
             v.wact_partiallyweighted[tt, rr] = v.wact_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
-            v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+
+            if p.discfix_fixediscountrate != 0.
+                v.dr_discountrate[tt, rr] = p.discfix_fixediscountrate
+            else
+                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+            end
 
             if is_first(tt)
                 v.yp_yearsperiod[TimestepIndex(1)] = p.y_year[TimestepIndex(1)] - p.y_year_0

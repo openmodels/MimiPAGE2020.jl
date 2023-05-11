@@ -297,10 +297,15 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     # Growth Effects - additional variables and parameters
     ###############################################
     equityweighting_grw[:dfc_consumptiondiscountrate] = equityweighting[:dfc_consumptiondiscountrate]
+    equityweighting_grw[:df_utilitydiscountfactor] = equityweighting[:df_utilitydiscountfactor]
     equityweighting_grw[:tpc_totalaggregatedcosts] = equityweighting[:tpc_totalaggregatedcosts]
     equityweighting_grw[:tac_totaladaptationcosts] = equityweighting[:tac_totaladaptationcosts]
     connect_param!(m, :EquityWeighting_growth => :grwnet_realizedgdpgrowth, :GDP_growth => :grwnet_realizedgdpgrowth)
     connect_param!(m, :EquityWeighting_growth => :lgdp_gdploss, :GDP_growth => :lgdp_gdploss)
+    connect_param!(m, :EquityWeighting_growth => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
+    connect_param!(m, :EquityWeighting_growth => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
+    connect_param!(m, :EquityWeighting_growth => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
+    connect_param!(m, :EquityWeighting_growth => :yagg_periodspan, :GDP => :yagg_periodspan)
     ###############################################
     equityweighting[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
     equityweighting[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]

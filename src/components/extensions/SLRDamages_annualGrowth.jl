@@ -1,4 +1,4 @@
-@defcomp SLRDamages begin
+@defcomp SLRDamages_annualGrowth begin
     region = Index()
     year = Index()
 
@@ -76,8 +76,8 @@ end
 # Still need this function in order to set the parameters than depend on
 # readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
-function addslrdamages_annual(model::Model)
-    SLRDamagescomp = add_comp!(model, SLRDamages)
+function addslrdamages_annualgrowth(model::Model)
+    SLRDamagescomp = add_comp!(model, SLRDamages_annualGrowth)
 
     SLRDamagescomp[:wincf_weightsfactor_sea] = readpagedata(model, "data/wincf_weightsfactor_sea.csv")
     SLRDamagescomp[:impmax_maxSLRforadaptpolicySLR] = readpagedata(model, "data/impmax_sealevel.csv")

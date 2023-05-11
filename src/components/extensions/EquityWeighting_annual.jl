@@ -110,7 +110,7 @@
             end
         end
 
-        v.td_totaldiscountedimpacts_ts[tt] = v.td_totaldiscountedimpacts # for analysis
+        v.td_totaldiscountedimpacts_ts[tt] = v.td_totaldiscountedimpacts_ann # for analysis
     end
 end
 

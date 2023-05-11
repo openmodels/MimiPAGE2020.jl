@@ -73,6 +73,7 @@
                 v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r]
                 v.cons_consumption[t, r] = p.gdp_leveleffect[t, r] * (1 - p.save_savingsrate / 100)
                 v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
+                v.gdp[t, r] = p.gdp_leveleffect[t, r]
             else
                 # if region switch is used, multiply the growth effect by the switch; otherwise, multiply by one
                 v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r] - ifelse(p.ge_use_regionswitch == 1., p.ge_regionswitch[r], 1.) * v.geadpt_growtheffects_adapted[t] * p.isat_ImpactinclSaturationandAdaptation[t-1,r]

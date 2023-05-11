@@ -14,6 +14,7 @@
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
     ipow_incomeexponent = Parameter(unit="unitless", default=-0.13333333333333333)
 
+    igdp_realizeddiscimpact_ann = Variable(index=[year,region], unit="%")
     occurdis_occurrencedummy = Parameter(index=[time], unit="unitless")
     occurdis_occurrencedummy_sum = Variable(unit="unitless") # for analysis
     occurdis_occurrencedummy_ann = Variable(index=[year], unit="unitless")
@@ -21,11 +22,17 @@
 
     distau_discontinuityexponent = Parameter(unit="unitless", default=20.)
 
+    igdpeqdis_eqdiscimpact_ann = Variable(index=[year,region], unit="%")
+    idis_lossfromdisc_ann = Variable(index=[year], unit="degreeC")
+    expfdis_discdecay_ann = Variable(index=[year], unit="unitless")
     tdis_tolerabilitydisc = Parameter(unit="degreeC", default=1.5)
     pdis_probability = Parameter(unit="%/degreeC", default=20.)
 
     isatg_saturationmodification = Parameter(unit="unitless")
+    isat_satdiscimpact_ann = Variable(index=[year,region], unit="%")
 
+    rt_g_globaltemperature_ann = Parameter(index=[year], unit="degreeC")
+    rgdp_per_cap_NonMarketRemainGDP_ann = Parameter(index=[year, region], unit="\$/person")
     isat_per_cap_DiscImpactperCapinclSaturation = Parameter(index=[time,region], unit="\$/person")
     isat_per_cap_DiscImpactperCapinclSaturation_sum = Variable(unit="\$/person") # for analysis
     isat_per_cap_DiscImpactperCapinclSaturation_ann = Variable(index=[year,region], unit="\$/person")
