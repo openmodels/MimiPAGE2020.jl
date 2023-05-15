@@ -4,7 +4,10 @@ using Mimi
 # Test that all models run
 outdir = joinpath(@__DIR__, "../output")
 samplesize = 10
-rm(outdir, recursive=true) # NB !!cleans out the 'output' folder!!
+try
+    rm(outdir, recursive=true) # NB !!cleans out the 'output' folder!!
+catch
+end
 mkdir(outdir)
 
 include("../analysis/allscc/runmodel.jl")
@@ -13,7 +16,7 @@ rm(outdir, recursive=true)
 mkdir(outdir)
 
 include("../analysis/allscc/runmodel_growth.jl")
-@test sum([length(files) for (root, dirs, files) in walkdir(outdir)]) ==  4622
+@test sum([length(files) for (root, dirs, files) in walkdir(outdir)]) ==  946
 rm(outdir, recursive=true)
 mkdir(outdir)
 

@@ -25,6 +25,9 @@
     perm_jul_e_co2 = Variable(index=[time], unit="MtonCO2/yr")
     perm_jul_ce_ch4 = Variable(index=[time], unit="Mtonne CH4")
 
+    # ADDED: new floor parameter for perm_sib_temp to avoid numerical issues arising from temperatures below pre-industrial perm_sib_af
+    floor_perm_temp = Parameter(default = 0.01)
+
     function run_timestep(p, v, d, tt)
         if is_first(tt)
             yp = p.y_year[tt] - p.y_year_0
@@ -34,10 +37,18 @@
 
         # Permafrost temperature
         v.perm_jul_temp[tt] = p.rt_g[tt] * p.perm_jul_af
-        # Correction for perm sensitivity, CO2
-        v.perm_jul_sens_c_co2_correct[tt] = (v.perm_jul_temp[tt] / (0.5 * p.perm_jul_limit_t))^p.perm_jul_sens_slope_vs_t_co2
-        # Correction for perm lag, CO2
-        v.perm_jul_lag_c_co2_correct[tt] = (v.perm_jul_temp[tt] / (0.5 * p.perm_jul_limit_t))^p.perm_jul_lag_slope_vs_t_co2
+
+        # MODIFIED: IF-condition for positive perm_jul_temp values added and use of floor_perm_temp if perm_jul_temp non-positive
+        # Correction for perm sensitivity, CO2, and for perm lag, CO2
+        if v.perm_jul_temp[tt] > 0
+            v.perm_jul_sens_c_co2_correct[tt] = (v.perm_jul_temp[tt] / (0.5 * p.perm_jul_limit_t))^p.perm_jul_sens_slope_vs_t_co2
+            v.perm_jul_lag_c_co2_correct[tt] = (v.perm_jul_temp[tt] / (0.5 * p.perm_jul_limit_t))^p.perm_jul_lag_slope_vs_t_co2
+        else
+            v.perm_jul_sens_c_co2_correct[tt] = (p.floor_perm_temp / (0.5 * p.perm_jul_limit_t))^p.perm_jul_sens_slope_vs_t_co2
+            v.perm_jul_lag_c_co2_correct[tt] = (p.floor_perm_temp / (0.5 * p.perm_jul_limit_t))^p.perm_jul_lag_slope_vs_t_co2
+        end
+        # END OF MODIFICATION
+
         # Correction for perm power, CO2
         v.perm_jul_pow_c_co2_correct[tt] = ifelse(1 + p.perm_jul_pow_slope_vs_t_co2 * (v.perm_jul_temp[tt] - 0.5 * p.perm_jul_limit_t) / p.perm_jul_limit_t <= 0, 0.000001, 1 + p.perm_jul_pow_slope_vs_t_co2 * (v.perm_jul_temp[tt] - 0.5 * p.perm_jul_limit_t) / p.perm_jul_limit_t)
         # Equilibrium perm cumul carbon, CO2

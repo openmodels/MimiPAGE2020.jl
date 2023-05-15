@@ -38,6 +38,9 @@
     perm_sib_ce_c_ch4 = Variable(index=[time], unit="Mtonne C")
     perm_sib_ce_ch4 = Variable(index=[time], unit="Mtonne CH4")
 
+    # ADDED: new floor parameter for perm_sib_temp to avoid numerical issues arising from temperatures below pre-industrial perm_sib_af
+    floor_perm_temp = Parameter(default = 0.01)
+
     function run_timestep(p, v, d, tt)
         if is_first(tt)
             yp = p.y_year[tt] - p.y_year_0
@@ -90,10 +93,17 @@
 # Annual emissions CO2 perm
         v.perm_sib_e_co2[tt] = (44 / 12) * (p.perm_sib_limit_c / (p.perm_sib_lag_c_co2 * v.perm_sib_lag_c_co2_correct[tt])) * ( ((v.perm_sib_equilib_c_co2[tt] > v.perm_sib_ce_c_co2[tt]) ? ((v.perm_sib_equilib_c_co2[tt] - v.perm_sib_ce_c_co2[tt]) / p.perm_sib_limit_c)^((1 + p.perm_sib_pow_c_co2) * v.perm_sib_pow_c_co2_correct[tt]) : 0) )
 
-        # Correction for perm sensitivity, CH4
-        v.perm_sib_sens_c_ch4_correct[tt] = (v.perm_sib_temp[tt] / (0.5 * p.perm_sib_limit_t))^p.perm_sib_sens_slope_vs_t_ch4
-        # Correction for perm lag, CH4
-        v.perm_sib_lag_c_ch4_correct[tt] = (v.perm_sib_temp[tt] / (0.5 * p.perm_sib_limit_t))^p.perm_sib_lag_slope_vs_t_ch4
+        # MODIFIED: IF-condition for positive perm_sib_temp values added and use of floor_perm_temp if perm_sib_temp non-positive
+        # Correction for perm sensitivity, CO2, and for perm lag, CO2
+        if v.perm_sib_temp[tt] > 0
+            v.perm_sib_sens_c_ch4_correct[tt] = (v.perm_sib_temp[tt] / (0.5 * p.perm_sib_limit_t))^p.perm_sib_sens_slope_vs_t_ch4
+            v.perm_sib_lag_c_ch4_correct[tt] = (v.perm_sib_temp[tt] / (0.5 * p.perm_sib_limit_t))^p.perm_sib_lag_slope_vs_t_ch4
+        else
+            v.perm_sib_sens_c_ch4_correct[tt] = (p.floor_perm_temp / (0.5 * p.perm_sib_limit_t))^p.perm_sib_sens_slope_vs_t_ch4
+            v.perm_sib_lag_c_ch4_correct[tt] = (p.floor_perm_temp / (0.5 * p.perm_sib_limit_t))^p.perm_sib_lag_slope_vs_t_ch4
+        end
+        # END OF MODIFICATION
+
         # Correction for perm power, CH4
         v.perm_sib_pow_c_ch4_correct[tt] = ifelse(1 + p.perm_sib_pow_slope_vs_t_ch4 * (v.perm_sib_temp[tt] - 0.5 * p.perm_sib_limit_t) / p.perm_sib_limit_t <= 0, 0.000001, 1 + p.perm_sib_pow_slope_vs_t_ch4 * (v.perm_sib_temp[tt] - 0.5 * p.perm_sib_limit_t) / p.perm_sib_limit_t)
         # Equilibrium perm cumul carbon, CH4

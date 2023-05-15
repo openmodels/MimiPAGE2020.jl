@@ -20,7 +20,7 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
     mcs = @defsim begin
 
         ## NOTE: some assignment to global variables can probably be avoided now
-        ## with new treatment of shared and unshared parameters, but this will 
+        ## with new treatment of shared and unshared parameters, but this will
         ## all work for now!
 
          ############################################################################
@@ -36,18 +36,18 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         MarketDamagesBurke.save_savingsrate = RV_save_savingsrate
         NonMarketDamages.save_savingsrate = RV_save_savingsrate
         SLRDamages.save_savingsrate = RV_save_savingsrate
-        
+
         # each component should have the same value for its tcal_CalibrationTemp
         # so we use an RV here because in the model this is not an explicitly
         # shared parameter, then assign to components
         rv(RV_tcal_CalibrationTemp) = TriangularDist(2.5, 3.5, 3.)
         MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
-        
-        # each component should have the same value for the following Abatement 
-        # Cost Parameters so we use an RV here because in the model this is not 
+
+        # each component should have the same value for the following Abatement
+        # Cost Parameters so we use an RV here because in the model this is not
         # an explicitly shared parameter, then assign to components
-        
+
         rv(RV_q0propmult_cutbacksatnegativecostinfinalyear) = TriangularDist(0.3, 1.2, 0.7)
         AbatementCostParametersCO2.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
         AbatementCostParametersCH4.q0propmult_cutbacksatnegativecostinfinalyear = RV_q0propmult_cutbacksatnegativecostinfinalyear
@@ -65,31 +65,31 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         AbatementCostParametersCH4.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
         AbatementCostParametersN2O.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
         AbatementCostParametersLin.c0mult_mostnegativecostinfinalyear = RV_c0mult_mostnegativecostinfinalyear
-        
+
         rv(RV_curve_below_curvatureofMACcurvebelowzerocost) = TriangularDist(0.25, 0.8, 0.45)
         AbatementCostParametersCO2.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
         AbatementCostParametersCH4.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
         AbatementCostParametersN2O.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
         AbatementCostParametersLin.curve_below_curvatureofMACcurvebelowzerocost = RV_curve_below_curvatureofMACcurvebelowzerocost
-        
+
         rv(RV_curve_above_curvatureofMACcurveabovezerocost) = TriangularDist(0.1, 0.7, 0.4)
         AbatementCostParametersCO2.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
         AbatementCostParametersCH4.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
         AbatementCostParametersN2O.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
         AbatementCostParametersLin.curve_above_curvatureofMACcurveabovezerocost = RV_curve_above_curvatureofMACcurveabovezerocost
-        
+
         rv(RV_cross_experiencecrossoverratio) = TriangularDist(0.1, 0.3, 0.2)
         AbatementCostParametersCO2.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
         AbatementCostParametersCH4.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
         AbatementCostParametersN2O.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
         AbatementCostParametersLin.cross_experiencecrossoverratio = RV_cross_experiencecrossoverratio
-        
+
         rv(RV_learn_learningrate) = TriangularDist(0.05, 0.35, 0.2)
         AbatementCostParametersCO2.learn_learningrate = RV_learn_learningrate
         AbatementCostParametersCH4.learn_learningrate = RV_learn_learningrate
         AbatementCostParametersN2O.learn_learningrate = RV_learn_learningrate
         AbatementCostParametersLin.learn_learningrate = RV_learn_learningrate
-        
+
         # CO2cycle
         CO2Cycle.air_CO2fractioninatm = TriangularDist(57, 67, 62)
         CO2Cycle.res_CO2atmlifetime = TriangularDist(50, 100, 70)
@@ -146,8 +146,8 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
 
         # GDP
         GDP.isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
-        GDP.ge_growtheffects = TriangularDist(ge_minimum, ge_maximum, ge_mode)
-        GDP.ge_seed_empiricaldistribution = Uniform(0, 10^10)
+        GDP_growth.ge_growtheffects = TriangularDist(ge_minimum, ge_maximum, ge_mode)
+        GDP_growth.ge_seed_empiricaldistribution = Uniform(0, 10^10)
 
         # MarketDamages
         MarketDamages.iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
@@ -192,11 +192,11 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         ############################################################################
 
         # shared parameter linked to components: AdaptationCosts, AbatementCosts
-        automult_autonomoustechchange = TriangularDist(0.5, 0.8, 0.65) 
+        automult_autonomoustechchange = TriangularDist(0.5, 0.8, 0.65)
 
-        # shared parameter linked to components: SLRDamages, Discontinuity (weights 
+        # shared parameter linked to components: SLRDamages, Discontinuity (weights
         # for market and nonmarket are non-stochastic and uniformly 1)
-        wincf_weightsfactor_sea["USA"] = TriangularDist(.6, 1, .8) 
+        wincf_weightsfactor_sea["USA"] = TriangularDist(.6, 1, .8)
         wincf_weightsfactor_sea["OECD"] = TriangularDist(.4, 1.2, .8)
         wincf_weightsfactor_sea["USSR"] = TriangularDist(.2, .6, .4)
         wincf_weightsfactor_sea["China"] = TriangularDist(.4, 1.2, .8)
@@ -240,7 +240,7 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         cf_costregional["LatAmerica"] = TriangularDist(0.4, 0.8, 0.6)
 
         # NOTE: the below can probably be resolved into unique, unshared parameters with the same name
-        # in the new Mimi paradigm of shared and unshared parameters, but for now this will 
+        # in the new Mimi paradigm of shared and unshared parameters, but for now this will
         # continue to work!
 
         # MarketDamagesBurke
@@ -297,8 +297,8 @@ function getsim(ge_minimum::Union{Float64,Nothing}=nothing,
         ############################################################################
 
         save(GDP.gdp,
-             EquityWeighting.grwnet_realizedgdpgrowth,
-             GDP.cbreg_regionsatbound
+             EquityWeighting_growth.grwnet_realizedgdpgrowth,
+             GDP_growth.cbreg_regionsatbound
              )
 
     end # de
