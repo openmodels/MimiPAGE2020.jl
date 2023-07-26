@@ -262,6 +262,7 @@ function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, us
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
+    set_dimension!(m, :country, ["AFG", "ALA", "ALB", "DZA", "ASM", "AND", "AGO", "AIA", "ATA", "ATG", "ARG", "ARM", "ABW", "AUS", "AUT", "AZE"]) # TODO: Load official list from CSV
 
     buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages; use_page09weights=use_page09weights, page09_discontinuity=page09_discontinuity, page09_sealevelrise=page09_sealevelrise)
 
