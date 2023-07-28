@@ -39,7 +39,5 @@ end
 function addpopulation(model::Model)
     populationcomp = add_comp!(model, Population)
 
-    populationcomp[:pop0_initpopulation] = zeros(dim_count(model, :country))
-
     return populationcomp
 end

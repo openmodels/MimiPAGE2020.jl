@@ -13,4 +13,10 @@ function countrytoregion(model::Model, combine::F, bycountry...) where {F <: Fun
 end
 
 
+function loadparameters_country(model::Model)
+    parameters = Dict{Any,Any}()
 
+    parameters[:pop0_initpopulation] = zeros(dim_count(model, :country)) # TODO: Load data from CSV
+
+    parameters
+end
