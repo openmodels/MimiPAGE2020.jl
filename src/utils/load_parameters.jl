@@ -86,7 +86,7 @@ function load_parameters(model::Model; lowpass::Bool=false)
         parameters["ge_empirical_distribution"] = readpagedata(model, joinpath(parameter_directory, "ge_empirical_distribution_lowpass.csv"))
     end
     parameters_country = loadparameters_country(model)
-    parameters = merge(parameter, parameters_country)
+    parameters = merge(parameters, parameters_country)
 
     return parameters
 end
