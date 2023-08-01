@@ -31,6 +31,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     population = addpopulation(m)
     gdp = add_comp!(m, GDP)
 
+    gdp[:pop0_initpopulation_region] = population[:pop0_initpopulation_region]
+
     # Abatement Costs
     addabatementcostparameters(m, :CO2)
     addabatementcostparameters(m, :CH4)
