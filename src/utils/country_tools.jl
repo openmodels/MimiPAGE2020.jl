@@ -1,4 +1,22 @@
-countrymapping = Dict("EU" => ["AFG", "ALA", "ALB", "DZA", "ASM", "AND", "AGO", "AIA", "ATA"], "USA" => ["ATG"], "OECD" => ["ARG"], "USSR" => ["ARM"], "China" => ["ABW"], "SEAsia" => ["AUS"], "Africa" => ["AUT"], "LatAmerica" => ["AZE"]) # TODO: Load mapping from CSV
+using CSV, DataFrames
+using Memoize
+
+@memoize function get_countrymapping()
+    parameter_directory = joinpath(dirname(@__FILE__), "..", "..", "data")
+    df = CSV.read(joinpath(parameter_directory, "countryregions.csv"), DataFrame)
+
+    countrymapping = Dict{String, Vector{String}}()
+    for region in unique(df.Region)
+        countrymapping[region] = df.Code[df.Region .== region]
+    end
+
+    countrymapping
+end
+
+@memoize function get_countryinfo()
+    parameter_directory = joinpath(dirname(@__FILE__), "..", "..", "data")
+    CSV.read(joinpath(parameter_directory, "bycountry.csv"), DataFrame)
+end
 
 function countrytoregion(model::Model, combine::F, bycountry...) where {F <: Function} #, T = eltype(F())}
     result = []
@@ -16,7 +34,7 @@ end
 function loadparameters_country(model::Model)
     parameters = Dict{Any,Any}()
 
-    parameters[:pop0_initpopulation] = zeros(dim_count(model, :country)) # TODO: Load data from CSV
+    parameters[:pop0_initpopulation] = df.Pop2015
 
     parameters
 end
