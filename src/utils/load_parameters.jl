@@ -77,6 +77,9 @@ function load_parameters(model::Model; lowpass::Bool=false)
 
     parameter_directory = joinpath(dirname(@__FILE__), "..", "..", "data")
     for file in filter(q -> splitext(q)[2] == ".csv", readdir(parameter_directory))
+        if file in ["bycountry.csv", "countryregions.csv", "burkey-estimates.csv", "inform-combined.csv"]
+            continue
+        end
         parametername = splitext(file)[1]
         filepath = joinpath(parameter_directory, file)
 

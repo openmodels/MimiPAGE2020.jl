@@ -19,6 +19,7 @@ end
 end
 
 function countrytoregion(model::Model, combine::F, bycountry...) where {F <: Function} #, T = eltype(F())}
+    countrymapping = get_countrymapping()
     result = []
     countries = dim_keys(model, :country)
     for region in dim_keys(model, :region)
@@ -30,11 +31,14 @@ function countrytoregion(model::Model, combine::F, bycountry...) where {F <: Fun
     result
 end
 
-
 function loadparameters_country(model::Model)
     parameters = Dict{Any,Any}()
 
+    df = get_countryinfo()
+
     parameters[:pop0_initpopulation] = df.Pop2015
+    parameters[:gdp0_initgdp] = df.GDP2015
+    parameters[:area] = df.LandArea + df.MarineArea
 
     parameters
 end

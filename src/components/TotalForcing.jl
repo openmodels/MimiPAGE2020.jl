@@ -8,7 +8,7 @@
     exf_excessforcing = Parameter(index=[time], unit="W/m2")
     fs_sulfateforcing = Parameter(index=[time, region], unit="W/m2")
 
-    area = Parameter(index=[region], unit="km2")
+    area_region = Parameter(index=[region], unit="km2")
     area_e_eartharea = Parameter(unit="km2", default=5.1e8)
 
     # Total anthropogenic forcing

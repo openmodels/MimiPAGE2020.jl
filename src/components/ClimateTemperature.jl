@@ -1,12 +1,16 @@
+include("../utils/country_tools.jl")
+
 @defcomp ClimateTemperature begin
     region = Index()
+    country = Index()
 
     # Basic parameters
-    area = Parameter(index=[region], unit="km2")
+    area = Parameter(index=[country], unit="km2")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
     area_e_eartharea = Parameter(unit="km2", default=5.1e8)
     use_seaice = Parameter{Bool}()
+    area_region = Variable(index=[region], unit="km2")
 
     # Initial temperature outputs
     rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component
@@ -57,6 +61,11 @@
     rtl_realizedtemperature = Variable(index=[time, region], unit="degreeC")
 
     function init(p, v, d)
+        byregion = countrytoregion(model, sum, p.area)
+        for rr in d.region
+            v.area_region[rr] = byregion[rr]
+        end
+
         for rr in d.region
             v.rtl_0_baselandtemp[rr] = p.rt_g0_baseglobaltemp * p.ampf_amplification[rr]
         end

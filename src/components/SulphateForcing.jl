@@ -6,7 +6,7 @@
     se0_sulphateemissionsbase = Parameter(index=[region], unit="TgS/year")
     pse_sulphatevsbase = Parameter(index=[time, region], unit="%")
     se_sulphateemissions = Variable(index=[time, region], unit="TgS/year")
-    area = Parameter(index=[region], unit="km2")
+    area_region = Parameter(index=[region], unit="km2")
     area_e_eartharea = Parameter(unit="km2", default=5.1e8)
 
     sfx_sulphateflux = Variable(index=[time, region], unit="TgS/km2/yr")

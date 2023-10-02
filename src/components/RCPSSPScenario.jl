@@ -73,23 +73,23 @@
 
         # Set the SSP values
         if p.ssp == 234 || p.ssp == 10
-            v.popgrw_populationgrowth[:, :] = (readpagedata(nothing, "data/ssps/ssp2_pop_rate.csv") +
-                                   readpagedata(nothing, "data/ssps/ssp3_pop_rate.csv") +
-                                   readpagedata(nothing, "data/ssps/ssp4_pop_rate.csv")) / 3
-            v.grw_gdpgrowthrate[:, :] = (readpagedata(nothing, "data/ssps/ssp2_gdp_rate.csv") +
-                                         readpagedata(nothing, "data/ssps/ssp3_gdp_rate.csv") +
-                                         readpagedata(nothing, "data/ssps/ssp4_gdp_rate.csv")) / 3
+            v.popgrw_populationgrowth[:, :] = (readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP2-pop.csv") +
+                                               readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP3-pop.csv") +
+                                               readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP4-pop.csv")) / 3
+            v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth + (readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP2_gdppc.csv") +
+                                                                     readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP3_gdppc.csv") +
+                                                                     readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP4_gdppc.csv")) / 3
             if p.ssp == 10
                 v.popgrw_populationgrowth[:, :] =
-                    weighted_scenario(readpagedata(nothing, "data/ssps/ssp1_pop_rate.csv"), v.popgrw_populationgrowth[:, :],
-                                      readpagedata(nothing, "data/ssps/ssp5_pop_rate.csv"), p.weight_scenarios)
-                v.grw_gdpgrowthrate[:, :] =
-                    weighted_scenario(readpagedata(nothing, "data/ssps/ssp1_gdp_rate.csv"), v.grw_gdpgrowthrate[:, :],
-                                      readpagedata(nothing, "data/ssps/ssp5_gdp_rate.csv"), p.weight_scenarios)
+                    weighted_scenario(readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP1-pop.csv"), v.popgrw_populationgrowth[:, :],
+                                      readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP5-pop.csv"), p.weight_scenarios)
+                v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth +
+                    weighted_scenario(readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP1_gdppc.csv"), v.grw_gdpgrowthrate[:, :],
+                                      readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP5_gdppc.csv"), p.weight_scenarios)
             end
         else
-            v.popgrw_populationgrowth[:, :] = readpagedata(nothing, "data/ssps/ssp$(p.ssp)_pop_rate.csv")
-            v.grw_gdpgrowthrate[:, :] = readpagedata(nothing, "data/ssps/ssp$(p.ssp)_gdp_rate.csv")
+            v.popgrw_populationgrowth[:, :] = readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP$(p.ssp)-pop.csv")
+            v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth + readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP$(p.ssp)_gdppc.csv")
         end
     end
 

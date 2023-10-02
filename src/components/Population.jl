@@ -12,7 +12,8 @@ include("../utils/country_tools.jl")
 
     # Variables
     pop0_initpopulation_region = Variable(index=[region], unit="million person") # Population in y_year_0
-    pop_population = Variable(index=[time, region], unit="million person")
+    pop_population = Variable(index=[time, country], unit="million person")
+    pop_population_region = Variable(index=[time, region], unit="million person")
 
     function init(p, v, d)
         byregion = countrytoregion(model, sum, p.pop0_initpopulation)
@@ -22,14 +23,16 @@ include("../utils/country_tools.jl")
     end
 
     function run_timestep(p, v, d, tt)
-        for rr in d.region
+        for cc in d.country
             # Eq.28 in Hope 2002 (defined for GDP, but also applies to population)
             if is_first(tt)
-                v.pop_population[tt, rr] = v.pop0_initpopulation_region[rr] * (1 + p.popgrw_populationgrowth[tt, rr] / 100)^(p.y_year[tt] - p.y_year_0)
+                v.pop_population[tt, cc] = v.pop0_initpopulation_region[cc] * (1 + p.popgrw_populationgrowth[tt, cc] / 100)^(p.y_year[tt] - p.y_year_0)
             else
-                v.pop_population[tt, rr] = v.pop_population[tt - 1, rr] * (1 + p.popgrw_populationgrowth[tt, rr] / 100)^(p.y_year[tt] - p.y_year[tt - 1])
+                v.pop_population[tt, cc] = v.pop_population[tt - 1, cc] * (1 + p.popgrw_populationgrowth[tt, cc] / 100)^(p.y_year[tt] - p.y_year[tt - 1])
             end
         end
+
+        v.pop_population_region[t, :] = countrytoregion(model, sum, v.pop_population[t, :])
     end
 end
 
