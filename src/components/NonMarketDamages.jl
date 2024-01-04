@@ -22,7 +22,7 @@
 
     save_savingsrate = Parameter(unit="%", default=15.)
     wincf_weightsfactor_nonmarket = Parameter(index=[region], unit="")
-    w_NonImpactsatCalibrationTemp = Parameter(unit="%GDP", default=0.6333333333333333)
+    w_NonImpactsatCalibrationTemp = Parameter(unit="%GDP", default=0.487 * 1.25 * 3*3) # 125% of negative of mkt_t2 coefficient from Howard & Sterner 2017
     ipow_NonMarketIncomeFxnExponent = Parameter(unit="unitless", default=0.)
     iben_NonMarketInitialBenefit = Parameter(unit="%GDP/degreeC", default=0.08333333333333333)
     tcal_CalibrationTemp = Parameter(unit="degreeC", default=3.)

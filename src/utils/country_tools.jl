@@ -18,6 +18,13 @@ end
     CSV.read(joinpath(parameter_directory, "bycountry.csv"), DataFrame)
 end
 
+@memoize function get_aggregateinfo()
+    parameter_directory = joinpath(dirname(@__FILE__), "..", "..", "data")
+    CSV.read(joinpath(parameter_directory, "aggregates.csv"), DataFrame)
+end
+
+aggregates = unique(get_aggregateinfo().Aggregate)
+
 function countrytoregion(model::Model, combine::F, bycountry...) where {F <: Function} #, T = eltype(F())}
     countrymapping = get_countrymapping()
     result = []
@@ -41,4 +48,106 @@ function loadparameters_country(model::Model)
     parameters[:area] = df.LandArea + df.MarineArea
 
     parameters
+end
+
+function getcountryvalue(pageiso, isos, values, aggregator)
+    if pageiso ∈ aggregates
+        agginfo = get_aggregateinfo()
+        iis = [findfirst(iso .== isos) for iso in agginfo.ISO[agginfo.Aggregate .== pageiso]]
+        aggregator(values[iis])
+    else
+        ii = findfirst(pageiso .== isos)
+        if ii == nothing
+            missing
+        else
+            values[ii]
+        end
+    end
+end
+
+function readcountrydata_it_const(filepath::String, isocol, yearcol, getter, aggregator=mean)
+    # Handle relative paths
+    if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
+        filepath = joinpath(@__DIR__, "..", "..", filepath)
+    end
+
+    # Collect information for each year and country
+    df = CSV.read(filepath, DataFrame)
+
+    readcountrydata_it_const(df, isocol, yearcol, getter, aggregator=mean)
+end
+
+function readcountrydata_it_const(model::Model, df::DataFrame, isocol, yearcol, valuecol::String, aggregator=mean)
+    timexcountry = Matrix{Float64}(undef, dim_count(model, :time), dim_count(model, :country))
+    for (ii, time) in enumerate(dim_keys(model, :time))
+        for (jj, country) in enumerate(dim_keys(model, :country))
+            timexcountry[ii, jj] = getcountryvalue(country, df[df[!, yearcol] .== time, isocol],
+                                                   df[df[!, yearcol] .== time, valuecol], aggregator)
+        end
+    end
+
+    timexcountry
+end
+
+function readcountrydata_it_const(model::Model, df::DataFrame, isocol, yearcol, row2value::Function, aggregator=mean)
+    df.__value__ = zeros(Float64, nrow(df))
+    for row in eachrow(df)
+        row.__value__ = row2value(row)
+    end
+
+    readcountrydata_it_const(df, isocol, yearcol, "__value__", aggregator=mean)
+end
+
+function readcountrydata_it_dist(model::Model, filepath, isocol, yearcol, ptestcol, row2dist, uniforms, aggregator=mean)
+    # Handle relative paths
+    if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
+        filepath = joinpath(@__DIR__, "..", "..", filepath)
+    end
+
+    df = CSV.read(filepath, DataFrame)
+
+    # Update columns accounting for uncertainty
+    if all(uniforms .== 0)
+        df.__value__ = df[!, ptestcol]
+    else
+        df.__value__ = zeros(Float64, nrow(df))
+        for row in eachrow(df)
+            dist = row2dist(row)
+            ii = findfirst(dim_keys(model, :time) .== row[yearcol])
+            jj = findfirst(dim_keys(model, :country) .== row[isocol])
+            row.__value__ = quantile(dist, uniforms[ii, jj])
+        end
+    end
+
+    readcountrydata_it_const(df, isocol, yearcol, "__value__", aggregator=mean)
+end
+
+function readcountrydata_im_ft(model::Model, filepath::String, isocol, mccol, mc, row2value::Function, aggregator=mean)
+    # Handle relative paths
+    if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
+        filepath = joinpath(@__DIR__, "..", "..", filepath)
+    end
+
+    df = CSV.read(filepath, DataFrame)
+
+    if mc == nothing
+        df2 = combine(groupby(df, isocol), names(df)[names(df) .!= isocol] .=> mean)
+    else
+        df2 = df[df[!, mccol] .== mc, :]
+    end
+
+    # Collect information for each year and country
+    timexcountry = Matrix{Float64}(undef, dim_count(model, :time), dim_count(model, :country))
+    for (ii, time) in enumerate(dim_keys(model, :time))
+        df2.__value__ = zeros(Float64, nrow(df2))
+        for row in eachrow(df2)
+            row.__value__ = row2value(row, time)
+        end
+
+        for (jj, country) in enumerate(dim_keys(model, :country))
+            timexcountry[ii, jj] = getcountryvalue(country, df2[!, isocol], df2.__value__, aggregator)
+        end
+    end
+
+    timexcountry
 end

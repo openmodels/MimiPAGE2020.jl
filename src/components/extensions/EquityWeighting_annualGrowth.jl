@@ -8,8 +8,8 @@
     y_year_ann = Parameter(index=[year], unit="year")
 
     # Impacts across all gases
-    pop_population = Parameter(index=[time, region], unit="million person")
-    pop_population_ann = Parameter(index=[year, region], unit="million person")
+    pop_population_region = Parameter(index=[time, region], unit="million person")
+    pop_population_region_ann = Parameter(index=[year, region], unit="million person")
 
     # Total and Per-Capita Abatement and Adaptation Costs
     tct_percap_totalcosts_total = Parameter(index=[time, region], unit="\$/person")
@@ -172,12 +172,12 @@
             end
 
             # calculate the total damages due to impacts
-            v.currentdam_currentdamages[tt, rr] = (p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr]
-            v.currentdampc_percapitacurrentdamages[tt, rr] = v.currentdam_currentdamages[tt, rr] / p.pop_population[tt, rr]
+            v.currentdam_currentdamages[tt, rr] = (p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr]) * p.pop_population_region[tt, rr]
+            v.currentdampc_percapitacurrentdamages[tt, rr] = v.currentdam_currentdamages[tt, rr] / p.pop_population_region[tt, rr]
             v.damshare_currentdamagesshare[tt, rr] = 100 * v.currentdampc_percapitacurrentdamages[tt, rr] / p.cons_percap_aftercosts[tt, rr]
 
             # if damages including GDP losses exceed current consumption levels, calculate the share for equity weighting based on the convergence system
-            v.eqwshare_shareofweighteddamages_noconvergence[tt,rr] = (v.currentdam_currentdamages[tt, rr] + p.lgdp_gdploss[tt,rr]) / (p.cons_percap_aftercosts[tt, rr] * p.pop_population[tt, rr])
+            v.eqwshare_shareofweighteddamages_noconvergence[tt,rr] = (v.currentdam_currentdamages[tt, rr] + p.lgdp_gdploss[tt,rr]) / (p.cons_percap_aftercosts[tt, rr] * p.pop_population_region[tt, rr])
 
             if p.use_convergence == 1.
                 if v.eqwshare_shareofweighteddamages_noconvergence[tt,rr] > p.eqwboundn_maxshareofweighteddamages_neighbourhood
@@ -191,32 +191,32 @@
                         v.eqwshare_shareofweighteddamages[tt,rr] = p.eqwbound_maxshareofweighteddamages
                     end
 
-                    v.excdam_excessdamages[tt, rr] =  max(0, v.currentdam_currentdamages[tt, rr] + p.lgdp_gdploss[tt,rr] - v.eqwshare_shareofweighteddamages[tt,rr] * p.cons_percap_aftercosts[tt, rr] * p.pop_population[tt, rr])
+                    v.excdam_excessdamages[tt, rr] =  max(0, v.currentdam_currentdamages[tt, rr] + p.lgdp_gdploss[tt,rr] - v.eqwshare_shareofweighteddamages[tt,rr] * p.cons_percap_aftercosts[tt, rr] * p.pop_population_region[tt, rr])
                 else
                     v.excdam_excessdamages[tt, rr] =  0
                 end
             else
                 # use hard boundaries if use_convergence is not set to 1
                 v.eqwshare_shareofweighteddamages[tt,rr] = min(v.eqwshare_shareofweighteddamages_noconvergence[tt,rr], p.eqwbound_maxshareofweighteddamages)
-                v.excdam_excessdamages[tt, rr] =  max(0, v.currentdam_currentdamages[tt, rr] + p.lgdp_gdploss[tt,rr] - v.eqwshare_shareofweighteddamages[tt,rr] * p.cons_percap_aftercosts[tt, rr] * p.pop_population[tt, rr])
+                v.excdam_excessdamages[tt, rr] =  max(0, v.currentdam_currentdamages[tt, rr] + p.lgdp_gdploss[tt,rr] - v.eqwshare_shareofweighteddamages[tt,rr] * p.cons_percap_aftercosts[tt, rr] * p.pop_population_region[tt, rr])
             end
 
             ## Equity weighted impacts (end of page 28, Hope 2009)
             if p.lossinc_includegdplosses == 0. && p.equity_proportion == 0.
-                v.wit_partiallyweighted[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr]
+                v.wit_partiallyweighted[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population_region[tt, rr]
                 v.widt_partiallyweighted_discounted[tt, rr] = v.wit_partiallyweighted[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
             elseif p.lossinc_includegdplosses == 0. && p.equity_proportion == 1.
-                v.wit_partiallyweighted[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                v.wit_partiallyweighted[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population_region[tt, rr]
                 v.widt_partiallyweighted_discounted[tt, rr] = v.wit_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]
             elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 0.
-                v.wit_partiallyweighted[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population[tt, rr] + p.lgdp_gdploss[tt, rr]
+                v.wit_partiallyweighted[tt, rr] = (p.cons_percap_aftercosts[tt, rr]  - p.rcons_percap_dis[tt, rr]) * p.pop_population_region[tt, rr] + p.lgdp_gdploss[tt, rr]
                 v.widt_partiallyweighted_discounted[tt, rr] = v.wit_partiallyweighted[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
             elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 1.
                 if v.excdam_excessdamages[tt, rr] == 0
-                    v.wit_partiallyweighted[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                    v.wit_partiallyweighted[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity)) * p.pop_population_region[tt, rr]
                     v.widt_partiallyweighted_discounted[tt, rr] = v.wit_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]
                 else
-                    v.wit_partiallyweighted[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - ((1 - v.eqwshare_shareofweighteddamages[tt,rr]) * p.cons_percap_aftercosts[tt, rr])^(1 - p.emuc_utilityconvexity)) * p.pop_population[tt, rr]
+                    v.wit_partiallyweighted[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - ((1 - v.eqwshare_shareofweighteddamages[tt,rr]) * p.cons_percap_aftercosts[tt, rr])^(1 - p.emuc_utilityconvexity)) * p.pop_population_region[tt, rr]
                     v.widt_partiallyweighted_discounted[tt, rr] = v.wit_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]  + v.excdam_excessdamages[tt, rr] *  v.dfc_consumptiondiscountrate[tt, rr]
                 end
             end
@@ -308,8 +308,8 @@ function calc_equityweighting(p, v, d, t, annual_year)
             v.wact_percap_partiallyweighted_ann[yr, r] = (1 - p.equity_proportion) * p.act_percap_adaptationcosts_ann[yr, r] + p.equity_proportion * v.eact_percap_weightedadaptationcosts_ann[yr, r]
         end
 
-        v.pct_partiallyweighted_ann[yr, r] = v.pct_percap_partiallyweighted_ann[yr, r] * p.pop_population_ann[yr, r]
-        v.wact_partiallyweighted_ann[yr, r] = v.wact_percap_partiallyweighted_ann[yr, r] * p.pop_population_ann[yr, r]
+        v.pct_partiallyweighted_ann[yr, r] = v.pct_percap_partiallyweighted_ann[yr, r] * p.pop_population_region_ann[yr, r]
+        v.wact_partiallyweighted_ann[yr, r] = v.wact_percap_partiallyweighted_ann[yr, r] * p.pop_population_region_ann[yr, r]
 
         # Discount rate calculations
         v.dr_discountrate_ann[yr, r] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grwnet_realizedgdpgrowth_ann[yr, r] - v.popgrw_populationgrowth_ann[yr, r])
@@ -338,12 +338,12 @@ function calc_equityweighting(p, v, d, t, annual_year)
         v.pcdat_partiallyweighted_discountedaggregated_ann[yr, r] = v.pcdt_partiallyweighted_discounted_ann[yr, r]
 
         # calculate the total damages due to impacts
-        v.currentdam_currentdamages_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r] - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_ann[yr, r]
-        v.currentdampc_percapitacurrentdamages_ann[yr, r] = v.currentdam_currentdamages_ann[yr, r] / p.pop_population_ann[yr, r]
+        v.currentdam_currentdamages_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r] - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_region_ann[yr, r]
+        v.currentdampc_percapitacurrentdamages_ann[yr, r] = v.currentdam_currentdamages_ann[yr, r] / p.pop_population_region_ann[yr, r]
         v.damshare_currentdamagesshare_ann[yr, r] = 100 * v.currentdampc_percapitacurrentdamages_ann[yr, r] / p.cons_percap_aftercosts_ann[yr, r]
 
         # if damages including GDP losses exceed current consumption levels, calculate the share for equity weighting based on the convergence system
-        v.eqwshare_shareofweighteddamages_noconvergence_ann[yr,r] = (v.currentdam_currentdamages_ann[yr, r] + p.lgdp_gdploss_ann[yr,r]) / (p.cons_percap_aftercosts_ann[yr, r] * p.pop_population_ann[yr, r])
+        v.eqwshare_shareofweighteddamages_noconvergence_ann[yr,r] = (v.currentdam_currentdamages_ann[yr, r] + p.lgdp_gdploss_ann[yr,r]) / (p.cons_percap_aftercosts_ann[yr, r] * p.pop_population_region_ann[yr, r])
 
         if p.use_convergence == 1.
             if v.eqwshare_shareofweighteddamages_noconvergence_ann[yr,r] > p.eqwboundn_maxshareofweighteddamages_neighbourhood
@@ -357,32 +357,32 @@ function calc_equityweighting(p, v, d, t, annual_year)
                     v.eqwshare_shareofweighteddamages_ann[yr,r] = p.eqwbound_maxshareofweighteddamages
                 end
 
-                v.excdam_excessdamages_ann[yr, r] =  max(0, v.currentdam_currentdamages_ann[yr, r] + p.lgdp_gdploss_ann[yr,r] - v.eqwshare_shareofweighteddamages_ann[yr,r] * p.cons_percap_aftercosts_ann[yr, r] * p.pop_population_ann[yr, r])
+                v.excdam_excessdamages_ann[yr, r] =  max(0, v.currentdam_currentdamages_ann[yr, r] + p.lgdp_gdploss_ann[yr,r] - v.eqwshare_shareofweighteddamages_ann[yr,r] * p.cons_percap_aftercosts_ann[yr, r] * p.pop_population_region_ann[yr, r])
             else
                 v.excdam_excessdamages_ann[yr, r] =  0
             end
         else
             # use hard boundaries if use_convergence is not set to 1
             v.eqwshare_shareofweighteddamages_ann[yr,r] = min(v.eqwshare_shareofweighteddamages_noconvergence_ann[yr,r], p.eqwbound_maxshareofweighteddamages)
-            v.excdam_excessdamages_ann[yr, r] =  max(0, v.currentdam_currentdamages_ann[yr, r] + p.lgdp_gdploss_ann[yr,r] - v.eqwshare_shareofweighteddamages_ann[yr,r] * p.cons_percap_aftercosts_ann[yr, r] * p.pop_population_ann[yr, r])
+            v.excdam_excessdamages_ann[yr, r] =  max(0, v.currentdam_currentdamages_ann[yr, r] + p.lgdp_gdploss_ann[yr,r] - v.eqwshare_shareofweighteddamages_ann[yr,r] * p.cons_percap_aftercosts_ann[yr, r] * p.pop_population_region_ann[yr, r])
         end
 
         ## Equity weighted impacts (end of page 28, Hope 2009)
 if p.lossinc_includegdplosses == 0. && p.equity_proportion == 0.
-            v.wit_partiallyweighted_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r]  - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_ann[yr, r]
+            v.wit_partiallyweighted_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r]  - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_region_ann[yr, r]
             v.widt_partiallyweighted_discounted_ann[yr, r] = v.wit_partiallyweighted_ann[yr, r] * v.dfc_consumptiondiscountrate_ann[yr, r]
         elseif p.lossinc_includegdplosses == 0. && p.equity_proportion == 1.
-            v.wit_partiallyweighted_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, r]^(1 - p.emuc_utilityconvexity)) * p.pop_population_ann[yr, r]
+            v.wit_partiallyweighted_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, r]^(1 - p.emuc_utilityconvexity)) * p.pop_population_region_ann[yr, r]
             v.widt_partiallyweighted_discounted_ann[yr, r] = v.wit_partiallyweighted_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]
         elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 0.
-            v.wit_partiallyweighted_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r]  - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_ann[yr, r] + p.lgdp_gdploss_ann[yr, r]
+            v.wit_partiallyweighted_ann[yr, r] = (p.cons_percap_aftercosts_ann[yr, r]  - p.rcons_percap_dis_ann[yr, r]) * p.pop_population_region_ann[yr, r] + p.lgdp_gdploss_ann[yr, r]
             v.widt_partiallyweighted_discounted_ann[yr, r] = v.wit_partiallyweighted_ann[yr, r] * v.dfc_consumptiondiscountrate_ann[yr, r]
         elseif p.lossinc_includegdplosses == 1. && p.equity_proportion == 1.
             if v.excdam_excessdamages_ann[yr, r] == 0
-                v.wit_partiallyweighted_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, r]^(1 - p.emuc_utilityconvexity)) * p.pop_population_ann[yr, r]
+                v.wit_partiallyweighted_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, r]^(1 - p.emuc_utilityconvexity)) * p.pop_population_region_ann[yr, r]
                 v.widt_partiallyweighted_discounted_ann[yr, r] = v.wit_partiallyweighted_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]
             else
-                v.wit_partiallyweighted_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - ((1 - v.eqwshare_shareofweighteddamages_ann[yr,r]) * p.cons_percap_aftercosts_ann[yr, r])^(1 - p.emuc_utilityconvexity)) * p.pop_population_ann[yr, r]
+                v.wit_partiallyweighted_ann[yr, r] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts_ann[yr, r]^(1 - p.emuc_utilityconvexity) - ((1 - v.eqwshare_shareofweighteddamages_ann[yr,r]) * p.cons_percap_aftercosts_ann[yr, r])^(1 - p.emuc_utilityconvexity)) * p.pop_population_region_ann[yr, r]
                 v.widt_partiallyweighted_discounted_ann[yr, r] = v.wit_partiallyweighted_ann[yr, r] * v.df_utilitydiscountfactor_ann[yr]  + v.excdam_excessdamages_ann[yr, r] *  v.dfc_consumptiondiscountrate_ann[yr, r]
             end
         end

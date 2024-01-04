@@ -9,8 +9,10 @@ include("../utils/country_tools.jl")
     # Variables
     gdp               = Variable(index=[time, country], unit="\$M")
     gdp_region        = Variable(index=[time, region], unit="\$M")
-    cons_consumption  = Variable(index=[time, region], unit="\$million")
-    cons_percap_consumption = Variable(index=[time, region], unit="\$/person")
+    cons_consumption  = Variable(index=[time, country], unit="\$million")
+    cons_percap_consumption = Variable(index=[time, country], unit="\$/person")
+    cons_consumption_region  = Variable(index=[time, region], unit="\$million")
+    cons_percap_consumption_region = Variable(index=[time, region], unit="\$/person")
     cons_percap_consumption_0 = Variable(index=[region], unit="\$/person")
     yagg_periodspan = Variable(index=[time], unit="year")
     gdp0_initgdp_region = Variable(index=[region], unit="\$M")
@@ -22,7 +24,8 @@ include("../utils/country_tools.jl")
     gdp0_initgdp      = Parameter(index=[country], unit="\$M") # GDP in y_year_0
     save_savingsrate  = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
     pop0_initpopulation_region = Parameter(index=[region], unit="million person")
-    pop_population    = Parameter(index=[time,region], unit="million person")
+    pop_population    = Parameter(index=[time, country], unit="million person")
+    pop_population_region = Parameter(index=[time, region], unit="million person")
 
     # Saturation, used in impacts
     isat0_initialimpactfxnsaturation = Parameter(unit="unitless", default=20.0) # pp34 PAGE09 documentation
@@ -64,12 +67,15 @@ include("../utils/country_tools.jl")
             else
                 v.gdp[t, cc] = v.gdp[t - 1, cc] * (1 + (p.grw_gdpgrowthrate[t, cc] / 100))^(p.y_year[t] - p.y_year[t - 1])
             end
+
+            v.cons_consumption[t, cc] = v.gdp[t, cc] * (1 - p.save_savingsrate / 100)
+            v.cons_percap_consumption[t, cc] = v.cons_consumption[t, cc] / p.pop_population[t, cc]
         end
 
         v.gdp_region[t, :] = countrytoregion(model, sum, v.gdp[t, :])
         for r in d.region
-            v.cons_consumption[t, r] = v.gdp_region[t, r] * (1 - p.save_savingsrate / 100)
-            v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
+            v.cons_consumption_region[t, r] = v.gdp_region[t, r] * (1 - p.save_savingsrate / 100)
+            v.cons_percap_consumption_region[t, r] = v.cons_consumption_region[t, r] / p.pop_population_region[t, r]
         end
     end
 end

@@ -4,11 +4,15 @@
 ## "ssp1" -> 1, "ssp2" -> 2, "ssp5" -> 5, "sspw" -> 10, "ssp234" -> 234
 ## $(rcp) -> rcp$(rcp), $(ssp) -> ssp$(ssp)
 
+include("../utils/country_tools.jl")
+
 @defcomp RCPSSPScenario begin
     region = Index()
 
     rcp = Parameter{Int64}() # like rcp26
     ssp = Parameter{Int64}() # like ssp1
+    rateuniforms = Parameter(index=[time, country])
+    model = Parameter{Model}()
 
     y_year = Parameter(index=[time], unit="year")
     weight_scenarios = Parameter(unit="%") # from -100% to 100%, only used for sspw, rcpw
@@ -28,9 +32,8 @@
     extra_abate_compound = Variable(index=[time])
 
     # SSP scenario values
-    popgrw_populationgrowth = Variable(index=[time, region], unit="%/year") # From p.32 of Hope 2009
-    grw_gdpgrowthrate = Variable(index=[time, region], unit="%/year") # From p.32 of Hope 2009
-
+    popgrw_populationgrowth = Variable(index=[time, country], unit="%/year") # From p.32 of Hope 2009
+    grw_gdpgrowthrate = Variable(index=[time, country], unit="%/year") # From p.32 of Hope 2009
 
     function init(p, v, d)
         # Set the RCP values
@@ -72,6 +75,10 @@
         end
 
         # Set the SSP values
+        readcountrydata = (filepath) -> readcountrydata_it_dist(p.model, filepath, "Region", "year", "rate",
+                                                                row -> TriangularDist(row["rate.lb"], row["rate.ub"], row.rate),
+                                                                rateuniforms)
+
         if p.ssp == 234 || p.ssp == 10
             v.popgrw_populationgrowth[:, :] = (readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP2-pop.csv") +
                                                readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP3-pop.csv") +
@@ -192,6 +199,8 @@ function addrcpsspscenario(model::Model, scenario::String)
     else
         error("Unknown scenario")
     end
+
+    rcpsspscenario[:model] = model
 
     rcpsspscenario
 end
