@@ -201,6 +201,7 @@ function addrcpsspscenario(model::Model, scenario::String)
     end
 
     rcpsspscenario[:model] = model
+    rcpsspscenario[:rateuniforms] = zeros(dim_count(model, :time), dim_count(model, :country))
 
     rcpsspscenario
 end

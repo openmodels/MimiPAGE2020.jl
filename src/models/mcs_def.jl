@@ -66,24 +66,29 @@ function getsim()
         SulphateForcing.d_sulphateforcingbase = TriangularDist(-0.8, -0.2, -0.4)
         SulphateForcing.ind_slopeSEforcing_indirect = TriangularDist(-0.8, 0, -0.4)
 
-        # ClimateTemperature
-        ClimateTemperature.frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation
-        ClimateTemperature.tcr_transientresponse = TriangularDist(0.8, 2.7, 1.8)   # from PAGE-ICE v6.2 documentation
-        ClimateTemperature.alb_emulator_rand = TriangularDist(-1., 1., 0.)
-        ClimateTemperature.ampf_amplification["EU"] = TriangularDist(1.05, 1.53, 1.23)
-        ClimateTemperature.ampf_amplification["USA"] = TriangularDist(1.16, 1.54, 1.32)
-        ClimateTemperature.ampf_amplification["OECD"] = TriangularDist(1.14, 1.31, 1.21)
-        ClimateTemperature.ampf_amplification["USSR"] = TriangularDist(1.41, 1.9, 1.64)
-        ClimateTemperature.ampf_amplification["China"] = TriangularDist(1, 1.3, 1.21)
-        ClimateTemperature.ampf_amplification["SEAsia"] = TriangularDist(0.84, 1.15, 1.04)
-        ClimateTemperature.ampf_amplification["Africa"] = TriangularDist(0.99, 1.42, 1.22)
-        ClimateTemperature.ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
+        # GlobalTemperature
+        GlobalTemperature.frt_warminghalflife = TriangularDist(10, 55, 20)        # from PAGE-ICE v6.2 documentation
+        GlobalTemperature.tcr_transientresponse = TriangularDist(0.8, 2.7, 1.8)   # from PAGE-ICE v6.2 documentation
+        GlobalTemperature.alb_emulator_rand = TriangularDist(-1., 1., 0.)
+
+        # RegionTemperature
+        RegionTemperature.ampf_amplification["EU"] = TriangularDist(1.05, 1.53, 1.23)
+        RegionTemperature.ampf_amplification["USA"] = TriangularDist(1.16, 1.54, 1.32)
+        RegionTemperature.ampf_amplification["OECD"] = TriangularDist(1.14, 1.31, 1.21)
+        RegionTemperature.ampf_amplification["USSR"] = TriangularDist(1.41, 1.9, 1.64)
+        RegionTemperature.ampf_amplification["China"] = TriangularDist(1, 1.3, 1.21)
+        RegionTemperature.ampf_amplification["SEAsia"] = TriangularDist(0.84, 1.15, 1.04)
+        RegionTemperature.ampf_amplification["Africa"] = TriangularDist(0.99, 1.42, 1.22)
+        RegionTemperature.ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
 
         # SeaLevelRise
         SeaLevelRise.s0_initialSL = TriangularDist(0.17, 0.21, 0.19)        # taken from PAGE-ICE v6.20 default
         SeaLevelRise.sltemp_SLtemprise = TriangularDist(0.7, 3., 1.5)       # median sensitivity to GMST changes
         SeaLevelRise.sla_SLbaselinerise = TriangularDist(0.5, 1.5, 1.)      # asymptote for pre-industrial
         SeaLevelRise.sltau_SLresponsetime = Gamma(16.0833333333333333, 24.) # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
+
+        # RCPSSPScenario
+        RCPSSPScenario.rateuniforms = UniformDist(0, 1)
 
         # GDP
         GDP.isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
@@ -252,7 +257,7 @@ function getsim()
              EquityWeighting.act_percap_adaptationcosts, # without equity
              CO2Cycle.c_CO2concentration,
              TotalForcing.ft_totalforcing,
-             ClimateTemperature.rt_g_globaltemperature,
+             GlobalTemperature.rt_g_globaltemperature,
              GDP.cons_percap_consumption,
              Population.pop_population,
              SeaLevelRise.s_sealevel,
@@ -292,7 +297,7 @@ function reformat_RV_outputs(samplesize::Int; output_path::String=joinpath(@__DI
     # time index
     c_co2concentration = load_RV("CO2Cycle_c_CO2concentration", "c_CO2concentration"; output_path=output_path)
     ft      = load_RV("TotalForcing_ft_totalforcing", "ft_totalforcing"; output_path=output_path)
-    rt_g    = load_RV("ClimateTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path=output_path)
+    rt_g    = load_RV("GlobalTemperature_rt_g_globaltemperature", "rt_g_globaltemperature"; output_path=output_path)
     s       = load_RV("SeaLevelRise_s_sealevel", "s_sealevel"; output_path=output_path)
 
     # region index

@@ -50,31 +50,46 @@ function loadparameters_country(model::Model)
     parameters
 end
 
-function getcountryvalue(pageiso, isos, values, aggregator)
+function getcountryvalue(pageiso, isos, values, aggregator; allowmissing=false)
     if pageiso ∈ aggregates
         agginfo = get_aggregateinfo()
         iis = [findfirst(iso .== isos) for iso in agginfo.ISO[agginfo.Aggregate .== pageiso]]
-        aggregator(values[iis])
+        iis = iis[iis .!= nothing]
+        if length(iis) == 0
+            if allowmissing
+                missing
+            else
+                aggregator(values)
+            end
+        else
+            aggregator(values[iis])
+        end
     else
         ii = findfirst(pageiso .== isos)
         if ii == nothing
-            missing
+            if allowmissing
+                missing
+            else
+                aggregator(values)
+            end
         else
             values[ii]
         end
     end
 end
 
-function readcountrydata_it_const(filepath::String, isocol, yearcol, getter, aggregator=mean)
+function myloadcsv(filepath::String)
     # Handle relative paths
     if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
         filepath = joinpath(@__DIR__, "..", "..", filepath)
     end
 
     # Collect information for each year and country
-    df = CSV.read(filepath, DataFrame)
+    CSV.read(filepath, DataFrame)
+end
 
-    readcountrydata_it_const(df, isocol, yearcol, getter, aggregator=mean)
+function readcountrydata_it_const(filepath::String, isocol, yearcol, getter, aggregator=mean)
+    readcountrydata_it_const(myloadcsv(filepath), isocol, yearcol, getter, aggregator=mean)
 end
 
 function readcountrydata_it_const(model::Model, df::DataFrame, isocol, yearcol, valuecol::String, aggregator=mean)
@@ -99,12 +114,7 @@ function readcountrydata_it_const(model::Model, df::DataFrame, isocol, yearcol, 
 end
 
 function readcountrydata_it_dist(model::Model, filepath, isocol, yearcol, ptestcol, row2dist, uniforms, aggregator=mean)
-    # Handle relative paths
-    if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
-        filepath = joinpath(@__DIR__, "..", "..", filepath)
-    end
-
-    df = CSV.read(filepath, DataFrame)
+    df = myloadcsv(filepath)
 
     # Update columns accounting for uncertainty
     if all(uniforms .== 0)
@@ -122,19 +132,42 @@ function readcountrydata_it_dist(model::Model, filepath, isocol, yearcol, ptestc
     readcountrydata_it_const(df, isocol, yearcol, "__value__", aggregator=mean)
 end
 
-function readcountrydata_im_ft(model::Model, filepath::String, isocol, mccol, mc, row2value::Function, aggregator=mean)
-    # Handle relative paths
-    if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
-        filepath = joinpath(@__DIR__, "..", "..", filepath)
-    end
+function readcountrydata_im(model::Model, filepath::String, isocol, mccol, mc, valuecol::String, aggregator=mean)
+    readcountrydata_im(model, myloadcsv(filepath), isocol, mccol, mc, valuecol, aggregator)
+end
 
-    df = CSV.read(filepath, DataFrame)
-
+function im_to_i(df::DataFrame, isocol, mccol, mc)
     if mc == nothing
         df2 = combine(groupby(df, isocol), names(df)[names(df) .!= isocol] .=> mean)
+        for ii in 2:ncol(df)
+            rename!(df2, names(df2)[ii] => names(df)[ii])
+        end
     else
         df2 = df[df[!, mccol] .== mc, :]
     end
+
+    df2
+end
+
+function readcountrydata_i_const(model::Model, df2::DataFrame, isocol, valuecol::String, aggregator=mean)
+    # Collect information for country
+    [getcountryvalue(country, df2[!, isocol], df2[!, valuecol], aggregator) for country in dim_keys(model, :country)]
+end
+
+function readcountrydata_im(model::Model, df::DataFrame, isocol, mccol, mc, valuecol::String, aggregator=mean)
+    if mc == nothing
+        df2 = combine(groupby(df[!, [isocol, valuecol]], isocol), valuecol => mean)
+        rename!(df2, names(df2)[2] => valuecol)
+    else
+        df2 = df[df[!, mccol] .== mc, :]
+    end
+
+    readcountrydata_i_const(model, df2, isocol, valuecol, aggregator)
+end
+
+function readcountrydata_im_ft(model::Model, filepath::String, isocol, mccol, mc, row2value::Function, aggregator=mean)
+    df = myloadcsv(filepath)
+    df2 = im_to_i(df, isocol, mccol, mc)
 
     # Collect information for each year and country
     timexcountry = Matrix{Float64}(undef, dim_count(model, :time), dim_count(model, :country))

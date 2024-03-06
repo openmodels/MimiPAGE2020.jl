@@ -1,7 +1,8 @@
 function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false, page09_sealevelrise::Bool=false)
     # add all the components
     scenario = addrcpsspscenario(m, scenario)
-    climtemp = addclimatetemperature(m, use_seaice)
+    glotemp = addglobaltemperature(m, use_seaice)
+    regtemp = addregiontemperature(m)
     if use_permafrost
         permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
         permafrost_jules = add_comp!(m, PermafrostJULES)
@@ -50,7 +51,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     set_param!(m, :automult_autonomoustechchange, .65)
 
-    addabatementcostsco2(m)
+    abateco2 = addabatementcostsco2(m)
     addabatementcosts(m, :CH4)
     addabatementcosts(m, :N2O)
     addabatementcosts(m, :Lin)
@@ -81,11 +82,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     equityweighting = add_comp!(m, EquityWeighting)
 
     # connect parameters together
-    connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
+    connect_param!(m, :GlobalTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
 
     if use_permafrost
-        permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
-        permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost_sibcasa[:rt_g] = glotemp[:rt_g_globaltemperature]
+        permafrost_jules[:rt_g] = glotemp[:rt_g_globaltemperature]
         permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
         permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
         permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
@@ -97,7 +98,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
 
     connect_param!(m, :CO2Cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
-    connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
+    connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :GlobalTemperature => :rt_g_globaltemperature)
     if use_permafrost
         co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
     end
@@ -107,8 +108,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
 
     connect_param!(m, :CH4Cycle => :e_globalCH4emissions, :ch4emissions => :e_globalCH4emissions)
-    connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-    connect_param!(m, :CH4Cycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    connect_param!(m, :CH4Cycle => :rtl_g0_baselandtemp, :RegionTemperature => :rtl_g0_baselandtemp)
+    connect_param!(m, :CH4Cycle => :rtl_g_landtemperature, :RegionTemperature => :rtl_g_landtemperature)
     if use_permafrost
         ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
     end
@@ -119,8 +120,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
 
     connect_param!(m, :n2ocycle => :e_globalN2Oemissions, :n2oemissions => :e_globalN2Oemissions)
-    connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-    connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :RegionTemperature => :rtl_g0_baselandtemp)
+    connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :RegionTemperature => :rtl_g_landtemperature)
 
     connect_param!(m, :n2oforcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :n2oforcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
@@ -128,13 +129,13 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
 
     connect_param!(m, :LGcycle => :e_globalLGemissions, :LGemissions => :e_globalLGemissions)
-    connect_param!(m, :LGcycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-    connect_param!(m, :LGcycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    connect_param!(m, :LGcycle => :rtl_g0_baselandtemp, :RegionTemperature => :rtl_g0_baselandtemp)
+    connect_param!(m, :LGcycle => :rtl_g_landtemperature, :RegionTemperature => :rtl_g_landtemperature)
 
     connect_param!(m, :LGforcing => :c_LGconcentration, :LGcycle => :c_LGconcentration)
 
     sulfemit[:pse_sulphatevsbase] = scenario[:pse_sulphatevsbase]
-    sulfemit[:area_region] = climtemp[:area_region]
+    sulfemit[:area_region] = regtemp[:area_region]
 
     connect_param!(m, :TotalForcing => :f_CO2forcing, :co2forcing => :f_CO2forcing)
     connect_param!(m, :TotalForcing => :f_CH4forcing, :ch4forcing => :f_CH4forcing)
@@ -142,9 +143,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :TotalForcing => :f_lineargasforcing, :LGforcing => :f_LGforcing)
     totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
     connect_param!(m, :TotalForcing => :fs_sulfateforcing, :SulphateForcing => :fs_sulphateforcing)
-    totalforcing[:area_region] = climtemp[:area_region]
+    totalforcing[:area_region] = regtemp[:area_region]
 
-    connect_param!(m, :SeaLevelRise => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
+    connect_param!(m, :SeaLevelRise => :rt_g_globaltemperature, :GlobalTemperature => :rt_g_globaltemperature)
 
     population[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
 
@@ -153,7 +154,6 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
 
     for allabatement in [
-        (:AbatementCostParametersCO2, :AbatementCostsCO2, :er_CO2emissionsgrowth),
         (:AbatementCostParametersCH4, :AbatementCostsCH4, :er_CH4emissionsgrowth),
         (:AbatementCostParametersN2O, :AbatementCostsN2O, :er_N2Oemissionsgrowth),
         (:AbatementCostParametersLin, :AbatementCostsLin, :er_LGemissionsgrowth)]
@@ -170,7 +170,6 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         connect_param!(m, abatementcosts => :bhi, abatementcostparameters => :bhi)
         connect_param!(m, abatementcosts => :ahi, abatementcostparameters => :ahi)
         connect_param!(m, abatementcosts => :er_emissionsgrowth, :RCPSSPScenario => er_parameter)
-
     end
 
     connect_param!(m, :TotalAbatementCosts => :tc_totalcosts_co2, :AbatementCostsCO2 => :tc_totalcost)
@@ -197,21 +196,21 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :SLRDamages => :imp_actualreductionSLR, :AdaptiveCostsSeaLevel => :imp_adaptedimpacts)
     connect_param!(m, :SLRDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
-    connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :MarketDamages => :rtl_realizedtemperature, :RegionTemperature => :rtl_realizedtemperature)
     connect_param!(m, :MarketDamages => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
     connect_param!(m, :MarketDamages => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
     connect_param!(m, :MarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsEconomic => :atl_adjustedtolerablelevel, ignoreunits=true) # not required for Burke damages
     connect_param!(m, :MarketDamages => :imp_actualreduction, :AdaptiveCostsEconomic => :imp_adaptedimpacts) # not required for Burke damages
     connect_param!(m, :MarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
-    connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :MarketDamagesBurke => :rtl_realizedtemperature, :RegionTemperature => :rtl_realizedtemperature)
     connect_param!(m, :MarketDamagesBurke => :rgdp_per_cap_SLRRemainGDP, :SLRDamages => :rgdp_per_cap_SLRRemainGDP)
     connect_param!(m, :MarketDamagesBurke => :rcons_per_cap_SLRRemainConsumption, :SLRDamages => :rcons_per_cap_SLRRemainConsumption)
     connect_param!(m, :MarketDamagesBurke => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :MarketDamagesBurke => :gdp, :GDP => :gdp)
     connect_param!(m, :MarketDamagesBurke => :pop_population, :Population => :pop_population)
 
-    connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature, :ClimateTemperature => :rtl_realizedtemperature)
+    connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature, :RegionTemperature => :rtl_realizedtemperature)
     if use_page09damages
         connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamages => :rgdp_per_cap_MarketRemainGDP)
         connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamages => :rcons_per_cap_MarketRemainConsumption)
@@ -224,7 +223,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :NonMarketDamages => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
 
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
-    connect_param!(m, :Discontinuity => :rt_g_globaltemperature, :ClimateTemperature => :rt_g_globaltemperature)
+    connect_param!(m, :Discontinuity => :rt_g_globaltemperature, :GlobalTemperature => :rt_g_globaltemperature)
     connect_param!(m, :Discontinuity => :rgdp_per_cap_NonMarketRemainGDP, :NonMarketDamages => :rgdp_per_cap_NonMarketRemainGDP)
     connect_param!(m, :Discontinuity => :rcons_per_cap_NonMarketRemainConsumption, :NonMarketDamages => :rcons_per_cap_NonMarketRemainConsumption)
     connect_param!(m, :Discontinuity => :isatg_saturationmodification, :GDP => :isatg_impactfxnsaturation)

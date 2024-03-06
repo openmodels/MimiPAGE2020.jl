@@ -6,7 +6,8 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
 
     # add all the components
     scenario = addrcpsspscenario(m, scenario)
-    climtemp = addclimatetemperature(m, use_seaice)
+    glotemp = addglobaltemperature(m, use_seaice)
+    regtemp = addregiontemperature(m)
     if use_permafrost
         permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
         permafrost_jules = add_comp!(m, PermafrostJULES)
@@ -28,11 +29,11 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     totalforcing = add_comp!(m, TotalForcing)
 
     # connect parameters together
-    connect_param!(m, :ClimateTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
+    connect_param!(m, :GlobalTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
 
     if use_permafrost
-        permafrost_sibcasa[:rt_g] = climtemp[:rt_g_globaltemperature]
-        permafrost_jules[:rt_g] = climtemp[:rt_g_globaltemperature]
+        permafrost_sibcasa[:rt_g] = glotemp[:rt_g_globaltemperature]
+        permafrost_jules[:rt_g] = glotemp[:rt_g_globaltemperature]
         permafrost[:perm_sib_ce_co2] = permafrost_sibcasa[:perm_sib_ce_co2]
         permafrost[:perm_sib_e_co2] = permafrost_sibcasa[:perm_sib_e_co2]
         permafrost[:perm_sib_ce_ch4] = permafrost_sibcasa[:perm_sib_ce_ch4]
@@ -43,7 +44,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
 
     co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
     co2cycle[:e_globalCO2emissions] = co2emit[:e_globalCO2emissions]
-    co2cycle[:rt_g_globaltemperature] = climtemp[:rt_g_globaltemperature]
+    co2cycle[:rt_g_globaltemperature] = glotemp[:rt_g_globaltemperature]
     if use_permafrost
         co2cycle[:permte_permafrostemissions] = permafrost[:perm_tot_e_co2]
     end
@@ -52,8 +53,8 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
 
     ch4emit[:er_CH4emissionsgrowth] = scenario[:er_CH4emissionsgrowth]
     ch4cycle[:e_globalCH4emissions] = ch4emit[:e_globalCH4emissions]
-    ch4cycle[:rtl_g0_baselandtemp] = climtemp[:rtl_g0_baselandtemp]
-    ch4cycle[:rtl_g_landtemperature] = climtemp[:rtl_g_landtemperature]
+    ch4cycle[:rtl_g0_baselandtemp] = regtemp[:rtl_g0_baselandtemp]
+    ch4cycle[:rtl_g_landtemperature] = regtemp[:rtl_g_landtemperature]
     if use_permafrost
         ch4cycle[:permtce_permafrostemissions] = permafrost[:perm_tot_ce_ch4]
     end
@@ -63,16 +64,16 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
 
     n2oemit[:er_N2Oemissionsgrowth] = scenario[:er_N2Oemissionsgrowth]
     connect_param!(m, :n2ocycle => :e_globalN2Oemissions, :n2oemissions => :e_globalN2Oemissions)
-    connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-    connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    connect_param!(m, :n2ocycle => :rtl_g0_baselandtemp, :RegionTemperature => :rtl_g0_baselandtemp)
+    connect_param!(m, :n2ocycle => :rtl_g_landtemperature, :RegionTemperature => :rtl_g_landtemperature)
 
     connect_param!(m, :n2oforcing => :c_CH4concentration, :CH4Cycle => :c_CH4concentration)
     connect_param!(m, :n2oforcing => :c_N2Oconcentration, :n2ocycle => :c_N2Oconcentration)
 
     lgemit[:er_LGemissionsgrowth] = scenario[:er_LGemissionsgrowth]
     connect_param!(m, :LGcycle => :e_globalLGemissions, :LGemissions => :e_globalLGemissions)
-    connect_param!(m, :LGcycle => :rtl_g0_baselandtemp, :ClimateTemperature => :rtl_g0_baselandtemp)
-    connect_param!(m, :LGcycle => :rtl_g_landtemperature, :ClimateTemperature => :rtl_g_landtemperature)
+    connect_param!(m, :LGcycle => :rtl_g0_baselandtemp, :RegionTemperature => :rtl_g0_baselandtemp)
+    connect_param!(m, :LGcycle => :rtl_g_landtemperature, :RegionTemperature => :rtl_g_landtemperature)
 
     connect_param!(m, :LGforcing => :c_LGconcentration, :LGcycle => :c_LGconcentration)
 
