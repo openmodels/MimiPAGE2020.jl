@@ -78,14 +78,18 @@ function getcountryvalue(pageiso, isos, values, aggregator; allowmissing=false)
     end
 end
 
-function myloadcsv(filepath::String)
+function datapath(filepath::String)
     # Handle relative paths
     if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
         filepath = joinpath(@__DIR__, "..", "..", filepath)
     end
 
+    filepath
+end
+
+function myloadcsv(filepath::String)
     # Collect information for each year and country
-    CSV.read(filepath, DataFrame)
+    CSV.read(datapath(filepath), DataFrame)
 end
 
 function readcountrydata_it_const(filepath::String, isocol, yearcol, getter, aggregator=mean)

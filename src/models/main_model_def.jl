@@ -1,6 +1,11 @@
-function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false, page09_sealevelrise::Bool=false)
+function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false, page09_sealevelrise::Bool=false, use_rffsp::Bool=false)
     # add all the components
     scenario = addrcpsspscenario(m, scenario)
+    if use_rffsp
+        socioscenario = addrffspscenario(m)
+    else
+        socioscenario = scenario
+    end
     glotemp = addglobaltemperature(m, use_seaice)
     regtemp = addregiontemperature(m)
     if use_permafrost
@@ -147,11 +152,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     connect_param!(m, :SeaLevelRise => :rt_g_globaltemperature, :GlobalTemperature => :rt_g_globaltemperature)
 
-    population[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
+    population[:popgrw_populationgrowth] = socioscenario[:popgrw_populationgrowth]
 
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
     connect_param!(m, :GDP => :pop_population_region, :Population => :pop_population_region)
-    gdp[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
+    gdp[:grw_gdpgrowthrate] = socioscenario[:grw_gdpgrowthrate]
 
     for allabatement in [
         (:AbatementCostParametersCH4, :AbatementCostsCH4, :er_CH4emissionsgrowth),
@@ -250,8 +255,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
     connect_param!(m, :EquityWeighting => :yagg_periodspan, :GDP => :yagg_periodspan)
-    equityweighting[:grw_gdpgrowthrate] = scenario[:grw_gdpgrowthrate]
-    equityweighting[:popgrw_populationgrowth] = scenario[:popgrw_populationgrowth]
+    equityweighting[:grw_gdpgrowthrate] = socioscenario[:grw_gdpgrowthrate]
+    equityweighting[:popgrw_populationgrowth] = socioscenario[:popgrw_populationgrowth]
 
     return m
 end
@@ -263,13 +268,13 @@ function initpage(m::Model)
     set_leftover_params!(m, p)
 end
 
-function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false, page09_sealevelrise::Bool=false)
+function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true, use_page09damages::Bool=false; use_page09weights::Bool=false, page09_discontinuity::Bool=false, page09_sealevelrise::Bool=false, use_rffsp::Bool=false)
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
     set_dimension!(m, :country, get_countryinfo().ISO3)
 
-    buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages; use_page09weights=use_page09weights, page09_discontinuity=page09_discontinuity, page09_sealevelrise=page09_sealevelrise)
+    buildpage(m, scenario, use_permafrost, use_seaice, use_page09damages; use_page09weights=use_page09weights, page09_discontinuity=page09_discontinuity, page09_sealevelrise=page09_sealevelrise, use_rffsp=use_rffsp)
 
     # next: add vector and panel example
     initpage(m)
