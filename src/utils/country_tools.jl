@@ -149,7 +149,7 @@ function im_to_i(df::DataFrame, isocol, mccol, mc)
     df2
 end
 
-function readcountrydata_i_const(model::Model, df2::DataFrame, isocol, valuecol::String, aggregator=mean)
+function readcountrydata_i_const(model::Model, df2::DataFrame, isocol::Union{String, Symbol}, valuecol::Union{String, Symbol}, aggregator=mean)
     # Collect information for country
     [getcountryvalue(country, df2[!, isocol], df2[!, valuecol], aggregator) for country in dim_keys(model, :country)]
 end

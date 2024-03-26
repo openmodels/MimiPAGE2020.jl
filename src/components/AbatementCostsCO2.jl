@@ -9,7 +9,7 @@ end
 @defcomp AbatementCostsCO2 begin
     country = Index()
 
-    baselinecarbon = Parameter(index=[time, country], unit="tCO2")
+    baselineemit = Parameter(index=[time, country], unit="tCO2")
     gdp = Parameter(index=[time, country], unit="\$M")
     carbonprice = Parameter(index=[country], unit="\$2010/tCO2")
 
@@ -62,7 +62,7 @@ end
             ac_100_200_co2 * price2frac(pp.carbonprice, 100, 200) +
             ac_200_500_co2 * price2frac(pp.carbonprice, 200, 500) +
             ac_500_inf_co2 * price2frac(pp.carbonprice, 500, Inf) # tCO2
-        rawfractargetabated = -rawabated ./ baselinecarbon[tt,:] # fraction abated
+        rawfractargetabated = -rawabated ./ baselineemit[tt,:] # fraction abated
         # Regularize so not over 1 and goes to 1 as p -> inf
         regfractargetabated = rawfractargetabated ./ (exp.(-pp.carbonprice / 500) + rawfractargetabated)
 

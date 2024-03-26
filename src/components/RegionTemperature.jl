@@ -3,37 +3,54 @@ include("../utils/country_tools.jl")
 using StatsBase
 using Distributions
 
+df_patterns = CSV.read("../data/climate/patterns.csv", DataFrame)
+df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame)
+
 @defcomp RegionTemperature begin
     region = Index()
     country = Index()
 
     # Basic parameters
+    prcile = Parameter()
+
     area = Parameter(index=[country], unit="km2")
     area_e_eartharea = Parameter(unit="km2", default=5.1e8)
     area_region = Variable(index=[region], unit="km2")
 
     # Initial temperature outputs
-    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component
+    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component # XXX
     rtl_0_baselandtemp = Variable(index=[region], unit="degreeC")
     rtl_g0_baselandtemp = Variable(unit="degreeC") # needed for feedback in CH4 and N2O cycles
+
+    # Set by init
+    b0_intercept = Variable(index=[country], unit="degreeC")
+    b1_slope = Variable(index=[country])
 
     # Global outputs
     rto_g_oceantemperature = Variable(index=[time], unit="degreeC")
     rtl_g_landtemperature = Variable(index=[time], unit="degreeC")
 
     # Regional outputs
-    ampf_amplification = Parameter(index=[region])
-
-    rtl_realizedtemperature = Variable(index=[time, region], unit="degreeC")
+    rtl_realizedtemperature = Variable(index=[time, country], unit="degreeC")
 
     function init(p, v, d)
+        if pp.prcile >= 0
+            model = get_pattern(pp.prcile)
+            pattern = df_patterns[df_patterns.model .== model]
+        else
+            pattern = df_patterns_generic
+        end
+
+        vv.b0_intercept = readcountrydata_i_const(model, pattern, :ISO, :intercept)
+        vv.b1_slope = readcountrydata_i_const(model, pattern, :ISO, :slope)
+
         byregion = countrytoregion(model, sum, p.area)
         for rr in d.region
             v.area_region[rr] = byregion[rr]
         end
 
-        for rr in d.region
-            v.rtl_0_baselandtemp[rr] = p.rt_g0_baseglobaltemp * p.ampf_amplification[rr]
+        for cc in d.country
+            v.rtl_0_baselandtemp[tt, cc] = vv.b0_intercept[cc] + vv.b1_slope[cc] * p.rt_g0_baseglobaltemp
         end
 
         # Equation 21 from Hope (2006): initial global land temperature
@@ -41,9 +58,8 @@ using Distributions
     end
 
     function run_timestep(p, v, d, tt)
-        # Adding adjustment, from Hope (2009)
-        for rr in d.region
-            v.rtl_realizedtemperature[tt, rr] = v.rt_g_globaltemperature[tt] * p.ampf_amplification[rr]
+        for cc in d.country
+            v.rtl_realizedtemperature[tt, cc] = vv.b0_intercept[cc] + vv.b1_slope[cc] * v.rt_g_globaltemperature[tt]
         end
 
         # Land average temperature
@@ -75,6 +91,9 @@ end
 
 function addregiontemperature(model::Model)
     climtemp = add_comp!(model, RegionTemperature)
+
+    climtemp[:area] = readcountrydata_i_const(model, get_countryinfo(), :ISO3, :LandArea)
+    climtemp[:prcile] = -1 # means, use the generic number
 
     return climtemp
 end
