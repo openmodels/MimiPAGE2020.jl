@@ -1,0 +1,1043 @@
+colMeans(state.cai)
+colMeans(state.new)
+.2 + .8 * .2
+.2 + .8 * .2 + (1 - .36) * .2
+1 - (1 - .2) * .2
+1 - (1 - .2) * .8
+1 - (1 - 0.36) * .8
+?optim
+?optimize
+theta = 0
+optimize(function(tack) {#
+        vopt * cos(theta - tack) + vwind * cos(tack)#
+    }, c(-pi, pi))
+vopt <- 5 # knots#
+vwind <- 10 # knots
+optimize(function(tack) {#
+        vopt * cos(theta - tack) + vwind * cos(tack)#
+    }, c(-pi, pi))
+tack <- optimize(function(tack) {#
+        -(vopt * cos(theta - tack) + vwind * cos(tack))#
+    }, c(-pi, pi))
+tack
+vopt <- 5 # knots#
+vwind <- 10 # knots#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    tack <- optimize(function(tack) {#
+        -(vopt * cos(theta - tack) + vwind * cos(tack))#
+    }, c(-pi, pi))#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=-tack$objective))#
+}
+pdf
+head(pdf)
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta))
+)
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+library(ggplot2)#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+vopt <- 0 # knots#
+vwind <- 10 # knots#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    tack <- optimize(function(tack) {#
+        -(vopt * cos(theta - tack) + vwind * cos(tack))#
+    }, c(-pi, pi))#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=-tack$objective))#
+}#
+#
+library(ggplot2)#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+vopt <- 10 # knots#
+vwind <- 10 # knots#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    tack <- optimize(function(tack) {#
+        -(vopt * cos(theta - tack) + vwind * cos(tack))#
+    }, c(-pi, pi))#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=-tack$objective))#
+}#
+#
+library(ggplot2)#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+pi / (pi - closehaul)
+closehaul <- pi / 6
+pi / (pi - closehaul)
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+#
+vwind <- 10 # knots#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective)#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout)#
+}#
+#
+library(ggplot2)#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative y axis, and theta=0 is positive y axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+#
+vwind <- 10 # knots#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout)#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative y axis, and theta=0 is positive y axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+#
+vwind <- 10 # knots#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+waveheight.danger <- 30#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 1 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / waveheight.danger) * (waveheight * abs(sin(wavedir - theta)) / waveperiod)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+(vopt / waveheight.danger) * (waveheight * abs(sin(wavedir - theta)) / waveperiod)
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+waveheight.danger <- 30#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 10 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / waveheight.danger) * (waveheight * abs(sin(wavedir - theta)) / waveperiod)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+waveheight.danger <- 30#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 1 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / waveheight.danger) * (waveheight * abs(sin(wavedir - theta)) / waveperiod)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+waveheight.danger <- 30#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 10 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / waveheight.danger) * (waveheight * abs(sin(wavedir - theta)) / waveperiod)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+waveheight.frequency.danger <- 30 # 30 ft per minute#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 1 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / waveheight.frequency.danger) * (waveheight * abs(sin(wavedir - theta)) / (waveperiod / 60))#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+waveheight / (waveperiod / 60)
+sqrt(waveheight / (waveperiod / 60))
+sqrt(waveheight)
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+sqr.waveheight.frequency.danger <- 30^2 # 30 ft per minute#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 1 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / sqrt.waveheight.frequency.danger) * (waveheight^2) * abs(sin(wavedir - theta)) / (waveperiod / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+sqr.waveheight.frequency.danger <- 30^2 # 30 ft per minute#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 1 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / sqr.waveheight.frequency.danger) * (waveheight^2) * abs(sin(wavedir - theta)) / (waveperiod / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+sqr.waveheight.frequency.danger <- 30^2 # 30 ft per minute#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 10 # ft#
+waveperiod <- 2 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / sqr.waveheight.frequency.danger) * (waveheight^2) * abs(sin(wavedir - theta)) / (waveperiod / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+sqr.waveheight.frequency.danger <- 30^2 # 30 ft per minute#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 10 # ft#
+waveperiod <- 60 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / sqr.waveheight.frequency.danger) * (waveheight^2) * abs(sin(wavedir - theta)) / (waveperiod / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+sqr.waveheight.frequency.danger <- 30^2 # 30 ft per minute#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 5 # ft#
+waveperiod <- 10 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / sqr.waveheight.frequency.danger) * (waveheight^2) * abs(sin(wavedir - theta)) / (waveperiod / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+vopt <- 10 # knots#
+sqr.waveheight.frequency.danger <- 30^2 # 30 ft per minute#
+#
+vwind <- 10 # knots#
+wavedir <- pi / 3#
+waveheight <- 10 # ft#
+waveperiod <- 30 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    vopt.adj <- vopt - (vopt / sqr.waveheight.frequency.danger) * (waveheight^2) * abs(sin(wavedir - theta)) / (waveperiod / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta.adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(vopt.adj * cos(theta.adj - tack) + vwind * cos(tack))#
+        }, c(-pi, pi))#
+        vout <- -tack$objective#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+ship_efficiency <- 10 # knots#
+sqr_waveheight_frequency_danger <- 30^2 # 30 ft per minute#
+#
+wind_speed <- 10 # knots#
+wave_direction <- pi / 3#
+wave_height <- 10 # ft#
+wave_period <- 30 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    ship_efficiency_adj <- ship_efficiency - (ship_efficiency / sqr_waveheight_frequency_danger) * (wave_height^2) * abs(sin(wave_direction - theta)) / (wave_period / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta_adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(wind_speed * cos(theta_adj - tack) + wind_speed * cos(tack)) / 2#
+        }, c(-pi, pi))#
+        vout <- -tack$objective * ship_efficiency_adj#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+## Assume wind blowing from negative x axis, and theta=0 is positive x axis#
+#
+library(ggplot2)#
+#
+closehaul <- pi / 6#
+ship_efficiency <- .65 # knots#
+sqr_waveheight_frequency_danger <- 30^2 # 30 ft per minute#
+#
+wind_speed <- 10 # knots#
+wave_direction <- pi / 3#
+wave_height <- 10 # ft#
+wave_period <- 30 # sec#
+#
+pdf <- data.frame()#
+for (theta in seq(-pi, pi, by=.1)) {#
+    ship_efficiency_adj <- ship_efficiency - (ship_efficiency / sqr_waveheight_frequency_danger) * (wave_height^2) * abs(sin(wave_direction - theta)) / (wave_period / 60)#
+#
+    if (theta < -pi + closehaul || theta > pi - closehaul)#
+        vout <- 0#
+    else {#
+        theta_adj <- theta * pi / (pi - closehaul)#
+        tack <- optimize(function(tack) {#
+            -(wind_speed * cos(theta_adj - tack) + wind_speed * cos(tack)) / 2#
+        }, c(-pi, pi))#
+        vout <- -tack$objective * ship_efficiency_adj#
+    }#
+#
+    pdf <- rbind(pdf, data.frame(theta, speed=vout))#
+}#
+#
+ggplot(pdf) +#
+    geom_segment(aes(x=0, y=0, xend=speed*cos(theta), yend=speed*sin(theta)))
+1 - exp(-3)
+1 - exp(-3 / 3)
+10 * exp(-10 / 10)
+10 * exp(0 / 10)
+1 * exp(1 / 10)
+1 * exp(-1 / 10)
+vv = 1:100
+plot(vv, vv * exp(-vv / 10))
+max(vv * exp(-vv / 10))
+which.max(vv * exp(-vv / 10))
+## setwd("~/research/scciams/scc_structural")#
+#
+source("src/data_cleaining_scripts/cleaning_master.R")#
+source("src/analysis/all_scc_lib.R")#
+#
+if (.Platform$OS.type != "unix") {#
+    pdffunc <- grDevices::cairo_pdf#
+} else#
+    pdffunc <- pdf#
+#
+dat$`SCC Year` <- as.numeric(dat$`SCC Year`)#
+#
+dat$log.scc.2020usd <- log(dat$`Central Value ($ per ton CO2)`)#
+dat$log.scc.2020usd[!is.finite(dat$log.scc.2020usd)] <- NA#
+#
+source("src/analysis/damage_funcs_lib.R")#
+#
+## Redo log.scc.synth so I get NAs#
+dat$log.scc.synth <- log(dat$scc.synth)#
+dat <- multivar.prep(dat)
+library(kSamples)
+ad.test(draw ~ branch, data=data.frame(draw=c(rnorm(0, 1e3), rnorm(0, 1e3)), branch=rep(c('A', 'B'), each=1e3)), method='asymptotic')
+ad.test(draw ~ branch, data=data.frame(draw=c(rnorm(1e3, 0, 1), rnorm(1e3, 0, 1)), branch=rep(c('A', 'B'), each=1e3)), method='asymptotic')
+ad.test(draw ~ branch, data=data.frame(draw=c(rnorm(1e3, 1, 1), rnorm(1e3, 0, 1)), branch=rep(c('A', 'B'), each=1e3)), method='asymptotic')
+ad.test(draw ~ branch, data=data.frame(draw=c(rnorm(1e3, 0, 1), rnorm(1e3, 0, 2)), branch=rep(c('A', 'B'), each=1e3)), method='asymptotic')
+cols <- c("Tipping Points", "Tipping Points2", "Persistent / Growth Damages", "Epstein-Zin",#
+          "Ambiguity/Model Uncertainty", "Limitedly-Substitutable Goods", "Inequality Aversion",#
+          "Learning", "Earth system", "TFP Growth", "Population Growth", "Emissions Growth",#
+          "Transient Climate Response", "Carbon Cycle2", "Equilibrium Climate Sensitivity",#
+          "Tipping Point Magnitude", "Damage Function", "Adaptation Rates", "Income Elasticity",#
+          "Constant Discount Rate", "EMUC2", "PRTP2", "Risk Aversion (EZ Utility)",#
+          "Backstop Price?", "Declining Discounting?", "Market Only Damages", "Other Market Failure?",#
+          "sccyearformerge", "discountrate", "log.scc.synth", "missing.scc.synth", "Year")
+length(cols)
+sqrt(length(cols))
+## setwd("~/Library/CloudStorage/GoogleDrive-tahmid@udel.edu/My Drive/Current Losses")#
+## setwd("~/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses")#
+#
+omega <- 0.08#
+#
+qstart <- 1#
+qq <- c(0)#
+for (tt in 1:10)#
+    qq <- c(qq, (1 - omega)*qq[length(qq)] + omega*qstart
+qq
+## setwd("~/Library/CloudStorage/GoogleDrive-tahmid@udel.edu/My Drive/Current Losses")#
+## setwd("~/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses")#
+#
+omega <- 0.08#
+#
+qstart <- 1#
+qq <- c(0)#
+for (tt in 1:10)#
+    qq <- c(qq, (1 - omega)*qq[length(qq)] + omega*qstart)
+qq
+plot(qq)
+## setwd("~/Library/CloudStorage/GoogleDrive-tahmid@udel.edu/My Drive/Current Losses")#
+## setwd("~/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses")#
+#
+omega <- 0.08#
+#
+qstart <- -1#
+qq <- c(0)#
+for (tt in 1:10)#
+    qq <- c(qq, (1 - omega)*qq[length(qq)] + omega*qstart)
+plot(qq)
+qq <- c(0, -0.01)#
+for (tt in 1:9)#
+    qq <- c(qq, (1 + omega) * qq[length(qq)])
+plot(qq)
+omega <- 0.08#
+#
+qq <- c(-0.01)#
+for (tt in 1:9)#
+    qq <- c(qq, (1 - omega)*qq[length(qq)])
+plot(qq)
+df <- data.frame()#
+for (omega in c(0, 0.5, 1, 0.08) {#
+    qq <- c(0, -0.01)#
+    for (tt in 1:9)#
+        qq <- c(qq, (1 - omega)*qq[length(qq)])#
+    df <- rbind(df, data.frame(omega, qq))#
+}
+df <- data.frame()#
+for (omega in c(0, 0.5, 1, 0.08)) {#
+    qq <- c(0, -0.01)#
+    for (tt in 1:9)#
+        qq <- c(qq, (1 - omega)*qq[length(qq)])#
+    df <- rbind(df, data.frame(omega, qq))#
+}
+df
+df <- data.frame()#
+for (omega in c(0, 0.5, 1, 0.08)) {#
+    qq <- c(0, -0.01)#
+    for (tt in 1:9)#
+        qq <- c(qq, (1 - omega)*qq[length(qq)])#
+    df <- rbind(df, data.frame(omega, tt=0:10, qq))#
+}
+library(ggplot2)#
+#
+df <- data.frame()#
+for (omega in c(0, 0.5, 1, 0.08)) {#
+    qq <- c(0, -0.01)#
+    for (tt in 1:9)#
+        qq <- c(qq, (1 - omega)*qq[length(qq)])#
+    df <- rbind(df, data.frame(omega, tt=0:10, qq))#
+}#
+#
+ggplot(df, aes(tt, qq, colour=factor(omega))) +#
+    geom_line()
+qq
+omega
+stats::filter(c(rep(0, 30), rep(-0.01, 30)), (1 - omega)^(0:30), sides=1)[-1:-30]
+df <- data.frame()#
+for (omega in c(0, 0.5, 1, 0.08)) {#
+    qq <- stats::filter(c(rep(0, 30), rep(-0.01, 30)), (1 - omega)^(0:30), sides=1)[-1:-30]#
+    df <- rbind(df, data.frame(omega, tt=-2:5, qq=c(0, 0, qq[1:6])))#
+}
+df
+df$tq <- df$qq + (0:7)*.03
+ggplot(df, aes(tt, tq, colour=factor(omega))) +#
+    geom_line()
+ggplot(df, aes(tt, tq, colour=factor(omega))) +#
+    geom_line(data=data.frame(omega='base', tt=-2:5, tq=(0:7)*.03))#
+    geom_line()
+ggplot(df, aes(tt, tq, colour=factor(omega))) +#
+    geom_line(data=data.frame(omega='base', tt=-2:5, tq=(0:7)*.03)) +#
+    geom_line()
+ggplot(df, aes(tt, 1 + tq, colour=factor(omega))) +#
+    geom_line(data=data.frame(omega='base', tt=-2:5, tq=(0:7)*.03)) +#
+    geom_line()
+df <- data.frame()#
+for (omega in c(0, 0.5, 1, 0.08)) {#
+    qq <- stats::filter(c(rep(0, 30), rep(-0.02, 30)), (1 - omega)^(0:30), sides=1)[-1:-30]#
+    df <- rbind(df, data.frame(omega, tt=-2:5, qq=c(0, 0, qq[1:6])))#
+}#
+df$tq <- df$qq + (0:7)*.03#
+#
+ggplot(df, aes(tt, 1 + tq, colour=factor(omega))) +#
+    geom_line(data=data.frame(omega='base', tt=-2:5, tq=(0:7)*.03)) +#
+    geom_line()
+rlnnorm
+??rlnnorm
+library(googlesheets4)
+sheet = 2
+df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)
+df
+name <- df[2, 2]
+name
+name <- df[2, 2, drop=T]
+name
+df
+df[11:20]
+df[11:20,]
+df[21:30,]
+df[22:26, 5, drop=T]
+sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))
+pdf <- data.frame()#
+for (sheet in 2:20) {#
+    df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)#
+    name <- df[2, 2, drop=T]#
+    percents <- sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))#
+    percents <- 100 * percents / sum(percents)#
+    pdf <- rbind(pdf, data.frame(name, WP=1:5, percents))#
+}
+pdf
+lastnames <- c("Adeluyi", "Aderoju", "Babamaaji", "Diouf", "Davis", "Fournier", "Horney", "Kjellevold", "Le Bris", "Mundaca", "Ngom", "Ndiaye", "Olsen", "Ostrowski", "Ottersen", "Sarre")#
+#
+pdf <- data.frame()#
+for (sheet in 2:17) {#
+    df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)#
+    percents <- sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))#
+    percents <- 100 * percents / sum(percents)#
+    pdf <- rbind(pdf, data.frame(name=lastname[sheet-1], WP=1:5, percents))#
+}
+pdf <- data.frame()#
+for (sheet in 2:17) {#
+    df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)#
+    percents <- sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))#
+    percents <- 100 * percents / sum(percents)#
+    pdf <- rbind(pdf, data.frame(name=lastnames[sheet-1], WP=1:5, percents))#
+}
+ggplot(pdf, aes(lastname, percent, fill=WP)) +#
+    geom_col()
+library(ggplot2)
+ggplot(pdf, aes(lastname, percent, fill=WP)) +#
+    geom_col()
+pdf
+head(pdf)
+ggplot(pdf, aes(name, percent, fill=WP)) +#
+    geom_col()
+ggplot(pdf, aes(name, percents, fill=WP)) +#
+    geom_col()
+ggplot(pdf, aes(name, percents, fill=as.factor(WP))) +#
+    geom_col() + coord_flip()
+pdf <- data.frame()#
+for (sheet in 2:17) {#
+    df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)#
+    percents <- sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))#
+    if (sum(percents) == 0)#
+        percents <- c(0, 0, 100, 0, 0) # Just Marek#
+    percents <- 100 * percents / sum(percents)#
+    pdf <- rbind(pdf, data.frame(name=lastnames[sheet-1], WP=1:5, percents))#
+}#
+#
+ggplot(pdf, aes(name, percents, fill=as.factor(WP))) +#
+    geom_col() + coord_flip()
+pdf <- data.frame()#
+for (sheet in 2:17) {#
+    df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)#
+    percents <- sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))#
+    if (sum(percents) == 0)#
+        percents <- c(0, 0, 100, 0, 0) # Just Marek#
+    percents <- 100 * percents / sum(percents)#
+    pdf <- rbind(pdf, data.frame(name=lastnames[sheet-1], WP=paste0("WP", 1:5), percents))#
+}
+ggplot(pdf, aes(name, percents, fill=WP)) +#
+    geom_col() + coord_flip()
+pdf$WP <- factor(pdf$WP, levels=paste0("WP", 1:5))#
+ggplot(pdf, aes(name, percents, fill=WP)) +#
+    geom_col() + coord_flip()
+pdf$WP <- factor(pdf$WP, levels=rev(paste0("WP", 1:5)))#
+pdf$name <- factor(pdf$name, levels=rev(lastnames))#
+#
+ggplot(pdf, aes(name, percents, fill=WP)) +#
+    geom_col() + coord_flip()
+ggplot(pdf, aes(name, percents, fill=WP)) +#
+    geom_col() + coord_flip() +#
+    scale_fill_manual(breaks=paste0("WP", 1:5), values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e'))
+ggplot(pdf, aes(name, percents / 100, fill=WP)) +#
+    geom_col() + coord_flip() +#
+    scale_fill_manual(breaks=paste0("WP", 1:5), values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e')) +#
+    scale_y_continuous(expand=c(0, 0), labels=scales::percent)
+ggplot(pdf, aes(name, percents / 100, fill=WP)) +#
+    geom_col() + coord_flip() + theme_bw() +#
+    scale_fill_manual(breaks=paste0("WP", 1:5), values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e')) +#
+    scale_y_continuous(expand=c(0, 0), labels=scales::percent)
+pdf <- rbind(pdf, data.frame(name="Rising", WP=paste0("WP", 1:5), percents=c(25, 5, 5, 5, 60)))
+length(lastnames)
+pdf$WP <- factor(pdf$WP, levels=rev(paste0("WP", 1:5)))#
+pdf$name <- factor(pdf$name, levels=rev(lastnames[1:15], "Rising", lastnames[16]))#
+#
+ggplot(pdf, aes(name, percents / 100, fill=WP)) +#
+    geom_col() + coord_flip() + theme_bw() +#
+    scale_fill_manual(breaks=paste0("WP", 1:5), values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e')) +#
+    scale_y_continuous(expand=c(0, 0), labels=scales::percent)
+pdf <- data.frame()#
+for (sheet in 2:17) {#
+    df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)#
+    percents <- sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))#
+    if (sum(percents) == 0)#
+        percents <- c(0, 0, 100, 0, 0) # Just Marek#
+    percents <- 100 * percents / sum(percents)#
+    pdf <- rbind(pdf, data.frame(name=lastnames[sheet-1], WP=paste0("WP", 1:5), percents))#
+}#
+pdf <- rbind(pdf, data.frame(name="Rising", WP=paste0("WP", 1:5), percents=c(25, 5, 5, 5, 60)))#
+#
+pdf$WP <- factor(pdf$WP, levels=rev(paste0("WP", 1:5)))#
+pdf$name <- factor(pdf$name, levels=rev(c(lastnames[1:15], "Rising", lastnames[16])))#
+#
+ggplot(pdf, aes(name, percents / 100, fill=WP)) +#
+    geom_col() + coord_flip() + theme_bw() +#
+    scale_fill_manual(breaks=paste0("WP", 1:5), values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e')) +#
+    scale_y_continuous(expand=c(0, 0), labels=scales::percent)
+20 / 3
+pdf <- data.frame()#
+for (sheet in 2:17) {#
+    df <- read_sheet('https://docs.google.com/spreadsheets/d/1IIvpyelznocikLJyQjQIGH4-bPqAe3Ayr_fOZr55Gtk/view', sheet=sheet)#
+    percents <- sapply(df[22:26, 5, drop=T], function(xx) ifelse(is.null(xx), 0, xx))#
+    if (sum(percents) == 0)#
+        percents <- c(0, 0, 100, 0, 0) # Just Marek#
+    percents <- 100 * percents / sum(percents)#
+    pdf <- rbind(pdf, data.frame(name=lastnames[sheet-1], WP=paste0("WP", 1:5), percents))#
+}#
+pdf <- rbind(pdf, data.frame(name="Rising", WP=paste0("WP", 1:5), percents=c(40, 20/3, 20/3, 20/3, 40)))#
+#
+pdf$WP <- factor(pdf$WP, levels=rev(paste0("WP", 1:5)))#
+pdf$name <- factor(pdf$name, levels=rev(c(lastnames[1:15], "Rising", lastnames[16])))#
+#
+ggplot(pdf, aes(name, percents / 100, fill=WP)) +#
+    geom_col() + coord_flip() + theme_bw() +#
+    scale_fill_manual(breaks=paste0("WP", 1:5), values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e')) +#
+    scale_y_continuous(expand=c(0, 0), labels=scales::percent)
+ggplot(pdf, aes(name, percents / 100, fill=WP)) +#
+    geom_col() + coord_flip() + theme_bw() +#
+    scale_fill_manual(breaks=paste0("WP", 1:5), values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e')) +#
+    scale_y_continuous("Percent of project time (%)", expand=c(0, 0), labels=scales::percent) +#
+    xlab(NULL)
+ggsave("manage.png", width=6.5, height=4)
+ggsave("~/groups/grants/belmont/manage.png", width=6.5, height=4)
+ggsave("~/groups/grants/belmont/manage.png", width=6.5, height=3.5)
+ptri
+library(EnvStats)
+ptry(0, 0, 1, .5)
+ptri(0, 0, 1, .5)
+ptri(.5, 0, 1, .5)
+ptri(.25, 0, 1, .5)
+ptri(.75, 0, 1, .5)
+qtri(.75, 0, 1, .5)
+qtri(1, 0, 1, .5)
+?ptri
+dtri(1, 0, 1, .5)
+dtri(.5, 0, 1, .5)
+dtri(.25, 0, 1, .5)
+dtri(.75, 0, 1, .5)
+dimpact <- rnorm(40)#
+accum <- stats::filter(c(rep(0, 30), dimpact), (1 - .08)^(0:30), sides=1)[-1:-30]
+accum
+length(accum)
+decay <- (1 - 0.08)^(0:30)
+reconstructed_dimpact <- numeric(length(result))
+reconstructed_dimpact <- numeric(length(accum))#
+#
+# Iterate to reconstruct dimpact values#
+for (t in 31:length(accum)) {#
+  reconstructed_dimpact[t] <- accum[t] - sum(reconstructed_dimpact[(t-30):(t-1)] * rev(decay))#
+}
+reconstructed_dimpact
+reconstructed_dimpact <- accum#
+#
+# Iterate to reconstruct dimpact values#
+for (tt in 2:length(accum)) {#
+    reconstructed_dimpact[t] <- accum[t] - sum(reconstructed_dimpact[max(1, (tt-30)):(tt-1)] * rev(decay))#
+}
+warnings()
+tt
+tt = 2
+sum(reconstructed_dimpact[max(1, (tt-30)):(tt-1)] * rev(decay))
+reconstructed_dimpact[max(1, (tt-30)):(tt-1)]
+rev(decay)
+reconstructed_dimpact <- accum#
+#
+# Iterate to reconstruct dimpact values#
+for (tt in 2:length(accum)) {#
+    reconstructed_dimpact[t] <- accum[t] - sum(c(rep(0, 30), reconstructed_dimpact)[(tt-30):(tt-1)] * rev(decay))#
+}
+reconstructed_dimpact <- accum#
+#
+# Iterate to reconstruct dimpact values#
+for (tt in 2:length(accum)) {#
+    reconstructed_dimpact[t] <- accum[t] - sum(c(rep(0, 30), reconstructed_dimpact)[tt:(tt-29)] * rev(decay))#
+}
+for (tt in 2:length(accum)) {#
+    reconstructed_dimpact[t] <- accum[t] - sum(c(rep(0, 30), reconstructed_dimpact)[tt:(tt+29)] * rev(decay))#
+}
+warnings()
+c(rep(0, 30), reconstructed_dimpact)[tt:(tt+29)] * rev(decay)
+c(rep(0, 30), reconstructed_dimpact)[tt:(tt+29)]
+length(c(rep(0, 30), reconstructed_dimpact)[tt:(tt+29)])
+length(rev(decay))
+decay
+reconstructed_dimpact <- accum#
+#
+# Iterate to reconstruct dimpact values#
+for (tt in 2:length(accum)) {#
+    reconstructed_dimpact[t] <- accum[t] - sum(c(rep(0, 30), reconstructed_dimpact)[tt:(tt+29)] * rev(decay[-1]))#
+}
+reconstructed_dimpact
+dimpact
+accum
+tt = 2
+sum(c(rep(0, 30), reconstructed_dimpact)[tt:(tt+29)] * rev(decay[-1]))
+reconstructed_dimpact <- accum#
+#
+# Iterate to reconstruct dimpact values#
+for (tt in 2:length(accum)) {#
+    reconstructed_dimpact[tt] <- accum[tt] - sum(c(rep(0, 30), reconstructed_dimpact)[tt:(tt+29)] * rev(decay[-1]))#
+}
+reconstructed_dimpact
+dimpact - reconstructed_dimpact
+exp(-.01)
+df = read.csv("~/research/coffee2/weather/observations-brazil.csv")
+head(df)
+names(df)
+which(grep(".1$", names(df)))
+grep(".1$", names(df))
+grep("\\.1$", names(df))
+length(names(df))
+df = df[, -grep("\\.1$", names(df))]
+nrow(df)
+head(df)
+unique(df$variety)
+head(df)
+max(table(paste(df$year, df$region, df$variety)))
+head(df)
+save(df, file="~/Dropbox/Climate Change Economics 2024/practica/brazil-coffee.RData")
+head(df)
+df$yield = df$harvested / df$planted
+library(lfe)
+felm(log(yield) ~ above2804 | region)
+felm(log(yield) ~ above2804 | region, data=df)
+head(df)
+df$yield = df$produced / df$harvested
+felm(log(yield) ~ above2804 | region, data=df)
+summarize(felm(log(yield) ~ above2804 | region, data=df))
+summary(felm(log(yield) ~ above2804 | region, data=df))
+df$gdd <- df$above1004 - df$above2804
+summary(felm(log(yield) ~ gdd + above2804 | region, data=df))
+summary(felm(log(yield) ~ gdd + above2804 | region + year, data=df))
+summary(felm(log(yield) ~ gdd + above2804 | region + year : region, data=df))
+felm(log(yield) ~ gdd + above2804 | region + year : region, data=df)
+felm(log(yield) ~ gdd + above2804 | region + year * region, data=df)
+felm(log(yield) ~ gdd + above2804 | region + region : year, data=df)
+mean(df$year)
+?felm
+felm(log(yield) ~ gdd + above2804 | year:region + region, data=df)
+df$region = factor(df$region)
+felm(log(yield) ~ gdd + above2804 | year:region + region, data=df)
+df$year = as.numeric(df$year)
+felm(log(yield) ~ gdd + above2804 | year:region + region, data=df)
+summary(felm(log(yield) ~ gdd + above2804 | year:region + region, data=df))
+summary(felm(log(yield) ~ gdd + above2804 | year:region + region + factor(year), data=df))
+head(df)
+save(df, file="~/Dropbox/Climate Change Economics 2024/practica/brazil-coffee.RData")
+library(dplyr)#
+df %>% group_by(region) %>% summarize(produced=sum(produced))
+stats <- df %>% group_by(region) %>% summarize(produced=sum(produced))
+which.max(stats$produced)
+stats[which.max(stats$produced),]
+?arrange
+quantile(df$produced)
+stats <- df %>% group_by(region) %>% summarize(produced=sum(produced)) %>% arrange(-produced)
+tail(stats)
+quantile(stats$produced)
+df <- subset(df, region %in% stats$region[stats$produced > 1000])
+save(df, file="~/Dropbox/Climate Change Economics 2024/practica/brazil-coffee.RData")
+df <- subset(df, region %in% stats$region[stats$produced > 10000])#
+save(df, file="~/Dropbox/Climate Change Economics 2024/practica/brazil-coffee.RData")
+setwd("~/research/iamup2/MimiPAGE2020.jl/preproc/downscaling")#
+#
+gmst <- read.csv("gmst-annual.csv")#
+#
+bycountry <- data.frame()#
+for (gcm in unique(gmst$model)) {#
+    for (scn in unique(gmst$scenario)) {#
+        print(c(gcm, scn))#
+        filename <- paste0(gcm, '_', scn, '.csv')#
+        if (file.exists(filename)) {#
+            bgs <- read.csv(filename)#
+            bgs$year <- as.numeric(substring(bgs$time, 1, 4))#
+            bycountry <- rbind(bycountry, data.frame(year=bgs$year, model=gcm, scenario=scn, iso=bgs$adm0_a3, temp=bgs$var - 273.15))#
+        }#
+    }#
+}#
+#
+library(dplyr)#
+df <- bycountry %>% left_join(gmst, by=c('year', 'model', 'scenario'))#
+#
+library(lfe)#
+summary(felm(temp ~ iso * gsat, data=df))
+mod <- felm(temp ~ 0 + iso : gsat, data=df)
+coefs <- data.frame()#
+ccs <- coef(mod)
+for (iso in unique(df$iso)) {#
+    coefs <- rbind(coefs, data.frame(ISO=iso, intercept=ccs[names(ccs) == paste0('iso', iso)],#
+                                     slope=ccs[names(ccs) == paste0('iso', iso, ':gsat')]))#
+}
+iso
+ccs
+mod <- felm(temp ~ 0 + iso + iso : gsat, data=df)#
+coefs <- data.frame()#
+ccs <- coef(mod)#
+for (iso in unique(df$iso)) {#
+    coefs <- rbind(coefs, data.frame(ISO=iso, intercept=ccs[names(ccs) == paste0('iso', iso)],#
+                                     slope=ccs[names(ccs) == paste0('iso', iso, ':gsat')]))#
+}
+coefs
+write.csv(coefs, "../../data/climate/patterns_generic.csv", row.names=F)

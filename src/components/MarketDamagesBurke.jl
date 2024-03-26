@@ -1,3 +1,6 @@
+using Interpolations
+using Statistics
+
 @defcomp MarketDamagesBurke begin
     region = Index()
     y_year = Parameter(index=[time], unit="year")
@@ -34,8 +37,24 @@
     isat_ImpactinclSaturationandAdaptation = Variable(index=[time,region], unit="\$")
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit="\$/person")
 
+    # Vulnerability-based shifter coefficients
+    gamma0_burkey_intercept = Parameter()
+    gamma1_burkey_hazard = Parameter()
+    gamma2_burkey_vulnerability = Parameter()
+    gamma3_burkey_copinglack = Parameter()
+    gamma4_burkey_loggdppc = Parameter()
+
+    r1_riskindex_hazard = Parameter(index=[time, country])
+    r2_riskindex_vulnerability = Parameter(index=[time, country])
+    r3_riskindex_copinglack = Parameter(index=[time, country])
+    gdp = Parameter(index=[time, country], unit="\$M")
+    pop_population = Parameter(index=[time, country], unit="million person")
 
     function run_timestep(p, v, d, t)
+
+        ## TODO: Need to use these marginal effect diffs
+        marginal_offset = p.gamma0_burkey_intercept + p.gamma1_burkey_hazard * p.r1_riskindex_hazard[t, :] + p.gamma2_burkey_vulnerability * p.r2_riskindex_vulnerability[t, :] + p.gamma3_burkey_copinglack * r3_riskindex_copinglack[t, :] + p.gamma4_burkey_loggdppc * log(p.gdp[t, :] ./ p.pop_population[t, :])
+        ## NEXT: NEED COUNTRY-LEVEL TEMPERATURES
 
         for r in d.region
 
@@ -45,8 +64,8 @@
 
             # calculate the log change, depending on the number of lags specified
             v.i1log_impactlogchange[t,r] = p.nlag_burke * (p.impf_coeff_lin  * (v.i_burke_regionalimpact[t,r] - p.rtl_abs_0_realizedabstemperature[r]) +
-                                p.impf_coeff_quadr * ((v.i_burke_regionalimpact[t,r] - p.tcal_burke)^2 -
-                                                      (p.rtl_abs_0_realizedabstemperature[r] - p.tcal_burke)^2))
+                                                           p.impf_coeff_quadr * ((v.i_burke_regionalimpact[t,r] - p.tcal_burke)^2 -
+                                                                                 (p.rtl_abs_0_realizedabstemperature[r] - p.tcal_burke)^2))
 
             # calculate the impact at focus region GDP p.c.
             v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange[t,r]))
@@ -86,6 +105,40 @@ function addmarketdamagesburke(model::Model)
 
     # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
     marketdamagesburkecomp[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
+
+    burkey = CSV.read("../data/burkey-estimates.csv", DataFrame)
+    marketdamagesburkecomp[:gamma0_burkey_intercept] = mean(burkey.Intercept)
+    marketdamagesburkecomp[:gamma1_burkey_hazard] = mean(burkey.HA)
+    marketdamagesburkecomp[:gamma2_burkey_vulnerability] = mean(burkey.VU)
+    marketdamagesburkecomp[:gamma3_burkey_copinglack] = mean(burkey.CC)
+    marketdamagesburkecomp[:gamma4_burkey_loggdppc] = mean(burkey.loggdppc)
+
+    informs = CSV.read("../data/inform-combined.csv", DataFrame)
+    r1 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))
+    r2 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))
+    r3 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))
+    for cc in 1:dim_count(model, :country)
+        row = findfirst(informs.ISO .== dim_keys(model, :country)[cc])
+        if row == nothing
+            continue
+        end
+
+        interp1 = LinearInterpolation([2015, 2020, 2023, 2050, 2080], [informs."HA.2015"[row], informs."HA.2020"[row], informs."HA.2023"[row], (informs."HA.2050.Pess"[row] + informs."HA.2050.Opt"[row]) / 2, (informs."HA.2080.Pess"[row] + informs."HA.2080.Opt"[row]) / 2], extrapolation_bc=Line())
+        r1[:, cc] = interp1(dim_keys(model, :time))
+
+        interp2 = LinearInterpolation([2015, 2020, 2023], [informs."VU.2015"[row], informs."VU.2020"[row], informs."VU.2023"[row]], extrapolation_bc=Flat())
+        r2[:, cc] = interp2(dim_keys(model, :time))
+
+        interp3 = LinearInterpolation([2015, 2020, 2023], [informs."CC.2015"[row], informs."CC.2020"[row], informs."CC.2023"[row]], extrapolation_bc=Flat())
+        r3[:, cc] = interp3(dim_keys(model, :time))
+    end
+    r1[ismissing.(r1[:, 1]), :] .= [mean(skipmissing(col)) for col in eachcol(r1)]'
+    r2[ismissing.(r2[:, 1]), :] .= [mean(skipmissing(col)) for col in eachcol(r2)]'
+    r3[ismissing.(r3[:, 1]), :] .= [mean(skipmissing(col)) for col in eachcol(r3)]'
+
+    marketdamagesburkecomp[:r1_riskindex_hazard] = r1
+    marketdamagesburkecomp[:r2_riskindex_vulnerability] = r2
+    marketdamagesburkecomp[:r3_riskindex_copinglack] = r3
 
     return marketdamagesburkecomp
 end

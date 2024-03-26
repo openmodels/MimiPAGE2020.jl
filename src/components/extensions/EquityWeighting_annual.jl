@@ -8,8 +8,8 @@
     y_year_ann = Parameter(index=[year], unit="year")
 
     # Impacts across all gases
-    pop_population = Parameter(index=[time, region], unit="million person")
-    pop_population_ann = Variable(index=[year, region], unit="million person")
+    pop_population_region = Parameter(index=[time, region], unit="million person")
+    pop_population_region_ann = Variable(index=[year, region], unit="million person")
 
     # Total and Per-Capita Abatement and Adaptation Costs
     tct_percap_totalcosts_total = Parameter(index=[time, region], unit="\$/person")
@@ -122,7 +122,7 @@ function interpolate_parameters_equityweighting(p, v, d, t)
             yr = annual_year - 2015 + 1
             for r in d.region
 
-                v.pop_population_ann[yr, r] = p.pop_population[t, r]
+                v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r]
 
                 v.tct_percap_totalcosts_total_ann[yr, r] = p.tct_percap_totalcosts_total[t, r]
                 v.act_adaptationcosts_total_ann[yr, r] = p.act_adaptationcosts_total[t, r]
@@ -146,7 +146,7 @@ function interpolate_parameters_equityweighting(p, v, d, t)
 
             for r in d.region
                 if use_linear
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r] * fraction_timestep + p.pop_population[t - 1, r] * (1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r] * fraction_timestep + p.pop_population_region[t - 1, r] * (1 - fraction_timestep)
 
                     v.tct_percap_totalcosts_total_ann[yr, r] = p.tct_percap_totalcosts_total[t, r] * fraction_timestep + p.tct_percap_totalcosts_total[t - 1, r] * (1 - fraction_timestep)
                     v.act_adaptationcosts_total_ann[yr, r] = p.act_adaptationcosts_total[t, r] * fraction_timestep + p.act_adaptationcosts_total[t - 1, r] * (1 - fraction_timestep)
@@ -158,7 +158,7 @@ function interpolate_parameters_equityweighting(p, v, d, t)
                     v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r] * fraction_timestep + p.grw_gdpgrowthrate[t - 1, r] * (1 - fraction_timestep)
                     v.popgrw_populationgrowth_ann[yr, r] = p.popgrw_populationgrowth[t, r] * fraction_timestep + p.popgrw_populationgrowth[t - 1, r] * (1 - fraction_timestep)
                 elseif use_logburke
-                    ## fully linear (partially because everything except for pop_population causes imaginary numbers (due to negative numbers)).
+                    ## fully linear (partially because everything except for pop_population_region causes imaginary numbers (due to negative numbers)).
                     # linear
                     v.tct_percap_totalcosts_total_ann[yr, r] = p.tct_percap_totalcosts_total[t, r] * fraction_timestep + p.tct_percap_totalcosts_total[t - 1, r] * (1 - fraction_timestep)
                     v.act_adaptationcosts_total_ann[yr, r] = p.act_adaptationcosts_total[t, r] * fraction_timestep + p.act_adaptationcosts_total[t - 1, r] * (1 - fraction_timestep)
@@ -170,7 +170,7 @@ function interpolate_parameters_equityweighting(p, v, d, t)
                     v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r] * fraction_timestep + p.grw_gdpgrowthrate[t - 1, r] * (1 - fraction_timestep)
                     v.popgrw_populationgrowth_ann[yr, r] = p.popgrw_populationgrowth[t, r] * fraction_timestep + p.popgrw_populationgrowth[t - 1, r] * (1 - fraction_timestep)
 
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r] * fraction_timestep + p.pop_population[t - 1, r] * (1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r] * fraction_timestep + p.pop_population_region[t - 1, r] * (1 - fraction_timestep)
 
                 elseif use_logpopulation
                     # linear
@@ -185,7 +185,7 @@ function interpolate_parameters_equityweighting(p, v, d, t)
                     v.popgrw_populationgrowth_ann[yr, r] = p.popgrw_populationgrowth[t, r] * fraction_timestep + p.popgrw_populationgrowth[t - 1, r] * (1 - fraction_timestep)
 
                     # log
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r]^fraction_timestep * p.pop_population[t - 1, r]^(1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r]^fraction_timestep * p.pop_population_region[t - 1, r]^(1 - fraction_timestep)
                 elseif use_logwherepossible
                     # linear
                     v.tct_percap_totalcosts_total_ann[yr, r] = p.tct_percap_totalcosts_total[t, r] * fraction_timestep + p.tct_percap_totalcosts_total[t - 1, r] * (1 - fraction_timestep)
@@ -199,7 +199,7 @@ function interpolate_parameters_equityweighting(p, v, d, t)
                     v.popgrw_populationgrowth_ann[yr, r] = p.popgrw_populationgrowth[t, r] * fraction_timestep + p.popgrw_populationgrowth[t - 1, r] * (1 - fraction_timestep)
 
                     # log
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r]^fraction_timestep * p.pop_population[t - 1, r]^(1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r]^fraction_timestep * p.pop_population_region[t - 1, r]^(1 - fraction_timestep)
                 else
                     error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
                 end
@@ -233,8 +233,8 @@ function calc_equityweighting(p, v, d, t, annual_year, r)
             v.wact_percap_partiallyweighted_ann[yr, rr] = (1 - p.equity_proportion) * v.act_percap_adaptationcosts_ann[yr, rr] + p.equity_proportion * v.eact_percap_weightedadaptationcosts_ann[yr, rr]
         end
 
-        v.pct_partiallyweighted_ann[yr, rr] = v.pct_percap_partiallyweighted_ann[yr, rr] * v.pop_population_ann[yr, rr]
-        v.wact_partiallyweighted_ann[yr, rr] = v.wact_percap_partiallyweighted_ann[yr, rr] * v.pop_population_ann[yr, rr]
+        v.pct_partiallyweighted_ann[yr, rr] = v.pct_percap_partiallyweighted_ann[yr, rr] * v.pop_population_region_ann[yr, rr]
+        v.wact_partiallyweighted_ann[yr, rr] = v.wact_percap_partiallyweighted_ann[yr, rr] * v.pop_population_region_ann[yr, rr]
 
         # Discount rate calculations
         v.dr_discountrate_ann[yr, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (v.grw_gdpgrowthrate_ann[yr, rr] - v.popgrw_populationgrowth_ann[yr, rr])
@@ -249,13 +249,13 @@ function calc_equityweighting(p, v, d, t, annual_year, r)
         if p.equity_proportion == 0
             v.pcdt_partiallyweighted_discounted_ann[yr, rr] = v.pct_partiallyweighted_ann[yr, rr] * v.dfc_consumptiondiscountrate_ann[yr, rr]
             v.wacdt_partiallyweighted_discounted_ann[yr, rr] = v.act_adaptationcosts_total_ann[yr, rr] * v.dfc_consumptiondiscountrate_ann[yr, rr]
-            v.wit_partiallyweighted_ann[yr, rr] = (v.cons_percap_aftercosts_ann[yr, rr] - p.rcons_percap_dis_ann[yr, rr]) * v.pop_population_ann[yr, rr] # equivalent to emuc = 0
+            v.wit_partiallyweighted_ann[yr, rr] = (v.cons_percap_aftercosts_ann[yr, rr] - p.rcons_percap_dis_ann[yr, rr]) * v.pop_population_region_ann[yr, rr] # equivalent to emuc = 0
             v.widt_partiallyweighted_discounted_ann[yr, rr] = v.wit_partiallyweighted_ann[yr, rr] * v.dfc_consumptiondiscountrate_ann[yr] # apply Ramsey discounting
         else
             v.pcdt_partiallyweighted_discounted_ann[yr, rr] = v.pct_partiallyweighted_ann[yr, rr] * v.df_utilitydiscountfactor_ann[yr]
             v.wacdt_partiallyweighted_discounted_ann[yr, rr] = v.wact_partiallyweighted_ann[yr, rr] * v.df_utilitydiscountfactor_ann[yr]
             ## Equity weighted impacts (end of page 28, Hope 2009)
-            v.wit_partiallyweighted_ann[yr, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (v.cons_percap_aftercosts_ann[yr, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, rr]^(1 - p.emuc_utilityconvexity)) * v.pop_population_ann[yr, rr]
+            v.wit_partiallyweighted_ann[yr, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (v.cons_percap_aftercosts_ann[yr, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis_ann[yr, rr]^(1 - p.emuc_utilityconvexity)) * v.pop_population_region_ann[yr, rr]
             v.widt_partiallyweighted_discounted_ann[yr, rr] = v.wit_partiallyweighted_ann[yr, rr] * v.df_utilitydiscountfactor_ann[yr]
         end
         v.pcdat_partiallyweighted_discountedaggregated_ann[yr, rr] = v.pcdt_partiallyweighted_discounted_ann[yr, rr] * v.yagg_periodspan_ann[yr]

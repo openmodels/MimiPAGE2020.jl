@@ -13,7 +13,7 @@
     y_year            = Parameter(index=[time], unit="year")
     grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year") # From p.32 of Hope 2009
     save_savingsrate  = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
-    pop_population    = Parameter(index=[time,region], unit="million person")
+    pop_population_region    = Parameter(index=[time,region], unit="million person")
 
     ###############################################
     # Growth Effects - additional variables and parameters
@@ -72,7 +72,7 @@
             if is_first(t)
                 v.grwnet_realizedgdpgrowth[t,r] = p.grw_gdpgrowthrate[t,r]
                 v.cons_consumption[t, r] = p.gdp_leveleffect[t, r] * (1 - p.save_savingsrate / 100)
-                v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
+                v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population_region[t, r]
                 v.gdp[t, r] = p.gdp_leveleffect[t, r]
             else
                 # if region switch is used, multiply the growth effect by the switch; otherwise, multiply by one
@@ -80,18 +80,18 @@
                 v.gdp[t, r] = v.gdp[t-1, r] * (1 + (v.grwnet_realizedgdpgrowth[t,r]/100))^(p.y_year[t] - p.y_year[t-1])
 
                 v.cons_consumption[t, r] = v.gdp[t, r] * (1 - p.save_savingsrate / 100)
-                v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population[t, r]
+                v.cons_percap_consumption[t, r] = v.cons_consumption[t, r] / p.pop_population_region[t, r]
 
                 # let boundary take effect if pc consumption is in the neighbourhood of the boundary
                 if p.use_convergence == 1.
                     if v.cons_percap_consumption[t,r] >= v.cbabsn_pcconsumptionbound_neighbourhood
                         v.cbreg_regionsatbound[t,r] = 0.
                         v.cons_consumption_noconvergence[t,r] = v.cons_consumption[t,r]
-                        v.cons_percap_consumption_noconvergence[t,r] = v.cons_consumption_noconvergence[t,r] / p.pop_population[t,r]
+                        v.cons_percap_consumption_noconvergence[t,r] = v.cons_consumption_noconvergence[t,r] / p.pop_population_region[t,r]
                     else
                         # calculate the consumption level if there was no convergence system
                         v.cons_consumption_noconvergence[t,r] = v.cons_consumption_noconvergence[t - 1, r] * (1 + (v.grwnet_realizedgdpgrowth[t,r] / 100))^(p.y_year[t] - p.y_year[t - 1])
-                        v.cons_percap_consumption_noconvergence[t,r] = v.cons_consumption_noconvergence[t,r] / p.pop_population[t,r]
+                        v.cons_percap_consumption_noconvergence[t,r] = v.cons_consumption_noconvergence[t,r] / p.pop_population_region[t,r]
 
                         # send the pc cconsumption on a logistic path convergenging against the bound
                         v.cons_percap_consumption[t,r] = v.cbabsn_pcconsumptionbound_neighbourhood - 0.5 * v.cbaux1_pcconsumptionbound_auxiliary1 +
@@ -101,7 +101,7 @@
                                                                                         (v.cons_percap_consumption_noconvergence[t,r] - v.cbabsn_pcconsumptionbound_neighbourhood)))
 
                     # recalculate all variables accordingly
-                        v.cons_consumption[t, r] = v.cons_percap_consumption[t,r] * p.pop_population[t,r]
+                        v.cons_consumption[t, r] = v.cons_percap_consumption[t,r] * p.pop_population_region[t,r]
                         v.gdp[t, r] = v.cons_consumption[t, r] / (1 - p.save_savingsrate / 100)
                         v.grwnet_realizedgdpgrowth[t,r] = 100 * ((v.gdp[t, r] / v.gdp[t - 1, r])^(1 / (p.y_year[t] - p.y_year[t - 1])) - 1)
 
@@ -113,7 +113,7 @@
                         v.cons_percap_consumption[t,r] = p.cbabs_pcconsumptionbound
 
                         # recalculate all variables accordingly
-                        v.cons_consumption[t, r] = v.cons_percap_consumption[t,r] * p.pop_population[t,r]
+                        v.cons_consumption[t, r] = v.cons_percap_consumption[t,r] * p.pop_population_region[t,r]
                         v.gdp[t, r] = v.cons_consumption[t, r] / (1 - p.save_savingsrate / 100)
                         v.grwnet_realizedgdpgrowth[t,r] = 100 * ((v.gdp[t, r] / v.gdp[t - 1, r])^(1 / (p.y_year[t] - p.y_year[t - 1])) - 1)
 

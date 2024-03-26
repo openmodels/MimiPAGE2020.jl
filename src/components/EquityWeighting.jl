@@ -6,7 +6,7 @@
     y_year_0 = Parameter(unit="year")
 
     # Impacts across all gases
-    pop_population = Parameter(index=[time, region], unit="million person")
+    pop_population_region = Parameter(index=[time, region], unit="million person")
 
     # Total and Per-Capita Abatement and Adaptation Costs
     tct_percap_totalcosts_total = Parameter(index=[time, region], unit="\$/person")
@@ -119,8 +119,8 @@
                 v.wact_percap_partiallyweighted[tt, rr] = (1 - p.equity_proportion) * p.act_percap_adaptationcosts[tt, rr] + p.equity_proportion * v.eact_percap_weightedadaptationcosts[tt, rr]
             end
 
-            v.pct_partiallyweighted[tt, rr] = v.pct_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
-            v.wact_partiallyweighted[tt, rr] = v.wact_percap_partiallyweighted[tt, rr] * p.pop_population[tt, rr]
+            v.pct_partiallyweighted[tt, rr] = v.pct_percap_partiallyweighted[tt, rr] * p.pop_population_region[tt, rr]
+            v.wact_partiallyweighted[tt, rr] = v.wact_percap_partiallyweighted[tt, rr] * p.pop_population_region[tt, rr]
 
             if p.discfix_fixediscountrate != 0.
                 v.dr_discountrate[tt, rr] = p.discfix_fixediscountrate
@@ -146,7 +146,7 @@
                 v.wacdt_partiallyweighted_discounted[tt, rr] = p.act_adaptationcosts_total[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
 
                 v.wit_percap_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr]) # equivalent to emuc = 0
-                v.wit_equityweightedimpact[tt, rr] = v.wit_percap_equityweightedimpact[tt, rr] * p.pop_population[tt, rr]
+                v.wit_equityweightedimpact[tt, rr] = v.wit_percap_equityweightedimpact[tt, rr] * p.pop_population_region[tt, rr]
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.dfc_consumptiondiscountrate[tt] # apply Ramsey discounting
             else
                 v.pcdt_partiallyweighted_discounted[tt, rr] = v.pct_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]
@@ -154,7 +154,7 @@
 
                 ## Equity weighted impacts (end of page 28, Hope 2009)
                 v.wit_percap_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity))
-                v.wit_equityweightedimpact[tt, rr] = v.wit_percap_equityweightedimpact[tt, rr] * p.pop_population[tt, rr]
+                v.wit_equityweightedimpact[tt, rr] = v.wit_percap_equityweightedimpact[tt, rr] * p.pop_population_region[tt, rr]
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountfactor[tt]
             end
 

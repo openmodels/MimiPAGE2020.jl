@@ -3,7 +3,7 @@
     year = Index()
 
     # Total Adaptation Costs
-    pop_population_ann = Parameter(index=[year, region], unit="million person")
+    pop_population_region_ann = Parameter(index=[year, region], unit="million person")
     ac_adaptationcosts_economic_ann = Parameter(index=[year, region], unit="\$million")
     ac_adaptationcosts_noneconomic_ann = Parameter(index=[year, region], unit="\$million")
     ac_adaptationcosts_sealevelrise_ann = Parameter(index=[year, region], unit="\$million")
@@ -33,6 +33,6 @@ function calc_totaladaptationcosts(p, v, d, t, annual_year, r)
     yr = annual_year - 2015 + 1 # + 1 because of 1-based indexing in Julia
 
     v.act_adaptationcosts_total_ann[yr,r] = p.ac_adaptationcosts_economic_ann[yr,r] + p.ac_adaptationcosts_sealevelrise_ann[yr,r] + p.ac_adaptationcosts_noneconomic_ann[yr,r]
-    v.act_percap_adaptationcosts_ann[yr,r] = v.act_adaptationcosts_total_ann[yr,r] / p.pop_population_ann[yr,r]
+    v.act_percap_adaptationcosts_ann[yr,r] = v.act_adaptationcosts_total_ann[yr,r] / p.pop_population_region_ann[yr,r]
 end
 
