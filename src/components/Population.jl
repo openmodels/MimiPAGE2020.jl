@@ -7,7 +7,7 @@ include("../utils/country_tools.jl")
     # Parameters
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
-    popgrw_populationgrowth = Parameter(index=[time, region], unit="%/year") # From p.32 of Hope 2009
+    popgrw_populationgrowth = Parameter(index=[time, country], unit="%/year") # From p.32 of Hope 2009
     pop0_initpopulation = Parameter(index=[country], unit="million person") # Population in y_year_0
 
     # Variables
@@ -26,13 +26,13 @@ include("../utils/country_tools.jl")
         for cc in d.country
             # Eq.28 in Hope 2002 (defined for GDP, but also applies to population)
             if is_first(tt)
-                v.pop_population[tt, cc] = v.pop0_initpopulation_region[cc] * (1 + p.popgrw_populationgrowth[tt, cc] / 100)^(p.y_year[tt] - p.y_year_0)
+                v.pop_population[tt, cc] = p.pop0_initpopulation[cc] * (1 + p.popgrw_populationgrowth[tt, cc] / 100)^(p.y_year[tt] - p.y_year_0)
             else
                 v.pop_population[tt, cc] = v.pop_population[tt - 1, cc] * (1 + p.popgrw_populationgrowth[tt, cc] / 100)^(p.y_year[tt] - p.y_year[tt - 1])
             end
         end
 
-        v.pop_population_region[t, :] = countrytoregion(model, sum, v.pop_population[t, :])
+        v.pop_population_region[tt, :] = countrytoregion(model, sum, v.pop_population[tt, :])
     end
 end
 

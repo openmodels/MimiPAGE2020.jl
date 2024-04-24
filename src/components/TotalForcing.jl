@@ -20,7 +20,7 @@
         v.ft_totalforcing[tt] = p.f_CO2forcing[tt] + p.f_CH4forcing[tt] + p.f_N2Oforcing[tt] + p.f_lineargasforcing[tt] + p.exf_excessforcing[tt]
 
         # Grand total forcing
-        v.fant_anthroforcing[tt] = v.ft_totalforcing[tt] + sum(p.area .* p.fs_sulfateforcing[tt, :]) / p.area_e_eartharea
+        v.fant_anthroforcing[tt] = v.ft_totalforcing[tt] + sum(p.area_region .* p.fs_sulfateforcing[tt, :]) / p.area_e_eartharea
     end
 end
 

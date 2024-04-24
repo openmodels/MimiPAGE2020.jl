@@ -2,6 +2,7 @@
     region = Index()
 
     # Basic information
+    model = Parameter{Model}()
     y_year = Parameter(index=[time], unit="year")
     y_year_0 = Parameter(unit="year")
 
@@ -35,8 +36,8 @@
 
     # Discount rates
     ptp_timepreference = Parameter(unit="%/year", default=1.0333333333333334) # <0.1,1, 2>
-    grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year")
-    popgrw_populationgrowth = Parameter(index=[time, region], unit="%/year")
+    grw_gdpgrowthrate = Parameter(index=[time, country], unit="%/year")
+    popgrw_populationgrowth = Parameter(index=[time, country], unit="%/year")
 
     dr_discountrate = Variable(index=[time, region], unit="%/year")
     yp_yearsperiod = Variable(index=[time], unit="year") # defined differently from yagg
@@ -101,6 +102,9 @@
             v.df_utilitydiscountfactor[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
         end
 
+        grw_gdpgrowthrate_region = countrytoregion(p.model, mean, p.grw_gdpgrowthrate[tt, :])
+        popgrw_populationgrowth_region = countrytoregion(p.model, mean, p.popgrw_populationgrowth[tt, :])
+
         for rr in d.region
 
             ## Gas Costs Accounting
@@ -125,7 +129,7 @@
             if p.discfix_fixediscountrate != 0.
                 v.dr_discountrate[tt, rr] = p.discfix_fixediscountrate
             else
-                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, rr] - p.popgrw_populationgrowth[tt, rr])
+                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (grw_gdpgrowthrate_region[rr] - popgrw_populationgrowth_region[rr])
             end
 
             if is_first(tt)
@@ -188,4 +192,10 @@
         # Total effect of climate change
         v.te_totaleffect = min(v.td_totaldiscountedimpacts + v.tpc_totalaggregatedcosts + v.tac_totaladaptationcosts, p.civvalue_civilizationvalue)
     end
+end
+
+function addequityweighting(model::Model)
+    equityweighting = add_comp!(model, EquityWeighting)
+    equityweighting[:model] = model
+    equityweighting
 end

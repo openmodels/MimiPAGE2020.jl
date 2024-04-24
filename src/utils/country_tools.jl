@@ -31,8 +31,21 @@ function countrytoregion(model::Model, combine::F, bycountry...) where {F <: Fun
     countries = dim_keys(model, :country)
     for region in dim_keys(model, :region)
         indexes = [findfirst(country .== countries) for country in countrymapping[region]]
-        value = combine([bycountry[jj][indexes] for jj in 1:length(bycountry)]...)
+        value = combine([bycountry[jj][indexes[indexes .!= nothing]] for jj in 1:length(bycountry)]...)
         push!(result, value)
+    end
+
+    result
+end
+
+function regiontocountry(model::Model, byregion)
+    countrymapping = get_countrymapping()
+    countries = dim_keys(model, :country)
+    regions = dim_keys(model, :region)
+    result = NaN * zeros(length(countries))
+    for rr in 1:length(regions)
+        indexes = [findfirst(country .== countries) for country in countrymapping[regions[rr]]]
+        result[indexes[indexes .!= nothing]] .= byregion[rr]
     end
 
     result
@@ -92,8 +105,8 @@ function myloadcsv(filepath::String)
     CSV.read(datapath(filepath), DataFrame)
 end
 
-function readcountrydata_it_const(filepath::String, isocol, yearcol, getter, aggregator=mean)
-    readcountrydata_it_const(myloadcsv(filepath), isocol, yearcol, getter, aggregator=mean)
+function readcountrydata_it_const(filepath::String, isocol, yearcol, getter; aggregator=mean)
+    readcountrydata_it_const(myloadcsv(filepath), isocol, yearcol, getter, aggregator)
 end
 
 function readcountrydata_it_const(model::Model, df::DataFrame, isocol, yearcol, valuecol::String, aggregator=mean)
@@ -114,7 +127,7 @@ function readcountrydata_it_const(model::Model, df::DataFrame, isocol, yearcol, 
         row.__value__ = row2value(row)
     end
 
-    readcountrydata_it_const(df, isocol, yearcol, "__value__", aggregator=mean)
+    readcountrydata_it_const(df, isocol, yearcol, "__value__", aggregator)
 end
 
 function readcountrydata_it_dist(model::Model, filepath, isocol, yearcol, ptestcol, row2dist, uniforms, aggregator=mean)
@@ -133,7 +146,7 @@ function readcountrydata_it_dist(model::Model, filepath, isocol, yearcol, ptestc
         end
     end
 
-    readcountrydata_it_const(df, isocol, yearcol, "__value__", aggregator=mean)
+    readcountrydata_it_const(model, df, isocol, yearcol, "__value__", aggregator)
 end
 
 function readcountrydata_im(model::Model, filepath::String, isocol, mccol, mc, valuecol::String, aggregator=mean)
@@ -153,9 +166,31 @@ function im_to_i(df::DataFrame, isocol, mccol, mc)
     df2
 end
 
+function readcountrydata_i_const(model::Model, filepath::String, isocol::Union{String, Symbol}, valuecol::Union{String, Symbol}, aggregator=mean)
+    readcountrydata_i_const(model, myloadcsv(filepath), isocol, valuecol, aggregator)
+end
+
 function readcountrydata_i_const(model::Model, df2::DataFrame, isocol::Union{String, Symbol}, valuecol::Union{String, Symbol}, aggregator=mean)
     # Collect information for country
     [getcountryvalue(country, df2[!, isocol], df2[!, valuecol], aggregator) for country in dim_keys(model, :country)]
+end
+
+function readcountrydata_i_dist(model::Model, filepath::String, isocol, ptestcol, row2dist, uniforms, aggregator=mean)
+    df = myloadcsv(filepath)
+
+    # Update columns accounting for uncertainty
+    if all(uniforms .== 0)
+        df.__value__ = df[!, ptestcol]
+    else
+        df.__value__ = zeros(Float64, nrow(df))
+        for row in eachrow(df)
+            dist = row2dist(row)
+            jj = findfirst(dim_keys(model, :country) .== row[isocol])
+            row.__value__ = quantile(dist, uniforms[ii, jj])
+        end
+    end
+
+    readcountrydata_i_const(model, df, isocol, "__value__", aggregator)
 end
 
 function readcountrydata_im(model::Model, df::DataFrame, isocol, mccol, mc, valuecol::String, aggregator=mean)

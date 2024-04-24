@@ -11,6 +11,7 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
     country = Index()
 
     # Basic parameters
+    model = Parameter{Model}()
     prcile = Parameter()
 
     area = Parameter(index=[country], unit="km2")
@@ -19,38 +20,43 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
 
     # Initial temperature outputs
     rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component # XXX
-    rtl_0_baselandtemp = Variable(index=[region], unit="degreeC")
+    rtl_0_baselandtemp = Variable(index=[country], unit="degreeC")
     rtl_g0_baselandtemp = Variable(unit="degreeC") # needed for feedback in CH4 and N2O cycles
 
     # Set by init
     b0_intercept = Variable(index=[country], unit="degreeC")
     b1_slope = Variable(index=[country])
+    rtl_0_realizedtemperature_absolute = Parameter(index=[country], unit="degreeC")
+    rtl_0_realizedtemperature_change = Parameter(index=[country], unit="degreeC")
 
     # Global outputs
+    rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
     rto_g_oceantemperature = Variable(index=[time], unit="degreeC")
     rtl_g_landtemperature = Variable(index=[time], unit="degreeC")
 
-    # Regional outputs
-    rtl_realizedtemperature = Variable(index=[time, country], unit="degreeC")
+    # Country and region outputs
+    rtl_realizedtemperature_absolute = Variable(index=[time, country], unit="degreeC")
+    rtl_realizedtemperature_change = Variable(index=[time, country], unit="degreeC")
+    rtl_realizedtemperature_region = Variable(index=[time, region], unit="degreeC")
 
     function init(p, v, d)
-        if pp.prcile >= 0
-            model = get_pattern(pp.prcile)
-            pattern = df_patterns[df_patterns.model .== model]
+        if p.prcile >= 0
+            gcm = get_pattern(p.prcile)
+            pattern = df_patterns[df_patterns.model .== gcm]
         else
             pattern = df_patterns_generic
         end
 
-        vv.b0_intercept = readcountrydata_i_const(model, pattern, :ISO, :intercept)
-        vv.b1_slope = readcountrydata_i_const(model, pattern, :ISO, :slope)
+        v.b0_intercept[:] = readcountrydata_i_const(p.model, pattern, :ISO, :intercept)
+        v.b1_slope[:] = readcountrydata_i_const(p.model, pattern, :ISO, :slope)
 
-        byregion = countrytoregion(model, sum, p.area)
+        byregion = countrytoregion(p.model, sum, p.area)
         for rr in d.region
             v.area_region[rr] = byregion[rr]
         end
 
         for cc in d.country
-            v.rtl_0_baselandtemp[tt, cc] = vv.b0_intercept[cc] + vv.b1_slope[cc] * p.rt_g0_baseglobaltemp
+            v.rtl_0_baselandtemp[cc] = v.b0_intercept[cc] + v.b1_slope[cc] * p.rt_g0_baseglobaltemp
         end
 
         # Equation 21 from Hope (2006): initial global land temperature
@@ -59,14 +65,17 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
 
     function run_timestep(p, v, d, tt)
         for cc in d.country
-            v.rtl_realizedtemperature[tt, cc] = vv.b0_intercept[cc] + vv.b1_slope[cc] * v.rt_g_globaltemperature[tt]
+            v.rtl_realizedtemperature_absolute[tt, cc] = v.b0_intercept[cc] + v.b1_slope[cc] * p.rt_g_globaltemperature[tt]
+            v.rtl_realizedtemperature_change[tt, cc] = v.rtl_realizedtemperature_absolute[tt, cc] - p.rtl_0_realizedtemperature_absolute[cc] + p.rtl_0_realizedtemperature_change[cc]
         end
 
+        v.rtl_realizedtemperature_region[tt, :] .= countrytoregion(p.model, mean, v.rtl_realizedtemperature_change[tt, :])
+
         # Land average temperature
-        v.rtl_g_landtemperature[tt] = sum(v.rtl_realizedtemperature[tt, :]' .* p.area') / sum(p.area)
+        v.rtl_g_landtemperature[tt] = sum(v.rtl_realizedtemperature_change[tt, :]' .* p.area') / sum(p.area)
 
         # Ocean average temperature
-        v.rto_g_oceantemperature[tt] = (p.area_e_eartharea * v.rt_g_globaltemperature[tt] - sum(p.area) * v.rtl_g_landtemperature[tt]) / (p.area_e_eartharea - sum(p.area))
+        v.rto_g_oceantemperature[tt] = (p.area_e_eartharea * p.rt_g_globaltemperature[tt] - sum(p.area) * v.rtl_g_landtemperature[tt]) / (p.area_e_eartharea - sum(p.area))
     end
 end
 
@@ -92,8 +101,11 @@ end
 function addregiontemperature(model::Model)
     climtemp = add_comp!(model, RegionTemperature)
 
+    climtemp[:model] = model
     climtemp[:area] = readcountrydata_i_const(model, get_countryinfo(), :ISO3, :LandArea)
     climtemp[:prcile] = -1 # means, use the generic number
+    climtemp[:rtl_0_realizedtemperature_absolute] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
+    climtemp[:rtl_0_realizedtemperature_change] = regiontocountry(model, readpagedata(model, "data/rtl_0_realizedtemperature.csv"))
 
     return climtemp
 end

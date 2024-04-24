@@ -20,7 +20,7 @@ include("../utils/country_tools.jl")
     # Parameters
     y_year_0          = Parameter(unit="year")
     y_year            = Parameter(index=[time], unit="year")
-    grw_gdpgrowthrate = Parameter(index=[time, region], unit="%/year") # From p.32 of Hope 2009
+    grw_gdpgrowthrate = Parameter(index=[time, country], unit="%/year") # From p.32 of Hope 2009
     gdp0_initgdp      = Parameter(index=[country], unit="\$M") # GDP in y_year_0
     save_savingsrate  = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
     pop0_initpopulation_region = Parameter(index=[region], unit="million person")
@@ -39,7 +39,7 @@ include("../utils/country_tools.jl")
 
         v.isatg_impactfxnsaturation = p.isat0_initialimpactfxnsaturation * (1 - p.save_savingsrate / 100)
         for rr in d.region
-            v.cons_percap_consumption_0[rr] = (p.gdp0_initgdp_region[rr] / p.pop0_initpopulation_region[rr]) * (1 - p.save_savingsrate / 100)
+            v.cons_percap_consumption_0[rr] = (v.gdp0_initgdp_region[rr] / p.pop0_initpopulation_region[rr]) * (1 - p.save_savingsrate / 100)
         end
     end
 

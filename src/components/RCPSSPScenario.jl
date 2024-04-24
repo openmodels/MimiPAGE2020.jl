@@ -11,7 +11,7 @@ include("../utils/country_tools.jl")
 
     rcp = Parameter{Int64}() # like rcp26
     ssp = Parameter{Int64}() # like ssp1
-    rateuniforms = Parameter(index=[time, country])
+    rateuniforms = Parameter(index=[country])
     model = Parameter{Model}()
 
     y_year = Parameter(index=[time], unit="year")
@@ -77,26 +77,26 @@ include("../utils/country_tools.jl")
         # Set the SSP values
         readcountrydata = (filepath) -> readcountrydata_it_dist(p.model, filepath, "Region", "year", "rate",
                                                                 row -> TriangularDist(row["rate.lb"], row["rate.ub"], row.rate),
-                                                                rateuniforms)
+                                                                p.rateuniforms)
 
         if p.ssp == 234 || p.ssp == 10
             v.popgrw_populationgrowth[:, :] = (readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP2-pop.csv") +
                                                readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP3-pop.csv") +
                                                readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP4-pop.csv")) / 3
-            v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth + (readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP2_gdppc.csv") +
-                                                                     readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP3_gdppc.csv") +
-                                                                     readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP4_gdppc.csv")) / 3
+            v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth[:, :] + (readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP2-gdppc.csv") +
+                                                                     readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP3-gdppc.csv") +
+                                                                     readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP4-gdppc.csv")) / 3
             if p.ssp == 10
                 v.popgrw_populationgrowth[:, :] =
                     weighted_scenario(readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP1-pop.csv"), v.popgrw_populationgrowth[:, :],
                                       readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP5-pop.csv"), p.weight_scenarios)
-                v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth +
-                    weighted_scenario(readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP1_gdppc.csv"), v.grw_gdpgrowthrate[:, :],
-                                      readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP5_gdppc.csv"), p.weight_scenarios)
+                v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth[:, :] +
+                    weighted_scenario(readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP1-gdppc.csv"), v.grw_gdpgrowthrate[:, :],
+                                      readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP5-gdppc.csv"), p.weight_scenarios)
             end
         else
             v.popgrw_populationgrowth[:, :] = readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP$(p.ssp)-pop.csv")
-            v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth + readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP$(p.ssp)_gdppc.csv")
+            v.grw_gdpgrowthrate[:, :] = v.popgrw_populationgrowth[:, :] + readcountrydata("data/ssps/ssp2.0-IIASA GDP-SSP$(p.ssp)-gdppc.csv")
         end
     end
 
@@ -201,7 +201,7 @@ function addrcpsspscenario(model::Model, scenario::String)
     end
 
     rcpsspscenario[:model] = model
-    rcpsspscenario[:rateuniforms] = zeros(dim_count(model, :time), dim_count(model, :country))
+    rcpsspscenario[:rateuniforms] = zeros(dim_count(model, :country))
 
     rcpsspscenario
 end

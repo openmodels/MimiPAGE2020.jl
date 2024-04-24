@@ -8,6 +8,13 @@ library(splines)
 library(nnls)
 
 df <- read_excel("1665743477883-V3.4-NGFS-Phase-3/Downscaled_data.xlsx")
+
+## Get baseline emissions in 2015
+baseline <- df %>% filter(Variable %in% c("Emissions|CO2|Energy", "Emissions|CO2|Industrial Processes")) %>%
+    group_by(Model, Scenario, Region) %>% summarize(count=length(`2015`), co2=sum(`2015`)) %>%
+    group_by(Region) %>% summarize(co2mu=mean(co2), co2sd=sd(co2))
+write.csv(baseline, "../../data/e0_baselineCO2emissions_country.csv", row.names=F)
+
 quantile(df[df$Variable == "Price|Carbon", -1:-5], na.rm=T) # 0, so no negative prices
 df$`2010`[df$Variable == "Price|Carbon"]
 
