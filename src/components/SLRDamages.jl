@@ -34,20 +34,20 @@
     rcons_per_cap_SLRRemainConsumption = Variable(index=[time, country], unit="\$/person")
     rgdp_per_cap_SLRRemainGDP = Variable(index=[time, country], unit="\$/person")
 
-
     function run_timestep(p, v, d, t)
-        slrmm = p.s_sealevel * 1000
-        damage_noadapt = p.alpha_noadapt * slrmm + p.beta_noadapt * slrmm^2
-        damage_optimal = p.alpha_optimal * slrmm + p.beta_optimal * slrmm^2
-
-        v.d_slr[t, :] = damage_noadapt * (1 - p.saf_slradaptfrac) + damage_optimal * p.saf_slradaptfrac
-        v.d_percap_slr[t, :] = v.d_slr[t, :] / (p.pop_population[t, :] * 1e6)
+        slrmm = p.s_sealevel[t] * 1000
 
         for cc in d.country
+            damage_noadapt = p.alpha_noadapt[cc] * slrmm + p.beta_noadapt[cc] * slrmm^2
+            damage_optimal = p.alpha_optimal[cc] * slrmm + p.beta_optimal[cc] * slrmm^2
+
+            v.d_slr[t, cc] = damage_noadapt * (1 - p.saf_slradaptfrac[t, cc]) + damage_optimal * p.saf_slradaptfrac[t, cc]
+            v.d_percap_slr[t, cc] = v.d_slr[t, cc] / (p.pop_population[t, cc] * 1e6)
+
             v.cons_percap_aftercosts[t, cc] = p.cons_percap_consumption[t, cc] - p.tct_per_cap_totalcostspercap[t, cc] - p.act_percap_adaptationcosts[t, cc]
 
-            if (v.cons_percap_aftercosts[t, cc] < 0.01 * p.cons_percap_consumption_0[1])
-                v.cons_percap_aftercosts[t, cc] = 0.01 * p.cons_percap_consumption_0[1]
+            if (v.cons_percap_aftercosts[t, cc] < 0.01 * p.cons_percap_consumption_0[cc])
+                v.cons_percap_aftercosts[t, cc] = 0.01 * p.cons_percap_consumption_0[cc]
             end
 
             v.gdp_percap_aftercosts[t,cc] = v.cons_percap_aftercosts[t, cc] / (1 - p.save_savingsrate / 100)
@@ -65,11 +65,11 @@ end
 function addslrdamages(model::Model)
     SLRDamagescomp = add_comp!(model, SLRDamages)
 
-    SLRDamagescomp[:alpha_noadapt] = readcountrydata_im(model, "damages/slremul.csv", :adm0, :bs, nothing, "alpha.damage.noadapt", values -> 0.)
-    SLRDamagescomp[:beta_noadapt] = readcountrydata_im(model, "damages/slremul.csv", :adm0, :bs, nothing, "beta.damage.noadapt", values -> 0.)
-    SLRDamagescomp[:alpha_optimal] = readcountrydata_im(model, "damages/slremul.csv", :adm0, :bs, nothing, "alpha.damage.optimal", values -> 0.)
-    SLRDamagescomp[:beta_optimal] = readcountrydata_im(model, "damages/slremul.csv", :adm0, :bs, nothing, "beta.damage.optimal", values -> 0.)
-    SLRDamagescomp[:saf_slradaptfrac] = Matrix(0.5, dim_count(model, :time), dim_count(model, :country))
+    SLRDamagescomp[:alpha_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.damage.noadapt", values -> 0.)
+    SLRDamagescomp[:beta_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.damage.noadapt", values -> 0.)
+    SLRDamagescomp[:alpha_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.damage.optimal", values -> 0.)
+    SLRDamagescomp[:beta_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.damage.optimal", values -> 0.)
+    SLRDamagescomp[:saf_slradaptfrac] = 0.5 * ones(dim_count(model, :time), dim_count(model, :country))
 
     return SLRDamagescomp
 end

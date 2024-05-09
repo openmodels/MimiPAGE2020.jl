@@ -14,10 +14,9 @@ include("../utils/country_tools.jl")
     rtl_0_realizedtemperature_absolute = Parameter(index=[country], unit="degreeC")
 
     # tolerability and impact variables from PAGE damages that Burke damages also require
-    rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, region], unit="\$/person")
-    rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, region], unit="\$/person")
+    rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, country], unit="\$/person")
+    rgdp_per_cap_SLRRemainGDP = Parameter(index=[time, country], unit="\$/person")
     save_savingsrate = Parameter(unit="%", default=15.)
-    wincf_weightsfactor_market = Parameter(index=[region], unit="")
     ipow_MarketIncomeFxnExponent = Parameter(default=0.0)
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
 
@@ -28,17 +27,16 @@ include("../utils/country_tools.jl")
     nlag_burke = Parameter(default=1.) # Yumashev et al. (2019) allow for one or two lags
 
     i1log_impactlogchange = Variable(index=[time, country]) # intermediate variable for computation
-    i1log_impactlogchange_region = Variable(index=[time, region]) # intermediate variable for computation
 
     # impact variables from PAGE damages that Burke damages also require
     isatg_impactfxnsaturation = Parameter(unit="unitless")
-    rcons_per_cap_MarketRemainConsumption = Variable(index=[time, region], unit="\$/person")
-    rgdp_per_cap_MarketRemainGDP = Variable(index=[time, region], unit="\$/person")
-    iref_ImpactatReferenceGDPperCap = Variable(index=[time, region])
-    igdp_ImpactatActualGDPperCap = Variable(index=[time, region])
+    rcons_per_cap_MarketRemainConsumption = Variable(index=[time, country], unit="\$/person")
+    rgdp_per_cap_MarketRemainGDP = Variable(index=[time, country], unit="\$/person")
+    iref_ImpactatReferenceGDPperCap = Variable(index=[time, country])
+    igdp_ImpactatActualGDPperCap = Variable(index=[time, country])
 
-    isat_ImpactinclSaturationandAdaptation = Variable(index=[time,region], unit="\$")
-    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,region], unit="\$/person")
+    isat_ImpactinclSaturationandAdaptation = Variable(index=[time,country], unit="\$")
+    isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,country], unit="\$/person")
 
     # Vulnerability-based shifter coefficients
     gamma0_burkey_intercept = Parameter()
@@ -66,33 +64,29 @@ include("../utils/country_tools.jl")
             v.i1log_impactlogchange[t,cc] = p.nlag_burke * (p.impf_coeff_lin  * (p.rtl_realizedtemperature_absolute[t,cc] - p.rtl_0_realizedtemperature_absolute[cc] + delta_temp[cc]) +
                                                             p.impf_coeff_quadr * ((p.rtl_realizedtemperature_absolute[t,cc] + delta_temp[cc] - p.tcal_burke)^2 -
                                                                                   (p.rtl_0_realizedtemperature_absolute[cc] - p.tcal_burke)^2))
-        end
 
-        v.i1log_impactlogchange_region[t, :] = countrytoregion(p.model, mean, v.i1log_impactlogchange[t,:])
-
-        for r in d.region
             # calculate the impact at focus region GDP p.c.
-            v.iref_ImpactatReferenceGDPperCap[t,r] = 100 * p.wincf_weightsfactor_market[r] * (1 - exp(v.i1log_impactlogchange_region[t,r]))
+            v.iref_ImpactatReferenceGDPperCap[t, cc] = 100 * (1 - exp(v.i1log_impactlogchange[t, cc]))
 
             # calculate impacts at actual GDP
-            v.igdp_ImpactatActualGDPperCap[t,r] = v.iref_ImpactatReferenceGDPperCap[t,r] *
-                (p.rgdp_per_cap_SLRRemainGDP[t,r] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
+            v.igdp_ImpactatActualGDPperCap[t, cc] = v.iref_ImpactatReferenceGDPperCap[t, cc] *
+                (p.rgdp_per_cap_SLRRemainGDP[t, cc] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_MarketIncomeFxnExponent
 
             # send impacts down a logistic path if saturation threshold is exceeded
-            if v.igdp_ImpactatActualGDPperCap[t,r] < p.isatg_impactfxnsaturation
-                v.isat_ImpactinclSaturationandAdaptation[t,r] = v.igdp_ImpactatActualGDPperCap[t,r]
+            if v.igdp_ImpactatActualGDPperCap[t, cc] < p.isatg_impactfxnsaturation
+                v.isat_ImpactinclSaturationandAdaptation[t, cc] = v.igdp_ImpactatActualGDPperCap[t, cc]
             else
-                v.isat_ImpactinclSaturationandAdaptation[t,r] = p.isatg_impactfxnsaturation +
+                v.isat_ImpactinclSaturationandAdaptation[t, cc] = p.isatg_impactfxnsaturation +
                     ((100 - p.save_savingsrate) - p.isatg_impactfxnsaturation) *
-                    ((v.igdp_ImpactatActualGDPperCap[t,r] - p.isatg_impactfxnsaturation) /
+                    ((v.igdp_ImpactatActualGDPperCap[t, cc] - p.isatg_impactfxnsaturation) /
                     (((100 - p.save_savingsrate) - p.isatg_impactfxnsaturation) +
-                    (v.igdp_ImpactatActualGDPperCap[t,r] -
+                    (v.igdp_ImpactatActualGDPperCap[t, cc] -
                     p.isatg_impactfxnsaturation)))
             end
 
-            v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r] = (v.isat_ImpactinclSaturationandAdaptation[t,r] / 100) * p.rgdp_per_cap_SLRRemainGDP[t,r]
-            v.rcons_per_cap_MarketRemainConsumption[t,r] = p.rcons_per_cap_SLRRemainConsumption[t,r] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t,r]
-            v.rgdp_per_cap_MarketRemainGDP[t,r] = v.rcons_per_cap_MarketRemainConsumption[t,r] / (1 - p.save_savingsrate / 100)
+            v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t, cc] = (v.isat_ImpactinclSaturationandAdaptation[t, cc] / 100) * p.rgdp_per_cap_SLRRemainGDP[t, cc]
+            v.rcons_per_cap_MarketRemainConsumption[t, cc] = p.rcons_per_cap_SLRRemainConsumption[t, cc] - v.isat_per_cap_ImpactperCapinclSaturationandAdaptation[t, cc]
+            v.rgdp_per_cap_MarketRemainGDP[t, cc] = v.rcons_per_cap_MarketRemainConsumption[t, cc] / (1 - p.save_savingsrate / 100)
         end
 
     end
@@ -131,9 +125,6 @@ function addmarketdamagesburke(model::Model)
 
     marketdamagesburke[:model] = model
     marketdamagesburke[:rtl_0_realizedtemperature_absolute] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
-
-    # fix the current bug which implements the regional weights from SLR and discontinuity also for market and non-market damages (where weights should be uniformly one)
-    marketdamagesburke[:wincf_weightsfactor_market] = readpagedata(model, "data/wincf_weightsfactor_market.csv")
 
     burkey = CSV.read("../data/burkey-estimates.csv", DataFrame)
     marketdamagesburke[:gamma0_burkey_intercept] = mean(burkey.Intercept)

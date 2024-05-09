@@ -11,13 +11,12 @@
 
     # Total and Per-Capita Abatement and Adaptation Costs
     tct_percap_totalcosts_total = Parameter(index=[time, region], unit="\$/person")
-    act_adaptationcosts_total = Parameter(index=[time, region], unit="\$million")
     act_percap_adaptationcosts = Parameter(index=[time, region], unit="\$/person")
 
     # Consumption
     cons_percap_consumption = Parameter(index=[time, region], unit="\$/person") # Called "CONS_PER_CAP"
-    cons_percap_consumption_0 = Parameter(index=[region], unit="\$/person")
-    cons_percap_aftercosts = Parameter(index=[time, region], unit="\$/person")
+    cons_percap_consumption_0_region = Parameter(index=[region], unit="\$/person")
+    cons_percap_aftercosts = Parameter(index=[time, country], unit="\$/person")
 
     # Calculation of weighted costs
     emuc_utilityconvexity = Parameter(unit="none", default=1.1666666666666667)
@@ -57,7 +56,7 @@
     wacdt_partiallyweighted_discounted = Variable(index=[time, region], unit="\$million")
 
     # Equity weighted impact totals
-    rcons_percap_dis = Parameter(index=[time, region], unit="\$/person")
+    rcons_percap_dis = Parameter(index=[time, country], unit="\$/person")
 
     wit_equityweightedimpact = Variable(index=[time, region], unit="\$million")
     wit_percap_equityweightedimpact = Variable(index=[time, region], unit="\$million")
@@ -104,15 +103,17 @@
 
         grw_gdpgrowthrate_region = countrytoregion(p.model, mean, p.grw_gdpgrowthrate[tt, :])
         popgrw_populationgrowth_region = countrytoregion(p.model, mean, p.popgrw_populationgrowth[tt, :])
+        cons_percap_aftercosts_region = countrytoregion(p.model, mean, p.cons_percap_aftercosts[tt, :])
+        rcons_percap_dis_region = countrytoregion(p.model, mean, p.rcons_percap_dis[tt, :])
 
         for rr in d.region
 
             ## Gas Costs Accounting
             # Weighted costs (Page 23 of Hope 2009)
-            v.wtct_percap_weightedcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr] < 0.01 * p.cons_percap_consumption_0[1] ? 0.01 * p.cons_percap_consumption_0[1] : p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr])^(1 - p.emuc_utilityconvexity))
+            v.wtct_percap_weightedcosts[tt, rr] = ((p.cons_percap_consumption_0_region[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr] < 0.01 * p.cons_percap_consumption_0_region[1] ? 0.01 * p.cons_percap_consumption_0_region[1] : p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr])^(1 - p.emuc_utilityconvexity))
 
             # Add these into consumption
-            v.eact_percap_weightedadaptationcosts[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr] < 0.01 * p.cons_percap_consumption_0[1] ? 0.01 * p.cons_percap_consumption_0[1] : p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr])^(1 - p.emuc_utilityconvexity))
+            v.eact_percap_weightedadaptationcosts[tt, rr] = ((p.cons_percap_consumption_0_region[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr] < 0.01 * p.cons_percap_consumption_0_region[1] ? 0.01 * p.cons_percap_consumption_0_region[1] : p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr])^(1 - p.emuc_utilityconvexity))
 
             # Do partial weighting
             if p.equity_proportion == 0
@@ -147,9 +148,9 @@
             # Discounted costs
             if p.equity_proportion == 0
                 v.pcdt_partiallyweighted_discounted[tt, rr] = v.pct_partiallyweighted[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
-                v.wacdt_partiallyweighted_discounted[tt, rr] = p.act_adaptationcosts_total[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
+                v.wacdt_partiallyweighted_discounted[tt, rr] = p.wact_partiallyweighted[tt, rr] * v.dfc_consumptiondiscountrate[tt, rr]
 
-                v.wit_percap_equityweightedimpact[tt, rr] = (p.cons_percap_aftercosts[tt, rr] - p.rcons_percap_dis[tt, rr]) # equivalent to emuc = 0
+                v.wit_percap_equityweightedimpact[tt, rr] = (cons_percap_aftercosts_region[rr] - rcons_percap_dis_region[rr]) # equivalent to emuc = 0
                 v.wit_equityweightedimpact[tt, rr] = v.wit_percap_equityweightedimpact[tt, rr] * p.pop_population_region[tt, rr]
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.dfc_consumptiondiscountrate[tt] # apply Ramsey discounting
             else
@@ -157,7 +158,7 @@
                 v.wacdt_partiallyweighted_discounted[tt, rr] = v.wact_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]
 
                 ## Equity weighted impacts (end of page 28, Hope 2009)
-                v.wit_percap_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_aftercosts[tt, rr]^(1 - p.emuc_utilityconvexity) - p.rcons_percap_dis[tt, rr]^(1 - p.emuc_utilityconvexity))
+                v.wit_percap_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0_region[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (cons_percap_aftercosts_region[rr]^(1 - p.emuc_utilityconvexity) - rcons_percap_dis_region[rr]^(1 - p.emuc_utilityconvexity))
                 v.wit_equityweightedimpact[tt, rr] = v.wit_percap_equityweightedimpact[tt, rr] * p.pop_population_region[tt, rr]
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountfactor[tt]
             end
