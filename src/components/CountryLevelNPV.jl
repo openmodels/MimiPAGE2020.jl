@@ -80,7 +80,7 @@
             if p.discfix_fixediscountrate != 0.
                 v.dr_discountrate[tt, cc] = p.discfix_fixediscountrate
             else
-                v.dr_discountrate[tt, cc] = p.ptp_timepreference + p.emuc_utilityconvexity * (grw_gdpgrowthrate[cc] - popgrw_populationgrowth[cc])
+                v.dr_discountrate[tt, cc] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, cc] - p.popgrw_populationgrowth[tt, cc])
             end
 
             if is_first(tt)
@@ -97,7 +97,7 @@
 
             # Discounted costs
             v.pcdt_partiallyweighted_discounted[tt, cc] = v.pct_partiallyweighted[tt, cc] * v.dfc_consumptiondiscountrate[tt, cc]
-            v.wacdt_partiallyweighted_discounted[tt, cc] = p.wact_partiallyweighted[tt, cc] * v.dfc_consumptiondiscountrate[tt, cc]
+            v.wacdt_partiallyweighted_discounted[tt, cc] = v.wact_partiallyweighted[tt, cc] * v.dfc_consumptiondiscountrate[tt, cc]
 
             v.wit_percap_equityweightedimpact[tt, cc] = (p.cons_percap_aftercosts[tt, cc] - p.rcons_percap_dis[tt, cc]) # equivalent to emuc = 0
             v.wit_equityweightedimpact[tt, cc] = v.wit_percap_equityweightedimpact[tt, cc] * p.pop_population[tt, cc]
