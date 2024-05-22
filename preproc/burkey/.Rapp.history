@@ -1,0 +1,1325 @@
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * (temp - 20), gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=mean(gdppc), lin1=mean(lin1), lin2=mean(lin2), kaw=mean(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * (temp - 20), gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1*dt - .1 * (temp - 20), gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * (temp - 20), gdppc=exp(c(0, gg[-1])))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+library(tidyverse)#
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1*dt - .1*dt:temp, gdppc=exp(c(0, gg[-1])))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1*dt - .1*dt*temp, gdppc=exp(c(0, gg[-1])))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * (temp - 20), gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * (temp - 20)^2, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * (temp - 20)^3, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * abs(temp - 20) * (temp - 20)^2, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * sign(temp - 20) * (temp - 20)^2, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:1000) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * sign(temp - 20) * (temp - 20)^2, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * sign(temp - 20) * (temp - 20)^2, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * sign(temp - 20) * (temp - 20)^2, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1 * sign(temp - 20) * (temp - 20)^2, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=.1*dt - .1*dt*temp, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1*dt - .1*dt*temp, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz'))
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz')) +#
+    scale_y_log10()
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1*dt - .1*dt*temp, gdppc=exp(c(0, gg[-1])))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz')) +#
+    scale_y_log10()
+pdf <- data.frame()#
+for (mc in 1:100) {#
+    df <- tibble(time=1:100, temp=rnorm(100, 20, 1), dt=c(NA, diff(temp)), gg=-.1*dt - .1*dt*temp, gdppc=exp(cumsum(c(0, gg[-1]))))#
+    printmod <- mc == 1#
+    df$lin1 <- project.linear(df, F, printmod)#
+    df$lin2 <- project.linear(df, T)#
+    df$kaw <- project.kaw(df, printmod)#
+    pdf <- rbind(pdf, cbind(mc=mc, df))#
+}#
+#
+pdf2 <- pdf %>% group_by(time) %>% summarize(gdppc=median(gdppc), lin1=median(lin1), lin2=median(lin2), kaw=median(kaw))#
+#
+ggplot(pdf2, aes(time)) +#
+    geom_point(aes(y=gdppc, colour='Truth')) +#
+    geom_line(aes(y=lin1, colour='Linear, no persistence')) +#
+    geom_line(aes(y=lin2, colour='Linear, full persistence')) +#
+    geom_line(aes(y=kaw, colour='Linear, Kalkuhl & Wenz')) +#
+    scale_y_log10()
+df <- data.frame(year=c(1980, 2008, 2030), area=c(207368, 366375, 496805))#
+library(ggplot2)#
+#
+ggplot(df, aes(year, area)) +#
+    geom_line()
+twh <- read.csv("/Users/admin/Dropbox/Climate Change Economics 2024/week7/global-energy-substitution.csv")
+head(twh)
+twh$total <- rowSums(twh[, -1:-3])
+twh
+head(twh)
+tail(twh)
+subset(twh, year >= 1980)
+subset(twh, Year >= 1980)
+twh$area <- twh$total * (366375 / twh$total[twh$Year == 2008])
+ggplot(df, aes(year, area)) +#
+    geom_line() +#
+    geom_line(data=twh, aes(Year))
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative') +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData'))
+)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData'))
+rate <- (log(twh$area[twh$Year == 2022]) - log(twh$area[twh$Year == 1980])) / (2022 - 1980)
+rate
+proj <- data.frame(year=2022:2300, area=twh$area[twh$Year == 2022] * exp(rate * ((2022:2300) - 2022)))
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated'))
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    xlim(1980, 2030)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated'))
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) +#
+    xlim(1980, 2030)
+proj
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) +#
+    xlim(1980, 2030)
+148326000 / 1e8
+proj$area / 1e8
+df <- data.frame(year=c(1980, 2008, 2030), area=c(207368, 366375, 496805))#
+#
+twh <- read.csv("/Users/admin/Dropbox/Climate Change Economics 2024/week7/global-energy-substitution.csv")#
+twh$total <- rowSums(twh[, -1:-3])#
+twh$area <- twh$total * (366375 / twh$total[twh$Year == 2008])#
+#
+rate <- (log(twh$area[twh$Year == 2022]) - log(twh$area[twh$Year == 1980])) / (2022 - 1980)#
+#
+proj <- data.frame(year=2022:2300, area=twh$area[twh$Year == 2022] * exp(rate * ((2022:2300) - 2022)))#
+#
+library(ggplot2)#
+#
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()#
+#
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) +#
+    xlim(1980, 2030)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000)#
+    #xlim(1980, 2030)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) +#
+    xlim(1980, 2300)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) +#
+    xlim(1980, 2300) + theme_bw()
+proj <- data.frame(year=2022:2350, area=twh$area[twh$Year == 2022] * exp(rate * ((2022:2350) - 2022)))#
+#
+library(ggplot2)#
+#
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()#
+#
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) +#
+    xlim(1980, 2350) + theme_bw()
+proj <- data.frame(year=2022:2370, area=twh$area[twh$Year == 2022] * exp(rate * ((2022:2370) - 2022)))#
+#
+library(ggplot2)#
+#
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()#
+#
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) +#
+    xlim(1980, 2370) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) + xlab(NULL) + ylab("Solar panel area (km²)")#
+    xlim(1980, 2370) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=148326000) + xlab(NULL) + ylab("Solar panel area (km²)") +#
+    xlim(1980, 2370) + theme_bw()
+ggplot(df, aes(year, area / 148326000)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    xlab(NULL) + scale_y_continuous("Solar panel area (km²)", labels=scales::percent) +#
+    xlim(1980, 2370) + theme_bw()
+ggplot(df, aes(year, area / 148326000)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=1) +#
+    xlab(NULL) + scale_y_continuous("Solar panel area (% land area)", labels=scales::percent) +#
+    xlim(1980, 2370) + theme_bw()
+df <- data.frame(year=c(1980, 2008, 2030), area=c(207368, 366375, 496805))#
+#
+twh <- read.csv("/Users/admin/Dropbox/Climate Change Economics 2024/week7/global-energy-substitution.csv")#
+twh$total <- rowSums(twh[, -1:-3])#
+twh$area <- twh$total * (366375 / twh$total[twh$Year == 2008])#
+#
+rate <- (log(twh$area[twh$Year == 2022]) - log(twh$area[twh$Year == 1980])) / (2022 - 1980)#
+#
+proj <- data.frame(year=2022:2370, area=twh$area[twh$Year == 2022] * exp(rate * ((2022:2370) - 2022)))#
+#
+library(ggplot2)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_none(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_none(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_blank(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_blank(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_blank(data=subset(proj, year <= 2030), aes(colour='Extrapolated')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_blank(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_blank(data=subset(proj, year <= 2030), aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_blank(data=twh, aes(Year)) + #, colour='OurWorldInData (Energy use)')) +#
+    geom_blank(data=subset(proj, year <= 2030)) + #, aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year), colour='OurWorldInData (Energy use)')) +#
+    geom_blank(data=subset(proj, year <= 2030)) + #, aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_blank(data=subset(proj, year <= 2030)) + #, aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_line(data=subset(proj, year <= 2100), aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2100) + theme_bw()
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_blank(data=twh, aes(Year)) + #, colour='OurWorldInData (Energy use)')) +#
+    geom_blank(data=subset(proj, year <= 2030)) + #, aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw() + xlab(NULL) + ylab("Solar panel area (km²)") +
+)
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_blank(data=twh, aes(Year)) + #, colour='OurWorldInData (Energy use)')) +#
+    geom_blank(data=subset(proj, year <= 2030)) + #, aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw() + xlab(NULL) + ylab("Solar panel area (km²)")
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_blank(data=subset(proj, year <= 2030)) + #, aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw() + xlab(NULL) + ylab("Solar panel area (km²)")
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_line(data=subset(proj, year <= 2030), aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2030) + theme_bw() + xlab(NULL) + ylab("Solar panel area (km²)")
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_line(data=subset(proj, year <= 2100), aes(colour='Extrapolated (exponential)')) +#
+    xlim(1980, 2100) + theme_bw() + xlab(NULL) + ylab("Solar panel area (km²)")
+ggplot(df, aes(year, area)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData (Energy use)')) +#
+    geom_line(data=subset(proj, year <= 2100), aes(colour='Extrapolated (exponential)')) +#
+    geom_hline(yintercept=148326000) + xlab(NULL) + ylab("Solar panel area (km²)") +#
+    xlim(1980, 2100) + theme_bw()
+ggplot(df, aes(year, area / 148326000)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=subset(proj, year <= 2100), aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=1) +#
+    xlab(NULL) + scale_y_continuous("Solar panel area (% land area)", labels=scales::percent) +#
+    xlim(1980, 2100) + theme_bw()
+ggplot(df, aes(year, area / 148326000)) +#
+    geom_line(aes(colour='land art generator initiative')) +#
+    geom_line(data=twh, aes(Year, colour='OurWorldInData')) +#
+    geom_line(data=proj, aes(colour='Extrapolated')) +#
+    geom_hline(yintercept=1) +#
+    xlab(NULL) + scale_y_continuous("Solar panel area (% land area)", labels=scales::percent) +#
+    xlim(1980, 2370) + theme_bw()
+path.jion
+file.path
+strsplit("name: test", ": ")
+?read.csv
+budget = 61
+sapply(1:1000, function(ii) min(runif(6)))
+mean(sapply(1:1000, function(ii) min(runif(6))))
+mean(sapply(1:10000, function(ii) min(runif(6))))
+mean(sapply(1:100000, function(ii) min(runif(6))))
+TT <- seq(0, 8, length.out=100)#
+DD <- 0.3 * TT^2#
+#
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw()
+library(ggplot2)#
+#
+TT <- seq(0, 8, length.out=100)#
+DD <- 0.3 * TT^2#
+#
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw()
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw() + scale_y_continuous(labels=scales::percent)
+TT <- seq(0, 8, length.out=100)#
+DD <- 0.004 * TT^2#
+#
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw() + scale_y_continuous(labels=scales::percent)
+library(ggplot2)#
+#
+TT <- seq(0, 8, length.out=100)#
+DD <- 0.01 * TT^2#
+#
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw() + scale_y_continuous(labels=scales::percent)
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Damages (% GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+ggplot(data.frame(TT=TT[-1], MB=diff(DD)), aes(TT, MB)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Marginal Damages (pp GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+ggplot(data.frame(TT=8 - TT[-1], MB=rev(diff(DD))), aes(TT, MB)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Marginal Damages (pp GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+ggplot(data.frame(TT=8 - TT[-1], MB=diff(DD)), aes(TT, MB)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Marginal Damages (pp GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Damages (% GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+TT <- seq(0, 6, length.out=100)#
+DD <- 0.01 * TT^2#
+#
+ggplot(data.frame(TT, DD), aes(TT, DD)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Damages (% GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+ggplot(data.frame(TT=TT[-1], MB=diff(DD)), aes(TT, MB)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Marginal Damages (pp GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+ggplot(data.frame(TT=6 - TT[-1], MB=diff(DD)), aes(TT, MB)) +#
+    geom_line() + theme_bw() + scale_y_continuous("Marginal Damages (pp GDP)", labels=scales::percent) +#
+    xlab("Global warming level (C)")
+c.1960 = 3601#
+c.2020 = 10508#
+tt = 2100#
+cbar = (c.2020 - c.1960) * (tt - 1960) / (2020 - 1960) + c.1960
+cbar
+eta = 1.45#
+for (cbar in c(c.2020, (c.2020 - c.1960) * (2100 - 1960) / (2020 - 1960) + c.1960)) {#
+  for (DD in c(1, 10)) {#
+    cc = cbar * (1 - DD / 100)#
+    uu = (cc^(1 - eta)) / (1 - eta)#
+    print(c(cbar, DD, uu))#
+  }#
+}
+log(1 - .1)
+log(.1)
+log(1 - .1)
+R = 3.8#
+  C0 = 280#
+  C1 = 2*C0#
+  F = (R*(1/log10(2))*(log10(C1/C0)))
+F
+c = 0.098#
+ECS = 3#
+Tt = ECS#
+F = 8.5#
+R = 3.8#
+deltaT = c*(F-((R/ECS)*Tt))#
+df = data.frame(year=1960, T = .2)#
+for (tt in 1961:2100) {#
+  T = df$T[nrow(df)] + (c*(F-((R/ECS)*df$T[nrow(df)])))#
+  df = rbind(df, data.frame(year=tt, T=T))#
+}#
+tail(df)
+plot(df$year, df$T, xlab='Year', ylab = 'GLobal temperature change(C)')
+co2 = read.csv("~/Dropbox/Climate Change Economics 2024/labs/lab3 - social cost of carbon/co2_ppm.csv")
+co2.ssp245 = subset(co2, scenario == 'ssp245'& year>1960)#
+df2 = data.frame(year=1960, T=0.2)#
+for (tt in 1961:2100) {#
+  C1 = co2.ssp245$value[co2.ssp245$year==tt]#
+  F = (R*(1/log10(2))*(log10(C1/C0)))#
+  T = df2$T[nrow(df2)] + (c*(F-((R/ECS)*df2$T[nrow(df2)])))#
+  df2 = rbind(df2, data.frame(year=tt, T=T))#
+}#
+plot(df2$year, df2$T, xlab='Year', ylab = 'GLobal temperature change(C)')
+a = .010038#
+D = a * (TT*TT)#
+TT=seq(0, 6, length.out=100)#
+DP= D*100#
+df5 = data.frame(year=1960, T=0.2, D=.1)#
+for (tt in 1961:2100) {#
+  C1 = co2.ssp245$value[co2.ssp245$year==tt]#
+  F = (R*(1/log10(2))*(log10(C1/C0)))#
+  T = df5$T[nrow(df5)] + (c*(F-((R/ECS)*df5$T[nrow(df5)])))#
+  D = a * (T*T)#
+  df5 = rbind(df5, data.frame(year=tt, T=T, D=D))#
+}#
+plot(df5$year, df5$D, xlab='Year', ylab = 'Damages')
+ct = meanct (1-(Dt/100))#
+eta = 1.45#
+ut = (ct^(1-eta))/(1-eta)#
+ct=3601.6#
+df10 = data.frame(year=1960, T=0.2, D=.1, ct=3601.6, ut=-.055765)#
+for (tt in 1961:2100) {#
+  C1 = co2.ssp245$value[co2.ssp245$year==tt]#
+  F = (R*(1/log10(2))*(log10(C1/C0)))#
+  T = df10$T[nrow(df10)] + (c*(F-((R/ECS)*df10$T[nrow(df10)])))#
+  D = a * (T*T) *100#
+  ct = df10$ct[nrow(df10)]*(1-(D/100))#
+  ut = (ct^-.45)/(-.45)#
+  df10 = rbind(df10, data.frame(year=tt, T=T, D=D, ct=ct, ut=ut))#
+}
+year = 2020:2300#
+ut = -0.027#
+tp = 2020#
+P = 7.762 * (10^9)#
+p = .015#
+df13 = data.frame(year=1960, T=0.2, D=.1, ct=3601.6, ut=-.055765)#
+for (tt in 1961:2300) {#
+  C1 = co2.ssp245$value[co2.ssp245$year==tt]#
+  F = (R*(1/log10(2))*(log10(C1/C0)))#
+  T = df13$T[nrow(df13)] + (c*(F-((R/ECS)*df13$T[nrow(df13)])))#
+  D = a * (T*T) *100#
+  ct = df13$ct[nrow(df13)]*(1-(D/100))#
+  ut = (ct^-.45)/(-.45)#
+  df13 = rbind(df13, data.frame(year=tt, T=T, D=D, ct=ct, ut=ut))#
+}#
+W_base <- ((P*ut)*(1+p)^(-(df13$year[df13$year >= 2020]-2020)))#
+sum(W_base)
+df14 = data.frame(year=1960, T=0.2, D=.1, ct=3601.6, ut=-.055765)#
+for (tt in 1961:2300) {#
+  C1 = co2.ssp245$value[co2.ssp245$year==tt]#
+  if(tt >=2020)#
+    C1 = C1 + .6569#
+  F = (R*(1/log10(2))*(log10(C1/C0)))#
+  T = df14$T[nrow(df14)] + (c*(F-((R/ECS)*df14$T[nrow(df14)])))#
+  D = a * (T*T) *100#
+  ct = df14$ct[nrow(df14)]*(1-(D/100))#
+  ut = (ct^-.45)/(-.45)#
+  df14 = rbind(df14, data.frame(year=tt, T=T, D=D, ct=ct, ut=ut))#
+}#
+W_plus <- ((P*ut)*(1+p)^(-(df14$year[df14$year >= 2020]-2020)))#
+Welfare = sum(W_plus)-sum(W_base)
+SCC = -(1/(10^10))*(Welfare/(2081.7468^-1.45))
+SCC
+W_base
+df13 = data.frame(year=1960, T=0.2, D=.1, ct=3601.6, ut=-.055765)#
+for (tt in 1961:2300) {#
+  C1 = co2.ssp245$value[co2.ssp245$year==tt]#
+  F = (R*(1/log10(2))*(log10(C1/C0)))#
+  T = df13$T[nrow(df13)] + (c*(F-((R/ECS)*df13$T[nrow(df13)])))#
+  D = a * (T*T) *100#
+  ct = df13$ct[nrow(df13)]*(1-(D/100))#
+  ut = (ct^-.45)/(-.45)#
+  df13 = rbind(df13, data.frame(year=tt, T=T, D=D, ct=ct, ut=ut))#
+}#
+W_base <- ((P*ut)*(1+p)^(-(df13$year[df13$year >= 2020]-2020)))#
+sum(W_base)
+1 - 1.45
+## Libraries#
+library(reshape2)#
+library(ggplot2)#
+#
+## Parameters#
+RR = 3.8 # Forcing at 2x CO2#
+C0 = 280 # Pre-industrial CO2#
+c = 0.098 # reaction rate of atmosphere#
+ECS = 3 # Equilibrium climate sensitivity#
+alpha = 1.0038 # Damage function scale#
+c.1960 = 3601.6 # GDP p.c. in 1960#
+c.2020 = 10508.6 # GDP p.c. in 2020#
+eta = 1.45 # Elasticity of marginal consumption#
+#
+## Inputs
+input = read.csv("~/Dropbox/Climate Change Economics 2024/labs/lab5 - integrated assessment/aimcge-np.csv")
+input2 = melt(input, c('Model', 'Scenario', 'Region', 'Variable', 'Unit'))#
+input2 = subset(input2, !is.na(value))#
+input2$year = as.numeric(substring(input2$variable, 2, 5))
+temp = subset(input2, Variable == 'Diagnostics|MAGICC6|Temperature|Global Mean')#
+T.2009 = temp$value[temp$year == 2009]
+co2 = subset(input2, Variable == "Diagnostics|MAGICC6|Concentration|CO2")#
+#
+## Loop over all years from 2010 to 2100#
+df = data.frame(year=2009, T=T.2009, D=NA, cbar=NA, u=NA)#
+for (tt in 2010:2100) {#
+  ## Retrieve the CO2 concentration in year tt#
+  C1 = co2$value[co2$year == tt]#
+  ## Calculate the radiative foring#
+  F = (RR / log(2)) * log(C1 / C0)#
+  ## Update the warming level, using the last row of df for the previous year#
+  T = df$T[nrow(df)] + c * (F - (RR / ECS) * df$T[nrow(df)])#
+  ## Compute the damages#
+  D = alpha * T^2#
+  ## Compute social welfare#
+  cbar = (c.2020 - c.1960) * (tt - 1960) / (2020 - 1960) + c.1960#
+  cc = cbar * (1 - D / 100)#
+  uu = (cc^(1 - eta)) / (1 - eta)#
+  ## Add on the results for the new year to df#
+  df = rbind(df, data.frame(year=tt, T=T, D=D, cbar, u=uu))#
+}
+ggplot(df, aes(year, T)) + geom_line()
+df = read.delim("~/Downloads/ghcn.txt")
+head(df)
+df = read.delim("~/Downloads/ghcn.txt", header=F)
+head(df)
+df = read.delim("~/Downloads/ghcn.txt", header=F, sep=' ')
+head(df)
+?read.delim
+df = read.delim("~/Downloads/ghcn.txt", header=F, sep=' +')
+df = read.table("~/Downloads/ghcn.txt", header=F, sep='')
+df = read.table("~/Downloads/ghcn.txt", header=F, sep=' ')
+df = read.table("~/Downloads/ghcn.txt", header=F)
+df = read.table("~/Downloads/ghcn.txt", header=T)
+df = read.table("~/Downloads/ghcn.txt", header=T, sep='')
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F)
+?read.fwf
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F, n=10)
+df
+head(df)
+df$V1
+df$V2
+df$V6
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F, n=25447)
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F, n=25440)
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F, n=25446)
+tail(df)
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F, n=25447)
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F, n=25448)
+?read.fwf
+df = read.fwf("~/Downloads/ghcn.txt", widths=diff(c(0, 12, 21, 31, 38, 41, 72, 76, 80)), header=F, comment.char='')
+head(df)
+plot(df$V3, df$V2)
+?plot
+library(ggplot2)
+ggplot(df, aes())ggplot(df, aes(V3, V2)) + geom_point() + xlim(0, 50) + ylim(0, 50)
+ggplot(df, aes(V3, V2)) + geom_point() + xlim(0, 50) + ylim(0, 50)
+ggplot(df, aes(V3, V2)) + geom_point() + xlim(0, 60) + ylim(-10, 60)
+world_map <- st_read("~/research/gcp/reverse-coding-test/data/ne_50m_admin_0_countries_lakes/ne_50m_admin_0_countries_lakes.shp")
+library(sf)
+world_map <- st_read("~/research/gcp/reverse-coding-test/data/ne_50m_admin_0_countries_lakes/ne_50m_admin_0_countries_lakes.shp")
+head(worldmap)
+head(world_map)
+ggplot(world_map2) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(0, 50) + ylim(0, 50)
+ggplot(world_map) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(0, 50) + ylim(0, 50)
+ggplot(world_map) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(30, 40) + ylim(30, 40)
+ggplot(world_map) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(34, 36) + ylim(30, 34)
+ggplot(world_map) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(34, 36) + ylim(30, 34) + theme_bw()
+ggplot(world_map) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(34, 36) + ylim(30, 34) + theme_bw() +#
+    xlab(NULL) + ylab(NULL)
+ggplot(world_map) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(33, 36) + ylim(30, 34) + theme_bw() +#
+    xlab(NULL) + ylab(NULL)
+ggplot(world_map) +#
+    geom_sf() +#
+    geom_point(data=df, aes(V3, V2)) + xlim(33.5, 36) + ylim(30, 34) + theme_bw() +#
+    xlab(NULL) + ylab(NULL)
+-(1/1e10)*(-1890000) / (10508)^-1.45
+for (ii in 1:10) {}
+for (ii in 1:10) { if (ii < 3) continue; print(ii) }
+for (ii in 1:10) { if (ii < 3) next; print(ii) }
+exp(.509)
+cost.input <- 0.5 / 1e6#
+cost.output <- 1.5 / 1e6#
+#
+doc.tokens <- 2000#
+query.tokens <- 200#
+extract.tokens <- 500#
+response.tokens <- 500#
+brief.tokens <- 200#
+#
+## doc.to.extract <- function(num.query) {#
+##     (doc.tokens + num.query * query.tokens) + num.query * extract.tokens#
+## }#
+#
+## respond.query.with.extract <- function(num.doc) {#
+##     (num.doc * extract.tokens) + response.tokens#
+## }#
+#
+## doc.to.extract <- function() {#
+##     doc.tokens + extract.tokens#
+## }#
+#
+## query.to.brief <- function() {#
+##     query.tokens + brief.tokens#
+## }#
+#
+## extracts.to.extract <- function(num.doc) {#
+##     num.doc * extract.tokens + extract.tokens#
+## }#
+#
+calc.info.per.cent <- function(num.doc, num.query) {#
+    df <- data.frame()#
+    for (summarize.doc in c(F, T)) {#
+        if (summarize.doc) {#
+            cost.sumdoc <- num.doc * (cost.input * doc.tokens + cost.output * extract.tokens)#
+            my.doc.tokens <- extract.tokens#
+            doc.note <- ", summarized docs"#
+        } else {#
+            cost.sumdoc <- 0#
+            my.doc.tokens <- doc.tokens#
+            doc.note <- ""#
+        }#
+#
+        for (summarize.query in c(F, T)) {#
+            if (summarize.query) {#
+                cost.sumquery <- num.query * (cost.input * query.tokens + cost.output * brief.tokens)#
+                my.query.tokens <- brief.tokens#
+                query.note <- ", summarized query"#
+            } else {#
+                cost.sumquery <- 0#
+                my.query.tokens <- query.tokens#
+                query.note <- ""#
+            }#
+#
+            ## Option 1: Pass in all documents for each query#
+            input.tokens <- num.doc * my.doc.tokens + my.query.tokens#
+            info <- num.query * num.doc * log(my.doc.tokens)#
+            cost <- num.query * (cost.input * input.tokens + cost.output * response.tokens)#
+#
+            df <- rbind(data.frame(method=paste0("All documents", doc.note, query.note), info, cost=cost + cost.sumdoc + cost.sumquery))#
+#
+            ## Option 2: First extract from each document#
+            input.tokens.step1 <- my.doc.tokens + my.query.tokens#
+            info.step1 <- log(extract.tokens)#
+            cost.step1 <- cost.input * input.tokens.step1 + cost.output * extract.tokens#
+#
+            for (summarize.extracts in c(F, T)) {#
+                if (summarize.extracts) {#
+                    cost.sumextracts <- cost.input * num.doc * extract.tokens + cost.output * extract.tokens#
+                    my.extracts.tokens <- extract.tokens#
+                    info.step2 <- log(extract.tokens)#
+                    extracts.note <- ", summarized extracts"#
+                } else {#
+                    cost.sumextracts <- 0#
+                    my.extracts.tokens <- num.doc * extract.tokens#
+                    info.step2 <- num.doc * info.step1#
+                    extracts.note <- ""#
+                }#
+#
+                input.tokens.step2 <- my.extracts.tokens + my.query.tokens#
+                cost.step2 <- cost.input * input.tokens.step2 + cost.output * response.tokens#
+#
+                df <- rbind(df, data.frame(method=paste0("Extracts first", doc.note, query.note), info=info.step2, cost=cost.step1 + cost.step2 + cost.sumdoc + cost.sumquery + cost.sumextracts))#
+            }#
+        }#
+    }#
+    df#
+}#
+#
+calc.info.per.cent(100, 10)
+cost.input <- 0.5 / 1e6#
+cost.output <- 1.5 / 1e6#
+#
+doc.tokens <- 2000#
+query.tokens <- 200#
+extract.tokens <- 500#
+response.tokens <- 500#
+brief.tokens <- 200#
+#
+## doc.to.extract <- function(num.query) {#
+##     (doc.tokens + num.query * query.tokens) + num.query * extract.tokens#
+## }#
+#
+## respond.query.with.extract <- function(num.doc) {#
+##     (num.doc * extract.tokens) + response.tokens#
+## }#
+#
+## doc.to.extract <- function() {#
+##     doc.tokens + extract.tokens#
+## }#
+#
+## query.to.brief <- function() {#
+##     query.tokens + brief.tokens#
+## }#
+#
+## extracts.to.extract <- function(num.doc) {#
+##     num.doc * extract.tokens + extract.tokens#
+## }#
+#
+calc.info.per.cent <- function(num.doc, num.query) {#
+    df <- data.frame()#
+    for (summarize.doc in c(F, T)) {#
+        if (summarize.doc) {#
+            cost.sumdoc <- num.doc * (cost.input * doc.tokens + cost.output * extract.tokens)#
+            my.doc.tokens <- extract.tokens#
+            doc.note <- ", summarized docs"#
+        } else {#
+            cost.sumdoc <- 0#
+            my.doc.tokens <- doc.tokens#
+            doc.note <- ""#
+        }#
+#
+        for (summarize.query in c(F, T)) {#
+            if (summarize.query) {#
+                cost.sumquery <- num.query * (cost.input * query.tokens + cost.output * brief.tokens)#
+                my.query.tokens <- brief.tokens#
+                query.note <- ", summarized query"#
+            } else {#
+                cost.sumquery <- 0#
+                my.query.tokens <- query.tokens#
+                query.note <- ""#
+            }#
+#
+            ## Option 1: Pass in all documents for each query#
+            input.tokens <- num.doc * my.doc.tokens + my.query.tokens#
+            info <- num.query * num.doc * log(my.doc.tokens)#
+            cost <- num.query * (cost.input * input.tokens + cost.output * response.tokens)#
+#
+            df <- rbind(df, data.frame(method=paste0("All documents", doc.note, query.note), info, cost=cost + cost.sumdoc + cost.sumquery))#
+#
+            ## Option 2: First extract from each document#
+            input.tokens.step1 <- my.doc.tokens + my.query.tokens#
+            info.step1 <- log(extract.tokens)#
+            cost.step1 <- cost.input * input.tokens.step1 + cost.output * extract.tokens#
+#
+            for (summarize.extracts in c(F, T)) {#
+                if (summarize.extracts) {#
+                    cost.sumextracts <- cost.input * num.doc * extract.tokens + cost.output * extract.tokens#
+                    my.extracts.tokens <- extract.tokens#
+                    info.step2 <- log(extract.tokens)#
+                    extracts.note <- ", summarized extracts"#
+                } else {#
+                    cost.sumextracts <- 0#
+                    my.extracts.tokens <- num.doc * extract.tokens#
+                    info.step2 <- num.doc * info.step1#
+                    extracts.note <- ""#
+                }#
+#
+                input.tokens.step2 <- my.extracts.tokens + my.query.tokens#
+                cost.step2 <- cost.input * input.tokens.step2 + cost.output * response.tokens#
+#
+                df <- rbind(df, data.frame(method=paste0("Extracts first", doc.note, query.note), info=info.step2, cost=cost.step1 + cost.step2 + cost.sumdoc + cost.sumquery + cost.sumextracts))#
+            }#
+        }#
+    }#
+    df#
+}#
+#
+df <- calc.info.per.cent(100, 10)
+df
+df$metric <- df$info / df$cost
+df
+cost.input <- 0.5 / 1e6#
+cost.output <- 1.5 / 1e6#
+#
+doc.tokens <- 2000#
+query.tokens <- 200#
+extract.tokens <- 500#
+response.tokens <- 500#
+brief.tokens <- 200#
+#
+## doc.to.extract <- function(num.query) {#
+##     (doc.tokens + num.query * query.tokens) + num.query * extract.tokens#
+## }#
+#
+## respond.query.with.extract <- function(num.doc) {#
+##     (num.doc * extract.tokens) + response.tokens#
+## }#
+#
+## doc.to.extract <- function() {#
+##     doc.tokens + extract.tokens#
+## }#
+#
+## query.to.brief <- function() {#
+##     query.tokens + brief.tokens#
+## }#
+#
+## extracts.to.extract <- function(num.doc) {#
+##     num.doc * extract.tokens + extract.tokens#
+## }#
+#
+calc.info.per.cent <- function(num.doc, num.query) {#
+    df <- data.frame()#
+    for (summarize.doc in c(F, T)) {#
+        if (summarize.doc) {#
+            cost.sumdoc <- num.doc * (cost.input * doc.tokens + cost.output * extract.tokens)#
+            my.doc.tokens <- extract.tokens#
+            doc.note <- ", summarized docs"#
+        } else {#
+            cost.sumdoc <- 0#
+            my.doc.tokens <- doc.tokens#
+            doc.note <- ""#
+        }#
+#
+        for (summarize.query in c(F, T)) {#
+            if (summarize.query) {#
+                cost.sumquery <- num.query * (cost.input * query.tokens + cost.output * brief.tokens)#
+                my.query.tokens <- brief.tokens#
+                query.note <- ", summarized query"#
+            } else {#
+                cost.sumquery <- 0#
+                my.query.tokens <- query.tokens#
+                query.note <- ""#
+            }#
+#
+            ## Option 1: Pass in all documents for each query#
+            input.tokens <- num.doc * my.doc.tokens + my.query.tokens#
+            info <- num.query * num.doc * log(my.doc.tokens)#
+            cost <- num.query * (cost.input * input.tokens + cost.output * response.tokens)#
+#
+            df <- rbind(df, data.frame(method=paste0("All documents", doc.note, query.note), info, cost=cost + cost.sumdoc + cost.sumquery))#
+#
+            ## Option 2: First extract from each document#
+            input.tokens.step1 <- my.doc.tokens + my.query.tokens#
+            info.step1 <- log(extract.tokens)#
+            cost.step1 <- cost.input * input.tokens.step1 + cost.output * extract.tokens#
+#
+            for (summarize.extracts in c(F, T)) {#
+                if (summarize.extracts) {#
+                    cost.sumextracts <- cost.input * num.doc * extract.tokens + cost.output * extract.tokens#
+                    my.extracts.tokens <- extract.tokens#
+                    info.step2 <- log(extract.tokens)#
+                    extracts.note <- ", summarized extracts"#
+                } else {#
+                    cost.sumextracts <- 0#
+                    my.extracts.tokens <- num.doc * extract.tokens#
+                    info.step2 <- num.doc * info.step1#
+                    extracts.note <- ""#
+                }#
+#
+                input.tokens.step2 <- my.extracts.tokens + my.query.tokens#
+                cost.step2 <- cost.input * input.tokens.step2 + cost.output * response.tokens#
+#
+                df <- rbind(df, data.frame(method=paste0("Extracts first", doc.note, query.note, extracts.note), info=info.step2, cost=cost.step1 + cost.step2 + cost.sumdoc + cost.sumquery + cost.sumextracts))#
+            }#
+        }#
+    }#
+    df#
+}#
+#
+df <- calc.info.per.cent(100, 10)#
+df$metric <- df$info / df$cost
+df
+df <- calc.info.per.cent(100, 1)#
+df$metric <- df$info / df$cost
+df
+df <- calc.info.per.cent(10, 1)#
+df$metric <- df$info / df$cost
+df
+growrate <- mean(diff(log(c(1314.245, 1329.186, 1350.140, 1382.128, 1418.235, 1455.828, 1495.583))))#
+gdp.2015.gbp <- 2089276e6 # GBP, from https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/abmi/pn2#
+gdp.proj <- gdp.2015.gbp * exp(growrate * (c(2020, 2050, 2080) - 2015))
+growrate
+plot(c(2020, 2050, 2080), gdp.proj)
+plot(c(2020, 2050, 2080), 10e9 / gdp.proj)
+10e9 / gdp.proj
+100 * 10e9 / gdp.proj
+rwald(10000,1.3,3.3)
+library(extraDistr)
+install.packages("extraDistr")
+library(extraDistr)
+rwald(10000,1.3,3.3)
+mean(rwald(10000,1.3,3.3))
+median(rwald(10000,1.3,3.3))
+ECS = rawld(n,1.3,3.3)
+alpha = runif(n,.272,.6528)#
+#
+simulate = function(rate,ECS,alpha){#
+  df = data.frame(year=2009, T=T.2009, D=NA, cbar=NA, u=NA, C1 = 390.5047, consleft=1)#
+  policy = data.frame(tt=2010:2100)#
+  policy$price = seq(0,rate*90,by=rate)#
+  policy$emitred = exp(p2logemit*policy$price)#
+  policy$consloss = exp(logp2logcons*log(policy$price))#
+  policy$consloss[policy$consloss == Inf] <- 1#
+  for (tt in 2010:2100) {#
+    ## Retrieve the CO2 concentration in year tt #
+    C1 = df$C1[nrow(df)] + future$pop[tt-2009] * future$gdppc[tt-2009] * future$cigdp[tt-2009] * emit2ppm* policy$emitred[tt-2009]#
+    ## Calculate the radiative foring#
+    F = (RR / log(2)) *log(C1 / C0)#
+    ## Update the warming level, using the last row of df for the previous year#
+    T = df$T[nrow(df)] + c *(F -(RR / ECS) *df$T[nrow(df)])#
+    ## Compute the damages#
+    D = alpha *T^2#
+    ## Compute social welfare#
+    cbar = future$gdppc[tt-2009]*policy$consloss[tt-2009]#
+    cc = cbar *(1 -D / 100)#
+    uu = (cc^(1 -eta)) / (1 -eta)#
+    ## Add on the results for the new year to df#
+    consleft = policy$consloss[policy$tt==tt]#
+    df = rbind(df, data.frame(year=tt, T=T, D=D, C1 = C1, cbar, u=uu,consleft=consleft))#
+  }#
+  df#
+}
+npv = function(rate,ECS,alpha){#
+  np = 0#
+  df = simulate(rate,ECS,alpha)#
+  for (tt in 2010:2100){#
+    np = np + df$u[df$year==tt]*(1+rho)^(-(tt-2009))#
+  }#
+  np#
+}
+ECS = rwald(10000,1.3,3.3)#
+#
+npv0 = function(rate){#
+  df1 = data.frame(run = numeric(0), np1 = numeric(0))#
+  for (i in 1:100){#
+    EC = ECS[i]#
+    alpha = 1.0038#
+    np = 0#
+    df = simulate(rate,EC,alpha)#
+    for (tt in 2010:2100){#
+      np = np + df$u[df$year==tt]*(1+rho)^(-(tt-2009))#
+    }#
+    df1 = rbind(df1,data.frame(run=i,np1 = np))#
+  } #
+  mean(df1$np1)#
+}
+optimize(npv0,c(0,100),maximum=TRUE)
+max(ECS)
+alphaV = runif(1000,.272,.6528)
+alphaV
+c1 = 10
+c2 = 5
+x = 1
+(sqrt(c1 - x) + sqrt(c2 - x)) / 2
+sqrt((c1 + c2)/2 - x)
+(log(c1 - x) + log(c2 - x)) / 2
+log((c1 + c2)/2 - x)
+?sample
+setwd("~/research/iamup2/MimiPAGE2020.jl/preproc/burkey")
+library(readxl)#
+library(reshape2)#
+library(dplyr)#
+library(ggplot2)#
+library(rstan)#
+#
+choose.heathelp <- 'drop'#
+choose.heatonly <- T#
+choose.index <- 'INFORM'
+options(mc.cores = parallel::detectCores())#
+rstan_options(auto_write = TRUE)#
+#
+df <- read.csv("ExtendedDataFig1g.csv")
+gamma <- c(0.0127183, -0.0004871)#
+gammavcv <- matrix(c(0.0000143,-0.000000376,-3.76E-07,1.40E-08), 2, 2, byrow=T)
+df$fit2 <- gamma[1] + 2 * gamma[2] * df$meantemp#
+df$fitse <- sapply(df$meantemp, function(TT) sqrt(t(c(1, 2*TT)) %*% gammavcv %*% t(t(c(1, 2*TT)))))
+ggplot(df, aes(meantemp)) +#
+    geom_line(aes(y=fit, colour=fit < 0)) +#
+    geom_ribbon(aes(ymin=fit - 1.96 * fitse, ymax=fit + 1.96 * fitse), alpha=.25) +#
+    geom_point(aes(y=b, colour=b < 0)) +#
+    scale_x_continuous("Population-weighted average temperature (C)", expand=c(0, 0)) + ylab("Marginal effect of warming") +#
+    scale_colour_manual("Marginal sign", breaks=c(T, F), labels=c("Negative", "Positive"), values=c("#d95f02", "#7570b3")) +#
+    theme_bw()
+if (choose.heathelp == 'allow') {#
+    valid <- T#
+    df$delta <- df$b - df$fit#
+} else if (choose.heathelp == 'clip') {#
+    df$bclip <- df$b#
+    df$bclip[df$b > 0] <- 0#
+    valid <- df$fit < 0#
+    df$delta <- df$bclip - df$fit#
+} else { # 'drop'#
+    valid <- df$b < 0#
+    df$delta <- df$b - df$fit#
+}
+if (choose.heatonly) {#
+    opttemp <- -gamma[1] / (2 * gamma[2])#
+    valid <- valid & (df$meantemp > opttemp)#
+}
+df$deltase <- sqrt(df$se^2 + df$fitse^2)
+wri <- read_xlsx("WRI_FullData_Time-series-2000-2022.xlsx", sheet=2006 - 2000 + 2)#
+wri <- wri[, 2:8]#
+#
+## 2014#
+icc <- read_xlsx("INFORM2022_TREND_2013_2022_v063_ALL.xlsx")#
+icc <- subset(icc, IndicatorName %in% c('INFORM Risk Index', 'Hazard & Exposure Index', 'Vulnerability Index', 'Lack of Coping Capacity Index'))#
+icc <- dcast(subset(icc, INFORMYear == 2014), Iso3 ~ IndicatorId, value.var='IndicatorScore')#
+#
+## Collect GDPpc#
+burkedf.2011 <- burkedf[burkedf$year == 2011, c('iso', 'gdpCAPppp')]
+burkedf <- read.csv("../BurkeHsiangMiguel2015_Replication/data/input/GrowthClimateDataset.csv")
+burkedf <- read.csv("GrowthClimateDataset.csv")
+burkedf <- read.csv("GrowthClimateDataset.csv")
+head(burkedf)
+burkedf.2011 <- burkedf[burkedf$year == 2011, c('iso', 'gdpCAPppp')]
+burkedf.2011
+df2 <- df %>% left_join(wri, by=c('iso'='Code')) %>% left_join(icc, by=c('iso'='Iso3')) %>% left_join(burkedf.2011, by='iso')#
+#
+ggplot(df2, aes(gdpCAPppp, delta, alpha=valid)) +#
+    geom_point() + geom_linerange(aes(ymin=delta-deltase, ymax=delta+deltase)) +#
+    geom_smooth(method='lm', se=T) +#
+    scale_x_log10()
+summary(lm(delta ~ log(gdpCAPppp), weights=1 / df2$deltase[valid]^2, data=df2[valid,]))
+ggplot(df2, aes(W, delta, alpha=valid)) +#
+    geom_point() + geom_linerange(aes(ymin=delta-deltase, ymax=delta+deltase)) +#
+    scale_x_log10()
+summary(lm(delta ~ log(W), weights=1 / df2$deltase[valid]^2, data=df2[valid,]))#
+summary(lm(delta ~ log(E) + log(S) + log(C) + log(A), weights=1 / df2$deltase[valid]^2, data=df2[valid,]))#
+summary(lm(delta ~ log(E) + log(S) + log(C) + log(A) + log(gdpCAPppp), weights=1 / df2$deltase[valid]^2, data=df2[valid,]))
+ggplot(df2, aes(INFORM, delta, alpha=valid)) +#
+    geom_point() + geom_linerange(aes(ymin=delta-deltase, ymax=delta+deltase)) +#
+    scale_x_log10() + theme_bw() + xlab("INFORM Risk Index") + ylab("Deviation from expectation")#
+#
+summary(lm(delta ~ log(INFORM), weights=1 / df2$deltase[valid]^2, data=df2[valid,]))#
+summary(lm(delta ~ log(HA) + log(VU) + log(CC), weights=1 / df2$deltase[valid]^2, data=df2[valid,]))#
+summary(lm(delta ~ log(HA) + log(VU) + log(CC) + log(gdpCAPppp), weights=1 / df2$deltase[valid]^2, data=df2[valid,]))
+xx = c()-0.011887395503596276, -0.0179390385631233, -0.005679464599525371, -0.01840692383057808, -0.02296951243286293, -0.017779392337207347, -0.027291138163981987, -0.020063157779274858, -0.016442054176624456, -0.00316198230803238, -0.01942866007360252, -0.017309776466560723, -0.029649955114769862, -0.01895784397698082, -0.014872594084676363, -0.0002628472272324101, -0.018489475550239498, -0.01267308873215533, -0.03585911195922735, -0.01479415253323556, -0.0011241477817515843, -0.0027750567798963278, -0.004109685898995888, -0.014246253672463025, -0.025330175112880274, -0.02642591373912162, -0.0021427522101304507, -0.014248501931364833, -0.024385909610074613, -0.0018313818157670574, -0.01731048801737958, -0.009690384104769294, -0.01597434014605808, -0.006545648694837466, -0.028944457470701804, -0.02901916288146301, -0.028395894655131246, -0.004659814951898366, -0.016134509225223442, -0.032794763002864526, -0.009687028027574407, -0.00835413958127506, -0.01220234496826517, -0.015820540483479483, -0.019274389646016334, -0.0172368205489501, -0.03617325673113266, -0.026665787137218767, -0.020614550777354444, -0.026666473996060945, -0.024544778171302687, -0.027922909939359197, -0.0040304268217323256, -0.02501803359115073, -0.015405317226279237, -0.025328751728064328, -0.013383344759850093, -0.032950875185351045, -0.009687863615886716, -0.024149684304961793, -0.026903507603064678, -0.027057611795665192, -0.007564993049889174, -0.011100615359821608, 0.001624552105146583, -0.02415429559687488, -0.02140430767280627, -0.013777487955667087, -0.020694689035953884, -0.023364136704094172, -0.019437853647228328, -0.022111019028875096, -0.03829680363828371, -0.04033852160026587, -0.018338967997809416, -0.027686543793969, -0.016367102024841314, -0.008117563767102773, -0.0014390659892619681, -0.04167747985541659, -0.01951364488063978, -0.024781751776451588, -0.005445645096371531, -0.027767411805355708, -0.030278564793389116, -0.001987827957510468, -0.015819150687973342, -0.0026941675644758345, -0.016135871000606653, 0.0009940325574473734, -0.0032452137212728963, -0.005917456745452693, -0.014410646991238838, -0.019593991879274786, -0.0022218712879492103, -0.02980792048765023, -0.00010437803842925401, -0.018647449821560642, 0.0028816403591196416, -0.0034802039208459484, -0.011261201283490873, -0.029103922691950473, -0.015405096520809798, -0.026197681615718588, -0.007096976332833918, -0.02202885254983824, -0.014645986437098291, -0.020062034679169824, -0.016291797315396674, -0.030823960891169684, -0.013228988428894422, -0.014403786371588009, -0.020844875422135693, 0.001467727608562894, 0.0025703930814951013, 0.0017816566095583, -0.005758838616227834, 0.0003670100920247018, -0.03004739260831295, -0.00646873982923873, -0.0386918581081802, -0.0017523012881522472, -0.030441062534525526, -0.002299803623434659, -0.014958150867017427, -0.008586503520551025, -0.011572643095995037, -0.013226095689534543, -0.024625141545807958, -0.009610489531740728, -0.008436623193528147, -0.015821054210675135, -0.015405247209604202, -0.005290549627144291, -0.030203736844769485, -0.014874695509141079, -0.015741523888171353, -0.0033243208851646555, -0.01510854468647462, -0.015506372730345417, -0.01086731733070676, -0.006230537976056656, -0.013779217468135752, -0.01747416688782133, -0.01865401239787171, -0.024626940979447513, -0.010002839435612318, -0.0008076944524235668, -0.021243040198589865, -0.004580809862988254, -0.030753804980073376, -0.015406115940158463, -0.008827282995096716, -0.00701738086201658, -0.027528709304762665, -0.0007309178247525782, -0.006702393508889438, -0.021243275892518152, -0.005056615961187807, -0.01841809163596483, -0.023131513604659, -0.006784413714536748, -0.017629293253646736, -0.014642654007756382, -0.02651163658182435, -0.00882360196781467, -0.015404811921751957, -0.0252492944302012, -0.01629033384536425, 0.001625725174584456, -0.010007615068565437, -0.015406402632202755, -0.004661107608981167, -0.012989089130736141, -0.009451935984422778, -0.007410327905104473, -0.0188829077203861, -0.0012797866413780802, -0.016877352312564854, -0.009509656306867214, -0.012284408020470657, -0.015404838713619839, 0.0019414561216027305)
+xx = c(-0.011887395503596276, -0.0179390385631233, -0.005679464599525371, -0.01840692383057808, -0.02296951243286293, -0.017779392337207347, -0.027291138163981987, -0.020063157779274858, -0.016442054176624456, -0.00316198230803238, -0.01942866007360252, -0.017309776466560723, -0.029649955114769862, -0.01895784397698082, -0.014872594084676363, -0.0002628472272324101, -0.018489475550239498, -0.01267308873215533, -0.03585911195922735, -0.01479415253323556, -0.0011241477817515843, -0.0027750567798963278, -0.004109685898995888, -0.014246253672463025, -0.025330175112880274, -0.02642591373912162, -0.0021427522101304507, -0.014248501931364833, -0.024385909610074613, -0.0018313818157670574, -0.01731048801737958, -0.009690384104769294, -0.01597434014605808, -0.006545648694837466, -0.028944457470701804, -0.02901916288146301, -0.028395894655131246, -0.004659814951898366, -0.016134509225223442, -0.032794763002864526, -0.009687028027574407, -0.00835413958127506, -0.01220234496826517, -0.015820540483479483, -0.019274389646016334, -0.0172368205489501, -0.03617325673113266, -0.026665787137218767, -0.020614550777354444, -0.026666473996060945, -0.024544778171302687, -0.027922909939359197, -0.0040304268217323256, -0.02501803359115073, -0.015405317226279237, -0.025328751728064328, -0.013383344759850093, -0.032950875185351045, -0.009687863615886716, -0.024149684304961793, -0.026903507603064678, -0.027057611795665192, -0.007564993049889174, -0.011100615359821608, 0.001624552105146583, -0.02415429559687488, -0.02140430767280627, -0.013777487955667087, -0.020694689035953884, -0.023364136704094172, -0.019437853647228328, -0.022111019028875096, -0.03829680363828371, -0.04033852160026587, -0.018338967997809416, -0.027686543793969, -0.016367102024841314, -0.008117563767102773, -0.0014390659892619681, -0.04167747985541659, -0.01951364488063978, -0.024781751776451588, -0.005445645096371531, -0.027767411805355708, -0.030278564793389116, -0.001987827957510468, -0.015819150687973342, -0.0026941675644758345, -0.016135871000606653, 0.0009940325574473734, -0.0032452137212728963, -0.005917456745452693, -0.014410646991238838, -0.019593991879274786, -0.0022218712879492103, -0.02980792048765023, -0.00010437803842925401, -0.018647449821560642, 0.0028816403591196416, -0.0034802039208459484, -0.011261201283490873, -0.029103922691950473, -0.015405096520809798, -0.026197681615718588, -0.007096976332833918, -0.02202885254983824, -0.014645986437098291, -0.020062034679169824, -0.016291797315396674, -0.030823960891169684, -0.013228988428894422, -0.014403786371588009, -0.020844875422135693, 0.001467727608562894, 0.0025703930814951013, 0.0017816566095583, -0.005758838616227834, 0.0003670100920247018, -0.03004739260831295, -0.00646873982923873, -0.0386918581081802, -0.0017523012881522472, -0.030441062534525526, -0.002299803623434659, -0.014958150867017427, -0.008586503520551025, -0.011572643095995037, -0.013226095689534543, -0.024625141545807958, -0.009610489531740728, -0.008436623193528147, -0.015821054210675135, -0.015405247209604202, -0.005290549627144291, -0.030203736844769485, -0.014874695509141079, -0.015741523888171353, -0.0033243208851646555, -0.01510854468647462, -0.015506372730345417, -0.01086731733070676, -0.006230537976056656, -0.013779217468135752, -0.01747416688782133, -0.01865401239787171, -0.024626940979447513, -0.010002839435612318, -0.0008076944524235668, -0.021243040198589865, -0.004580809862988254, -0.030753804980073376, -0.015406115940158463, -0.008827282995096716, -0.00701738086201658, -0.027528709304762665, -0.0007309178247525782, -0.006702393508889438, -0.021243275892518152, -0.005056615961187807, -0.01841809163596483, -0.023131513604659, -0.006784413714536748, -0.017629293253646736, -0.014642654007756382, -0.02651163658182435, -0.00882360196781467, -0.015404811921751957, -0.0252492944302012, -0.01629033384536425, 0.001625725174584456, -0.010007615068565437, -0.015406402632202755, -0.004661107608981167, -0.012989089130736141, -0.009451935984422778, -0.007410327905104473, -0.0188829077203861, -0.0012797866413780802, -0.016877352312564854, -0.009509656306867214, -0.012284408020470657, -0.015404838713619839, 0.0019414561216027305)
+quantile(xx)
+mean(xx > 0)
+if (choose.index == 'INFORM') {#
+    valid2 <- valid & rowSums(is.na(df2[, c('delta', 'HA', 'VU', 'CC', 'gdpCAPppp')])) == 0#
+    stan.data <- list(N=sum(valid2), K=3, delta=df2$delta[valid2], se=df2$deltase[valid2],#
+                      xx=log(df2[valid2, c('HA', 'VU', 'CC')]), loggdppc=log(df2$gdpCAPppp[valid2]))#
+} else {#
+    valid2 <- valid & rowSums(is.na(df2[, c('delta', 'E', 'S', 'C', 'A', 'gdpCAPppp')])) == 0#
+    stan.data <- list(N=sum(valid2), K=4, delta=df2$delta[valid2], se=df2$deltase[valid2],#
+                      xx=log(df2[valid2, c('E', 'S', 'C', 'A')]), loggdppc=log(df2$gdpCAPppp[valid2]))#
+}
+stan.dat
+stan.data
