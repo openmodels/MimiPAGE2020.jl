@@ -63,7 +63,7 @@ include("../utils/country_tools.jl")
         for cc in d.country
             v.irefeqdis_eqdiscimpact[cc] = wincf_weightsfactor_sea_country[cc] * p.wdis_gdplostdisc
 
-            v.igdpeqdis_eqdiscimpact[t,cc] = v.irefeqdis_eqdiscimpact[cc] * (p.rgdp_per_cap_NonMarketRemainGDP[t,cc] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
+            v.igdpeqdis_eqdiscimpact[t,cc] = v.irefeqdis_eqdiscimpact[cc] * ((p.rgdp_per_cap_NonMarketRemainGDP[t,cc] < 0 ? 0 : p.rgdp_per_cap_NonMarketRemainGDP[t,cc]) / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
 
             if is_first(t)
                 v.igdp_realizeddiscimpact[t,cc] = v.occurdis_occurrencedummy[t] * (1 - v.expfdis_discdecay[t]) * v.igdpeqdis_eqdiscimpact[t,cc]

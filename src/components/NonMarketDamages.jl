@@ -46,7 +46,6 @@ include("../utils/country_tools.jl")
         wincf_weightsfactor_nonmarket_country = regiontocountry(p.model, p.wincf_weightsfactor_nonmarket)
 
         for cc in d.country
-
             if p.rtl_realizedtemperature[t,cc] - atl_adjustedtolerableleveloftemprise_country[cc] < 0
                 v.i_regionalimpact[t,cc] = 0
             else

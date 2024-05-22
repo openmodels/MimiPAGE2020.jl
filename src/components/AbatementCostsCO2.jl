@@ -19,7 +19,7 @@ macs = myloadcsv("data/macs.csv")
 
     bau_co2emissions = Parameter(index=[time, region], unit="%")
     e0_baselineCO2emissions_country = Variable(index=[country], unit="Mtonne/year")
-    baselineemit = Variable(index=[time, country], unit="tCO2")
+    baselineemit = Variable(index=[time, country], unit="MtCO2")
 
     gdp = Parameter(index=[time, country], unit="\$M")
     carbonprice = Parameter(index=[time, country], unit="\$2010/tCO2")
@@ -27,19 +27,19 @@ macs = myloadcsv("data/macs.csv")
     ## Parameters set by init to MC values
 
     # Decrease in CO2 for a given tax
-    ac_0_20_co2 = Variable(index=[country], unit="tCO2/\$2010")
-    ac_20_50_co2 = Variable(index=[country], unit="tCO2/\$2010")
-    ac_50_100_co2 = Variable(index=[country], unit="tCO2/\$2010")
-    ac_100_200_co2 = Variable(index=[country], unit="tCO2/\$2010")
-    ac_200_500_co2 = Variable(index=[country], unit="tCO2/\$2010")
-    ac_500_inf_co2 = Variable(index=[country], unit="tCO2/\$2010")
-    ac_0_20xyear_co2 = Variable(index=[country], unit="tCO2/\$2010/year")
-    ac_20_50xyear_co2 = Variable(index=[country], unit="tCO2/\$2010/year")
-    ac_50_100xyear_co2 = Variable(index=[country], unit="tCO2/\$2010/year")
-    ac_100_200xyear_co2 = Variable(index=[country], unit="tCO2/\$2010/year")
-    ac_200_500xyear_co2 = Variable(index=[country], unit="tCO2/\$2010/year")
-    ac_500_infxyear_co2 = Variable(index=[country], unit="tCO2/\$2010/year")
-    lag_value_co2 = Variable(index=[country], unit="tCO2")
+    ac_0_20_co2 = Variable(index=[country], unit="MtCO2/\$2010")
+    ac_20_50_co2 = Variable(index=[country], unit="MtCO2/\$2010")
+    ac_50_100_co2 = Variable(index=[country], unit="MtCO2/\$2010")
+    ac_100_200_co2 = Variable(index=[country], unit="MtCO2/\$2010")
+    ac_200_500_co2 = Variable(index=[country], unit="MtCO2/\$2010")
+    ac_500_inf_co2 = Variable(index=[country], unit="MtCO2/\$2010")
+    ac_0_20xyear_co2 = Variable(index=[country], unit="MtCO2/\$2010/year")
+    ac_20_50xyear_co2 = Variable(index=[country], unit="MtCO2/\$2010/year")
+    ac_50_100xyear_co2 = Variable(index=[country], unit="MtCO2/\$2010/year")
+    ac_100_200xyear_co2 = Variable(index=[country], unit="MtCO2/\$2010/year")
+    ac_200_500xyear_co2 = Variable(index=[country], unit="MtCO2/\$2010/year")
+    ac_500_infxyear_co2 = Variable(index=[country], unit="MtCO2/\$2010/year")
+    lag_value_co2 = Variable(index=[country], unit="MtCO2")
 
     # Decrease in GDP for a given tax
     ac_0_20_gdp = Variable(index=[country], unit="\$2010/\$2010")
@@ -116,10 +116,10 @@ macs = myloadcsv("data/macs.csv")
             ac_50_100_co2 .* price2frac(pp.carbonprice[tt, :], 50, 100) +
             ac_100_200_co2 .* price2frac(pp.carbonprice[tt, :], 100, 200) +
             ac_200_500_co2 .* price2frac(pp.carbonprice[tt, :], 200, 500) +
-            ac_500_inf_co2 .* price2frac(pp.carbonprice[tt, :], 500, Inf) # tCO2
+            ac_500_inf_co2 .* price2frac(pp.carbonprice[tt, :], 500, Inf) # MtCO2
 
         # Calculate baseline emissions
-        vv.baselineemit[tt, :] = 1e6 * vv.e0_baselineCO2emissions_country .* regiontocountry(pp.model, pp.bau_co2emissions[tt, :])
+        vv.baselineemit[tt, :] = vv.e0_baselineCO2emissions_country .* regiontocountry(pp.model, pp.bau_co2emissions[tt, :])
 
         rawfractargetabated = -rawtonnesabated ./ vv.baselineemit[tt,:] # fraction abated
         # Regularize so not over 1 and goes to 1 as p -> inf
@@ -151,8 +151,8 @@ macs = myloadcsv("data/macs.csv")
             ac_50_100_gdp .* price2frac(pp.carbonprice[tt, :], 50, 100) +
             ac_100_200_gdp .* price2frac(pp.carbonprice[tt, :], 100, 200) +
             ac_200_500_gdp .* price2frac(pp.carbonprice[tt, :], 200, 500) +
-            ac_500_inf_gdp .* price2frac(pp.carbonprice[tt, :], 500, Inf) +
-            vv.lag_value_gdp .* gdplogdiff # log difference
+            ac_500_inf_gdp .* price2frac(pp.carbonprice[tt, :], 500, Inf) # log difference
+        # Currently drop "vv.lag_value_gdp .* gdplogdiff", since want difference from baseline, but this is baseline
 
         vv.tc_totalcost[tt,:] = pp.gdp[tt,:] .* (1 .- exp.(vv.loggdpcost[tt,:]))
         vv.tc_totalcost_region[tt, :] = countrytoregion(pp.model, sum, vv.tc_totalcost[tt,:])

@@ -54,16 +54,16 @@ include("../utils/country_tools.jl")
     function run_timestep(p, v, d, t)
 
         # Calculate country-level marginal effect difference
-        marginal_offset = p.gamma0_burkey_intercept .+ p.gamma1_burkey_hazard * p.r1_riskindex_hazard[t, :] .+ p.gamma2_burkey_vulnerability * p.r2_riskindex_vulnerability[t, :] .+ p.gamma3_burkey_copinglack * p.r3_riskindex_copinglack[t, :] .+ p.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
+        marginal_offset = p.gamma0_burkey_intercept .+ p.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[t, :]) .+ p.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[t, :]) .+ p.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[t, :]) .+ p.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
         # Translate into a difference in temperatures
         #   deltay = 2 beta1 T
         delta_temp = marginal_offset ./ (2 * p.impf_coeff_quadr)
 
         for cc in d.country
             # calculate the log change, depending on the number of lags specified
-            v.i1log_impactlogchange[t,cc] = p.nlag_burke * (p.impf_coeff_lin  * (p.rtl_realizedtemperature_absolute[t,cc] - p.rtl_0_realizedtemperature_absolute[cc] + delta_temp[cc]) +
+            v.i1log_impactlogchange[t,cc] = p.nlag_burke * (p.impf_coeff_lin  * (p.rtl_realizedtemperature_absolute[t,cc] - p.rtl_0_realizedtemperature_absolute[cc]) +
                                                             p.impf_coeff_quadr * ((p.rtl_realizedtemperature_absolute[t,cc] + delta_temp[cc] - p.tcal_burke)^2 -
-                                                                                  (p.rtl_0_realizedtemperature_absolute[cc] - p.tcal_burke)^2))
+                                                                                  (p.rtl_0_realizedtemperature_absolute[cc] + delta_temp[cc] - p.tcal_burke)^2))
 
             # calculate the impact at focus region GDP p.c.
             v.iref_ImpactatReferenceGDPperCap[t, cc] = 100 * (1 - exp(v.i1log_impactlogchange[t, cc]))

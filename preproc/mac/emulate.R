@@ -149,9 +149,9 @@ for (iso in unique(df$Region)) {
         mod.co2 <- nnnpls(AA.co2bs, df5$value.co2[bootstrap], c(rep(-1, 6), rep(-1, 6), 1, rep(1, ncol(AA.co2bs) - 13)))
         mod.gdp <- nnnpls(AA.gdpbs, df5$value.gdp[bootstrap], c(rep(-1, 6), rep(-1, 6), 1, rep(1, ncol(AA.gdpbs) - 13)))
 
-        baseline <- df5$lag.value.co2[df5$Year == 2015 & df5$Model == 'Downscaling [GCAM 5.3+ NGFS]' & df5$Scenario == 'Delayed transition']
+        baseline <- df5$lag.value.co2[df5$Year == 2015 & df5$Model == 'Downscaling [MESSAGEix-GLOBIOM 1.1-M-R12]' & df5$Scenario == 'Current Policies']
         pdf <- data.frame(Year=2030, value.carbonprice=c(0, 20, 50, 100, 200, 500, 1000), lag.value.co2=0)
-        AA.co2pdf <- make.AA(cbind(pdf, Model='Downscaling [GCAM 5.3+ NGFS]', Scenario='Delayed transition'), df5)
+        AA.co2pdf <- make.AA(cbind(pdf, Model='Downscaling [MESSAGEix-GLOBIOM 1.1-M-R12]', Scenario='Current Policies'), df5)
         AA.co2pdf[, 14:ncol(AA.co2pdf)] <- 0
         pdf$value.co2.next <- as.numeric(AA.co2pdf %*% mod.co2$x)
         pdf$abated <- -pdf$value.co2.next / baseline

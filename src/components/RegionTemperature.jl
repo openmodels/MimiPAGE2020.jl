@@ -19,7 +19,7 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
     area_region = Variable(index=[region], unit="km2")
 
     # Initial temperature outputs
-    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component # XXX
+    rt_g0_baseglobaltemp = Parameter(unit="degreeC", default=0.9461666666666667) # needed for feedback in CO2 cycle component
     rtl_0_baselandtemp = Variable(index=[country], unit="degreeC")
     rtl_g0_baselandtemp = Variable(unit="degreeC") # needed for feedback in CH4 and N2O cycles
 
@@ -65,8 +65,8 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
 
     function run_timestep(p, v, d, tt)
         for cc in d.country
-            v.rtl_realizedtemperature_absolute[tt, cc] = v.b0_intercept[cc] + v.b1_slope[cc] * p.rt_g_globaltemperature[tt]
-            v.rtl_realizedtemperature_change[tt, cc] = v.rtl_realizedtemperature_absolute[tt, cc] - p.rtl_0_realizedtemperature_absolute[cc] + p.rtl_0_realizedtemperature_change[cc]
+            v.rtl_realizedtemperature_change[tt, cc] = v.b1_slope[cc] * (p.rt_g_globaltemperature[tt] - p.rt_g0_baseglobaltemp) + p.rtl_0_realizedtemperature_change[cc]
+            v.rtl_realizedtemperature_absolute[tt, cc] = v.rtl_realizedtemperature_change[tt, cc] - p.rtl_0_realizedtemperature_change[cc] + p.rtl_0_realizedtemperature_absolute[cc]
         end
 
         v.rtl_realizedtemperature_region[tt, :] .= countrytoregion(p.model, mean, v.rtl_realizedtemperature_change[tt, :])

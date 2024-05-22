@@ -9,8 +9,10 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         socioscenario[:er_N2Oemissionsgrowth_rcp] = scenario[:er_N2Oemissionsgrowth]
         socioscenario[:er_LGemissionsgrowth_rcp] = scenario[:er_LGemissionsgrowth]
         socioscenario[:pse_sulphatevsbase_rcp] = scenario[:pse_sulphatevsbase]
+        socioscenario_comp = :RFFSPScenario
     else
         socioscenario = scenario
+        socioscenario_comp = :RCPSSPScenario
     end
     glotemp = addglobaltemperature(m, use_seaice)
     regtemp = addregiontemperature(m)
@@ -45,6 +47,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     addabatementcostparameters(m, :CH4)
     addabatementcostparameters(m, :N2O)
     addabatementcostparameters(m, :Lin)
+    carbonpriceinfer = addcarbonpriceinfer(m)
 
     set_param!(m, :q0propmult_cutbacksatnegativecostinfinalyear, 0.8833333333333333)
     set_param!(m, :qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear, 1.1166666666666666)
@@ -157,6 +160,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :GDP => :pop_population_region, :Population => :pop_population_region)
     gdp[:grw_gdpgrowthrate] = socioscenario[:grw_gdpgrowthrate]
 
+    carbonpriceinfer[:er_CO2emissionsgrowth] = socioscenario[:er_CO2emissionsgrowth]
+
+    abateco2[:carbonprice] = carbonpriceinfer[:carbonprice]
     abateco2[:gdp] = gdp[:gdp]
 
     for allabatement in [
@@ -175,7 +181,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         connect_param!(m, abatementcosts => :alo, abatementcostparameters => :alo)
         connect_param!(m, abatementcosts => :bhi, abatementcostparameters => :bhi)
         connect_param!(m, abatementcosts => :ahi, abatementcostparameters => :ahi)
-        connect_param!(m, abatementcosts => :er_emissionsgrowth, :RCPSSPScenario => er_parameter)
+        connect_param!(m, abatementcosts => :er_emissionsgrowth, socioscenario_comp => er_parameter)
     end
 
     connect_param!(m, :TotalAbatementCosts => :tc_totalcosts_co2, :AbatementCostsCO2 => :tc_totalcost)

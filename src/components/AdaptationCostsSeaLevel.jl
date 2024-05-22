@@ -13,9 +13,10 @@
 
     function run_timestep(p, v, d, tt)
         slrmm = p.s_sealevel[tt] * 1000
+
         for cc in d.country
-            adaptcost_noadapt = p.alpha_noadapt[cc] * slrmm + p.beta_noadapt[cc] * slrmm^2
-            adaptcost_optimal = p.alpha_optimal[cc] * slrmm + p.beta_optimal[cc] * slrmm^2
+            adaptcost_noadapt = (p.alpha_noadapt[cc] * slrmm + p.beta_noadapt[cc] * slrmm^2) / 1e6 # convert to $million
+            adaptcost_optimal = (p.alpha_optimal[cc] * slrmm + p.beta_optimal[cc] * slrmm^2) / 1e6
 
             v.ac_adaptivecosts[tt, cc] = adaptcost_noadapt * (1 - p.saf_slradaptfrac[tt, cc]) + adaptcost_optimal * p.saf_slradaptfrac[tt, cc]
         end
