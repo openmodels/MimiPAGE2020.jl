@@ -193,6 +193,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     connect_param!(m, :AdaptiveCostsEconomic => :gdp, :GDP => :gdp_region)
     connect_param!(m, :AdaptiveCostsNonEconomic => :gdp, :GDP => :gdp_region)
+    connect_param!(m, :AdaptiveCostsSeaLevel => :gdp, :GDP => :gdp)
     connect_param!(m, :AdaptiveCostsSeaLevel => :s_sealevel, :SeaLevelRise => :s_sealevel)
 
     connect_param!(m, :TotalAdaptationCosts => :ac_adaptationcosts_economic, :AdaptiveCostsEconomic => :ac_adaptivecosts)
@@ -201,6 +202,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :TotalAdaptationCosts => :pop_population, :Population => :pop_population)
     connect_param!(m, :TotalAdaptationCosts => :pop_population_region, :Population => :pop_population_region)
 
+    connect_param!(m, :SLRDamages => :gdp, :GDP => :gdp)
     connect_param!(m, :SLRDamages => :pop_population, :Population => :pop_population)
     connect_param!(m, :SLRDamages => :s_sealevel, :SeaLevelRise => :s_sealevel)
     connect_param!(m, :SLRDamages => :cons_percap_consumption, :GDP => :cons_percap_consumption)

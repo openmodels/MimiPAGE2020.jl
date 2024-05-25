@@ -69,6 +69,7 @@ end
         seed::Union{Int, Nothing} = nothing)
 
 Computes the social cost of CO2 for an emissions pulse in `year` for the provided the model `m`.
+Returns a NamedTuple (scc, scc_disaggregated, mm) of the social cost of carbon and the MarginalModel used to compute it.
 If no model is provided, the default model from get_model() is used.
 Units of the returned value are \$ per metric tonne of CO2.
 
@@ -137,6 +138,9 @@ function compute_scc(
         # Run the "best guess" social cost calculation
         run(mm)
         scc = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
+        tds = getdataframe(mm, :CountryLevelNPV, :td_totaldiscountedimpacts)
+        tds[!, :scc] = tds[!, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
+        scc_disaggregated = tds
     elseif n < 1
         error("Invalid `n` value, only values >=1 allowed.")
     else
@@ -147,19 +151,26 @@ function compute_scc(
         prtp !== nothing ? _remove_RV!(simdef, "EquityWeighting.ptp_timepreference") : nothing
 
         seed !== nothing ? Random.seed!(seed) : nothing
-        Mimi.set_payload!(simdef, (Vector{Float64}(undef, n), year))  # pass the year and a vector for storing SCC values to the `run` function
-        si = run(simdef, mm, n, trials_output_filename=trials_output_filename, post_trial_func=_scc_post_trial_func)
-        scc = Mimi.payload(si)[1]   # collect the values computed during the post-trial function
+
+        # Setup of location of final results
+        scc_results = zeros(samplesize)
+        scc_disaggregated_results = []
+
+        function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
+            marginal = sim_inst.models[1]
+            marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
+            scc_results[trialnum] = marg_damages
+            tds = getdataframe(marginal, :CountryLevelNPV, :td_totaldiscountedimpacts)
+            tds[!, :scc] = tds[!, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
+            push!(scc_disaggregated_results, tds)
+        end
+
+        si = run(simdef, mm, n, trials_output_filename=trials_output_filename, post_trial_func=mc_scc_calculation)
+        scc = scc_results
+        scc_disaggregated = vcat(scc_disaggregated_results...)
     end
 
-    return scc
-end
-
-# Post trial function for calculating the scc in Monte Carlo mode
-function _scc_post_trial_func(si::SimulationInstance, trial::Int, ntimesteps::Int, tup::Nothing)
-    (scc_array, year) = Mimi.payload(si)
-    mm = si.models[1]
-    scc_array[trial] = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
+    return (scc=scc, scc_disaggregated=scc_disaggregated, mm=mm)
 end
 
 # Helper function for removing a random variable by its parameter name in the model.
@@ -173,51 +184,6 @@ function _remove_RV!(simdef, _name)
     [Mimi.delete_RV!(simdef, rv_name) for rv_name in rv_names]
 end
 
-
-"""
-    compute_scc_mm(m::Model = get_model(); year::Union{Int, Nothing} = nothing, eta::Union{Float64, Nothing} = nothing, prtp::Union{Float64, Nothing} = nothing, pulse_size = 100000.)
-
-Returns a NamedTuple (scc=scc, mm=mm) of the social cost of carbon and the MarginalModel used to compute it.
-Computes the social cost of CO2 for an emissions pulse in `year` for the provided Mimi-PAGE model.
-
-This pulse defaults to 100_000 metric megatonnes of CO2 (Mtonne CO2), and is spread over all years within the
-period following `year`. A pulse in `year` is actually a gradual increase throughout the timestep preceeding `year`,
-followed by a gradual decrease in emissions in the timestep superseeding `year`. Emissions are linearly interpolated
-between the points given by the years.
-The SCC will be returned in dollars per ton regardless of pulse size, because it is normalized over the pulse size.
-If no model is provided, the default model from MimiPAGE2020.get_model() is used. Discounting scheme can be
-specified by the `eta` and `prtp` parameters, which will  update the values of emuc_utilitiyconvexity and
-ptp_timepreference in the model.  If no values are provided, the discount factors will be computed using the
-default PAGE values of emuc_utilitiyconvexity=1.1666666667 and ptp_timepreference=1.0333333333.
-"""
-function compute_scc_mm(m::Model=get_model(); year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=75000.)
-    year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
-    !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
-
-    if eta != nothing
-        try
-            set_param!(m, :emuc_utilityconvexity, eta)      # since eta is a default parameter in PAGE, we need to use `set_param!` if it hasn't been set yet
-        catch e
-            update_param!(m, :emuc_utilityconvexity, eta)   # or update_param! if it has been set
-        end
-    end
-
-    if prtp != nothing
-        try
-            set_param!(m, :ptp_timepreference, prtp * 100)      # since prtp is a default parameter in PAGE, we need to use `set_param!` if it hasn't been set yet
-        catch e
-            update_param!(m, :ptp_timepreference, prtp * 100)   # or update_param! if it has been set
-        end
-    end
-
-    # note here that we use `pulse_size` as the `delta` keyword argument for
-    # the marginal model so we can normalize to $ per ton
-    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-    scc = mm[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
-    scc_disaggregated = mm[:EquityWeighting, :addt_equityweightedimpact_discountedaggregated] / undiscount_scc(mm.base, year)
-
-    return (scc = scc, scc_disaggregated = scc_disaggregated, mm = mm)
-end
 
 """
     get_marginal_model(m::Model = get_model(); year::Union{Int, Nothing} = nothing, pulse_size = 100000.)
@@ -246,29 +212,4 @@ function get_marginal_model(m::Model=get_model(); year::Union{Int,Nothing}=nothi
 
     run(mm)
     return mm
-end
-
-function compute_scc_mcs(m::Model, samplesize::Int; year::Union{Int,Nothing}=nothing, eta::Union{Float64,Nothing}=nothing, prtp::Union{Float64,Nothing}=nothing, pulse_size=100000.)
-    # Setup of location of final results
-    scc_results = zeros(samplesize)
-
-    function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
-        marginal = sim_inst.models[1]
-        marg_damages = marginal[:EquityWeighting, :td_totaldiscountedimpacts] / undiscount_scc(mm.base, year)
-        scc_results[trialnum] = marg_damages
-    end
-
-    # get simulation
-    mcs = getsim()
-
-    # Setup models
-    eta == nothing ? nothing : update_param!(m, :emuc_utilityconvexity, eta)
-    prtp == nothing ? nothing : update_param!(m, :ptp_timepreference, prtp * 100.)
-
-    mm = get_marginal_model(m, year=year, pulse_size=pulse_size)   # Returns a marginal model that has already been run
-
-    # Run
-    res = run(mcs, mm, samplesize; post_trial_func=mc_scc_calculation)
-
-    scc_results
 end

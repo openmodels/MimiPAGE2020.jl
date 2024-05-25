@@ -7,6 +7,7 @@
     # incoming parameters from SeaLevelRise
     s_sealevel = Parameter(index=[time], unit="m")
 
+    gdp = Parameter(index=[time, country], unit="\$M")
     pop_population = Parameter(index=[time, country], unit="million person")
 
     # incoming parameters to calculate consumption per capita after Costs
@@ -38,11 +39,12 @@
         slrmm = p.s_sealevel[t] * 1000
 
         for cc in d.country
+            # fraction of GDP
             damage_noadapt = p.alpha_noadapt[cc] * slrmm + p.beta_noadapt[cc] * slrmm^2
             damage_optimal = p.alpha_optimal[cc] * slrmm + p.beta_optimal[cc] * slrmm^2
 
             v.d_slr[t, cc] = damage_noadapt * (1 - p.saf_slradaptfrac[t, cc]) + damage_optimal * p.saf_slradaptfrac[t, cc]
-            v.d_percap_slr[t, cc] = v.d_slr[t, cc] / (p.pop_population[t, cc] * 1e6)
+            v.d_percap_slr[t, cc] = v.d_slr[t, cc] * p.gdp[t, cc] / p.pop_population[t, cc] # both in millions, cancels
 
             v.cons_percap_aftercosts[t, cc] = p.cons_percap_consumption[t, cc] - p.tct_per_cap_totalcostspercap[t, cc] - p.act_percap_adaptationcosts[t, cc]
 

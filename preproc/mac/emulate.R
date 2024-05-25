@@ -147,7 +147,7 @@ for (iso in unique(df$Region)) {
         AA.gdpbs <- AA.gdp[bootstrap,]
 
         mod.co2 <- nnnpls(AA.co2bs, df5$value.co2[bootstrap], c(rep(-1, 6), rep(-1, 6), 1, rep(1, ncol(AA.co2bs) - 13)))
-        mod.gdp <- nnnpls(AA.gdpbs, df5$value.gdp[bootstrap], c(rep(-1, 6), rep(-1, 6), 1, rep(1, ncol(AA.gdpbs) - 13)))
+        mod.gdp <- nnnpls(AA.gdpbs, df5$value.loggdp[bootstrap], c(rep(-1, 6), rep(-1, 6), 1, rep(1, ncol(AA.gdpbs) - 13)))
 
         baseline <- df5$lag.value.co2[df5$Year == 2015 & df5$Model == 'Downscaling [MESSAGEix-GLOBIOM 1.1-M-R12]' & df5$Scenario == 'Current Policies']
         pdf <- data.frame(Year=2030, value.carbonprice=c(0, 20, 50, 100, 200, 500, 1000), lag.value.co2=0)

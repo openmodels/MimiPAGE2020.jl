@@ -58,7 +58,13 @@
     addt_equityweightedimpact_discountedaggregated = Variable(index=[time, country], unit="\$million")
     aact_equityweightedadaptation_discountedaggregated = Variable(index=[time, country], unit="\$million")
 
+    td_totaldiscountedimpacts = Variable(index=[country], unit="\$million")
+
     function run_timestep(p, v, d, tt)
+        if is_first(tt)
+            v.td_totaldiscountedimpacts[:] .= 0
+        end
+
         if p.discfix_fixediscountrate != 0.
             v.df_utilitydiscountfactor[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
         else
@@ -107,6 +113,8 @@
 
             v.addt_equityweightedimpact_discountedaggregated[tt, cc] = v.widt_equityweightedimpact_discounted[tt, cc] * p.yagg_periodspan[tt]
             v.aact_equityweightedadaptation_discountedaggregated[tt, cc] = v.wacdt_partiallyweighted_discounted[tt, cc] * p.yagg_periodspan[tt]
+
+            v.td_totaldiscountedimpacts[cc] = v.td_totaldiscountedimpacts[cc] + v.addt_equityweightedimpact_discountedaggregated[tt, cc]
         end
     end
 end

@@ -83,16 +83,18 @@ macs = myloadcsv("data/macs.csv")
             baselineemit = pp.e0_baselineCO2emissions .* pp.bau_co2emissions[tt, :] / 100 # Mt
 
             rawfractargetabated = -sum(rawtonnesabated) / sum(baselineemit) # fraction abated
+            # Regularize so not over 1 and goes to 1 as p -> inf
+            regfractargetabated = rawfractargetabated ./ (exp.(-carbonprice / 500) + rawfractargetabated)
 
-            return 100 * (1 - rawfractargetabated) - sum(pp.e0_baselineCO2emissions .* pp.er_CO2emissionsgrowth[tt, :]) / sum(baselineemit)
+            return 100 * (1 - regfractargetabated) - sum(pp.e0_baselineCO2emissions .* pp.er_CO2emissionsgrowth[tt, :]) / sum(baselineemit)
         end
 
         if geterdiff(0) < 0 # emissions > no-mitigation
             vv.carbonprice[tt, :] .= 0.
-        elseif geterdiff(1000) > 0 # emissions < $1000 price
-            vv.carbonprice[tt, :] .= 1000. # XXX: Temporary, while improve MACs
+        elseif geterdiff(2000) > 0 # emissions < $2000 price
+            vv.carbonprice[tt, :] .= 2000.
         else
-            root = find_zero(geterdiff, (0.0, 1000.0), Bisection())
+            root = find_zero(geterdiff, (0.0, 2000.0), Bisection())
             vv.carbonprice[tt, :] .= root
         end
     end

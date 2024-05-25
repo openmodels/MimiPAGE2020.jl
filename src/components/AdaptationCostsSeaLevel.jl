@@ -2,6 +2,7 @@
     country = Index()
 
     s_sealevel = Parameter(index=[time], unit="m")
+    gdp = Parameter(index=[time, country], unit="\$M")
 
     alpha_noadapt = Parameter(index=[country])
     beta_noadapt = Parameter(index=[country])
@@ -15,8 +16,9 @@
         slrmm = p.s_sealevel[tt] * 1000
 
         for cc in d.country
-            adaptcost_noadapt = (p.alpha_noadapt[cc] * slrmm + p.beta_noadapt[cc] * slrmm^2) / 1e6 # convert to $million
-            adaptcost_optimal = (p.alpha_optimal[cc] * slrmm + p.beta_optimal[cc] * slrmm^2) / 1e6
+            # fraction of GDP -> $million
+            adaptcost_noadapt = (p.alpha_noadapt[cc] * slrmm + p.beta_noadapt[cc] * slrmm^2) * p.gdp[tt, cc]
+            adaptcost_optimal = (p.alpha_optimal[cc] * slrmm + p.beta_optimal[cc] * slrmm^2) * p.gdp[tt, cc]
 
             v.ac_adaptivecosts[tt, cc] = adaptcost_noadapt * (1 - p.saf_slradaptfrac[tt, cc]) + adaptcost_optimal * p.saf_slradaptfrac[tt, cc]
         end

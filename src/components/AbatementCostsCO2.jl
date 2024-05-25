@@ -141,18 +141,14 @@ macs = myloadcsv("data/macs.csv")
         ac_200_500_gdp = vv.ac_200_500_gdp + vv.ac_200_500xyear_gdp * (2050 - gettime(tt))
         ac_500_inf_gdp = vv.ac_500_inf_gdp + vv.ac_500_infxyear_gdp * (2050 - gettime(tt))
 
-        if is_first(tt)
-            gdplogdiff = 0
-        else
-            gdplogdiff = log.(pp.gdp[tt-1,:]) .- log.(pp.gdp[tt,:])
-        end
+        # Drop "vv.lag_value_gdp .* gdplogdiff", since want difference from baseline, but this is baseline
         vv.loggdpcost[tt,:] = ac_0_20_gdp .* price2frac(pp.carbonprice[tt, :], 0, 20) +
             ac_20_50_gdp .* price2frac(pp.carbonprice[tt, :], 20, 50) +
             ac_50_100_gdp .* price2frac(pp.carbonprice[tt, :], 50, 100) +
             ac_100_200_gdp .* price2frac(pp.carbonprice[tt, :], 100, 200) +
             ac_200_500_gdp .* price2frac(pp.carbonprice[tt, :], 200, 500) +
             ac_500_inf_gdp .* price2frac(pp.carbonprice[tt, :], 500, Inf) # log difference
-        # Currently drop "vv.lag_value_gdp .* gdplogdiff", since want difference from baseline, but this is baseline
+        vv.loggdpcost[tt,:] = min.(0, vv.loggdpcost[tt,:])
 
         vv.tc_totalcost[tt,:] = pp.gdp[tt,:] .* (1 .- exp.(vv.loggdpcost[tt,:]))
         vv.tc_totalcost_region[tt, :] = countrytoregion(pp.model, sum, vv.tc_totalcost[tt,:])
