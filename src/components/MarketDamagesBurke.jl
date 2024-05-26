@@ -39,6 +39,7 @@ include("../utils/country_tools.jl")
     isat_per_cap_ImpactperCapinclSaturationandAdaptation = Variable(index=[time,country], unit="\$/person")
 
     # Vulnerability-based shifter coefficients
+    burkey_draw = Parameter{Int64}()
     gamma0_burkey_intercept = Parameter()
     gamma1_burkey_hazard = Parameter()
     gamma2_burkey_vulnerability = Parameter()
@@ -50,6 +51,23 @@ include("../utils/country_tools.jl")
     r3_riskindex_copinglack = Parameter(index=[time, country])
     gdp = Parameter(index=[time, country], unit="\$M")
     pop_population = Parameter(index=[time, country], unit="million person")
+
+    function init(pp, vv, dd)
+        burkey = CSV.read("../data/burkey-estimates.csv", DataFrame)
+        if pp.burkey_draw == -1
+            marketdamagesburke[:gamma0_burkey_intercept] = mean(burkey.Intercept)
+            marketdamagesburke[:gamma1_burkey_hazard] = mean(burkey.HA)
+            marketdamagesburke[:gamma2_burkey_vulnerability] = mean(burkey.VU)
+            marketdamagesburke[:gamma3_burkey_copinglack] = mean(burkey.CC)
+            marketdamagesburke[:gamma4_burkey_loggdppc] = mean(burkey.loggdppc)
+        else
+            marketdamagesburke[:gamma0_burkey_intercept] = burkey.Intercept[pp.burkey_draw]
+            marketdamagesburke[:gamma1_burkey_hazard] = burkey.HA[pp.burkey_draw]
+            marketdamagesburke[:gamma2_burkey_vulnerability] = burkey.VU[pp.burkey_draw]
+            marketdamagesburke[:gamma3_burkey_copinglack] = burkey.CC[pp.burkey_draw]
+            marketdamagesburke[:gamma4_burkey_loggdppc] = burkey.loggdppc[pp.burkey_draw]
+        end
+    end
 
     function run_timestep(p, v, d, t)
 
@@ -125,13 +143,6 @@ function addmarketdamagesburke(model::Model)
 
     marketdamagesburke[:model] = model
     marketdamagesburke[:rtl_0_realizedtemperature_absolute] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
-
-    burkey = CSV.read("../data/burkey-estimates.csv", DataFrame)
-    marketdamagesburke[:gamma0_burkey_intercept] = mean(burkey.Intercept)
-    marketdamagesburke[:gamma1_burkey_hazard] = mean(burkey.HA)
-    marketdamagesburke[:gamma2_burkey_vulnerability] = mean(burkey.VU)
-    marketdamagesburke[:gamma3_burkey_copinglack] = mean(burkey.CC)
-    marketdamagesburke[:gamma4_burkey_loggdppc] = mean(burkey.loggdppc)
 
     informs = CSV.read("../data/inform-combined.csv", DataFrame)
     r1 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))

@@ -63,7 +63,7 @@ macs = myloadcsv("data/macs.csv")
     tc_totalcost_region = Variable(index=[time, region], unit="\$million")
 
     function init(pp, vv, dd)
-        if pp.mac_draw == 0
+        if pp.mac_draw == -1
             macs2 = im_to_i(macs, "iso", "bs", nothing)
         else
             macs2 = im_to_i(macs, "iso", "bs", pp.mac_draw)
@@ -159,7 +159,7 @@ function addabatementcostsco2(model::Model)
     abatementcostscomp = add_comp!(model, AbatementCostsCO2)
 
     abatementcostscomp[:model] = model
-    abatementcostscomp[:mac_draw] = 0
+    abatementcostscomp[:mac_draw] = -1
     abatementcostscomp[:baselineco2_uniforms] = -ones(dim_count(model, :country))
     abatementcostscomp[:carbonprice] = zeros(dim_count(model, :time), dim_count(model, :country))
 

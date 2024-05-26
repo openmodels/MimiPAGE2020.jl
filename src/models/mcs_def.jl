@@ -72,6 +72,7 @@ function getsim()
         GlobalTemperature.alb_emulator_rand = TriangularDist(-1., 1., 0.)
 
         # RegionTemperature
+        RegionTemperature.prcile = Uniform(0, 1)
         RegionTemperature.ampf_amplification["EU"] = TriangularDist(1.05, 1.53, 1.23)
         RegionTemperature.ampf_amplification["USA"] = TriangularDist(1.16, 1.54, 1.32)
         RegionTemperature.ampf_amplification["OECD"] = TriangularDist(1.14, 1.31, 1.21)
@@ -100,21 +101,19 @@ function getsim()
         MarketDamages.ipow_MarketIncomeFxnExponent = TriangularDist(-.3, 0, -.1)
 
         # MarketDamagesBurke
+        MarketDamagesBurke.burkey_draw = UniformDist(0, 4000)
         MarketDamagesBurke.impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
         MarketDamagesBurke.impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
 
         # NonMarketDamages
         NonMarketDamages.iben_NonMarketInitialBenefit = TriangularDist(0, .2, .05)
-        NonMarketDamages.w_NonImpactsatCalibrationTemp = TriangularDist(.1, 1, .5)
+        NonMarketDamages.w_NonImpactsatCalibrationTemp = Normal(0.487 * 1.25 * 3*3, 0.182 * 1.25 * 3*3)
         NonMarketDamages.pow_NonMarketExponent = TriangularDist(1.5, 3, 2)
         NonMarketDamages.ipow_NonMarketIncomeFxnExponent = TriangularDist(-.2, .2, 0)
 
         # SLRDamages
-        SLRDamages.scal_calibrationSLR = TriangularDist(0.45, 0.55, .5)
-        # SLRDamages.iben_SLRInitialBenefit = TriangularDist(0, 0, 0) # only usable if lb <> ub
-        SLRDamages.W_SatCalibrationSLR = TriangularDist(.5, 1.5, 1)
-        SLRDamages.pow_SLRImpactFxnExponent = TriangularDist(.5, 1, .7)
-        SLRDamages.ipow_SLRIncomeFxnExponent = TriangularDist(-.4, -.2, -.3)
+        rv(RV_sealevelcost_draw) = Uniform(0, 100)
+        SLRDamages_sealevelcost_draw = RV_sealevelcost_draw
 
         # Discontinuity
         Discontinuity.rand_discontinuity = Uniform(0, 1)
@@ -128,6 +127,9 @@ function getsim()
         EquityWeighting.civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
         EquityWeighting.ptp_timepreference = TriangularDist(0.1, 2, 1)
         EquityWeighting.emuc_utilityconvexity = TriangularDist(0.5, 2, 1)
+
+        # RFFSPScenario
+        RFFSPScenario.rffsp_draw = UniformDist(0, 10000)
 
         ############################################################################
         # Define random variables (RVs) - for SHARED parameters
@@ -204,43 +206,44 @@ function getsim()
         MarketDamagesBurke_rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
 
         # AbatementCosts
-        AbatementCostParametersCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50, 6.0, -22)
+        rv(RV_mac_draw) = UniformDist(0, 100)
+        AbatementCostsCO2_mac_draw = RV_mac_draw
+        AbatementCostsCO2_baselineco2_uniforms = UniformDist(0, 1)
+
         AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67, 6.0, -30)
         AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20, 6.0, -7.0)
         AbatementCostParametersLin_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50, 50, 0)
 
-        AbatementCostParametersCO2_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 40, 20)
         AbatementCostParametersCH4_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
         AbatementCostParametersN2O_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
         AbatementCostParametersLin_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
 
-        AbatementCostParametersCO2_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400, -100, -200)
         AbatementCostParametersCH4_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-8000, -1000, -4000)
         AbatementCostParametersN2O_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-15000, 0, -7000)
         AbatementCostParametersLin_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400, -100, -200)
 
-        AbatementCostParametersCO2_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60, 80, 70)
         AbatementCostParametersCH4_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35, 70, 50)
         AbatementCostParametersN2O_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35, 70, 50)
         AbatementCostParametersLin_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60, 80, 70)
 
-        AbatementCostParametersCO2_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100, 700, 400)
         AbatementCostParametersCH4_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(3000, 10000, 6000)
         AbatementCostParametersN2O_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(2000, 60000, 20000)
         AbatementCostParametersLin_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100, 600, 300)
 
-        AbatementCostParametersCO2_ies_InitialExperienceStockofCutbacks = TriangularDist(100000, 200000, 150000)
         AbatementCostParametersCH4_ies_InitialExperienceStockofCutbacks = TriangularDist(1500, 2500, 2000)
         AbatementCostParametersN2O_ies_InitialExperienceStockofCutbacks = TriangularDist(30, 80, 50)
         AbatementCostParametersLin_ies_InitialExperienceStockofCutbacks = TriangularDist(1500, 2500, 2000)
 
         # AdaptationCosts
-        AdaptiveCostsSeaLevel_cp_costplateau_eu = TriangularDist(0.01, 0.04, 0.02)
-        AdaptiveCostsSeaLevel_ci_costimpact_eu = TriangularDist(0.0005, 0.002, 0.001)
+        AdaptiveCostsSeaLevel_sealevelcost_draw = RV_sealevelcost_draw
+
         AdaptiveCostsEconomic_cp_costplateau_eu = TriangularDist(0.005, 0.02, 0.01)
         AdaptiveCostsEconomic_ci_costimpact_eu = TriangularDist(0.001, 0.008, 0.003)
         AdaptiveCostsNonEconomic_cp_costplateau_eu = TriangularDist(0.01, 0.04, 0.02)
         AdaptiveCostsNonEconomic_ci_costimpact_eu = TriangularDist(0.002, 0.01, 0.005)
+
+        # CarbonPriceInfer
+        CarbonPriceInfer_mac_draw = RV_mac_draw
 
         ############################################################################
         # Indicate which parameters to save for each model run

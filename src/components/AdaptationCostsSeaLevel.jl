@@ -1,6 +1,8 @@
 @defcomp AdaptiveCostsSeaLevel begin
     country = Index()
 
+    sealevelcost_draw = Parameter{Int64}()
+
     s_sealevel = Parameter(index=[time], unit="m")
     gdp = Parameter(index=[time, country], unit="\$M")
 
@@ -11,6 +13,20 @@
     saf_slradaptfrac = Parameter(index=[time, country])
 
     ac_adaptivecosts = Variable(index=[time, country], unit="\$million")
+
+    function init(pp, vv, dd)
+        if pp.sealevelcost_draw == -1
+            vv.alpha_noadapt = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.adapts.noadapt", values -> 0.)
+            vv.beta_noadapt = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.adapts.noadapt", values -> 0.)
+            vv.alpha_optimal = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.adapts.optimal", values -> 0.)
+            vv.beta_optimal = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.adapts.optimal", values -> 0.)
+        else
+            vv.alpha_noadapt = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "alpha.adapts.noadapt", values -> 0.)
+            vv.beta_noadapt = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "beta.adapts.noadapt", values -> 0.)
+            vv.alpha_optimal = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "alpha.adapts.optimal", values -> 0.)
+            vv.beta_optimal = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "beta.adapts.optimal", values -> 0.)
+        end
+    end
 
     function run_timestep(p, v, d, tt)
         slrmm = p.s_sealevel[tt] * 1000
@@ -28,10 +44,7 @@ end
 function addadaptationcosts_sealevel(model::Model)
     adaptationcosts = add_comp!(model, AdaptiveCostsSeaLevel)
 
-    adaptationcosts[:alpha_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.adapts.noadapt", values -> 0.)
-    adaptationcosts[:beta_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.adapts.noadapt", values -> 0.)
-    adaptationcosts[:alpha_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.adapts.optimal", values -> 0.)
-    adaptationcosts[:beta_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.adapts.optimal", values -> 0.)
+    adaptationcosts[:sealevelcost_draw] = -1
     adaptationcosts[:saf_slradaptfrac] = 0.5 * ones(dim_count(model, :time), dim_count(model, :country))
 
     return adaptationcosts

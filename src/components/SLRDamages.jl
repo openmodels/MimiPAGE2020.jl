@@ -4,6 +4,8 @@
     y_year = Parameter(index=[time], unit="year")
     y_year_0 = Parameter(unit="year")
 
+    sealevelcost_draw = Parameter{Int64}()
+
     # incoming parameters from SeaLevelRise
     s_sealevel = Parameter(index=[time], unit="m")
 
@@ -34,6 +36,20 @@
 
     rcons_per_cap_SLRRemainConsumption = Variable(index=[time, country], unit="\$/person")
     rgdp_per_cap_SLRRemainGDP = Variable(index=[time, country], unit="\$/person")
+
+    function init(pp, vv, dd)
+        if pp.sealevelcost_draw == -1
+            SLRDamagescomp[:alpha_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.damage.noadapt", values -> 0.)
+            SLRDamagescomp[:beta_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.damage.noadapt", values -> 0.)
+            SLRDamagescomp[:alpha_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.damage.optimal", values -> 0.)
+            SLRDamagescomp[:beta_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.damage.optimal", values -> 0.)
+        else
+            SLRDamagescomp[:alpha_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "alpha.damage.noadapt", values -> 0.)
+            SLRDamagescomp[:beta_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "beta.damage.noadapt", values -> 0.)
+            SLRDamagescomp[:alpha_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "alpha.damage.optimal", values -> 0.)
+            SLRDamagescomp[:beta_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, pp.sealevelcost_draw, "beta.damage.optimal", values -> 0.)
+        end
+    end
 
     function run_timestep(p, v, d, t)
         slrmm = p.s_sealevel[t] * 1000
@@ -67,10 +83,7 @@ end
 function addslrdamages(model::Model)
     SLRDamagescomp = add_comp!(model, SLRDamages)
 
-    SLRDamagescomp[:alpha_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.damage.noadapt", values -> 0.)
-    SLRDamagescomp[:beta_noadapt] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.damage.noadapt", values -> 0.)
-    SLRDamagescomp[:alpha_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "alpha.damage.optimal", values -> 0.)
-    SLRDamagescomp[:beta_optimal] = readcountrydata_im(model, "data/damages/slremul.csv", "adm0", :bs, nothing, "beta.damage.optimal", values -> 0.)
+    SLRDamagescomp[:sealevelcost_draw] = -1
     SLRDamagescomp[:saf_slradaptfrac] = 0.5 * ones(dim_count(model, :time), dim_count(model, :country))
 
     return SLRDamagescomp

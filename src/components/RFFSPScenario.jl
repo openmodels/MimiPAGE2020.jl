@@ -32,7 +32,8 @@ include("../utils/country_tools.jl")
         if pp.rffsp_draw == 0
             df = Arrow.Table(datapath("rffsp/grows-mean.feather")) |> DataFrame
         else
-            df = Arrow.Table(datapath("rffsp/grows-{((pp.rffsp_draw-1) ÷ 1000)+1}.feather")) |> DataFrame
+            df = Arrow.Table(datapath("rffsp/grows-$(((pp.rffsp_draw-1) ÷ 1000)+1).feather")) |> DataFrame
+            df = df[df.num .== pp.rffsp_draw, :]
         end
 
         vv.popgrw_populationgrowth[:, :] = readcountrydata_it_const(pp.model, df, :ISO, :period, "pop.grow")
