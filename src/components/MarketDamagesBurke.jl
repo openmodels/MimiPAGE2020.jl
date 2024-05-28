@@ -40,11 +40,11 @@ include("../utils/country_tools.jl")
 
     # Vulnerability-based shifter coefficients
     burkey_draw = Parameter{Int64}()
-    gamma0_burkey_intercept = Parameter()
-    gamma1_burkey_hazard = Parameter()
-    gamma2_burkey_vulnerability = Parameter()
-    gamma3_burkey_copinglack = Parameter()
-    gamma4_burkey_loggdppc = Parameter()
+    gamma0_burkey_intercept = Variable()
+    gamma1_burkey_hazard = Variable()
+    gamma2_burkey_vulnerability = Variable()
+    gamma3_burkey_copinglack = Variable()
+    gamma4_burkey_loggdppc = Variable()
 
     r1_riskindex_hazard = Parameter(index=[time, country])
     r2_riskindex_vulnerability = Parameter(index=[time, country])
@@ -55,24 +55,24 @@ include("../utils/country_tools.jl")
     function init(pp, vv, dd)
         burkey = CSV.read("../data/burkey-estimates.csv", DataFrame)
         if pp.burkey_draw == -1
-            marketdamagesburke[:gamma0_burkey_intercept] = mean(burkey.Intercept)
-            marketdamagesburke[:gamma1_burkey_hazard] = mean(burkey.HA)
-            marketdamagesburke[:gamma2_burkey_vulnerability] = mean(burkey.VU)
-            marketdamagesburke[:gamma3_burkey_copinglack] = mean(burkey.CC)
-            marketdamagesburke[:gamma4_burkey_loggdppc] = mean(burkey.loggdppc)
+            vv.gamma0_burkey_intercept = mean(burkey.Intercept)
+            vv.gamma1_burkey_hazard = mean(burkey.HA)
+            vv.gamma2_burkey_vulnerability = mean(burkey.VU)
+            vv.gamma3_burkey_copinglack = mean(burkey.CC)
+            vv.gamma4_burkey_loggdppc = mean(burkey.loggdppc)
         else
-            marketdamagesburke[:gamma0_burkey_intercept] = burkey.Intercept[pp.burkey_draw]
-            marketdamagesburke[:gamma1_burkey_hazard] = burkey.HA[pp.burkey_draw]
-            marketdamagesburke[:gamma2_burkey_vulnerability] = burkey.VU[pp.burkey_draw]
-            marketdamagesburke[:gamma3_burkey_copinglack] = burkey.CC[pp.burkey_draw]
-            marketdamagesburke[:gamma4_burkey_loggdppc] = burkey.loggdppc[pp.burkey_draw]
+            vv.gamma0_burkey_intercept = burkey.Intercept[pp.burkey_draw]
+            vv.gamma1_burkey_hazard = burkey.HA[pp.burkey_draw]
+            vv.gamma2_burkey_vulnerability = burkey.VU[pp.burkey_draw]
+            vv.gamma3_burkey_copinglack = burkey.CC[pp.burkey_draw]
+            vv.gamma4_burkey_loggdppc = burkey.loggdppc[pp.burkey_draw]
         end
     end
 
     function run_timestep(p, v, d, t)
 
         # Calculate country-level marginal effect difference
-        marginal_offset = p.gamma0_burkey_intercept .+ p.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[t, :]) .+ p.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[t, :]) .+ p.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[t, :]) .+ p.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
+        marginal_offset = v.gamma0_burkey_intercept .+ v.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[t, :]) .+ v.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[t, :]) .+ v.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[t, :]) .+ v.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
         # Translate into a difference in temperatures
         #   deltay = 2 beta1 T
         delta_temp = marginal_offset ./ (2 * p.impf_coeff_quadr)
@@ -142,6 +142,7 @@ function addmarketdamagesburke(model::Model)
     marketdamagesburke = add_comp!(model, MarketDamagesBurke)
 
     marketdamagesburke[:model] = model
+    marketdamagesburke[:burkey_draw] = -1
     marketdamagesburke[:rtl_0_realizedtemperature_absolute] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
 
     informs = CSV.read("../data/inform-combined.csv", DataFrame)

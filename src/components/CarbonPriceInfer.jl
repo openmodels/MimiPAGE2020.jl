@@ -89,9 +89,9 @@ macs = myloadcsv("data/macs.csv")
             return 100 * (1 - regfractargetabated) - sum(pp.e0_baselineCO2emissions .* pp.er_CO2emissionsgrowth[tt, :]) / sum(baselineemit)
         end
 
-        if geterdiff(0) < 0 # emissions > no-mitigation
+        if geterdiff(0) < 0 # no-mitigation - emissions < 0 -> emissions > no-mitigation
             vv.carbonprice[tt, :] .= 0.
-        elseif geterdiff(2000) > 0 # emissions < $2000 price
+        elseif geterdiff(2000) > 0 # full-mitigation - emissions > 0 -> emissions < $2000 price
             vv.carbonprice[tt, :] .= 2000.
         else
             root = find_zero(geterdiff, (0.0, 2000.0), Bisection())

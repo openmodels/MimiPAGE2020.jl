@@ -153,7 +153,7 @@ function compute_scc(
         seed !== nothing ? Random.seed!(seed) : nothing
 
         # Setup of location of final results
-        scc_results = zeros(samplesize)
+        scc_results = zeros(n)
         scc_disaggregated_results = []
 
         function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)

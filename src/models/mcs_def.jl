@@ -14,7 +14,6 @@ function getsim()
         # shared parameter, then assign to components
         rv(RV_save_savingsrate) = TriangularDist(10, 20, 15)
         GDP.save_savingsrate = RV_save_savingsrate
-        MarketDamages.save_savingsrate = RV_save_savingsrate
         MarketDamagesBurke.save_savingsrate = RV_save_savingsrate
         NonMarketDamages.save_savingsrate = RV_save_savingsrate
         SLRDamages.save_savingsrate = RV_save_savingsrate
@@ -23,7 +22,6 @@ function getsim()
         # so we use an RV here because in the model this is not an explicitly
         # shared parameter, then assign to components
         rv(RV_tcal_CalibrationTemp) = TriangularDist(2.5, 3.5, 3.)
-        MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
 
         # each component should have the same value for its q0propmult_cutbacksatnegativecostinfinalyear
@@ -72,15 +70,7 @@ function getsim()
         GlobalTemperature.alb_emulator_rand = TriangularDist(-1., 1., 0.)
 
         # RegionTemperature
-        RegionTemperature.prcile = Uniform(0, 1)
-        RegionTemperature.ampf_amplification["EU"] = TriangularDist(1.05, 1.53, 1.23)
-        RegionTemperature.ampf_amplification["USA"] = TriangularDist(1.16, 1.54, 1.32)
-        RegionTemperature.ampf_amplification["OECD"] = TriangularDist(1.14, 1.31, 1.21)
-        RegionTemperature.ampf_amplification["USSR"] = TriangularDist(1.41, 1.9, 1.64)
-        RegionTemperature.ampf_amplification["China"] = TriangularDist(1, 1.3, 1.21)
-        RegionTemperature.ampf_amplification["SEAsia"] = TriangularDist(0.84, 1.15, 1.04)
-        RegionTemperature.ampf_amplification["Africa"] = TriangularDist(0.99, 1.42, 1.22)
-        RegionTemperature.ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
+        RegionTemperature_prcile = Uniform(0, 1)
 
         # SeaLevelRise
         SeaLevelRise.s0_initialSL = TriangularDist(0.17, 0.21, 0.19)        # taken from PAGE-ICE v6.20 default
@@ -89,19 +79,13 @@ function getsim()
         SeaLevelRise.sltau_SLresponsetime = Gamma(16.0833333333333333, 24.) # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
 
         # RCPSSPScenario
-        RCPSSPScenario.rateuniforms = UniformDist(0, 1)
+        RCPSSPScenario_rateuniforms = Uniform(0, 1)
 
         # GDP
         GDP.isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
 
-        # MarketDamages
-        MarketDamages.iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
-        MarketDamages.W_MarketImpactsatCalibrationTemp = TriangularDist(.2, .8, .5)
-        MarketDamages.pow_MarketImpactExponent = TriangularDist(1.5, 3, 2)
-        MarketDamages.ipow_MarketIncomeFxnExponent = TriangularDist(-.3, 0, -.1)
-
         # MarketDamagesBurke
-        MarketDamagesBurke.burkey_draw = UniformDist(0, 4000)
+        MarketDamagesBurke_burkey_draw = Uniform(0, 4000)
         MarketDamagesBurke.impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
         MarketDamagesBurke.impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
 
@@ -129,7 +113,7 @@ function getsim()
         EquityWeighting.emuc_utilityconvexity = TriangularDist(0.5, 2, 1)
 
         # RFFSPScenario
-        RFFSPScenario.rffsp_draw = UniformDist(0, 10000)
+        RFFSPScenario_rffsp_draw = Uniform(0, 10000)
 
         ############################################################################
         # Define random variables (RVs) - for SHARED parameters
@@ -195,20 +179,10 @@ function getsim()
         # in the new Mimi paradigm of shared and unshared parameters, but for now this will
         # continue to work!
 
-        # MarketDamagesBurke
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["EU"] = TriangularDist(6.76231496767033, 13.482086163781, 10.1222005657257)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USA"] = TriangularDist(9.54210085883826, 17.3151395362191, 13.4286201975287)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["OECD"] = TriangularDist(9.07596053028087, 15.0507477943984, 12.0633541623396)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USSR"] = TriangularDist(3.01320548016903, 11.2132204366259, 7.11321295839747)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["China"] = TriangularDist(12.2330402806912, 17.7928749427573, 15.0129576117242)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["SEAsia"] = TriangularDist(23.3863348263352, 26.5136231383473, 24.9499789823412)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["Africa"] = TriangularDist(20.1866940491107, 23.5978086497453, 21.892251349428)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
-
         # AbatementCosts
-        rv(RV_mac_draw) = UniformDist(0, 100)
+        rv(RV_mac_draw) = Uniform(0, 100)
         AbatementCostsCO2_mac_draw = RV_mac_draw
-        AbatementCostsCO2_baselineco2_uniforms = UniformDist(0, 1)
+        AbatementCostsCO2_baselineco2_uniforms = Uniform(0, 1)
 
         AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67, 6.0, -30)
         AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20, 6.0, -7.0)
