@@ -1,3 +1,5 @@
+import Mimi.add_RV!, Mimi.add_transform!
+
 function getsim()
     mcs = @defsim begin
 
@@ -70,7 +72,8 @@ function getsim()
         GlobalTemperature.alb_emulator_rand = TriangularDist(-1., 1., 0.)
 
         # RegionTemperature
-        RegionTemperature_prcile = Uniform(0, 1)
+        rv(prcile) = Uniform(0, 1)
+        RegionTemperature_prcile = prcile
 
         # SeaLevelRise
         SeaLevelRise.s0_initialSL = TriangularDist(0.17, 0.21, 0.19)        # taken from PAGE-ICE v6.20 default
@@ -79,13 +82,14 @@ function getsim()
         SeaLevelRise.sltau_SLresponsetime = Gamma(16.0833333333333333, 24.) # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
 
         # RCPSSPScenario
-        RCPSSPScenario_rateuniforms = Uniform(0, 1)
+        RCPSSPScenario_rateuniforms = Uniform(0, 1) # <-- Added after @defsim
 
         # GDP
         GDP.isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
 
         # MarketDamagesBurke
-        MarketDamagesBurke_burkey_draw = Uniform(0, 4000)
+        rv(burkey_draw) = DiscreteUniform(1, 4000)
+        MarketDamagesBurke_burkey_draw = burkey_draw
         MarketDamagesBurke.impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
         MarketDamagesBurke.impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
 
@@ -96,7 +100,7 @@ function getsim()
         NonMarketDamages.ipow_NonMarketIncomeFxnExponent = TriangularDist(-.2, .2, 0)
 
         # SLRDamages
-        rv(RV_sealevelcost_draw) = Uniform(0, 100)
+        rv(RV_sealevelcost_draw) = DiscreteUniform(1, 100)
         SLRDamages_sealevelcost_draw = RV_sealevelcost_draw
 
         # Discontinuity
@@ -107,13 +111,17 @@ function getsim()
         Discontinuity.ipow_incomeexponent = TriangularDist(-.3, 0, -.1)
         Discontinuity.distau_discontinuityexponent = TriangularDist(10, 30, 20)
 
+        # CountryLevelNPV
+        rv(pref_draw) = DiscreteUniform(1, 181)
+        CountryLevelNPV.pref_draw = pref_draw
+
         # EquityWeighting
         EquityWeighting.civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
-        EquityWeighting.ptp_timepreference = TriangularDist(0.1, 2, 1)
-        EquityWeighting.emuc_utilityconvexity = TriangularDist(0.5, 2, 1)
+        EquityWeighting.pref_draw = pref_draw
 
         # RFFSPScenario
-        RFFSPScenario_rffsp_draw = Uniform(0, 10000)
+        rv(rffsp_draw) = DiscreteUniform(1, 9400)
+        RFFSPScenario_rffsp_draw = rffsp_draw
 
         ############################################################################
         # Define random variables (RVs) - for SHARED parameters
@@ -180,9 +188,9 @@ function getsim()
         # continue to work!
 
         # AbatementCosts
-        rv(RV_mac_draw) = Uniform(0, 100)
+        rv(RV_mac_draw) = DiscreteUniform(1, 100)
         AbatementCostsCO2_mac_draw = RV_mac_draw
-        AbatementCostsCO2_baselineco2_uniforms = Uniform(0, 1)
+        AbatementCostsCO2_baselineco2_uniforms = Uniform(0, 1) # <-- Added after @defsim
 
         AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67, 6.0, -30)
         AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20, 6.0, -7.0)
@@ -244,6 +252,16 @@ function getsim()
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP)
 
     end # de
+
+    # for (ii, country) in enumerate(get_countryinfo().ISO3)
+    #     rv_name1 = Symbol("rateuniforms_$country")
+    #     add_RV!(mcs, rv_name1, Uniform(0,1))
+    #     add_transform!(mcs, :RCPSSPScenario, :rateuniforms, :(=), rv_name1, [country])
+    #     rv_name2 = Symbol("baselineco2_uniforms_$country")
+    #     add_RV!(mcs, rv_name2, Uniform(0,1))
+    #     add_transform!(mcs, :AbatementCostsCO2, :baselineco2_uniforms, :(=), rv_name2, [country])
+    # end
+
     return mcs
 end
 
@@ -286,16 +304,22 @@ function reformat_RV_outputs(samplesize::Int; output_path::String=joinpath(@__DI
     # resave data
     df = DataFrame(td=td, tpc=tpc, tac=tac, te=te, c_co2concentration=c_co2concentration, ft=ft, rt_g=rt_g, sealevel=s, rgdppercap_slr=rgdppercap_slr, rgdppercap_market=rgdppercap_market, rgdppercap_nonmarket=rgdppercap_nonmarket, rgdppercap_di=rgdppercap_disc)
     save(joinpath(output_path, "mimipagemontecarlooutput.csv"), df)
+
+    df
 end
 
 
 function do_monte_carlo_runs(samplesize::Int, scenario::String="RCP4.5 & SSP2", output_path::String=joinpath(@__DIR__, "../output"))
-    # get simulation
-    mcs = getsim()
-
     # get a model
     m = getpage(scenario)
     run(m)
+
+    do_monte_carlo_runs(samplesize, m, output_path)
+end
+
+function do_monte_carlo_runs(samplesize::Int, m::Model, output_path::String=joinpath(@__DIR__, "../output"))
+    # get simulation
+    mcs = getsim()
 
     # Run
     res = run(mcs, m, samplesize; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)

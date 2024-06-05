@@ -11,7 +11,7 @@ include("../utils/country_tools.jl")
 
     rcp = Parameter{Int64}() # like rcp26
     ssp = Parameter{Int64}() # like ssp1
-    rateuniforms = Parameter(index=[country])
+    rateuniforms = Parameter() # XXX: index=[country])
     model = Parameter{Model}()
 
     y_year = Parameter(index=[time], unit="year")
@@ -202,7 +202,7 @@ function addrcpsspscenario(model::Model, scenario::String)
     end
 
     rcpsspscenario[:model] = model
-    rcpsspscenario[:rateuniforms] = zeros(dim_count(model, :country))
+    rcpsspscenario[:rateuniforms] = 0.5 # * ones(dim_count(model, :country))
 
     rcpsspscenario
 end

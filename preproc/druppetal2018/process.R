@@ -24,4 +24,4 @@ ggplot(df3, aes(prtp.round, emuc.round, fill=count)) +
     scale_y_continuous("Elasticity of marginal utility", expand=c(0, 0))
 
 
-write.csv(df2, "data/druppetal2018.csv", row.names=F)
+write.csv(df2, "data/preferences/druppetal2018.csv", row.names=F)

@@ -19,7 +19,8 @@
     cons_percap_aftercosts = Parameter(index=[time, country], unit="\$/person")
 
     # Calculation of weighted costs
-    emuc_utilityconvexity = Parameter(unit="none", default=1.1666666666666667)
+    pref_draw = Parameter{Int64}()
+    emuc_utilityconvexity = Variable(unit="none")
 
     wtct_percap_weightedcosts = Variable(index=[time, region], unit="\$/person")
     eact_percap_weightedadaptationcosts = Variable(index=[time, region], unit="\$/person")
@@ -34,7 +35,7 @@
     pct_g_partiallyweighted_global = Variable(index=[time], unit="\$million")
 
     # Discount rates
-    ptp_timepreference = Parameter(unit="%/year", default=1.0333333333333334) # <0.1,1, 2>
+    ptp_timepreference = Variable(unit="%/year")
     grw_gdpgrowthrate = Parameter(index=[time, country], unit="%/year")
     popgrw_populationgrowth = Parameter(index=[time, country], unit="%/year")
 
@@ -83,6 +84,16 @@
     # Final result: total effect of climate change
     te_totaleffect = Variable(unit="\$million")
 
+    function init(pp, vv, dd)
+        if pp.pref_draw == -1
+            vv.ptp_timepreference = 1.0333333333333334
+            vv.emuc_utilityconvexity = 1.1666666666666667
+        else
+            prefs = CSV.read("../data/preferences/druppetal2018.csv", DataFrame)
+            vv.ptp_timepreference = prefs.puretp[pp.pref_draw]
+            vv.emuc_utilityconvexity = prefs.eta[pp.pref_draw]
+        end
+    end
 
     function run_timestep(p, v, d, tt)
         if is_first(tt)
@@ -98,7 +109,7 @@
         if p.discfix_fixediscountrate != 0.
             v.df_utilitydiscountfactor[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
         else
-            v.df_utilitydiscountfactor[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
+            v.df_utilitydiscountfactor[tt] = (1 + v.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
         end
 
         grw_gdpgrowthrate_region = countrytoregion(p.model, mean, p.grw_gdpgrowthrate[tt, :])
@@ -110,10 +121,10 @@
 
             ## Gas Costs Accounting
             # Weighted costs (Page 23 of Hope 2009)
-            v.wtct_percap_weightedcosts[tt, rr] = ((p.cons_percap_consumption_0_region[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr] < 0.01 * p.cons_percap_consumption_0_region[1] ? 0.01 * p.cons_percap_consumption_0_region[1] : p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr])^(1 - p.emuc_utilityconvexity))
+            v.wtct_percap_weightedcosts[tt, rr] = ((p.cons_percap_consumption_0_region[1]^v.emuc_utilityconvexity) / (1 - v.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - v.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr] < 0.01 * p.cons_percap_consumption_0_region[1] ? 0.01 * p.cons_percap_consumption_0_region[1] : p.cons_percap_consumption[tt, rr] - p.tct_percap_totalcosts_total[tt, rr])^(1 - v.emuc_utilityconvexity))
 
             # Add these into consumption
-            v.eact_percap_weightedadaptationcosts[tt, rr] = ((p.cons_percap_consumption_0_region[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr] < 0.01 * p.cons_percap_consumption_0_region[1] ? 0.01 * p.cons_percap_consumption_0_region[1] : p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr])^(1 - p.emuc_utilityconvexity))
+            v.eact_percap_weightedadaptationcosts[tt, rr] = ((p.cons_percap_consumption_0_region[1]^v.emuc_utilityconvexity) / (1 - v.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, rr]^(1 - v.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr] < 0.01 * p.cons_percap_consumption_0_region[1] ? 0.01 * p.cons_percap_consumption_0_region[1] : p.cons_percap_consumption[tt, rr] - p.act_percap_adaptationcosts[tt, rr])^(1 - v.emuc_utilityconvexity))
 
             # Do partial weighting
             if p.equity_proportion == 0
@@ -130,7 +141,7 @@
             if p.discfix_fixediscountrate != 0.
                 v.dr_discountrate[tt, rr] = p.discfix_fixediscountrate
             else
-                v.dr_discountrate[tt, rr] = p.ptp_timepreference + p.emuc_utilityconvexity * (grw_gdpgrowthrate_region[rr] - popgrw_populationgrowth_region[rr])
+                v.dr_discountrate[tt, rr] = v.ptp_timepreference + v.emuc_utilityconvexity * (grw_gdpgrowthrate_region[rr] - popgrw_populationgrowth_region[rr])
             end
 
             if is_first(tt)
@@ -158,7 +169,7 @@
                 v.wacdt_partiallyweighted_discounted[tt, rr] = v.wact_partiallyweighted[tt, rr] * v.df_utilitydiscountfactor[tt]
 
                 ## Equity weighted impacts (end of page 28, Hope 2009)
-                v.wit_percap_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0_region[1]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (cons_percap_aftercosts_region[rr]^(1 - p.emuc_utilityconvexity) - rcons_percap_dis_region[rr]^(1 - p.emuc_utilityconvexity))
+                v.wit_percap_equityweightedimpact[tt, rr] = ((p.cons_percap_consumption_0_region[1]^v.emuc_utilityconvexity) / (1 - v.emuc_utilityconvexity)) * (cons_percap_aftercosts_region[rr]^(1 - v.emuc_utilityconvexity) - rcons_percap_dis_region[rr]^(1 - v.emuc_utilityconvexity))
                 v.wit_equityweightedimpact[tt, rr] = v.wit_percap_equityweightedimpact[tt, rr] * p.pop_population_region[tt, rr]
                 v.widt_equityweightedimpact_discounted[tt, rr] = v.wit_equityweightedimpact[tt, rr] * v.df_utilitydiscountfactor[tt]
             end
@@ -198,5 +209,6 @@ end
 function addequityweighting(model::Model)
     equityweighting = add_comp!(model, EquityWeighting)
     equityweighting[:model] = model
+    equityweighting[:pref_draw] = -1
     equityweighting
 end

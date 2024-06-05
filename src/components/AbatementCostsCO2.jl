@@ -15,7 +15,7 @@ macs = myloadcsv("data/macs.csv")
     # Uncertainty parameters
     model = Parameter{Model}()
     mac_draw = Parameter{Int64}()
-    baselineco2_uniforms = Parameter(index=[country])
+    baselineco2_uniforms = Parameter() #index=[country])
 
     bau_co2emissions = Parameter(index=[time, region], unit="%")
     e0_baselineCO2emissions_country = Variable(index=[country], unit="Mtonne/year")
@@ -160,7 +160,7 @@ function addabatementcostsco2(model::Model)
 
     abatementcostscomp[:model] = model
     abatementcostscomp[:mac_draw] = -1
-    abatementcostscomp[:baselineco2_uniforms] = -ones(dim_count(model, :country))
+    abatementcostscomp[:baselineco2_uniforms] = -1. #ones(dim_count(model, :country))
     abatementcostscomp[:carbonprice] = zeros(dim_count(model, :time), dim_count(model, :country))
 
     return abatementcostscomp

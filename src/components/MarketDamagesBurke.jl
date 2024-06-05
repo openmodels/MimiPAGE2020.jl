@@ -26,6 +26,7 @@ include("../utils/country_tools.jl")
     tcal_burke = Parameter(default=21.) # calibration temperature for the impact function
     nlag_burke = Parameter(default=1.) # Yumashev et al. (2019) allow for one or two lags
 
+    marginal_offset = Variable(index=[time, country])
     i1log_impactlogchange = Variable(index=[time, country]) # intermediate variable for computation
 
     # impact variables from PAGE damages that Burke damages also require
@@ -72,7 +73,7 @@ include("../utils/country_tools.jl")
     function run_timestep(p, v, d, t)
 
         # Calculate country-level marginal effect difference
-        marginal_offset = v.gamma0_burkey_intercept .+ v.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[t, :]) .+ v.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[t, :]) .+ v.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[t, :]) .+ v.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
+        vv.marginal_offset[t, :] = v.gamma0_burkey_intercept .+ v.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[t, :]) .+ v.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[t, :]) .+ v.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[t, :]) .+ v.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
         # Translate into a difference in temperatures
         #   deltay = 2 beta1 T
         delta_temp = marginal_offset ./ (2 * p.impf_coeff_quadr)
