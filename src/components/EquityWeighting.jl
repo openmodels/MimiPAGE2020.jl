@@ -86,8 +86,8 @@
 
     function init(pp, vv, dd)
         if pp.pref_draw == -1
-            vv.ptp_timepreference = 1.0333333333333334
-            vv.emuc_utilityconvexity = 1.1666666666666667
+            vv.ptp_timepreference = 0.5
+            vv.emuc_utilityconvexity = 1.
         else
             prefs = CSV.read("../data/preferences/druppetal2018.csv", DataFrame)
             vv.ptp_timepreference = prefs.puretp[pp.pref_draw]

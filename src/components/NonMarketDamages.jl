@@ -7,7 +7,9 @@ include("../utils/country_tools.jl")
     y_year = Parameter(index=[time], unit="year")
 
     # incoming parameters from Climate
-    rtl_realizedtemperature = Parameter(index=[time, country], unit="degreeC")
+    rtl_realizedtemperature_change = Parameter(index=[time, country], unit="degreeC")
+    rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
+    rtl_g_landtemperature = Parameter(index=[time], unit="degreeC")
 
     # tolerability parameters
     impmax_maxtempriseforadaptpolicyNM = Parameter(index=[region], unit="degreeC")
@@ -28,7 +30,7 @@ include("../utils/country_tools.jl")
     iben_NonMarketInitialBenefit = Parameter(unit="%GDP/degreeC", default=0.08333333333333333)
     tcal_CalibrationTemp = Parameter(unit="degreeC", default=3.)
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
-    pow_NonMarketExponent = Parameter(unit="", default=2.1666666666666665)
+    pow_NonMarketExponent = Parameter(unit="", default=2.)
 
     # impact variables
     isatg_impactfxnsaturation = Parameter(unit="unitless")
@@ -46,15 +48,15 @@ include("../utils/country_tools.jl")
         wincf_weightsfactor_nonmarket_country = regiontocountry(p.model, p.wincf_weightsfactor_nonmarket)
 
         for cc in d.country
-            if p.rtl_realizedtemperature[t,cc] - atl_adjustedtolerableleveloftemprise_country[cc] < 0
+            if p.rtl_realizedtemperature_change[t,cc] - atl_adjustedtolerableleveloftemprise_country[cc] < 0
                 v.i_regionalimpact[t,cc] = 0
             else
-                v.i_regionalimpact[t,cc] = p.rtl_realizedtemperature[t,cc] - atl_adjustedtolerableleveloftemprise_country[cc]
+                v.i_regionalimpact[t,cc] = p.rtl_realizedtemperature_change[t,cc] - atl_adjustedtolerableleveloftemprise_country[cc]
             end
 
             v.iref_ImpactatReferenceGDPperCap[t,cc] = wincf_weightsfactor_nonmarket_country[cc] *
                 ((p.w_NonImpactsatCalibrationTemp + p.iben_NonMarketInitialBenefit * p.tcal_CalibrationTemp) *
-                    (v.i_regionalimpact[t,cc] / p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact[t,cc] * p.iben_NonMarketInitialBenefit)
+                    (v.i_regionalimpact[t,cc] * (p.rt_g_globaltemperature[t] / p.rtl_g_landtemperature[t]) / p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact[t,cc] * p.iben_NonMarketInitialBenefit) # (beta + alpha * 3) * (T / 3)^2 - alpha * T => ((beta + alpha * 3) - alpha * 3
 
             v.igdp_ImpactatActualGDPperCap[t,cc] = v.iref_ImpactatReferenceGDPperCap[t,cc] *
                 (p.rgdp_per_cap_MarketRemainGDP[t,cc] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_NonMarketIncomeFxnExponent

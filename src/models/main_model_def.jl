@@ -217,7 +217,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :MarketDamagesBurke => :gdp, :GDP => :gdp)
     connect_param!(m, :MarketDamagesBurke => :pop_population, :Population => :pop_population)
 
-    connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature, :RegionTemperature => :rtl_realizedtemperature_change)
+    connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature_change, :RegionTemperature => :rtl_realizedtemperature_change)
+    connect_param!(m, :NonMarketDamages => :rtl_g_landtemperature, :RegionTemperature => :rtl_g_landtemperature)
+    connect_param!(m, :NonMarketDamages => :rt_g_globaltemperature, :GlobalTemperature => :rt_g_globaltemperature)
     connect_param!(m, :NonMarketDamages => :rgdp_per_cap_MarketRemainGDP, :MarketDamagesBurke => :rgdp_per_cap_MarketRemainGDP)
     connect_param!(m, :NonMarketDamages => :rcons_per_cap_MarketRemainConsumption, :MarketDamagesBurke => :rcons_per_cap_MarketRemainConsumption)
     connect_param!(m, :NonMarketDamages => :atl_adjustedtolerableleveloftemprise, :AdaptiveCostsNonEconomic => :atl_adjustedtolerablelevel, ignoreunits=true)

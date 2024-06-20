@@ -23,5 +23,14 @@ ggplot(df3, aes(prtp.round, emuc.round, fill=count)) +
     geom_tile() + scale_x_continuous("Pure rate of time preference", expand=c(0, 0)) +
     scale_y_continuous("Elasticity of marginal utility", expand=c(0, 0))
 
+df2$prtp.round <- round(df2$puretp)
+df2$emuc.round <- round(df2$eta)
+
+df3 <- df2 %>% group_by(prtp.round, emuc.round) %>% summarize(count=length(eta))
+
+ggplot(df3, aes(prtp.round, emuc.round, fill=count)) +
+    geom_tile() + scale_x_continuous("Pure rate of time preference", expand=c(0, 0)) +
+    scale_y_continuous("Elasticity of marginal utility", expand=c(0, 0))
+
 
 write.csv(df2, "data/preferences/druppetal2018.csv", row.names=F)

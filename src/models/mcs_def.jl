@@ -96,7 +96,6 @@ function getsim()
         # NonMarketDamages
         NonMarketDamages.iben_NonMarketInitialBenefit = TriangularDist(0, .2, .05)
         NonMarketDamages.w_NonImpactsatCalibrationTemp = Normal(0.487 * 1.25 * 3*3, 0.182 * 1.25 * 3*3)
-        NonMarketDamages.pow_NonMarketExponent = TriangularDist(1.5, 3, 2)
         NonMarketDamages.ipow_NonMarketIncomeFxnExponent = TriangularDist(-.2, .2, 0)
 
         # SLRDamages
