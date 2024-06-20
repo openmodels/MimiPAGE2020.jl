@@ -189,7 +189,7 @@ function getsim()
         # AbatementCosts
         rv(RV_mac_draw) = DiscreteUniform(1, 100)
         AbatementCostsCO2_mac_draw = RV_mac_draw
-        AbatementCostsCO2_baselineco2_uniforms = Uniform(0, 1) # <-- Added after @defsim
+        # AbatementCostsCO2_baselineco2_uniforms = Uniform(0, 1) # <-- Added after @defsim
 
         AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67, 6.0, -30)
         AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20, 6.0, -7.0)
@@ -252,14 +252,14 @@ function getsim()
 
     end # de
 
-    # for (ii, country) in enumerate(get_countryinfo().ISO3)
-    #     rv_name1 = Symbol("rateuniforms_$country")
-    #     add_RV!(mcs, rv_name1, Uniform(0,1))
-    #     add_transform!(mcs, :RCPSSPScenario, :rateuniforms, :(=), rv_name1, [country])
-    #     rv_name2 = Symbol("baselineco2_uniforms_$country")
-    #     add_RV!(mcs, rv_name2, Uniform(0,1))
-    #     add_transform!(mcs, :AbatementCostsCO2, :baselineco2_uniforms, :(=), rv_name2, [country])
-    # end
+    for (ii, country) in enumerate(get_countryinfo().ISO3)
+        # rv_name1 = Symbol("rateuniforms_$country")
+        # add_RV!(mcs, rv_name1, Uniform(0,1))
+        # add_transform!(mcs, :RCPSSPScenario, :rateuniforms, :(=), rv_name1, [country])
+        rv_name2 = Symbol("baselineco2_uniforms_$country")
+        add_RV!(mcs, rv_name2, Uniform(0,1))
+        add_transform!(mcs, :AbatementCostsCO2, :baselineco2_uniforms, :(=), rv_name2, [country])
+    end
 
     return mcs
 end
