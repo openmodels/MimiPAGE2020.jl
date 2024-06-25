@@ -251,11 +251,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     countrylevelnpv[:grw_gdpgrowthrate] = socioscenario[:grw_gdpgrowthrate]
     countrylevelnpv[:popgrw_populationgrowth] = socioscenario[:popgrw_populationgrowth]
 
-    connect_param!(m, :EquityWeighting => :pop_population_region, :Population => :pop_population_region)
-    connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_percap_totalcostspercap_region)
-    connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts_region)
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption_region)
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption_0_region, :GDP => :cons_percap_consumption_0_region)
+    connect_param!(m, :EquityWeighting => :pop_population, :Population => :pop_population)
+    connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_percap_totalcostspercap)
+    connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
     connect_param!(m, :EquityWeighting => :yagg_periodspan, :GDP => :yagg_periodspan)
