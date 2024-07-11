@@ -2,7 +2,7 @@
 
 @defcomp SeaLevelRise begin
 
-  # Parameters
+    # Parameters
 
     rt_g_globaltemperature = Parameter(index=[time], unit="degreeC")
     sltemp_SLtemprise = Parameter(unit="m-degreeC", default=1.7333333333333334)   # median sensitivity to GMST changes
@@ -12,7 +12,7 @@
     y_year = Parameter(index=[time], unit="year")
     y_year_0 = Parameter(unit="year")
 
-  # Variables
+    # Variables
 
     es_equilibriumSL = Variable(index=[time], unit="m")
     s_sealevel = Variable(index=[time], unit="m")

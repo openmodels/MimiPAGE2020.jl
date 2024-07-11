@@ -1,3 +1,5 @@
+import Mimi.add_RV!, Mimi.add_transform!
+
 function getsim()
     mcs = @defsim begin
 
@@ -14,7 +16,6 @@ function getsim()
         # shared parameter, then assign to components
         rv(RV_save_savingsrate) = TriangularDist(10, 20, 15)
         GDP.save_savingsrate = RV_save_savingsrate
-        MarketDamages.save_savingsrate = RV_save_savingsrate
         MarketDamagesBurke.save_savingsrate = RV_save_savingsrate
         NonMarketDamages.save_savingsrate = RV_save_savingsrate
         SLRDamages.save_savingsrate = RV_save_savingsrate
@@ -23,7 +24,6 @@ function getsim()
         # so we use an RV here because in the model this is not an explicitly
         # shared parameter, then assign to components
         rv(RV_tcal_CalibrationTemp) = TriangularDist(2.5, 3.5, 3.)
-        MarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
         NonMarketDamages.tcal_CalibrationTemp = RV_tcal_CalibrationTemp
 
         # each component should have the same value for its q0propmult_cutbacksatnegativecostinfinalyear
@@ -72,14 +72,8 @@ function getsim()
         GlobalTemperature.alb_emulator_rand = TriangularDist(-1., 1., 0.)
 
         # RegionTemperature
-        RegionTemperature.ampf_amplification["EU"] = TriangularDist(1.05, 1.53, 1.23)
-        RegionTemperature.ampf_amplification["USA"] = TriangularDist(1.16, 1.54, 1.32)
-        RegionTemperature.ampf_amplification["OECD"] = TriangularDist(1.14, 1.31, 1.21)
-        RegionTemperature.ampf_amplification["USSR"] = TriangularDist(1.41, 1.9, 1.64)
-        RegionTemperature.ampf_amplification["China"] = TriangularDist(1, 1.3, 1.21)
-        RegionTemperature.ampf_amplification["SEAsia"] = TriangularDist(0.84, 1.15, 1.04)
-        RegionTemperature.ampf_amplification["Africa"] = TriangularDist(0.99, 1.42, 1.22)
-        RegionTemperature.ampf_amplification["LatAmerica"] = TriangularDist(0.9, 1.18, 1.04)
+        rv(prcile) = Uniform(0, 1)
+        RegionTemperature_prcile = prcile
 
         # SeaLevelRise
         SeaLevelRise.s0_initialSL = TriangularDist(0.17, 0.21, 0.19)        # taken from PAGE-ICE v6.20 default
@@ -88,33 +82,25 @@ function getsim()
         SeaLevelRise.sltau_SLresponsetime = Gamma(16.0833333333333333, 24.) # fat-tailed distribution of time constant T_sl, sea level response time, from mode=362, mean = 386
 
         # RCPSSPScenario
-        RCPSSPScenario.rateuniforms = UniformDist(0, 1)
+        RCPSSPScenario_rateuniforms = Uniform(0, 1) # <-- Added after @defsim
 
         # GDP
         GDP.isat0_initialimpactfxnsaturation = TriangularDist(15, 25, 20)
 
-        # MarketDamages
-        MarketDamages.iben_MarketInitialBenefit = TriangularDist(0, .3, .1)
-        MarketDamages.W_MarketImpactsatCalibrationTemp = TriangularDist(.2, .8, .5)
-        MarketDamages.pow_MarketImpactExponent = TriangularDist(1.5, 3, 2)
-        MarketDamages.ipow_MarketIncomeFxnExponent = TriangularDist(-.3, 0, -.1)
-
         # MarketDamagesBurke
+        rv(burkey_draw) = DiscreteUniform(1, 4000)
+        MarketDamagesBurke_burkey_draw = burkey_draw
         MarketDamagesBurke.impf_coeff_lin = TriangularDist(-0.0139791885347898, -0.0026206307945989, -0.00829990966469437)
         MarketDamagesBurke.impf_coeff_quadr = TriangularDist(-0.000599999506482576, -0.000400007300924579, -0.000500003403703578)
 
         # NonMarketDamages
         NonMarketDamages.iben_NonMarketInitialBenefit = TriangularDist(0, .2, .05)
-        NonMarketDamages.w_NonImpactsatCalibrationTemp = TriangularDist(.1, 1, .5)
-        NonMarketDamages.pow_NonMarketExponent = TriangularDist(1.5, 3, 2)
+        NonMarketDamages.w_NonImpactsatCalibrationTemp = Normal(0.487 * 1.25 * 3*3, 0.182 * 1.25 * 3*3)
         NonMarketDamages.ipow_NonMarketIncomeFxnExponent = TriangularDist(-.2, .2, 0)
 
         # SLRDamages
-        SLRDamages.scal_calibrationSLR = TriangularDist(0.45, 0.55, .5)
-        # SLRDamages.iben_SLRInitialBenefit = TriangularDist(0, 0, 0) # only usable if lb <> ub
-        SLRDamages.W_SatCalibrationSLR = TriangularDist(.5, 1.5, 1)
-        SLRDamages.pow_SLRImpactFxnExponent = TriangularDist(.5, 1, .7)
-        SLRDamages.ipow_SLRIncomeFxnExponent = TriangularDist(-.4, -.2, -.3)
+        rv(RV_sealevelcost_draw) = DiscreteUniform(1, 100)
+        SLRDamages_sealevelcost_draw = RV_sealevelcost_draw
 
         # Discontinuity
         Discontinuity.rand_discontinuity = Uniform(0, 1)
@@ -124,10 +110,17 @@ function getsim()
         Discontinuity.ipow_incomeexponent = TriangularDist(-.3, 0, -.1)
         Discontinuity.distau_discontinuityexponent = TriangularDist(10, 30, 20)
 
+        # CountryLevelNPV
+        rv(pref_draw) = DiscreteUniform(1, 181)
+        CountryLevelNPV.pref_draw = pref_draw
+
         # EquityWeighting
         EquityWeighting.civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
-        EquityWeighting.ptp_timepreference = TriangularDist(0.1, 2, 1)
-        EquityWeighting.emuc_utilityconvexity = TriangularDist(0.5, 2, 1)
+        EquityWeighting.pref_draw = pref_draw
+
+        # RFFSPScenario
+        rv(rffsp_draw) = DiscreteUniform(1, 9400)
+        RFFSPScenario_rffsp_draw = rffsp_draw
 
         ############################################################################
         # Define random variables (RVs) - for SHARED parameters
@@ -193,54 +186,45 @@ function getsim()
         # in the new Mimi paradigm of shared and unshared parameters, but for now this will
         # continue to work!
 
-        # MarketDamagesBurke
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["EU"] = TriangularDist(6.76231496767033, 13.482086163781, 10.1222005657257)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USA"] = TriangularDist(9.54210085883826, 17.3151395362191, 13.4286201975287)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["OECD"] = TriangularDist(9.07596053028087, 15.0507477943984, 12.0633541623396)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["USSR"] = TriangularDist(3.01320548016903, 11.2132204366259, 7.11321295839747)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["China"] = TriangularDist(12.2330402806912, 17.7928749427573, 15.0129576117242)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["SEAsia"] = TriangularDist(23.3863348263352, 26.5136231383473, 24.9499789823412)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["Africa"] = TriangularDist(20.1866940491107, 23.5978086497453, 21.892251349428)
-        MarketDamagesBurke_rtl_abs_0_realizedabstemperature["LatAmerica"] = TriangularDist(19.4846849750102, 22.7561130637973, 21.1203990194037)
-
         # AbatementCosts
-        AbatementCostParametersCO2_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50, 6.0, -22)
+        rv(RV_mac_draw) = DiscreteUniform(1, 100)
+        AbatementCostsCO2_mac_draw = RV_mac_draw
+        AbatementCostsCO2_baselineco2_uniforms = Uniform(0, 1) # <-- Added after @defsim
+
         AbatementCostParametersCH4_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-67, 6.0, -30)
         AbatementCostParametersN2O_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-20, 6.0, -7.0)
         AbatementCostParametersLin_emit_UncertaintyinBAUEmissFactorinFocusRegioninFinalYear = TriangularDist(-50, 50, 0)
 
-        AbatementCostParametersCO2_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 40, 20)
         AbatementCostParametersCH4_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
         AbatementCostParametersN2O_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
         AbatementCostParametersLin_q0propinit_CutbacksinNegativeCostinFocusRegioninBaseYear = TriangularDist(0, 20, 10)
 
-        AbatementCostParametersCO2_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400, -100, -200)
         AbatementCostParametersCH4_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-8000, -1000, -4000)
         AbatementCostParametersN2O_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-15000, 0, -7000)
         AbatementCostParametersLin_c0init_MostNegativeCostCutbackinBaseYear = TriangularDist(-400, -100, -200)
 
-        AbatementCostParametersCO2_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60, 80, 70)
         AbatementCostParametersCH4_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35, 70, 50)
         AbatementCostParametersN2O_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(35, 70, 50)
         AbatementCostParametersLin_qmaxminusq0propinit_MaxCutbackCostatPositiveCostinBaseYear = TriangularDist(60, 80, 70)
 
-        AbatementCostParametersCO2_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100, 700, 400)
         AbatementCostParametersCH4_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(3000, 10000, 6000)
         AbatementCostParametersN2O_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(2000, 60000, 20000)
         AbatementCostParametersLin_cmaxinit_MaximumCutbackCostinFocusRegioninBaseYear = TriangularDist(100, 600, 300)
 
-        AbatementCostParametersCO2_ies_InitialExperienceStockofCutbacks = TriangularDist(100000, 200000, 150000)
         AbatementCostParametersCH4_ies_InitialExperienceStockofCutbacks = TriangularDist(1500, 2500, 2000)
         AbatementCostParametersN2O_ies_InitialExperienceStockofCutbacks = TriangularDist(30, 80, 50)
         AbatementCostParametersLin_ies_InitialExperienceStockofCutbacks = TriangularDist(1500, 2500, 2000)
 
         # AdaptationCosts
-        AdaptiveCostsSeaLevel_cp_costplateau_eu = TriangularDist(0.01, 0.04, 0.02)
-        AdaptiveCostsSeaLevel_ci_costimpact_eu = TriangularDist(0.0005, 0.002, 0.001)
+        AdaptiveCostsSeaLevel_sealevelcost_draw = RV_sealevelcost_draw
+
         AdaptiveCostsEconomic_cp_costplateau_eu = TriangularDist(0.005, 0.02, 0.01)
         AdaptiveCostsEconomic_ci_costimpact_eu = TriangularDist(0.001, 0.008, 0.003)
         AdaptiveCostsNonEconomic_cp_costplateau_eu = TriangularDist(0.01, 0.04, 0.02)
         AdaptiveCostsNonEconomic_ci_costimpact_eu = TriangularDist(0.002, 0.01, 0.005)
+
+        # CarbonPriceInfer
+        CarbonPriceInfer_mac_draw = RV_mac_draw
 
         ############################################################################
         # Indicate which parameters to save for each model run
@@ -267,6 +251,16 @@ function getsim()
              Discontinuity.rgdp_per_cap_NonMarketRemainGDP)
 
     end # de
+
+    # for (ii, country) in enumerate(get_countryinfo().ISO3)
+    #     rv_name1 = Symbol("rateuniforms_$country")
+    #     add_RV!(mcs, rv_name1, Uniform(0,1))
+    #     add_transform!(mcs, :RCPSSPScenario, :rateuniforms, :(=), rv_name1, [country])
+    #     rv_name2 = Symbol("baselineco2_uniforms_$country")
+    #     add_RV!(mcs, rv_name2, Uniform(0,1))
+    #     add_transform!(mcs, :AbatementCostsCO2, :baselineco2_uniforms, :(=), rv_name2, [country])
+    # end
+
     return mcs
 end
 
@@ -309,16 +303,22 @@ function reformat_RV_outputs(samplesize::Int; output_path::String=joinpath(@__DI
     # resave data
     df = DataFrame(td=td, tpc=tpc, tac=tac, te=te, c_co2concentration=c_co2concentration, ft=ft, rt_g=rt_g, sealevel=s, rgdppercap_slr=rgdppercap_slr, rgdppercap_market=rgdppercap_market, rgdppercap_nonmarket=rgdppercap_nonmarket, rgdppercap_di=rgdppercap_disc)
     save(joinpath(output_path, "mimipagemontecarlooutput.csv"), df)
+
+    df
 end
 
 
 function do_monte_carlo_runs(samplesize::Int, scenario::String="RCP4.5 & SSP2", output_path::String=joinpath(@__DIR__, "../output"))
-    # get simulation
-    mcs = getsim()
-
     # get a model
     m = getpage(scenario)
     run(m)
+
+    do_monte_carlo_runs(samplesize, m, output_path)
+end
+
+function do_monte_carlo_runs(samplesize::Int, m::Model, output_path::String=joinpath(@__DIR__, "../output"))
+    # get simulation
+    mcs = getsim()
 
     # Run
     res = run(mcs, m, samplesize; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)

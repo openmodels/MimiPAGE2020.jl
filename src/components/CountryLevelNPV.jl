@@ -1,3 +1,5 @@
+include("../utils/welfare.jl")
+
 @defcomp CountryLevelNPV begin
     country = Index()
 
@@ -19,24 +21,19 @@
     cons_percap_aftercosts = Parameter(index=[time, country], unit="\$/person")
 
     # Calculation of weighted costs
-    emuc_utilityconvexity = Parameter(unit="none", default=1.1666666666666667)
+    pref_draw = Parameter{Int64}()
+    emuc_utilityconvexity = Variable(unit="none")
 
-    wtct_percap_weightedcosts = Variable(index=[time, country], unit="\$/person")
-    eact_percap_weightedadaptationcosts = Variable(index=[time, country], unit="\$/person")
     wact_partiallyweighted = Variable(index=[time, country], unit="\$million")
 
     pct_partiallyweighted = Variable(index=[time, country], unit="\$million")
 
     # Discount rates
-    ptp_timepreference = Parameter(unit="%/year", default=1.0333333333333334) # <0.1,1, 2>
+    ptp_timepreference = Variable(unit="%/year")
     grw_gdpgrowthrate = Parameter(index=[time, country], unit="%/year")
     popgrw_populationgrowth = Parameter(index=[time, country], unit="%/year")
 
-    dr_discountrate = Variable(index=[time, country], unit="%/year")
-    yp_yearsperiod = Variable(index=[time], unit="year") # defined differently from yagg
     dfc_consumptiondiscountrate = Variable(index=[time, country], unit="1/year")
-
-    df_utilitydiscountfactor = Variable(index=[time], unit="fraction")
 
     discfix_fixediscountrate = Parameter(unit="none", default=0.) # override the discount rates with something exogenous
 
@@ -60,45 +57,38 @@
 
     td_totaldiscountedimpacts = Variable(index=[country], unit="\$million")
 
+    function init(pp, vv, dd)
+        if pp.pref_draw == -1
+            vv.ptp_timepreference = 0.5
+            vv.emuc_utilityconvexity = 1.
+        else
+            prefs = CSV.read("../data/preferences/druppetal2018.csv", DataFrame)
+            vv.ptp_timepreference = prefs.puretp[pp.pref_draw]
+            vv.emuc_utilityconvexity = prefs.eta[pp.pref_draw]
+        end
+    end
+
     function run_timestep(p, v, d, tt)
         if is_first(tt)
             v.td_totaldiscountedimpacts[:] .= 0
         end
 
-        if p.discfix_fixediscountrate != 0.
-            v.df_utilitydiscountfactor[tt] = (1 + p.discfix_fixediscountrate / 100)^(-(p.y_year[tt] - p.y_year_0))
-        else
-            v.df_utilitydiscountfactor[tt] = (1 + p.ptp_timepreference / 100)^(-(p.y_year[tt] - p.y_year_0))
-        end
-
         for cc in d.country
-
-            ## Gas Costs Accounting
-            # Weighted costs (Page 23 of Hope 2009)
-            v.wtct_percap_weightedcosts[tt, cc] = ((p.cons_percap_consumption_0[cc]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, cc]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, cc] - p.tct_percap_totalcosts_total[tt, cc] < 0.01 * p.cons_percap_consumption_0[cc] ? 0.01 * p.cons_percap_consumption_0[cc] : p.cons_percap_consumption[tt, cc] - p.tct_percap_totalcosts_total[tt, cc])^(1 - p.emuc_utilityconvexity))
-
-            # Add these into consumption
-            v.eact_percap_weightedadaptationcosts[tt, cc] = ((p.cons_percap_consumption_0[cc]^p.emuc_utilityconvexity) / (1 - p.emuc_utilityconvexity)) * (p.cons_percap_consumption[tt, cc]^(1 - p.emuc_utilityconvexity) - (p.cons_percap_consumption[tt, cc] - p.act_percap_adaptationcosts[tt, cc] < 0.01 * p.cons_percap_consumption_0[cc] ? 0.01 * p.cons_percap_consumption_0[cc] : p.cons_percap_consumption[tt, cc] - p.act_percap_adaptationcosts[tt, cc])^(1 - p.emuc_utilityconvexity))
-
             v.pct_partiallyweighted[tt, cc] = p.tct_percap_totalcosts_total[tt, cc] * p.pop_population[tt, cc]
             v.wact_partiallyweighted[tt, cc] = p.act_percap_adaptationcosts[tt, cc] * p.pop_population[tt, cc]
 
             if p.discfix_fixediscountrate != 0.
-                v.dr_discountrate[tt, cc] = p.discfix_fixediscountrate
+                dr_discountrate = p.discfix_fixediscountrate
             else
-                v.dr_discountrate[tt, cc] = p.ptp_timepreference + p.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, cc] - p.popgrw_populationgrowth[tt, cc])
+                dr_discountrate = v.ptp_timepreference + v.emuc_utilityconvexity * (p.grw_gdpgrowthrate[tt, cc] - p.popgrw_populationgrowth[tt, cc])
             end
 
             if is_first(tt)
-                v.yp_yearsperiod[TimestepIndex(1)] = p.y_year[TimestepIndex(1)] - p.y_year_0
+                yp_yearsperiod = p.y_year[tt] - p.y_year_0
+                v.dfc_consumptiondiscountrate[tt, cc] = (1 + dr_discountrate / 100)^(-yp_yearsperiod)
             else
-                v.yp_yearsperiod[tt] = p.y_year[tt] - p.y_year[tt - 1]
-            end
-
-            if is_first(tt)
-                v.dfc_consumptiondiscountrate[TimestepIndex(1), cc] = (1 + v.dr_discountrate[TimestepIndex(1), cc] / 100)^(-v.yp_yearsperiod[TimestepIndex(1)])
-            else
-                v.dfc_consumptiondiscountrate[tt, cc] = v.dfc_consumptiondiscountrate[tt - 1, cc] * (1 + v.dr_discountrate[tt, cc] / 100)^(-v.yp_yearsperiod[tt])
+                yp_yearsperiod = p.y_year[tt] - p.y_year[tt - 1]
+                v.dfc_consumptiondiscountrate[tt, cc] = v.dfc_consumptiondiscountrate[tt - 1, cc] * (1 + dr_discountrate / 100)^(-yp_yearsperiod)
             end
 
             # Discounted costs
@@ -122,5 +112,6 @@ end
 function addcountrylevelnpv(model::Model)
     countrylevel = add_comp!(model, CountryLevelNPV)
     countrylevel[:model] = model
+    countrylevel[:pref_draw] = -1
     countrylevel
 end

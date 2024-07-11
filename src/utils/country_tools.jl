@@ -134,7 +134,7 @@ function readcountrydata_it_dist(model::Model, filepath, isocol, yearcol, ptestc
     df = myloadcsv(filepath)
 
     # Update columns accounting for uncertainty
-    if all(uniforms .== 0)
+    if all(uniforms .== 0.5)
         df.__value__ = df[!, ptestcol]
     else
         df.__value__ = zeros(Float64, nrow(df))
@@ -142,7 +142,13 @@ function readcountrydata_it_dist(model::Model, filepath, isocol, yearcol, ptestc
             dist = row2dist(row)
             ii = findfirst(dim_keys(model, :time) .== row[yearcol])
             jj = findfirst(dim_keys(model, :country) .== row[isocol])
-            row.__value__ = quantile(dist, uniforms[ii, jj])
+            if uniforms isa Matrix
+                row.__value__ = quantile(dist, uniforms[ii, jj])
+            elseif uniforms isa Vector
+                row.__value__ = quantile(dist, uniforms[jj])
+            else
+                row.__value__ = quantile(dist, uniforms)
+            end
         end
     end
 
@@ -179,14 +185,18 @@ function readcountrydata_i_dist(model::Model, filepath::String, isocol, ptestcol
     df = myloadcsv(filepath)
 
     # Update columns accounting for uncertainty
-    if all(uniforms .== 0)
+    if all(uniforms .== 0.5)
         df.__value__ = df[!, ptestcol]
     else
         df.__value__ = zeros(Float64, nrow(df))
         for row in eachrow(df)
             dist = row2dist(row)
             jj = findfirst(dim_keys(model, :country) .== row[isocol])
-            row.__value__ = quantile(dist, uniforms[ii, jj])
+            if uniforms isa Vector
+                row.__value__ = quantile(dist, uniforms[jj])
+            else
+                row.__value__ = quantile(dist, uniforms)
+            end
         end
     end
 

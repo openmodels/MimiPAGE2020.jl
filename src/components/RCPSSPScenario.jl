@@ -11,10 +11,11 @@ include("../utils/country_tools.jl")
 
     rcp = Parameter{Int64}() # like rcp26
     ssp = Parameter{Int64}() # like ssp1
-    rateuniforms = Parameter(index=[country])
+    rateuniforms = Parameter() # XXX: index=[country])
     model = Parameter{Model}()
 
     y_year = Parameter(index=[time], unit="year")
+    y_year_0 = Parameter(unit="year")
     weight_scenarios = Parameter(unit="%") # from -100% to 100%, only used for sspw, rcpw
 
     extra_abate_rate = Parameter(unit="%/year") # only used for rcp26extra
@@ -104,7 +105,7 @@ include("../utils/country_tools.jl")
         # Only used for rcp26extra
         if p.rcp == 260
             if is_first(t)
-                duration = 5
+                duration = p.y_year[t] - p.y_year_0
             else
                 duration = p.y_year[t] - p.y_year[t - 1]
             end
@@ -201,7 +202,7 @@ function addrcpsspscenario(model::Model, scenario::String)
     end
 
     rcpsspscenario[:model] = model
-    rcpsspscenario[:rateuniforms] = zeros(dim_count(model, :country))
+    rcpsspscenario[:rateuniforms] = 0.5 # * ones(dim_count(model, :country))
 
     rcpsspscenario
 end

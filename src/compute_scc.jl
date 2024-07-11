@@ -94,8 +94,7 @@ results to be replicated.
 function compute_scc(
         m::Model=get_model();
         year::Union{Int,Nothing}=nothing,
-        eta::Union{Float64,Nothing}=nothing,
-        prtp::Union{Float64,Nothing}=nothing,
+        prefrange::Bool=true,
         equity_weighting::Bool=true,
         pulse_size=75000.,
         n::Union{Int,Nothing}=nothing,
@@ -105,22 +104,6 @@ function compute_scc(
 
     year === nothing ? error("Must specify an emission year. Try `compute_scc(m, year=2020)`.") : nothing
     !(year in page_years) ? error("Cannot compute the scc for year $year, year must be within the model's time index $page_years.") : nothing
-
-    if eta !== nothing
-        try
-            set_param!(m, :emuc_utilityconvexity, eta)      # since eta is a default parameter in PAGE, we need to use `set_param!` if it hasn't been set yet
-        catch e
-            update_param!(m, :emuc_utilityconvexity, eta)   # or update_param! if it has been set
-        end
-    end
-
-    if prtp !== nothing
-        try
-            set_param!(m, :ptp_timepreference, prtp * 100)      # since prtp is a default parameter in PAGE, we need to use `set_param!` if it hasn't been set yet
-        catch e
-            update_param!(m, :ptp_timepreference, prtp * 100)   # or update_param! if it has been set
-        end
-    end
 
     if !equity_weighting
         try
@@ -147,13 +130,14 @@ function compute_scc(
         # Run a Monte Carlo simulation
 
         simdef = getsim()   # get the default simulation, need to remove :emuc_utilityconvexity and :ptp_timepreference RVs if user specified values for these
-        eta !== nothing ? _remove_RV!(simdef, "EquityWeighting.emuc_utilityconvexity") : nothing
-        prtp !== nothing ? _remove_RV!(simdef, "EquityWeighting.ptp_timepreference") : nothing
+        if !prefrange
+            Mimi.delete_transform!(simdef, :pref_draw)
+        end
 
         seed !== nothing ? Random.seed!(seed) : nothing
 
         # Setup of location of final results
-        scc_results = zeros(samplesize)
+        scc_results = zeros(n)
         scc_disaggregated_results = []
 
         function mc_scc_calculation(sim_inst::SimulationInstance, trialnum::Int, ntimesteps::Int, ignore::Nothing)
@@ -173,16 +157,16 @@ function compute_scc(
     return (scc=scc, scc_disaggregated=scc_disaggregated, mm=mm)
 end
 
-# Helper function for removing a random variable by its parameter name in the model.
-#   Their random variable names have been appended with a unique number by Mimi,
-#   so need to look them up this way to find the RV name in the simulation definition
-#   in order to use the Mimi.delete_RV! function.
-#   If it is an array variable, it will be represented by multiple RVs; this deletes them all.
-function _remove_RV!(simdef, _name)
-    all_rv_names = collect(keys(simdef.rvdict))
-    rv_names = all_rv_names[findall(startswith(String(_name)), map(String, all_rv_names))]
-    [Mimi.delete_RV!(simdef, rv_name) for rv_name in rv_names]
-end
+# # Helper function for removing a random variable by its parameter name in the model.
+# #   Their random variable names have been appended with a unique number by Mimi,
+# #   so need to look them up this way to find the RV name in the simulation definition
+# #   in order to use the Mimi.delete_RV! function.
+# #   If it is an array variable, it will be represented by multiple RVs; this deletes them all.
+# function _remove_RV!(simdef, _name)
+#     all_rv_names = collect(keys(simdef.rvdict))
+#     rv_names = all_rv_names[findall(startswith(String(_name)), map(String, all_rv_names))]
+#     [Mimi.delete_RV!(simdef, rv_name) for rv_name in rv_names]
+# end
 
 
 """

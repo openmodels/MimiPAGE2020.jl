@@ -1,25 +1,59 @@
+import Mimi.add_save!
 include("main_model.jl")
 
-model = getpage()
+mcnum = 10000
+
+model = getpage(use_rffsp=true)
 run(model)
 
-outs = compute_scc(model, year=2020)
-CSV.write("bycountry.csv", outs.scc_disaggregated)
+model[:EquityWeighting, :td_totaldiscountedimpacts]
 
-findfirst(dim_keys(model, :country) .== "IDN")
+df = getdataframe(model, :NonMarketDamages, :isat_per_cap_ImpactperCapinclSaturationandAdaptation)
+df[df.country .== "KOR", :]
 
-df = getdataframe(model, :TotalAbatementCosts, :tct_percap_totalcostspercap)
-df[df.country .== "IDN", :]
-df = getdataframe(model, :TotalAdaptationCosts, :act_percap_adaptationcosts)
-df = getdataframe(model, :CarbonPriceInfer, :carbonprice)
-df = getdataframe(model, :CountryLevelNPV, :td_totaldiscountedimpacts)
+mcs = getsim()
+add_save!(mcs, (:CountryLevelNPV, :wit_percap_equityweightedimpact))
+add_save!(mcs, (:CountryLevelNPV, :tct_percap_totalcosts_total))
+add_save!(mcs, (:CountryLevelNPV, :act_percap_adaptationcosts))
+add_save!(mcs, (:MarketDamagesBurke, :i1log_impactlogchange))
+add_save!(mcs, (:MarketDamagesBurke, :isat_per_cap_ImpactperCapinclSaturationandAdaptation))
+add_save!(mcs, (:NonMarketDamages, :isat_per_cap_ImpactperCapinclSaturationandAdaptation))
+add_save!(mcs, (:RegionTemperature, :rtl_realizedtemperature_absolute))
+add_save!(mcs, (:RegionTemperature, :rtl_realizedtemperature_change))
+add_save!(mcs, (:SLRDamages, :d_percap_slr))
+add_save!(mcs, (:Discontinuity, :isat_per_cap_DiscImpactperCapinclSaturation))
 
-df = getdataframe(outs.mm.base, :CountryLevelNPV, :td_totaldiscountedimpacts)
-df = getdataframe(outs.mm.modified, :CountryLevelNPV, :td_totaldiscountedimpacts)
+output_path = "output"
+res = run(mcs, model, mcnum; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)
 
-df = getdataframe(outs.mm.modified, :TotalAbatementCosts, :tct_percap_totalcostspercap)
-df = getdataframe(outs.mm.modified, :TotalAdaptationCosts, :act_percap_adaptationcosts)
-df = getdataframe(outs.mm.modified, :CountryLevelNPV, :rcons_percap_dis)
-df = getdataframe(outs.mm.modified, :MarketDamagesBurke, :rcons_per_cap_MarketRemainConsumption)
-df = getdataframe(outs.mm.modified, :MarketDamagesBurke, :rcons_per_cap_SLRRemainConsumption)
-df = getdataframe(outs.mm.modified, :SLRDamages, :d_percap_slr)
+outs = compute_scc(model, year=2020, seed=20240528, n=mcnum);
+CSV.write("allscc-drupp.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
+
+outs = compute_scc(model, year=2020, prefrange=false, seed=20240528, n=mcnum);
+CSV.write("allscc-nodrupp.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
+
+outs = compute_scc(model, year=2050, prefrange=false, seed=20240528, n=mcnum);
+CSV.write("allscc-nodrupp-2050.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
+
+outs = compute_scc(model, year=2100, prefrange=false, seed=20240528, n=mcnum);
+CSV.write("allscc-nodrupp-2100.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
+
+model = getpage("RCP2.6 & SSP1")
+run(model)
+df = getdataframe(model, :CountryLevelNPV, :wit_percap_equityweightedimpact)
+CSV.write("wit_percap_equityweightedimpact-ssp126.csv", df)
+
+model = getpage("1.5 degC Target")
+run(model)
+df = getdataframe(model, :CountryLevelNPV, :wit_percap_equityweightedimpact)
+CSV.write("wit_percap_equityweightedimpact-1p5.csv", df)
+
+model = getpage("2 degC Target")
+run(model)
+df = getdataframe(model, :CountryLevelNPV, :wit_percap_equityweightedimpact)
+CSV.write("wit_percap_equityweightedimpact-2p0.csv", df)
+
+model = getpage("2.5 degC Target")
+run(model)
+df = getdataframe(model, :CountryLevelNPV, :wit_percap_equityweightedimpact)
+CSV.write("wit_percap_equityweightedimpact-2p5.csv", df)

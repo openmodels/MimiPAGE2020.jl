@@ -42,7 +42,7 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
     function init(p, v, d)
         if p.prcile >= 0
             gcm = get_pattern(p.prcile)
-            pattern = df_patterns[df_patterns.model .== gcm]
+            pattern = df_patterns[df_patterns.model .== gcm, :]
         else
             pattern = df_patterns_generic
         end
@@ -91,9 +91,11 @@ function get_pattern(prcile)
     probs2 = [pdf(Normal(mu, df_gendists.tau[df_gendists.scenario .== "ssp370"][1]),
                   df_warmeocs.ssp370[row]) for mu in df_gmstcmip.warming[df_gmstcmip.scenario .== "ssp370"]];
 
-    jointprobs = probs1 .* probs2 / sum(probs1 .* probs2)
+    inferprcile = (row - .505) / (nrow(df_warmeocs) - .01)
+    diffprcile = (prcile - inferprcile) * (nrow(df_warmeocs) - .01) # -0.5 - 0.5
 
-    pattern = sample(1:length(jointprobs), Weights(jointprobs))
+    jointprobs = probs1 .* probs2 / sum(probs1 .* probs2)
+    pattern = quantile(Categorical(jointprobs), diffprcile + .5)
 
     df_gmstcmip.model[pattern]
 end
