@@ -4,6 +4,8 @@ include("../utils/country_tools.jl")
     region = Index()
     country = Index()
 
+    model = Parameter{Model}()
+
     # Parameters
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
@@ -16,7 +18,7 @@ include("../utils/country_tools.jl")
     pop_population_region = Variable(index=[time, region], unit="million person")
 
     function init(p, v, d)
-        byregion = countrytoregion(model, sum, p.pop0_initpopulation)
+        byregion = countrytoregion(p.model, sum, p.pop0_initpopulation)
         for rr in d.region
             v.pop0_initpopulation_region[rr] = byregion[rr]
         end
@@ -32,7 +34,7 @@ include("../utils/country_tools.jl")
             end
         end
 
-        v.pop_population_region[tt, :] = countrytoregion(model, sum, v.pop_population[tt, :])
+        v.pop_population_region[tt, :] = countrytoregion(p.model, sum, v.pop_population[tt, :])
     end
 end
 
@@ -41,6 +43,7 @@ end
 # the default keyword arg for now.
 function addpopulation(model::Model)
     populationcomp = add_comp!(model, Population)
+    populationcomp[:model] = model
 
     return populationcomp
 end
