@@ -39,7 +39,7 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     # Socio-Economics
     population = addpopulation(m)
-    gdp = add_comp!(m, GDP)
+    gdp = addgdp(m)
 
     gdp[:pop0_initpopulation_region] = population[:pop0_initpopulation_region]
 
