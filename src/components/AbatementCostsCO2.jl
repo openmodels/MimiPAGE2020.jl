@@ -14,12 +14,12 @@ macs = myloadcsv("data/macs.csv")
 
     # Uncertainty parameters
     model = Parameter{Model}()
+    y_year = Parameter(index=[time], unit="year")
     mac_draw = Parameter{Int64}()
-    baselineco2_uniforms = Parameter() #index=[country])
 
     bau_co2emissions = Parameter(index=[time, region], unit="%")
-    e0_baselineCO2emissions_country = Variable(index=[country], unit="Mtonne/year")
-    baselineemit = Variable(index=[time, country], unit="MtCO2")
+    e0_baselineCO2emissions_country = Parameter(index=[country], unit="Mtonne/year")
+    baselineemit = Variable(index=[time, country], unit="MtCO2/year")
 
     gdp = Parameter(index=[time, country], unit="\$M")
     carbonprice = Parameter(index=[time, country], unit="\$2010/tCO2")
@@ -69,12 +69,6 @@ macs = myloadcsv("data/macs.csv")
             macs2 = im_to_i(macs, "iso", "bs", pp.mac_draw)
         end
 
-        if all(pp.baselineco2_uniforms .== -1)
-            vv.e0_baselineCO2emissions_country[:] = readcountrydata_i_const(pp.model, "data/e0_baselineCO2emissions_country.csv", :Region, :co2mu)
-        else
-            vv.e0_baselineCO2emissions_country[:] = readcountrydata_i_dist(pp.model, "data/e0_baselineCO2emissions_country.csv", :Region, :co2mu, row -> Normal(row[:co2mu], row[:co2sd]), pp.baselineco2_uniforms)
-        end
-
         vv.ac_0_20_co2[:] = readcountrydata_i_const(pp.model, macs2, "iso", "ac_0-20_co2")
         vv.ac_20_50_co2[:] = readcountrydata_i_const(pp.model, macs2, "iso", "ac_20-50_co2")
         vv.ac_50_100_co2[:] = readcountrydata_i_const(pp.model, macs2, "iso", "ac_50-100_co2")
@@ -119,11 +113,12 @@ macs = myloadcsv("data/macs.csv")
             ac_500_inf_co2 .* price2frac(pp.carbonprice[tt, :], 500, Inf) # MtCO2
 
         # Calculate baseline emissions
-        vv.baselineemit[tt, :] = vv.e0_baselineCO2emissions_country .* regiontocountry(pp.model, pp.bau_co2emissions[tt, :])
+        vv.baselineemit[tt, :] = pp.e0_baselineCO2emissions_country .* regiontocountry(pp.model, pp.bau_co2emissions[tt, :]) / 100
 
         rawfractargetabated = -rawtonnesabated ./ vv.baselineemit[tt,:] # fraction abated
         # Regularize so not over 1 and goes to 1 as p -> inf
         regfractargetabated = rawfractargetabated ./ (exp.(-pp.carbonprice[tt, :] / 500) + rawfractargetabated)
+        regfractargetabated[rawfractargetabated .> 1.] .= rawfractargetabated[rawfractargetabated .> 1.]
 
         # Use autoreg factor to approach target
         if is_first(tt)
@@ -131,7 +126,14 @@ macs = myloadcsv("data/macs.csv")
         else
             # delta y = (y_goal - y_t) / tau = y_t+1 - y_t
             #   => y_t+1 = y_goal / tau + (1 - 1 / tau) y_t
-            vv.fracabatedcarbon[tt,:] = regfractargetabated ./ vv.lag_value_co2 .+ (1 .- 1 ./ vv.lag_value_co2) .* vv.fracabatedcarbon[tt-1,:]
+            #   lag_value_co2 is (1 - 1 / tau)
+            invtau = (1 .- vv.lag_value_co2)
+            invtau[invtau .<= 0] .= mean(invtau[invtau .> 0])
+            yp_yearsperiod = pp.y_year[tt] - pp.y_year[tt - 1]
+            # G v + (1 - v) y -> G v + (1 - v) (G v + (1 - v) y)
+            # -> G (2v - v^2) + (1 - v)^2 y
+            autoreg = (1 .- invtau).^(yp_yearsperiod / 5)
+            vv.fracabatedcarbon[tt,:] = regfractargetabated .* (1 .- autoreg) .+ autoreg .* vv.fracabatedcarbon[tt-1,:]
         end
 
         ac_0_20_gdp = vv.ac_0_20_gdp + vv.ac_0_20xyear_gdp * (2050 - gettime(tt))
@@ -160,7 +162,6 @@ function addabatementcostsco2(model::Model)
 
     abatementcostscomp[:model] = model
     abatementcostscomp[:mac_draw] = -1
-    abatementcostscomp[:baselineco2_uniforms] = -1. #ones(dim_count(model, :country))
     abatementcostscomp[:carbonprice] = zeros(dim_count(model, :time), dim_count(model, :country))
 
     return abatementcostscomp

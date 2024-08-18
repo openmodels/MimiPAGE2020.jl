@@ -30,6 +30,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
 
     # connect parameters together
     connect_param!(m, :GlobalTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
+    regtemp[:rt_g_globaltemperature] = glotemp[:rt_g_globaltemperature]
 
     if use_permafrost
         permafrost_sibcasa[:rt_g] = glotemp[:rt_g_globaltemperature]
@@ -78,6 +79,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     connect_param!(m, :LGforcing => :c_LGconcentration, :LGcycle => :c_LGconcentration)
 
     sulfemit[:pse_sulphatevsbase] = scenario[:pse_sulphatevsbase]
+    sulfemit[:area_region] = regtemp[:area_region]
 
     connect_param!(m, :TotalForcing => :f_CO2forcing, :co2forcing => :f_CO2forcing)
     connect_param!(m, :TotalForcing => :f_CH4forcing, :ch4forcing => :f_CH4forcing)
@@ -85,6 +87,7 @@ function climatemodel(scenario::String, use_permafrost::Bool=true, use_seaice::B
     connect_param!(m, :TotalForcing => :f_lineargasforcing, :LGforcing => :f_LGforcing)
     totalforcing[:exf_excessforcing] = scenario[:exf_excessforcing]
     connect_param!(m, :TotalForcing => :fs_sulfateforcing, :SulphateForcing => :fs_sulphateforcing)
+    totalforcing[:area_region] = regtemp[:area_region]
 
     # next: add vector and panel example
     p = load_parameters(m)
