@@ -50,6 +50,8 @@ include("components/EquityWeighting.jl")
 include("components/PermafrostSiBCASA.jl")
 include("components/PermafrostJULES.jl")
 include("components/PermafrostTotal.jl")
+include("components/MarketDamageAQ.jl")
+
 
 include("models/main_model_def.jl")
 

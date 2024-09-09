@@ -84,14 +84,14 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     nonmarketdamages = addnonmarketdamages(m)
     discontinuity = adddiscontinuity(m)
 
-    # Total costs component
-    add_comp!(m, TotalCosts)
+    # Add MarketDamageAQ (Country version)
+    marketdamageaqcomp = addMarketDamageAQ(m)
 
-    # Equity weighting and Total Costs
+    add_comp!(m, TotalCosts)
     countrylevelnpv = addcountrylevelnpv(m)
     equityweighting = addequityweighting(m)
 
-    # connect parameters together
+    #continue
     connect_param!(m, :GlobalTemperature => :fant_anthroforcing, :TotalForcing => :fant_anthroforcing)
     regtemp[:rt_g_globaltemperature] = glotemp[:rt_g_globaltemperature]
 
@@ -221,6 +221,8 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :MarketDamagesBurke => :isatg_impactfxnsaturation, :GDP => :isatg_impactfxnsaturation)
     connect_param!(m, :MarketDamagesBurke => :gdp, :GDP => :gdp)
     connect_param!(m, :MarketDamagesBurke => :pop_population, :Population => :pop_population)
+    
+    connect_param!(m, :MarketDamageAQ => :global_ch4_emissions, :ch4emissions => :e_globalCH4emissions)
 
     connect_param!(m, :NonMarketDamages => :rtl_realizedtemperature_change, :RegionTemperature => :rtl_realizedtemperature_change)
     connect_param!(m, :NonMarketDamages => :rtl_g_landtemperature, :RegionTemperature => :rtl_g_landtemperature)
