@@ -106,7 +106,7 @@ function addregiontemperature(model::Model)
     climtemp[:model] = model
     climtemp[:area] = readcountrydata_i_const(model, get_countryinfo(), :ISO3, :LandArea)
     climtemp[:prcile] = -1 # means, use the generic number
-    climtemp[:rtl_0_realizedtemperature_absolute] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
+    climtemp[:rtl_0_realizedtemperature_absolute] = get_countryinfo().Temp2010
     climtemp[:rtl_0_realizedtemperature_change] = regiontocountry(model, readpagedata(model, "data/rtl_0_realizedtemperature.csv"))
 
     return climtemp

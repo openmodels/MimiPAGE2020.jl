@@ -3,7 +3,6 @@ using Statistics
 include("../utils/country_tools.jl")
 
 @defcomp MarketDamagesBurke begin
-    region = Index()
     country = Index()
 
     model = Parameter{Model}()
@@ -11,7 +10,7 @@ include("../utils/country_tools.jl")
 
     # incoming parameters from Climate
     rtl_realizedtemperature_absolute = Parameter(index=[time, country], unit="degreeC")
-    rtl_0_realizedtemperature_absolute = Parameter(index=[country], unit="degreeC")
+    rtl_0_realizedtemperature_absolute_burke = Parameter(index=[country], unit="degreeC")
 
     # tolerability and impact variables from PAGE damages that Burke damages also require
     rcons_per_cap_SLRRemainConsumption = Parameter(index=[time, country], unit="\$/person")
@@ -80,9 +79,9 @@ include("../utils/country_tools.jl")
 
         for cc in d.country
             # calculate the log change, depending on the number of lags specified
-            v.i1log_impactlogchange[t,cc] = p.nlag_burke * (p.impf_coeff_lin  * (p.rtl_realizedtemperature_absolute[t,cc] - p.rtl_0_realizedtemperature_absolute[cc]) +
+            v.i1log_impactlogchange[t,cc] = p.nlag_burke * (p.impf_coeff_lin  * (p.rtl_realizedtemperature_absolute[t,cc] - p.rtl_0_realizedtemperature_absolute_burke[cc]) +
                                                             p.impf_coeff_quadr * ((p.rtl_realizedtemperature_absolute[t,cc] + delta_temp[cc] - p.tcal_burke)^2 -
-                                                                                  (p.rtl_0_realizedtemperature_absolute[cc] + delta_temp[cc] - p.tcal_burke)^2))
+                                                                                  (p.rtl_0_realizedtemperature_absolute_burke[cc] + delta_temp[cc] - p.tcal_burke)^2))
 
             # calculate the impact at focus region GDP p.c.
             v.iref_ImpactatReferenceGDPperCap[t, cc] = 100 * (1 - exp(v.i1log_impactlogchange[t, cc]))
@@ -144,7 +143,7 @@ function addmarketdamagesburke(model::Model)
 
     marketdamagesburke[:model] = model
     marketdamagesburke[:burkey_draw] = -1
-    marketdamagesburke[:rtl_0_realizedtemperature_absolute] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
+    marketdamagesburke[:rtl_0_realizedtemperature_absolute_burke] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
 
     informs = CSV.read("../data/inform-combined.csv", DataFrame)
     r1 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))

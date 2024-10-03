@@ -1,4 +1,6 @@
-function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true; use_rffsp::Bool=false)
+function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_seaice::Bool=true; use_rffsp::Bool=false,
+                   config_marketdmg::String="adaptive", config_nonmarketdmg::String="national", config_slrdmg::String="national",
+                   config_abatement::String="national", config_downscaling::String="mcpr")
     # add all the components
     scenario = addrcpsspscenario(m, scenario)
     if use_rffsp
@@ -22,12 +24,20 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     gdp[:pop0_initpopulation_region] = population[:pop0_initpopulation_region]
 
-    abateco2 = addabatementcostsco2(m)
+    if config_abatement == "national"
+        abateco2 = addabatementcostsco2(m)
+    end
 
     abateco2[:e0_baselineCO2emissions_country] = carbonpriceinfer[:e0_baselineCO2emissions_country]
 
-    glotemp = addglobaltemperature(m, use_seaice)
-    regtemp = addregiontemperature(m)
+    if config_downscaling == "mcpr"
+        glotemp = addglobaltemperature(m, use_seaice)
+        regtemp = addregiontemperature(m)
+    elseif config_downscaling == "pageice"
+        climtemp = addclimatetemperature_regional(m, use_seaice)
+    else
+        throw(ArgumentError("Unknown downscaling configuration: $config_downscaling"))
+    end
     if use_permafrost
         permafrost_sibcasa = add_comp!(m, PermafrostSiBCASA)
         permafrost_jules = add_comp!(m, PermafrostJULES)
@@ -50,6 +60,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     add_comp!(m, SeaLevelRise)
 
     # Abatement Costs
+    if config_abatement == "pageice"
+        addabatementcostparameters(m, :CO2)
+    end
     addabatementcostparameters(m, :CH4)
     addabatementcostparameters(m, :N2O)
     addabatementcostparameters(m, :Lin)
@@ -66,6 +79,9 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     set_param!(m, :automult_autonomoustechchange, .65)
 
+    if config_abatement == "pageice"
+        addabatementcosts(m, :CO2)
+    end
     addabatementcosts(m, :CH4)
     addabatementcosts(m, :N2O)
     addabatementcosts(m, :Lin)
@@ -79,9 +95,27 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     totaladaptcost = addtotaladaptationcosts(m)
 
     # Impacts
-    slrdamages = addslrdamages(m)
-    marketdamagesburke = addmarketdamagesburke(m)
-    nonmarketdamages = addnonmarketdamages(m)
+    if config_slrdmg == "national"
+        slrdamages = addslrdamages(m)
+    elseif config_slrdmg == "pageice"
+        slrdamages = addslrdamages_regional(m)
+    else
+        throw(ArgumentError("Unknown SLR damages configuration: $config_slrdmg"))
+    end
+    if config_marketdmg == "adaptive"
+        marketdamagesburke = addmarketdamagesburke(m)
+    elseif config_marketdmg == "pageice"
+        marketdamagesburke = addmarketdamagesburke_regional(m)
+    else
+        throw(ArgumentError("Unknown Market damages configuration: $config_marketdmg"))
+    end
+    if config_nonmarketdmg == "national"
+        nonmarketdamages = addnonmarketdamages(m)
+    elseif config_nonmarketdmg == "pageice"
+        nonmarketdamages = addnonmarketdamages_regional(m)
+    else
+        throw(ArgumentError("Unknown Non-market damages configuration: $config_nonmarketdmg"))
+    end
     discontinuity = adddiscontinuity(m)
 
     # Total costs component
@@ -277,7 +311,9 @@ function initpage(m::Model)
     set_leftover_params!(m, p)
 end
 
-function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true; use_rffsp::Bool=false)
+function getpage(scenario::String="RCP4.5 & SSP2", use_permafrost::Bool=true, use_seaice::Bool=true; use_rffsp::Bool=false,
+                 config_marketdmg::String="adaptive", config_nonmarketdmg::String="national", config_slrdmg::String="national",
+                 config_abatement::String="national", config_downscaling::String="mcpr")
     m = Model()
     set_dimension!(m, :time, [2020, 2030, 2040, 2050, 2075, 2100, 2150, 2200, 2250, 2300])
     set_dimension!(m, :region, ["EU", "USA", "OECD","USSR","China","SEAsia","Africa","LatAmerica"])
