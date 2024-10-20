@@ -85,7 +85,7 @@ include("../utils/welfare.jl")
             vv.ptp_timepreference = 0.5
             vv.emuc_utilityconvexity = 1.01 # equations need to be rederived for emuc = 1
         else
-            prefs = CSV.read("../data/preferences/druppetal2018.csv", DataFrame)
+            prefs = CSV.read(pagedata("preferences/druppetal2018.csv"), DataFrame)
             vv.ptp_timepreference = prefs.puretp[pp.pref_draw]
             vv.emuc_utilityconvexity = prefs.eta[pp.pref_draw]
             if vv.emuc_utilityconvexity == 1.0

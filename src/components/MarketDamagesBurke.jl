@@ -7,6 +7,7 @@ include("../utils/country_tools.jl")
 
     model = Parameter{Model}()
     y_year = Parameter(index=[time], unit="year")
+    config_marketdmg = Parameter{String}()
 
     # incoming parameters from Climate
     rtl_realizedtemperature_absolute = Parameter(index=[time, country], unit="degreeC")
@@ -53,7 +54,7 @@ include("../utils/country_tools.jl")
     pop_population = Parameter(index=[time, country], unit="million person")
 
     function init(pp, vv, dd)
-        burkey = CSV.read("../data/burkey-estimates.csv", DataFrame)
+        burkey = CSV.read(pagedata("burkey-estimates.csv"), DataFrame)
         if pp.burkey_draw == -1
             vv.gamma0_burkey_intercept = mean(burkey.Intercept)
             vv.gamma1_burkey_hazard = mean(burkey.HA)
@@ -70,12 +71,19 @@ include("../utils/country_tools.jl")
     end
 
     function run_timestep(p, v, d, t)
-
-        # Calculate country-level marginal effect difference
-        v.marginal_offset[t, :] = v.gamma0_burkey_intercept .+ v.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[t, :]) .+ v.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[t, :]) .+ v.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[t, :]) .+ v.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
-        # Translate into a difference in temperatures
-        #   deltay = 2 beta1 T
-        delta_temp = v.marginal_offset[t, :] ./ (2 * p.impf_coeff_quadr)
+        if p.config_marketdmg == "adaptive"
+            # Calculate country-level marginal effect difference
+            v.marginal_offset[t, :] = v.gamma0_burkey_intercept .+ v.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[t, :]) .+ v.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[t, :]) .+ v.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[t, :]) .+ v.gamma4_burkey_loggdppc * log.(p.gdp[t, :] ./ p.pop_population[t, :])
+            # Translate into a difference in temperatures
+            #   deltay = 2 beta1 T
+            delta_temp = v.marginal_offset[t, :] ./ (2 * p.impf_coeff_quadr)
+        elseif p.config_marketdmg == "constoffset"
+            v.marginal_offset[t, :] = v.gamma0_burkey_intercept .+ v.gamma1_burkey_hazard * log.(p.r1_riskindex_hazard[1, :]) .+ v.gamma2_burkey_vulnerability * log.(p.r2_riskindex_vulnerability[1, :]) .+ v.gamma3_burkey_copinglack * log.(p.r3_riskindex_copinglack[1, :]) .+ v.gamma4_burkey_loggdppc * log.(p.gdp[1, :] ./ p.pop_population[1, :])
+            delta_temp = v.marginal_offset[t, :] ./ (2 * p.impf_coeff_quadr)
+        elseif p.config_marketdmg == "nooffset"
+            v.marginal_offset[t, :] = 0.
+            delta_temp = 0.
+        end
 
         for cc in d.country
             # calculate the log change, depending on the number of lags specified
@@ -138,14 +146,15 @@ function getriskindexes(informs, iso)
     return r1vals, r2vals, r3vals
 end
 
-function addmarketdamagesburke(model::Model)
+function addmarketdamagesburke(model::Model, config_marketdmg::String)
     marketdamagesburke = add_comp!(model, MarketDamagesBurke)
 
     marketdamagesburke[:model] = model
     marketdamagesburke[:burkey_draw] = -1
+    marketdamagesburke[:config_marketdmg] = config_marketdmg
     marketdamagesburke[:rtl_0_realizedtemperature_absolute_burke] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
 
-    informs = CSV.read("../data/inform-combined.csv", DataFrame)
+    informs = CSV.read(pagedata("inform-combined.csv"), DataFrame)
     r1 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))
     r2 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))
     r3 = Matrix{Union{Missing, Float64}}(missing, dim_count(model, :time), dim_count(model, :country))

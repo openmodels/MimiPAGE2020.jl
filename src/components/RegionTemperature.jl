@@ -3,8 +3,8 @@ include("../utils/country_tools.jl")
 using StatsBase
 using Distributions
 
-df_patterns = CSV.read("../data/climate/patterns.csv", DataFrame)
-df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame)
+df_patterns = CSV.read(pagedata("climate/patterns.csv"), DataFrame)
+df_patterns_generic = CSV.read(pagedata("climate/patterns_generic.csv"), DataFrame)
 
 @defcomp RegionTemperature begin
     region = Index()
@@ -79,9 +79,9 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
     end
 end
 
-df_warmeocs = CSV.read("../data/climate/warmeocs.csv", DataFrame)
-df_gendists = CSV.read("../data/climate/gendists.csv", DataFrame)
-df_gmstcmip = CSV.read("../data/climate/gmsts.csv", DataFrame)
+df_warmeocs = CSV.read(pagedata("climate/warmeocs.csv"), DataFrame)
+df_gendists = CSV.read(pagedata("climate/gendists.csv"), DataFrame)
+df_gmstcmip = CSV.read(pagedata("climate/gmsts.csv"), DataFrame)
 
 function get_pattern(prcile)
     row = round(Int64, prcile * (nrow(df_warmeocs) - .01) + .505)

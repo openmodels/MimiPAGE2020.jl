@@ -26,6 +26,14 @@ function checktimeorder(model::Model, times, file)
     end
 end
 
+function pagedata(filepath::AbstractString)
+    # Handle relative paths
+    if filepath[1] ∉ ['.', '/'] && !isfile(filepath)
+        filepath = joinpath(@__DIR__, "..", "..", "data", filepath)
+    end
+    return filepath
+end
+
 function readpagedata(model::Union{Model,Nothing}, filepath::AbstractString)
     # Handle relative paths
     if filepath[1] ∉ ['.', '/'] && !isfile(filepath)

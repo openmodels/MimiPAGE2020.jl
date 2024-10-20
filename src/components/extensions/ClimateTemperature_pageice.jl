@@ -1,8 +1,11 @@
 @defcomp ClimateTemperature_pageice begin
     region = Index()
+    country = Index()
+
+    model = Parameter{Model}()
 
     # Basic parameters
-    area = Parameter(index=[region], unit="km2")
+    area_region = Parameter(index=[region], unit="km2")
     y_year_0 = Parameter(unit="year")
     y_year = Parameter(index=[time], unit="year")
     area_e_eartharea = Parameter(unit="km2", default=5.1e8)
@@ -56,13 +59,19 @@
 
     rtl_realizedtemperature = Variable(index=[time, region], unit="degreeC")
 
+    ## Country-level extrapolations, for mix-and-match
+    rtl_0_realizedtemperature_absolute = Parameter(index=[country], unit="degreeC")
+    rtl_0_realizedtemperature_change = Parameter(index=[country], unit="degreeC")
+    rtl_realizedtemperature_absolute = Variable(index=[time, country], unit="degreeC")
+    rtl_realizedtemperature_change = Variable(index=[time, country], unit="degreeC")
+
     function init(p, v, d)
         for rr in d.region
             v.rtl_0_baselandtemp[rr] = p.rt_g0_baseglobaltemp * p.ampf_amplification[rr]
         end
 
         # Equation 21 from Hope (2006): initial global land temperature
-        v.rtl_g0_baselandtemp = sum(v.rtl_0_baselandtemp .* p.area) / sum(p.area)
+        v.rtl_g0_baselandtemp = sum(v.rtl_0_baselandtemp .* p.area_region) / sum(p.area_region)
 
         # Inclusion of transient climate response from Hope (2009)
         v.ecs_climatesensitivity = p.tcr_transientresponse / (1. - (p.frt_warminghalflife / 70.) * (1. - exp(-70. / p.frt_warminghalflife)))
@@ -134,17 +143,24 @@
         end
 
         # Land average temperature
-        v.rtl_g_landtemperature[tt] = sum(v.rtl_realizedtemperature[tt, :]' .* p.area') / sum(p.area)
+        v.rtl_g_landtemperature[tt] = sum(v.rtl_realizedtemperature[tt, :]' .* p.area_region') / sum(p.area_region)
 
         # Ocean average temperature
-        v.rto_g_oceantemperature[tt] = (p.area_e_eartharea * v.rt_g_globaltemperature[tt] - sum(p.area) * v.rtl_g_landtemperature[tt]) / (p.area_e_eartharea - sum(p.area))
+        v.rto_g_oceantemperature[tt] = (p.area_e_eartharea * v.rt_g_globaltemperature[tt] - sum(p.area_region) * v.rtl_g_landtemperature[tt]) / (p.area_e_eartharea - sum(p.area_region))
+
+        ## Generate country-level extrapolations, for mix-and-match
+        v.rtl_realizedtemperature_change[tt, :] = regiontocountry(p.model, v.rtl_realizedtemperature[tt, :])
+        v.rtl_realizedtemperature_absolute[tt, :] = v.rtl_realizedtemperature_change[tt, :] - p.rtl_0_realizedtemperature_change[cc] + p.rtl_0_realizedtemperature_absolute[cc]
     end
 end
 
 function addclimatetemperature_pageice(model::Model, use_seaice::Bool)
     climtemp = add_comp!(model, ClimateTemperature_pageice)
 
+    climtemp[:model] = model
     climtemp[:use_seaice] = use_seaice
+    climtemp[:rtl_0_realizedtemperature_absolute] = get_countryinfo().Temp2010
+    climtemp[:rtl_0_realizedtemperature_change] = regiontocountry(model, readpagedata(model, "data/rtl_0_realizedtemperature.csv"))
 
     return climtemp
 end
