@@ -13,7 +13,7 @@ include("compute_scc.jl")
 
 include("components/RCPSSPScenario.jl")
 include("components/RFFSPScenario.jl")
-include("components/CO2emissions.jl")
+include("components/CO2emissions_national.jl")
 include("components/CO2cycle.jl")
 include("components/CO2forcing.jl")
 include("components/CH4emissions.jl")

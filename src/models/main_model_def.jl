@@ -14,6 +14,18 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         socioscenario = scenario
         socioscenario_comp = :RCPSSPScenario
     end
+    carbonpriceinfer = addcarbonpriceinfer(m)
+
+    # Socio-Economics
+    population = addpopulation(m)
+    gdp = addgdp(m)
+
+    gdp[:pop0_initpopulation_region] = population[:pop0_initpopulation_region]
+
+    abateco2 = addabatementcostsco2(m)
+
+    abateco2[:e0_baselineCO2emissions_country] = carbonpriceinfer[:e0_baselineCO2emissions_country]
+
     glotemp = addglobaltemperature(m, use_seaice)
     regtemp = addregiontemperature(m)
     if use_permafrost
@@ -37,17 +49,10 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     totalforcing = add_comp!(m, TotalForcing)
     add_comp!(m, SeaLevelRise)
 
-    # Socio-Economics
-    population = addpopulation(m)
-    gdp = add_comp!(m, GDP)
-
-    gdp[:pop0_initpopulation_region] = population[:pop0_initpopulation_region]
-
     # Abatement Costs
     addabatementcostparameters(m, :CH4)
     addabatementcostparameters(m, :N2O)
     addabatementcostparameters(m, :Lin)
-    carbonpriceinfer = addcarbonpriceinfer(m)
 
     set_param!(m, :q0propmult_cutbacksatnegativecostinfinalyear, 0.8833333333333333)
     set_param!(m, :qmax_minus_q0propmult_maxcutbacksatpositivecostinfinalyear, 1.1166666666666666)
@@ -61,7 +66,6 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
 
     set_param!(m, :automult_autonomoustechchange, .65)
 
-    abateco2 = addabatementcostsco2(m)
     addabatementcosts(m, :CH4)
     addabatementcosts(m, :N2O)
     addabatementcosts(m, :Lin)
@@ -102,7 +106,13 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
         permafrost[:perm_jul_ce_ch4] = permafrost_jules[:perm_jul_ce_ch4]
     end
 
-    co2emit[:er_CO2emissionsgrowth] = scenario[:er_CO2emissionsgrowth]
+    carbonpriceinfer[:er_CO2emissionsgrowth] = socioscenario[:er_CO2emissionsgrowth]
+
+    abateco2[:carbonprice] = carbonpriceinfer[:carbonprice]
+    abateco2[:gdp] = gdp[:gdp]
+
+    co2emit[:baselineemit] = abateco2[:baselineemit]
+    co2emit[:fracabatedcarbon] = abateco2[:fracabatedcarbon]
 
     connect_param!(m, :CO2Cycle => :e_globalCO2emissions, :co2emissions => :e_globalCO2emissions)
     connect_param!(m, :CO2Cycle => :rt_g_globaltemperature, :GlobalTemperature => :rt_g_globaltemperature)
@@ -159,11 +169,6 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     connect_param!(m, :GDP => :pop_population, :Population => :pop_population)
     connect_param!(m, :GDP => :pop_population_region, :Population => :pop_population_region)
     gdp[:grw_gdpgrowthrate] = socioscenario[:grw_gdpgrowthrate]
-
-    carbonpriceinfer[:er_CO2emissionsgrowth] = socioscenario[:er_CO2emissionsgrowth]
-
-    abateco2[:carbonprice] = carbonpriceinfer[:carbonprice]
-    abateco2[:gdp] = gdp[:gdp]
 
     for allabatement in [
         (:AbatementCostParametersCH4, :AbatementCostsCH4, :er_CH4emissionsgrowth),
@@ -251,11 +256,11 @@ function buildpage(m::Model, scenario::String, use_permafrost::Bool=true, use_se
     countrylevelnpv[:grw_gdpgrowthrate] = socioscenario[:grw_gdpgrowthrate]
     countrylevelnpv[:popgrw_populationgrowth] = socioscenario[:popgrw_populationgrowth]
 
-    connect_param!(m, :EquityWeighting => :pop_population_region, :Population => :pop_population_region)
-    connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_percap_totalcostspercap_region)
-    connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts_region)
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption_region)
-    connect_param!(m, :EquityWeighting => :cons_percap_consumption_0_region, :GDP => :cons_percap_consumption_0_region)
+    connect_param!(m, :EquityWeighting => :pop_population, :Population => :pop_population)
+    connect_param!(m, :EquityWeighting => :tct_percap_totalcosts_total, :TotalAbatementCosts => :tct_percap_totalcostspercap)
+    connect_param!(m, :EquityWeighting => :act_percap_adaptationcosts, :TotalAdaptationCosts => :act_percap_adaptationcosts)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption, :GDP => :cons_percap_consumption)
+    connect_param!(m, :EquityWeighting => :cons_percap_consumption_0, :GDP => :cons_percap_consumption_0)
     connect_param!(m, :EquityWeighting => :cons_percap_aftercosts, :SLRDamages => :cons_percap_aftercosts)
     connect_param!(m, :EquityWeighting => :rcons_percap_dis, :Discontinuity => :rcons_per_cap_DiscRemainConsumption)
     connect_param!(m, :EquityWeighting => :yagg_periodspan, :GDP => :yagg_periodspan)

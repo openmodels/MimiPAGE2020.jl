@@ -6,6 +6,8 @@ include("../utils/country_tools.jl")
     region = Index()
     country = Index()
 
+    model = Parameter{Model}()
+
     # Variables
     gdp               = Variable(index=[time, country], unit="\$M")
     gdp_region        = Variable(index=[time, region], unit="\$M")
@@ -34,7 +36,7 @@ include("../utils/country_tools.jl")
     isatg_impactfxnsaturation = Variable(unit="unitless")
 
     function init(p, v, d)
-        byregion = countrytoregion(model, sum, p.gdp0_initgdp)
+        byregion = countrytoregion(p.model, sum, p.gdp0_initgdp)
         for rr in d.region
             v.gdp0_initgdp_region[rr] = byregion[rr]
         end
@@ -77,10 +79,17 @@ include("../utils/country_tools.jl")
             v.cons_percap_consumption[t, cc] = v.cons_consumption[t, cc] / p.pop_population[t, cc]
         end
 
-        v.gdp_region[t, :] = countrytoregion(model, sum, v.gdp[t, :])
+        v.gdp_region[t, :] = countrytoregion(p.model, sum, v.gdp[t, :])
         for r in d.region
             v.cons_consumption_region[t, r] = v.gdp_region[t, r] * (1 - p.save_savingsrate / 100)
             v.cons_percap_consumption_region[t, r] = v.cons_consumption_region[t, r] / p.pop_population_region[t, r]
         end
     end
+end
+
+function addgdp(model::Model)
+    gdp = add_comp!(model, GDP)
+    gdp[:model] = model
+
+    return gdp
 end
