@@ -17,12 +17,14 @@ macs = myloadcsv("data/macs.csv")
     model = Parameter{Model}()
 
     # Driver of abatement costs
+    e0_baselineCO2emissions_country = Variable(index=[country], unit="Mtonne/year")
     e0_baselineCO2emissions = Parameter(index=[region], unit="Mtonne/year")
     bau_co2emissions = Parameter(index=[time, region], unit="%")
     er_CO2emissionsgrowth = Parameter(index=[time, region], unit="%")
 
     # Uncertainty parameters
     mac_draw = Parameter{Int64}()
+    baselineco2_uniforms = Parameter() #index=[country])
 
     ## Parameters set by init to MC values
 
@@ -49,6 +51,12 @@ macs = myloadcsv("data/macs.csv")
             macs2 = im_to_i(macs, "iso", "bs", pp.mac_draw)
         end
 
+        if all(pp.baselineco2_uniforms .== -1)
+            vv.e0_baselineCO2emissions_country[:] = readcountrydata_i_const(pp.model, "data/e0_baselineCO2emissions_country.csv", :Region, :co2mu)
+        else
+            vv.e0_baselineCO2emissions_country[:] = readcountrydata_i_dist(pp.model, "data/e0_baselineCO2emissions_country.csv", :Region, :co2mu, row -> Normal(row[:co2mu], row[:co2sd]), pp.baselineco2_uniforms)
+        end
+
         vv.ac_0_20_co2[:] = readcountrydata_i_const(pp.model, macs2, "iso", "ac_0-20_co2")
         vv.ac_20_50_co2[:] = readcountrydata_i_const(pp.model, macs2, "iso", "ac_20-50_co2")
         vv.ac_50_100_co2[:] = readcountrydata_i_const(pp.model, macs2, "iso", "ac_50-100_co2")
@@ -71,6 +79,8 @@ macs = myloadcsv("data/macs.csv")
         ac_200_500_co2 = vv.ac_200_500_co2 + vv.ac_200_500xyear_co2 * (gettime(tt) - 2000)
         ac_500_inf_co2 = vv.ac_500_inf_co2 + vv.ac_500_infxyear_co2 * (gettime(tt) - 2000)
 
+        bau_co2emissions_country = regiontocountry(pp.model, pp.bau_co2emissions[tt, :])
+
         geterdiff = function(carbonprice)
             rawtonnesabated = ac_0_20_co2 .* price2frac(carbonprice, 0, 20) +
                 ac_20_50_co2 .* price2frac(carbonprice, 20, 50) +
@@ -80,21 +90,24 @@ macs = myloadcsv("data/macs.csv")
                 ac_500_inf_co2 .* price2frac(carbonprice, 500, Inf) # MtCO2
 
             # Calculate baseline emissions
-            baselineemit = pp.e0_baselineCO2emissions .* pp.bau_co2emissions[tt, :] / 100 # Mt
+            baselineemit = vv.e0_baselineCO2emissions_country .* bau_co2emissions_country / 100 # Mt
 
-            rawfractargetabated = -sum(rawtonnesabated) / sum(baselineemit) # fraction abated
+            rawfractargetabated = -rawtonnesabated ./ baselineemit # fraction abated
             # Regularize so not over 1 and goes to 1 as p -> inf
-            regfractargetabated = rawfractargetabated ./ (exp.(-carbonprice / 500) + rawfractargetabated)
+            regfractargetabated = rawfractargetabated ./ (exp.(-carbonprice / 500) .+ rawfractargetabated)
+            regfractargetabated[rawfractargetabated .> 1.] .= rawfractargetabated[rawfractargetabated .> 1.]
 
-            return 100 * (1 - regfractargetabated) - sum(pp.e0_baselineCO2emissions .* pp.er_CO2emissionsgrowth[tt, :]) / sum(baselineemit)
+            totregfractargetabated = sum(regfractargetabated .* baselineemit) / sum(baselineemit)
+
+            return 100 * (1 - totregfractargetabated) - sum(pp.e0_baselineCO2emissions .* pp.er_CO2emissionsgrowth[tt, :]) / sum(baselineemit)
         end
 
         if geterdiff(0) < 0 # no-mitigation - emissions < 0 -> emissions > no-mitigation
             vv.carbonprice[tt, :] .= 0.
-        elseif geterdiff(2000) > 0 # full-mitigation - emissions > 0 -> emissions < $2000 price
-            vv.carbonprice[tt, :] .= 2000.
+        elseif geterdiff(3000) > 0 # full-mitigation - emissions > 0 -> emissions < $3000 price
+            vv.carbonprice[tt, :] .= 3000.
         else
-            root = find_zero(geterdiff, (0.0, 2000.0), Bisection())
+            root = find_zero(geterdiff, (0.0, 3000.0), Bisection())
             vv.carbonprice[tt, :] .= root
         end
     end
@@ -105,6 +118,7 @@ function addcarbonpriceinfer(model::Model)
 
     carbonpriceinfer[:model] = model
     carbonpriceinfer[:mac_draw] = 0
+    carbonpriceinfer[:baselineco2_uniforms] = -1. #ones(dim_count(model, :country))
     setdistinctparameter(model, :CarbonPriceInfer, :e0_baselineCO2emissions, readpagedata(model, "data/e0_baselineCO2emissions.csv"))
 
     return carbonpriceinfer
