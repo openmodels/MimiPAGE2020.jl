@@ -112,11 +112,11 @@ function getsim()
 
         # CountryLevelNPV
         rv(pref_draw) = DiscreteUniform(1, 181)
-        CountryLevelNPV.pref_draw = pref_draw
+        CountryLevelNPV_pref_draw = pref_draw
 
         # EquityWeighting
         EquityWeighting.civvalue_civilizationvalue = TriangularDist(1e10, 1e11, 5e10)
-        EquityWeighting.pref_draw = pref_draw
+        EquityWeighting_pref_draw = pref_draw
 
         # RFFSPScenario
         rv(rffsp_draw) = DiscreteUniform(1, 9400)

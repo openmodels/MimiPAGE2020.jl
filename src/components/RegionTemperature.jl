@@ -3,8 +3,8 @@ include("../utils/country_tools.jl")
 using StatsBase
 using Distributions
 
-df_patterns = CSV.read("../data/climate/patterns.csv", DataFrame)
-df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame)
+df_patterns = CSV.read(pagedata("climate/patterns.csv"), DataFrame)
+df_patterns_generic = CSV.read(pagedata("climate/patterns_generic.csv"), DataFrame)
 
 @defcomp RegionTemperature begin
     region = Index()
@@ -79,9 +79,9 @@ df_patterns_generic = CSV.read("../data/climate/patterns_generic.csv", DataFrame
     end
 end
 
-df_warmeocs = CSV.read("../data/climate/warmeocs.csv", DataFrame)
-df_gendists = CSV.read("../data/climate/gendists.csv", DataFrame)
-df_gmstcmip = CSV.read("../data/climate/gmsts.csv", DataFrame)
+df_warmeocs = CSV.read(pagedata("climate/warmeocs.csv"), DataFrame)
+df_gendists = CSV.read(pagedata("climate/gendists.csv"), DataFrame)
+df_gmstcmip = CSV.read(pagedata("climate/gmsts.csv"), DataFrame)
 
 function get_pattern(prcile)
     row = round(Int64, prcile * (nrow(df_warmeocs) - .01) + .505)
@@ -106,7 +106,7 @@ function addregiontemperature(model::Model)
     climtemp[:model] = model
     climtemp[:area] = readcountrydata_i_const(model, get_countryinfo(), :ISO3, :LandArea)
     climtemp[:prcile] = -1 # means, use the generic number
-    climtemp[:rtl_0_realizedtemperature_absolute] = (get_countryinfo().Temp1980 + get_countryinfo().Temp2010) / 2
+    climtemp[:rtl_0_realizedtemperature_absolute] = get_countryinfo().Temp2010
     climtemp[:rtl_0_realizedtemperature_change] = regiontocountry(model, readpagedata(model, "data/rtl_0_realizedtemperature.csv"))
 
     return climtemp

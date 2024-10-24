@@ -26,18 +26,6 @@ add_save!(mcs, (:Discontinuity, :isat_per_cap_DiscImpactperCapinclSaturation))
 output_path = "output"
 res = run(mcs, model, mcnum; trials_output_filename=joinpath(output_path, "trialdata.csv"), results_output_dir=output_path)
 
-outs = compute_scc(model, year=2020, seed=20240528, n=mcnum);
-CSV.write("allscc-drupp.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
-
-outs = compute_scc(model, year=2020, prefrange=false, seed=20240528, n=mcnum);
-CSV.write("allscc-nodrupp.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
-
-outs = compute_scc(model, year=2050, prefrange=false, seed=20240528, n=mcnum);
-CSV.write("allscc-nodrupp-2050.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
-
-outs = compute_scc(model, year=2100, prefrange=false, seed=20240528, n=mcnum);
-CSV.write("allscc-nodrupp-2100.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
-
 model = getpage("RCP2.6 & SSP1")
 run(model)
 df = getdataframe(model, :CountryLevelNPV, :wit_percap_equityweightedimpact)

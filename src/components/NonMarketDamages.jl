@@ -2,8 +2,10 @@ include("../utils/country_tools.jl")
 
 @defcomp NonMarketDamages begin
     region = Index()
+    country = Index()
 
     model = Parameter{Model}()
+    use_pageiceconfig = Parameter{Bool}()
     y_year = Parameter(index=[time], unit="year")
 
     # incoming parameters from Climate
@@ -54,9 +56,15 @@ include("../utils/country_tools.jl")
                 v.i_regionalimpact[t,cc] = p.rtl_realizedtemperature_change[t,cc] - atl_adjustedtolerableleveloftemprise_country[cc]
             end
 
-            v.iref_ImpactatReferenceGDPperCap[t,cc] = wincf_weightsfactor_nonmarket_country[cc] *
-                ((p.w_NonImpactsatCalibrationTemp + p.iben_NonMarketInitialBenefit * p.tcal_CalibrationTemp) *
-                    (v.i_regionalimpact[t,cc] * (p.rt_g_globaltemperature[t] / p.rtl_g_landtemperature[t]) / p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact[t,cc] * p.iben_NonMarketInitialBenefit) # (beta + alpha * 3) * (T / 3)^2 - alpha * T => ((beta + alpha * 3) - alpha * 3
+            if p.use_pageiceconfig
+                v.iref_ImpactatReferenceGDPperCap[t,cc] = p.wincf_weightsfactor_nonmarket[cc] *
+                    ((p.w_NonImpactsatCalibrationTemp + p.iben_NonMarketInitialBenefit * p.tcal_CalibrationTemp) *
+                     (v.i_regionalimpact[t,cc] / p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact[t,cc] * p.iben_NonMarketInitialBenefit)
+            else
+                v.iref_ImpactatReferenceGDPperCap[t,cc] = wincf_weightsfactor_nonmarket_country[cc] *
+                    ((p.w_NonImpactsatCalibrationTemp + p.iben_NonMarketInitialBenefit * p.tcal_CalibrationTemp) *
+                     (v.i_regionalimpact[t,cc] * (p.rt_g_globaltemperature[t] / p.rtl_g_landtemperature[t]) / p.tcal_CalibrationTemp)^p.pow_NonMarketExponent - v.i_regionalimpact[t,cc] * p.iben_NonMarketInitialBenefit) # (beta + alpha * 3) * (T / 3)^2 - alpha * T => ((beta + alpha * 3) - alpha * 3
+            end
 
             v.igdp_ImpactatActualGDPperCap[t,cc] = v.iref_ImpactatReferenceGDPperCap[t,cc] *
                 (p.rgdp_per_cap_MarketRemainGDP[t,cc] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_NonMarketIncomeFxnExponent
@@ -91,12 +99,17 @@ end
 # Still need this function in order to set the parameters than depend on
 # readpagedata, which takes model as an input. These cannot be set using
 # the default keyword arg for now.
-function addnonmarketdamages(model::Model, use_page09weights::Bool=false)
+function addnonmarketdamages(model::Model, use_page09weights::Bool=false; use_pageiceconfig::Bool=false)
     nonmarketdamagescomp = add_comp!(model, NonMarketDamages)
     nonmarketdamagescomp[:model] = model
 
     nonmarketdamagescomp[:impmax_maxtempriseforadaptpolicyNM] = readpagedata(model, "data/impmax_noneconomic.csv")
     nonmarketdamagescomp[:wincf_weightsfactor_nonmarket] = readpagedata(model, "data/wincf_weightsfactor_nonmarket.csv")
+    nonmarketdamagescomp[:use_pageiceconfig] = use_pageiceconfig
+    if use_pageiceconfig
+        nonmarketdamagescomp[:w_NonImpactsatCalibrationTemp] = 0.6333333333333333
+        nonmarketdamagescomp[:pow_NonMarketExponent] = 2.1666666666666665
+    end
 
     return nonmarketdamagescomp
 end
