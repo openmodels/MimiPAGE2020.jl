@@ -16,8 +16,8 @@
     grw_gdpgrowthrate_ann = Variable(index=[year, region], unit="%/year")                                   # interpolation
     gdp_0             = Parameter(index=[region], unit="\$M") # GDP in y_year_0
     save_savingsrate  = Parameter(unit="%", default=15.00) # pp33 PAGE09 documentation, "savings rate".
-    pop_population    = Parameter(index=[time,region], unit="million person")
-    pop_population_ann = Variable(index=[year, region], unit="million person")                              # interpolation
+    pop_population_region    = Parameter(index=[time,region], unit="million person")
+    pop_population_region_ann = Variable(index=[year, region], unit="million person")                              # interpolation
 
     ###############################################
     # Growth Effects - additional variables and parameters
@@ -64,7 +64,7 @@ function interpolate_parameters_gdp(p, v, d, t)
             yr = annual_year - 2015 + 1
             for r in d.region
 
-                v.pop_population_ann[yr, r] = p.pop_population[t, r]
+                v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r]
                 v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r]
 
             end
@@ -77,25 +77,25 @@ function interpolate_parameters_gdp(p, v, d, t)
 
             for r in d.region
                 if use_linear
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r] * fraction_timestep + p.pop_population[t - 1, r] * (1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r] * fraction_timestep + p.pop_population_region[t - 1, r] * (1 - fraction_timestep)
                     v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r] * fraction_timestep + p.grw_gdpgrowthrate[t - 1, r] * (1 - fraction_timestep)
                 elseif use_logburke
-                    ## fully linear (partially because everything except for pop_population causes imaginary numbers (due to negative numbers)).
+                    ## fully linear (partially because everything except for pop_population_region causes imaginary numbers (due to negative numbers)).
                     # linear
                     v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r] * fraction_timestep + p.grw_gdpgrowthrate[t - 1, r] * (1 - fraction_timestep)
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r] * fraction_timestep + p.pop_population[t - 1, r] * (1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r] * fraction_timestep + p.pop_population_region[t - 1, r] * (1 - fraction_timestep)
                 elseif use_logpopulation
                     # linear
                     v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r] * fraction_timestep + p.grw_gdpgrowthrate[t - 1, r] * (1 - fraction_timestep)
 
                     # log
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r]^fraction_timestep * p.pop_population[t - 1, r]^(1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r]^fraction_timestep * p.pop_population_region[t - 1, r]^(1 - fraction_timestep)
                 elseif use_logwherepossible
                     # linear
                     v.grw_gdpgrowthrate_ann[yr, r] = p.grw_gdpgrowthrate[t, r] * fraction_timestep + p.grw_gdpgrowthrate[t - 1, r] * (1 - fraction_timestep)
 
                     # log
-                    v.pop_population_ann[yr, r] = p.pop_population[t, r]^fraction_timestep * p.pop_population[t - 1, r]^(1 - fraction_timestep)
+                    v.pop_population_region_ann[yr, r] = p.pop_population_region[t, r]^fraction_timestep * p.pop_population_region[t - 1, r]^(1 - fraction_timestep)
                 else
                     error("NO INTERPOLATION METHOD SELECTED! Specify linear or logarithmic interpolation.")
                 end
@@ -118,7 +118,7 @@ function calc_gdp(p, v, d, t, annual_year)
             v.gdp_leveleffect_ann[yr,r] = v.gdp_ann[yr,r]
 
             v.cons_consumption_ann[yr, r] = v.gdp_ann[yr, r] * (1 - p.save_savingsrate / 100)
-            v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_ann[yr, r]
+            v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_region_ann[yr, r]
 
         elseif isequal(gettime(t), 2030)
             v.grwnet_realizedgdpgrowth_ann[yr,r] = v.grw_gdpgrowthrate_ann[yr,r] - p.ge_growtheffects * p.isat_ImpactinclSaturationandAdaptation_ann[6,r]
@@ -126,18 +126,18 @@ function calc_gdp(p, v, d, t, annual_year)
             v.gdp_leveleffect_ann[yr,r] = v.gdp_leveleffect_ann[yr - 1, r] *  (1 + (v.grw_gdpgrowthrate_ann[yr,r] / 100))^(p.y_year_ann[yr] - p.y_year_ann[yr - 1])
 
             v.cons_consumption_ann[yr, r] = v.gdp_ann[yr, r] * (1 - p.save_savingsrate / 100)
-            v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_ann[yr, r]
+            v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_region_ann[yr, r]
 
             # let boundary take effect if pc consumption is in the neighbourhood of the boundary
             if p.use_convergence == 1.
                 if v.cons_percap_consumption_ann[yr,r] >= p.cbabsn_pcconsumptionbound_neighbourhood
                     v.cbreg_regionsatbound_ann[yr,r] = 0.
                     v.cons_consumption_noconvergence_ann[yr,r] = v.cons_consumption_ann[yr,r]
-                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_ann[yr,r]
+                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_region_ann[yr,r]
                 else
                     # calculate the consumption level if there was no convergence system
                     v.cons_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr - 1, r] * (1 + (v.grwnet_realizedgdpgrowth_ann[yr,r] / 100))^(p.y_year_ann[yr] - p.y_year_ann[yr - 1])
-                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_ann[yr,r]
+                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_region_ann[yr,r]
 
                     # send the pc cconsumption on a logistic path convergenging against the bound
                     v.cons_percap_consumption_ann[yr,r] = p.cbabsn_pcconsumptionbound_neighbourhood - 0.5 * p.cbaux1_pcconsumptionbound_auxiliary1 +
@@ -147,7 +147,7 @@ function calc_gdp(p, v, d, t, annual_year)
                                                                                     (v.cons_percap_consumption_noconvergence_ann[yr,r] - p.cbabsn_pcconsumptionbound_neighbourhood)))
 
                 # recalculate all variables accordingly
-                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_ann[yr,r]
+                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_region_ann[yr,r]
                     v.gdp_ann[yr, r] = v.cons_consumption_ann[yr, r] / (1 - p.save_savingsrate / 100)
                     v.grwnet_realizedgdpgrowth_ann[yr,r] = 100 * ((v.gdp_ann[yr, r] / v.gdp_ann[yr - 1, r])^(1 / (p.y_year_ann[yr] - p.y_year_ann[yr - 1])) - 1)
 
@@ -159,7 +159,7 @@ function calc_gdp(p, v, d, t, annual_year)
                     v.cons_percap_consumption_ann[yr,r] = p.cbabs_pcconsumptionbound
 
                     # recalculate all variables accordingly
-                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_ann[yr,r]
+                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_region_ann[yr,r]
                     v.gdp_ann[yr, r] = v.cons_consumption_ann[yr, r] / (1 - p.save_savingsrate / 100)
                     v.grwnet_realizedgdpgrowth_ann[yr,r] = 100 * ((v.gdp_ann[yr, r] / v.gdp_ann[yr - 1, r])^(1 / (p.y_year_ann[yr] - p.y_year_ann[yr - 1])) - 1)
 
@@ -175,18 +175,18 @@ function calc_gdp(p, v, d, t, annual_year)
             v.gdp_leveleffect_ann[yr,r] = v.gdp_leveleffect_ann[yr - 1, r] *  (1 + (v.grw_gdpgrowthrate_ann[yr,r] / 100))^(p.y_year_ann[yr] - p.y_year_ann[yr - 1])
 
             v.cons_consumption_ann[yr, r] = v.gdp_ann[yr, r] * (1 - p.save_savingsrate / 100)
-            v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_ann[yr, r]
+            v.cons_percap_consumption_ann[yr, r] = v.cons_consumption_ann[yr, r] / v.pop_population_region_ann[yr, r]
 
             # let boundary take effect if pc consumption is in the neighbourhood of the boundary
             if p.use_convergence == 1.
                 if v.cons_percap_consumption_ann[yr,r] >= p.cbabsn_pcconsumptionbound_neighbourhood
                     v.cbreg_regionsatbound_ann[yr,r] = 0.
                     v.cons_consumption_noconvergence_ann[yr,r] = v.cons_consumption_ann[yr,r]
-                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_ann[yr,r]
+                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_region_ann[yr,r]
                 else
                     # calculate the consumption level if there was no convergence system
                     v.cons_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr - 1, r] * (1 + (v.grwnet_realizedgdpgrowth_ann[yr,r] / 100))^(p.y_year_ann[yr] - p.y_year_ann[yr - 1])
-                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_ann[yr,r]
+                    v.cons_percap_consumption_noconvergence_ann[yr,r] = v.cons_consumption_noconvergence_ann[yr,r] / v.pop_population_region_ann[yr,r]
 
                     # send the pc cconsumption on a logistic path convergenging against the bound
                     v.cons_percap_consumption_ann[yr,r] = p.cbabsn_pcconsumptionbound_neighbourhood - 0.5 * p.cbaux1_pcconsumptionbound_auxiliary1 +
@@ -196,7 +196,7 @@ function calc_gdp(p, v, d, t, annual_year)
                                                                                     (v.cons_percap_consumption_noconvergence_ann[yr,r] - p.cbabsn_pcconsumptionbound_neighbourhood)))
 
                 # recalculate all variables accordingly
-                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_ann[yr,r]
+                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_region_ann[yr,r]
                     v.gdp_ann[yr, r] = v.cons_consumption_ann[yr, r] / (1 - p.save_savingsrate / 100)
                     v.grwnet_realizedgdpgrowth_ann[yr,r] = 100 * ((v.gdp_ann[yr, r] / v.gdp_ann[yr - 1, r])^(1 / (p.y_year_ann[yr] - p.y_year_ann[yr - 1])) - 1)
 
@@ -208,7 +208,7 @@ function calc_gdp(p, v, d, t, annual_year)
                     v.cons_percap_consumption_ann[yr,r] = p.cbabs_pcconsumptionbound
 
                     # recalculate all variables accordingly
-                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_ann[yr,r]
+                    v.cons_consumption_ann[yr, r] = v.cons_percap_consumption_ann[yr,r] * v.pop_population_region_ann[yr,r]
                     v.gdp_ann[yr, r] = v.cons_consumption_ann[yr, r] / (1 - p.save_savingsrate / 100)
                     v.grwnet_realizedgdpgrowth_ann[yr,r] = 100 * ((v.gdp_ann[yr, r] / v.gdp_ann[yr - 1, r])^(1 / (p.y_year_ann[yr] - p.y_year_ann[yr - 1])) - 1)
 

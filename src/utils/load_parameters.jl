@@ -77,6 +77,9 @@ function load_parameters(model::Model; lowpass::Bool=false)
 
     parameter_directory = joinpath(dirname(@__FILE__), "..", "..", "data")
     for file in filter(q -> splitext(q)[2] == ".csv", readdir(parameter_directory))
+        if file in ["bycountry.csv", "countryregions.csv", "burkey-estimates.csv", "inform-combined.csv", "aggregates.csv", "macs.csv", "e0_baselineCO2emissions_country.csv"]
+            continue
+        end
         parametername = splitext(file)[1]
         filepath = joinpath(parameter_directory, file)
 
@@ -85,5 +88,8 @@ function load_parameters(model::Model; lowpass::Bool=false)
     if lowpass
         parameters["ge_empirical_distribution"] = readpagedata(model, joinpath(parameter_directory, "ge_empirical_distribution_lowpass.csv"))
     end
+    parameters_country = loadparameters_country(model)
+    parameters = merge(parameters, parameters_country)
+
     return parameters
 end

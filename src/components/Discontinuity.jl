@@ -1,21 +1,24 @@
-@defcomp Discontinuity begin
+include("../utils/country_tools.jl")
 
-    region = Index()
+@defcomp Discontinuity begin
+    country = Index()
+
+    model = Parameter{Model}()
     y_year = Parameter(index=[time], unit="year")
     y_year_0 = Parameter(unit="year")
 
     rand_discontinuity = Parameter(unit="unitless", default=.5)
 
-    irefeqdis_eqdiscimpact = Variable(index=[region], unit="%")
+    irefeqdis_eqdiscimpact = Variable(index=[country], unit="%")
     wincf_weightsfactor_sea = Parameter(index=[region], unit="")
     wdis_gdplostdisc = Parameter(unit="%", default=3.)
 
-    igdpeqdis_eqdiscimpact = Variable(index=[time,region], unit="%")
-    rgdp_per_cap_NonMarketRemainGDP = Parameter(index=[time,region], unit="\$/person")
+    igdpeqdis_eqdiscimpact = Variable(index=[time,country], unit="%")
+    rgdp_per_cap_NonMarketRemainGDP = Parameter(index=[time,country], unit="\$/person")
     GDP_per_cap_focus_0_FocusRegionEU = Parameter(unit="\$/person", default=34298.93698672955)
     ipow_incomeexponent = Parameter(unit="unitless", default=-0.13333333333333333)
 
-    igdp_realizeddiscimpact = Variable(index=[time,region], unit="%")
+    igdp_realizeddiscimpact = Variable(index=[time,country], unit="%")
     occurdis_occurrencedummy = Variable(index=[time], unit="unitless")
     expfdis_discdecay = Variable(index=[time], unit="unitless")
 
@@ -27,11 +30,11 @@
     pdis_probability = Parameter(unit="%/degreeC", default=20.)
 
     isatg_saturationmodification = Parameter(unit="unitless")
-    isat_satdiscimpact = Variable(index=[time,region], unit="%")
+    isat_satdiscimpact = Variable(index=[time,country], unit="%")
 
-    isat_per_cap_DiscImpactperCapinclSaturation = Variable(index=[time,region], unit="\$/person")
-    rcons_per_cap_DiscRemainConsumption = Variable(index=[time, region], unit="\$/person")
-    rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, region], unit="\$/person")
+    isat_per_cap_DiscImpactperCapinclSaturation = Variable(index=[time,country], unit="\$/person")
+    rcons_per_cap_DiscRemainConsumption = Variable(index=[time, country], unit="\$/person")
+    rcons_per_cap_NonMarketRemainConsumption = Parameter(index=[time, country], unit="\$/person")
 
     function run_timestep(p, v, d, t)
 
@@ -55,24 +58,34 @@
             v.expfdis_discdecay[t] = exp(-(p.y_year[t] - p.y_year[t - 1]) / p.distau_discontinuityexponent)
         end
 
-        for r in d.region
-            v.irefeqdis_eqdiscimpact[r] = p.wincf_weightsfactor_sea[r] * p.wdis_gdplostdisc
+        wincf_weightsfactor_sea_country = regiontocountry(p.model, p.wincf_weightsfactor_sea)
 
-            v.igdpeqdis_eqdiscimpact[t,r] = v.irefeqdis_eqdiscimpact[r] * (p.rgdp_per_cap_NonMarketRemainGDP[t,r] / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
+        for cc in d.country
+            v.irefeqdis_eqdiscimpact[cc] = wincf_weightsfactor_sea_country[cc] * p.wdis_gdplostdisc
+
+            v.igdpeqdis_eqdiscimpact[t,cc] = v.irefeqdis_eqdiscimpact[cc] * ((p.rgdp_per_cap_NonMarketRemainGDP[t,cc] < 0 ? 0 : p.rgdp_per_cap_NonMarketRemainGDP[t,cc]) / p.GDP_per_cap_focus_0_FocusRegionEU)^p.ipow_incomeexponent
 
             if is_first(t)
-                v.igdp_realizeddiscimpact[t,r] = v.occurdis_occurrencedummy[t] * (1 - v.expfdis_discdecay[t]) * v.igdpeqdis_eqdiscimpact[t,r]
+                v.igdp_realizeddiscimpact[t,cc] = v.occurdis_occurrencedummy[t] * (1 - v.expfdis_discdecay[t]) * v.igdpeqdis_eqdiscimpact[t,cc]
             else
-                v.igdp_realizeddiscimpact[t,r] = v.igdp_realizeddiscimpact[t - 1,r] + v.occurdis_occurrencedummy[t] * (1 - v.expfdis_discdecay[t]) * (v.igdpeqdis_eqdiscimpact[t,r] - v.igdp_realizeddiscimpact[t - 1,r])
+                v.igdp_realizeddiscimpact[t,cc] = v.igdp_realizeddiscimpact[t - 1,cc] + v.occurdis_occurrencedummy[t] * (1 - v.expfdis_discdecay[t]) * (v.igdpeqdis_eqdiscimpact[t,cc] - v.igdp_realizeddiscimpact[t - 1,cc])
             end
 
-            if v.igdp_realizeddiscimpact[t,r] < p.isatg_saturationmodification
-                v.isat_satdiscimpact[t,r] = v.igdp_realizeddiscimpact[t,r]
+            if v.igdp_realizeddiscimpact[t,cc] < p.isatg_saturationmodification
+                v.isat_satdiscimpact[t,cc] = v.igdp_realizeddiscimpact[t,cc]
             else
-                v.isat_satdiscimpact[t,r] = p.isatg_saturationmodification + (100 - p.isatg_saturationmodification) * ((v.igdp_realizeddiscimpact[t,r] - p.isatg_saturationmodification) / ((100 - p.isatg_saturationmodification) + (v.igdp_realizeddiscimpact[t,r] - p.isatg_saturationmodification)))
+                v.isat_satdiscimpact[t,cc] = p.isatg_saturationmodification + (100 - p.isatg_saturationmodification) * ((v.igdp_realizeddiscimpact[t,cc] - p.isatg_saturationmodification) / ((100 - p.isatg_saturationmodification) + (v.igdp_realizeddiscimpact[t,cc] - p.isatg_saturationmodification)))
             end
-            v.isat_per_cap_DiscImpactperCapinclSaturation[t,r] = (v.isat_satdiscimpact[t,r] / 100) * p.rgdp_per_cap_NonMarketRemainGDP[t,r]
-            v.rcons_per_cap_DiscRemainConsumption[t,r] = p.rcons_per_cap_NonMarketRemainConsumption[t,r] - v.isat_per_cap_DiscImpactperCapinclSaturation[t,r]
+            v.isat_per_cap_DiscImpactperCapinclSaturation[t,cc] = (v.isat_satdiscimpact[t,cc] / 100) * p.rgdp_per_cap_NonMarketRemainGDP[t,cc]
+            v.rcons_per_cap_DiscRemainConsumption[t,cc] = p.rcons_per_cap_NonMarketRemainConsumption[t,cc] - v.isat_per_cap_DiscImpactperCapinclSaturation[t,cc]
         end
     end
+end
+
+function adddiscontinuity(model::Model)
+    discontinuity = add_comp!(model, Discontinuity)
+
+    discontinuity[:model] = model
+
+    discontinuity
 end
