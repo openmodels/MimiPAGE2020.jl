@@ -11,6 +11,7 @@ model = getpage(use_rffsp=true)
 run(model)
 
 rcons = getdataframe(model, :Discontinuity, :rcons_per_cap_DiscRemainConsumption)
+co2emit = getdataframe(model, :co2emissions, :e_countryCO2emissions)
 
 discounting = 0.03
 times = unique(rcons.time)
@@ -19,8 +20,13 @@ timediff = [5; diff(times)]
 result = DataFrame(iso=unique(rcons.country))
 result[!, :npv_consutil] = [sum(timediff .* exp.(-discounting * (times .- 2020)) .* log.(rcons.rcons_per_cap_DiscRemainConsumption[rcons.country .== iso])) for iso in result.iso]
 
-function get_capital(filepath)
-    df = CSV.read(filepath, DataFrame)
+# 190 exp(B (2080 - 2020)) = 410 => log(190) + 60 B = log(410) => B = 0.00556717092
+## scc = 190 * exp.(0.00556717092 * (times .- 2020))
+scc = 283 # From Moore et al. 2024
+result[!, :ccdmg] = [scc .* 1e6 .* co2emit.e_countryCO2emissions[(co2emit.country .== iso) .& (co2emit.time .== 2020)][1] for iso in result.iso]
+
+function get_capital(filepath; missingstring="NA")
+    df = CSV.read(filepath, DataFrame, missingstring=missingstring)
 
     df.Country[df.Country .== "Bolivia (Plurinational State of)"] .= "Bolivia"
     df.Country[df.Country .== "Congo"] .= "Congo, Rep."
@@ -50,7 +56,7 @@ end
 a1 = get_capital("/Users/admin/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses/data/capital/tabula-A1-nonrenewable.csv")
 a2 = get_capital("/Users/admin/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses/data/capital/tabula-A2-renewable.csv")
 bb = get_capital("/Users/admin/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses/data/capital/tabula-B-human.csv")
-cc = get_capital("/Users/admin/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses/data/capital/tabula-C-produced.csv")
+cc = get_capital("/Users/admin/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses/data/capital/tabula-C-produced.csv", missingstring="")
 xf = DataFrame(load("/Users/admin/Library/CloudStorage/GoogleDrive-jrising@udel.edu/My Drive/Research/Current Losses/data/capital/API_SP.POP.TOTL_DS2_en_excel_v2_5871620.xls", "Data", skipstartrows=3))
 
 function add_xf(df)
@@ -87,9 +93,13 @@ end
 function extrap2100_num(row)
     xxs = [1990, 1995, 2000, 2005, 2010, 2014]
     yys = log.([row["1990"], row["1995"], row["2000"], row["2005"], row["2010"], row["2014"]])
+    keep = .!ismissing.(yys)
+    if sum(keep) == 0
+        return missing
+    end
 
-    mod = lm(@formula(yys ~ xxs), DataFrame(xxs=xxs, yys=yys))
-    corr = var(predict(mod, DataFrame(xxs=xxs)) .- yys) / 2
+    mod = lm(@formula(yys ~ xxs), DataFrame(xxs=xxs[keep], yys=yys[keep]))
+    corr = var(predict(mod, DataFrame(xxs=xxs[keep])) .- yys[keep]) / 2
     return exp(predict(mod, DataFrame(xxs=2100))[1] + corr)
 end
 
@@ -106,19 +116,21 @@ end
 
 function frac2100(row)
     in2100 = extrap2100(row)
-    maxnow = maximum(exp.(yys))
+    expyys = [row["1990"], row["1995"], row["2000"], row["2005"], row["2010"], row["2014"]]
+    maxnow = maximum(expyys)
 
     return min(in2100 / maxnow, 1)
 end
 
 function frac2100_num(row)
     in2100 = extrap2100_num(row)
-    maxnow = maximum(exp.(yys))
+    expyys = [row["1990"], row["1995"], row["2000"], row["2005"], row["2010"], row["2014"]]
+    maxnow = maximum(expyys)
 
     return min(in2100 / maxnow, 1)
 end
 
-a1[!, :frac2100] = [frac2100(row) for row in eachrow(a1)]
+a1[!, :frac2100] = [frac2100_num(row) for row in eachrow(a1)]
 a2[!, :frac2100] = [frac2100_num(row) for row in eachrow(a2)]
 bbxf[!, :npv2100] = [npv_num(row) for row in eachrow(bbxf)]
 ccxf[!, :npv2100] = [npv_num(row) for row in eachrow(ccxf)]
@@ -148,7 +160,7 @@ result2.latest_life = Vector{Union{Float64, Missing}}(result2.latest_life)
 
 CSV.write("/Users/admin/projects/strategy/countries.csv", result2)
 
-XX = result2[!, [2; 4:9; 11:ncol(result2)]]
+XX = result2[!, [2; 3; 5:10; 12:ncol(result2)]]
 R"""
 library(mice)
 impObject <- mice($(XX), method="cart")
