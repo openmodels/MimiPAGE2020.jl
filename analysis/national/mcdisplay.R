@@ -288,3 +288,40 @@ ggplot(df.gdp2, aes(time, mu)) +
     geom_ribbon(aes(ymin=ci25, ymax=ci75), alpha=.5) +
     geom_line() +
     theme_bw() + scale_x_continuous(NULL, expand=c(0, 0)) + ylab("GDP per capita")
+
+## Bars for each damage component
+df.gdp <- read.csv(file.path("output", "GDP_cons_percap_consumption.csv"))
+df.pop <- read.csv(file.path("output", "Population_pop_population.csv"))
+
+get.pwts.bygdp <- function(filename) {
+    df <- read.csv(file.path("output", filename))
+    df2 <- df %>% left_join(df.gdp, by=c('time', 'country', 'trialnum')) %>%
+        left_join(df.pop, by=c('time', 'country', 'trialnum'))
+    names(df2)[3] <- 'var'
+    df2 %>% group_by(trialnum, time) %>%
+        summarize(var.bygdp.pw=sum(var / cons_percap_consumption * pop_population) / sum(pop_population), na.rm=T) %>%
+        group_by(time) %>% summarize(mu=median(var.bygdp.pw, na.rm=T),
+                                     ci25=quantile(var.bygdp.pw, .25, na.rm=T),
+                                     ci75=quantile(var.bygdp.pw, .75, na.rm=T))
+}
+
+
+df1 <- get.pwts.bygdp("MarketDamagesBurke_isat_per_cap_ImpactperCapinclSaturationandAdaptation.csv")
+df2 <- get.pwts.bygdp("NonMarketDamages_isat_per_cap_ImpactperCapinclSaturationandAdaptation.csv")
+df3 <- get.pwts.bygdp("SLRDamages_d_percap_slr.csv")
+df4 <- get.pwts.bygdp("Discontinuity_isat_per_cap_DiscImpactperCapinclSaturation.csv")
+df5 <- get.pwts.bygdp("CountryLevelNPV_wit_percap_equityweightedimpact.csv")
+
+pdf <- rbind(cbind(df1, group="Market damages"),
+             cbind(df2, group="Non-market damages"),
+             cbind(df3, group="Sea-level rise damages"),
+             cbind(df4, group="Catastrophic damages"))
+pdf$group <- factor(pdf$group, levels=rev(c("Sea-level rise damages", "Market damages", "Non-market damages", "Catastrophic damages")))
+
+ggplot(pdf, aes(time, mu)) +
+    geom_col(aes(fill=group)) +
+    geom_point(data=df5, aes(colour='Welfare-weighted')) +
+    theme_bw() + scale_y_continuous(labels=scales::percent) +
+    ylab("Population-weighted Damages (% GDP-equivalent)") + scale_fill_discrete(name="Damage component") +
+    scale_colour_manual(NULL, values='black') +
+    xlab(NULL)

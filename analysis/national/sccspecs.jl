@@ -16,7 +16,7 @@ outs = compute_scc(model, year=2020, prefrange=false, seed=20240528, n=mcnum);
 CSV.write("allscc-nodrupp.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))
 
 ## Experiment: Different pulse years
-pulseyears = [2050, 2100]
+pulseyears = [2030, 2050, 2100]
 for pulseyear in pulseyears
     outs = compute_scc(model, year=pulseyear, seed=20240528, n=mcnum);
     CSV.write("allscc-$(pulseyear)-v2.csv", vcat(outs.scc_disaggregated, DataFrame(country="global", td_totaldiscountedimpacts=missing, scc=outs.scc)))

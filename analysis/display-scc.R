@@ -1,6 +1,6 @@
 setwd("~/research/iamup2/MimiPAGE2020.jl/analysis")
 
-sccs <- read.csv("national/allscc-nodrupp.csv")
+sccs <- read.csv("../output/allscc-nodrupp.csv")
 
 library(ggplot2)
 library(scales)
@@ -16,7 +16,7 @@ mean(sccs$scc[sccs$country == 'KOR'])
 ggplot(subset(sccs, country == "KOR"), aes(scc)) +
     geom_histogram()
 
-sccs2 <- read.csv("national/allscc.csv")
+sccs2 <- read.csv("../output/allscc.csv")
 ggplot(subset(sccs2, country == "KOR"), aes(scc)) +
     geom_histogram()
 
@@ -51,3 +51,19 @@ sum((subset(sccs, country != "global") %>% group_by(country) %>% summarize(scc.m
 
 sccs <- read.csv("../src/allscc-nodrupp-2100.csv")
 sum((subset(sccs, country != "global") %>% group_by(country) %>% summarize(scc.mu=mean(scc)))$scc.mu)
+
+sccs <- read.csv("../output/allscc-2100-v2.csv")
+topcolval <- quantile((sccs %>% group_by(country) %>% summarize(scc=median(scc, na.rm=T)))$scc, .995)
+
+gp <- make.map(sccs %>% group_by(country) %>% summarize(scc=median(scc, na.rm=T)),
+               'country', 'scc', "Social Cost of Carbon\n(2015 USD / t CO2)", topcolval=topcolval) +
+    scale_fill_distiller("Social Cost of Carbon\n(2015 USD / t CO2)", limits=c(0.01, topcolval), breaks=c(0.01, 0.1, 1, 10, 100), palette="YlOrRd", direction=1, labels=scales::comma, trans='log10')
+ggsave("national/sccmap-2100.pdf", width=10, height=5.5)
+
+sccs <- read.csv("../output/allscc.csv")
+
+gp <- make.map(sccs %>% group_by(country) %>% summarize(scc=median(scc, na.rm=T)),
+               'country', 'scc', "Social Cost of Carbon\n(2015 USD / t CO2)", topcolval=topcolval) +
+    scale_fill_distiller("Social Cost of Carbon\n(2015 USD / t CO2)", limits=c(0.01, topcolval), breaks=c(0.01, 0.1, 1, 10, 100), palette="YlOrRd", direction=1, labels=scales::comma, trans='log10')
+ggsave("national/sccmap-col2100.pdf", width=10, height=5.5)
+
